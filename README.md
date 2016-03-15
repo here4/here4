@@ -2,7 +2,10 @@
 
 Drive dreambuggy on mountains, snow and sand. Fly dreambird.
 
-Supports USB gamepads. You may need to unplug and replug it in after reloading the page for your browser to recognize it. Raise an issue if yours doesn't work.
+Plug in a gamepad, or use mouse and keyboard arrows or WASD keys to move.
+Press X to switch between driving and flying.
+
+Supports up to 2 USB gamepads.
 
 ## Play in your browser
 
