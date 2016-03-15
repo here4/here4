@@ -58,6 +58,9 @@ demoThings terrain0 =
 
         seed0 = Random.initialSeed 7777
 
+        ground = Signal.constant <| Terrain.paint Terrain.mountains defaultPlacement terrain0
+        water = Signal.constant <| Terrain.ripplePaint Terrain.sea 0.3 defaultPlacement terrain0
+
 {-
         (rands, seed1) = Random.generate (Random.list 100 (Random.float 0.0 1.0)) seed0
 
@@ -81,6 +84,7 @@ demoThings terrain0 =
 
         -- boids = foldTCont boidsTCont boids0 (fps 60)
 
+{-
         (balls0, seed2) = Random.generate (Random.list 15 randomDrop) seed1
 
         ballsTCont = composeTCont moveBoids moveDrops
@@ -91,9 +95,6 @@ demoThings terrain0 =
         -- balls = List.map extractThing <~ foldTCont (simpleTCont moveDrops) balls0 (fps 60)
 
         balls = List.map extractThing <~ foldTCont ballsTCont balls0 (fps 60)
-
-        ground = Signal.constant <| Terrain.paint Terrain.mountains defaultPlacement terrain0
-        water = Signal.constant <| Terrain.ripplePaint Terrain.sea 0.3 defaultPlacement terrain0
 
         individuals : Signal (List Thing)
         individuals = combine [
@@ -106,5 +107,7 @@ demoThings terrain0 =
             -- lift2 (\y e -> place 0 y 0 e) s fireCube,
             place  10 1.5 -10 <~ (extractThing <~ fogMountainsCube)
             ]
+-}
     in
-        gather [ground, water, individuals, boids, balls]
+        -- gather [ground, water, individuals, boids, balls]
+        gather [ground, water, boids]
