@@ -72,7 +72,7 @@ seeSurface vertexShader fragmentShader mesh p =
             { iResolution=resolution, iDetail=detail, iGlobalTime=s, iGlobalTimeV=s, view=p.viewMatrix }]
 
 
-rippleNoiseSurface2D ripple placement xz = rippleSurface noiseVertex noiseColorFragment ripple
+rippleNoiseSurface2D ripple placement xz = rippleSurface rippleNoiseVertex noiseColorFragment ripple
     << surfaceMeshMaybe xz placement
 
 rippleSurface vertexShader fragmentShader ripple mesh =
