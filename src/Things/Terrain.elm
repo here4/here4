@@ -172,13 +172,3 @@ placeTerrain toSurface2D placement terrainsCoords =
         terrainz = Array2D.fromLists terrainSurfacesCoords
     in
         Array2D.map (\(s,(x,z)) -> extractThing { s | pos = vec3 (toFloat x*placement.xDelta) 0 (toFloat z*placement.zDelta)}) terrainz
-
-{-
-placeTerrainMaybe ripple placement terrainsCoords =
-    let
-        toSurface2D = rippleNoiseSurface2D ripple
-        terrainSurfacesCoords = List.map (List.map (\(t,(x,z)) -> (toSurface2D placement (toFloat x*placement.xDelta, toFloat z*placement.zDelta) t, (x,z)))) terrainsCoords
-        terrainz = Array2D.fromLists terrainSurfacesCoords
-    in
-        Array2D.map (\(s,(x,z)) -> extractThing { s | pos = vec3 (toFloat x*placement.xDelta) 0 (toFloat z*placement.zDelta)}) terrainz
--}
