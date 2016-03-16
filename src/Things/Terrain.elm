@@ -108,12 +108,12 @@ approxElevation terrain pos =
 paint : (Float -> NoiseSurfaceVertex) -> Placement -> Array2D Float -> List Thing
 paint how placement terrain =
     let paintedTerrain = Array2D.map how terrain
-    in visibleTerrain placement terrain (terrainGrid placement paintedTerrain)
+    in visibleTerrain placement terrain (terrainGrid 4 placement paintedTerrain)
 
 ripplePaint : (Float -> Maybe NoiseSurfaceVertex) -> Float -> Placement -> Array2D Float -> List Thing
 ripplePaint how ripple placement terrain =
     let paintedTerrain = Array2D.map how terrain
-    in visibleTerrain placement terrain (terrainGridMaybe ripple placement paintedTerrain)
+    in visibleTerrain placement terrain (terrainGridMaybe 4 ripple placement paintedTerrain)
 
 visibleTerrain : Placement -> Array2D Float -> Array2D Thing -> List Thing
 visibleTerrain placement terrain arr =
@@ -138,37 +138,39 @@ nearby placement terrain pos sees =
 
         -- The visible radius of tiles depends on the height of the camera
         r = max 8 (floor ((getY pos - approxElevation terrain pos) / 10))
+        -- r = (max 64 (floor ((getY pos - approxElevation terrain pos)))) // placement.tileSize
         ir = iradius r
     in
         List.map (\(x,y) -> getXZ (ix0+x) (iz0+y)) ir
 
-terrainGrid placement =
-       placeTerrain noiseSurface2D placement
-    << tileTerrain placement.tileSize
+terrainGrid skip placement =
+       placeTerrain (noiseSurface2D skip) placement
+    << tileTerrain skip placement.tileSize
 
-terrainGridMaybe ripple placement =
-       placeTerrain (rippleNoiseSurface2D ripple) placement
-    << tileTerrain placement.tileSize
+terrainGridMaybe skip ripple placement =
+       placeTerrain (rippleNoiseSurface2D skip ripple) placement
+    << tileTerrain skip placement.tileSize
 
-tileTerrain : Int -> Array2D v -> List (List ((List (List v), (Int, Int))))
-tileTerrain smallSide arr0 = case arr0 of
+tileTerrain : Int -> Int -> Array2D v -> List (List ((List (List v), (Int, Int))))
+tileTerrain skip smallSide arr0 = case arr0 of
   Array2D.Array2D bigSide _ ->
     let coords = subSquares smallSide bigSide
-    in List.map (List.map (mkTile smallSide arr0)) coords
+    in List.map (List.map (mkTile skip smallSide arr0)) coords
 
-mkTile : Int -> Array2D v -> (Int, Int) -> (List (List v), (Int, Int))
-mkTile smallSide arr0 (x0, y0) = case arr0 of
+-- smallSide better be a multiple of skip
+mkTile : Int -> Int -> Array2D v -> (Int, Int) -> (List (List v), (Int, Int))
+mkTile skip smallSide arr0 (x0, y0) = case arr0 of
   Array2D.Array2D bigSide arr ->
     let extent x = min (x+smallSide+1) (bigSide - 1)
         slice x y = Array.toList <| Array.slice (x + y*bigSide) (extent x + y*bigSide) arr
-        rows = List.map (slice x0) [y0 .. extent (y0-1)]
+        rows = List.map (subsample skip << slice x0) [y0 .. extent (y0-1)]
         out = List.reverse <| List.foldl (::) [] rows
     in (out, (x0, y0))
 
 -- placeTerrain : List (List ((List (List NoiseSurfaceVertex)), (Int, Int))) -> Array2D Thing
 placeTerrain toSurface2D placement terrainsCoords =
     let
-        terrainSurfacesCoords = List.map (List.map (\(t,(x,z)) -> (toSurface2D placement (toFloat x*placement.xDelta, toFloat z*placement.zDelta) t, (x,z)))) terrainsCoords
+        terrainSurfacesCoords = List.map (List.map (\(t,(x,z)) -> (toSurface2D placement (toFloat x * placement.xDelta, toFloat z * placement.zDelta) t, (x,z)))) terrainsCoords
         terrainz = Array2D.fromLists terrainSurfacesCoords
     in
-        Array2D.map (\(s,(x,z)) -> extractThing { s | pos = vec3 (toFloat x*placement.xDelta) 0 (toFloat z*placement.zDelta)}) terrainz
+        Array2D.map (\(s,(x,z)) -> extractThing { s | pos = vec3 (toFloat x * placement.xDelta) 0 (toFloat z * placement.zDelta)}) terrainz

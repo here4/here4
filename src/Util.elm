@@ -13,6 +13,11 @@ splitEvery size xs = case xs of
     [] -> []
     _  -> let (p,q) = splitAt size xs in p :: splitEvery size q
 
+subsample : Int -> List a -> List a
+subsample n list = case list of
+    []      -> []
+    (x::xs) -> x :: subsample n (List.drop (n-1) xs)
+
 unfoldWhile : (a -> a) -> (a -> Bool) -> a -> List a
 unfoldWhile f p x = if p x then x :: unfoldWhile f p (f x) else []
 
