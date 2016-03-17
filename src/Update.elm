@@ -15,6 +15,14 @@ import Vehicles.DreamBuggy as DreamBuggy
 
 import Debug
 
+aboveTerrain : Model.EyeLevel -> Vec3 -> Vec3
+aboveTerrain eyeLevel pos =
+    let
+        p = toRecord pos
+        e = eyeLevel pos
+    in
+        if p.y < e then vec3 p.x e p.z else pos
+
 step : Placement -> Array2D Float -> Model.Inputs -> Model.Person -> Model.Person
 step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson else
         let 
@@ -31,17 +39,15 @@ step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson
 
             moveCamera person =
                 if person.cameraInside then
-                    { person | cameraPos = person.pos `add`
-                                           (V3.scale 1.5 (Model.direction person))
+                    { person | cameraPos = aboveTerrain eyeLevel
+                                   (person.pos `add` (V3.scale 1.5 (Model.direction person)))
                              , cameraUp = Model.cameraUp person }
                 else
                     let newCameraPos =
                             vec3 0 7 0 `add` person.pos `sub`
                             (V3.scale 23 (Model.direction person))
-                        cPos = V3.scale 0.1 newCameraPos `add` V3.scale 0.9 person.cameraPos
-                        p = toRecord cPos
-                        e = eyeLevel cPos
-                        cameraPos = if p.y < e then vec3 p.x e p.z else cPos
+                        cameraPos = aboveTerrain eyeLevel
+                            (V3.scale 0.1 newCameraPos `add` V3.scale 0.9 person.cameraPos)
                         newCameraUp = Model.cameraUp person
 
                     in  { person | cameraPos = Terrain.bounds placement cameraPos
