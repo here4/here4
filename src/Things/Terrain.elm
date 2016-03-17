@@ -63,8 +63,8 @@ bounds placement pos =
 
 -- Elevation of terrain at a given coordinate
 -- Linearly interpolated on the mesh triangle
-elevation : Array2D Float -> Vec3 -> Float
-elevation terrain pos =
+elevation : Placement -> Array2D Float -> Vec3 -> Float
+elevation placement terrain pos =
     let
         ix0 = (getX pos + 256) / 2
         ix  = floor ix0
@@ -74,7 +74,7 @@ elevation terrain pos =
         iz  = floor iz0
         izf = iz0 - toFloat iz
 
-        getXZ x z = (Array2D.getXY x z 0 terrain) * 80
+        getXZ x z = (Array2D.getXY x z 0 terrain) * placement.yMult
 
         i00 = getXZ ix     iz      --     00 ... 10  -> x
         i10 = getXZ (ix+1) iz      --  |  .    /  .
@@ -94,12 +94,12 @@ elevation terrain pos =
 -- the four surrounding points. Useful for rough calculations like deciding
 -- how many nearby terrain tiles to display based on how close to the ground
 -- the camera is.
-approxElevation : Array2D Float -> Vec3 -> Float
-approxElevation terrain pos =
+approxElevation : Placement -> Array2D Float -> Vec3 -> Float
+approxElevation placement terrain pos =
     let
         ix0 = floor <| (getX pos + 256) / 2
         iz0 = floor <| (getZ pos + 256) / 2
-        getXZ x z = (Array2D.getXY x z 0 terrain) * 80
+        getXZ x z = (Array2D.getXY x z 0 terrain) * placement.yMult
     in
         getXZ ix0 iz0
             
@@ -108,12 +108,12 @@ approxElevation terrain pos =
 paint : (Float -> NoiseSurfaceVertex) -> Placement -> Array2D Float -> List Thing
 paint how placement terrain =
     let paintedTerrain = Array2D.map how terrain
-    in visibleTerrain placement terrain (terrainGrid 4 placement paintedTerrain)
+    in visibleTerrain placement terrain (terrainGrid 1 placement paintedTerrain)
 
 ripplePaint : (Float -> Maybe NoiseSurfaceVertex) -> Float -> Placement -> Array2D Float -> List Thing
 ripplePaint how ripple placement terrain =
     let paintedTerrain = Array2D.map how terrain
-    in visibleTerrain placement terrain (terrainGridMaybe 4 ripple placement paintedTerrain)
+    in visibleTerrain placement terrain (terrainGridMaybe 1 ripple placement paintedTerrain)
 
 visibleTerrain : Placement -> Array2D Float -> Array2D Thing -> List Thing
 visibleTerrain placement terrain arr =
@@ -137,8 +137,8 @@ nearby placement terrain pos sees =
         getXZ x z = Array2D.getXY z x (\_ -> []) sees
 
         -- The visible radius of tiles depends on the height of the camera
-        r = max 8 (floor ((getY pos - approxElevation terrain pos) / 10))
-        -- r = (max 64 (floor ((getY pos - approxElevation terrain pos)))) // placement.tileSize
+        r = max 8 (floor ((getY pos - approxElevation placement terrain pos) / 10))
+        -- r = (max 64 (floor ((getY pos - approxElevation placement terrain pos)))) // placement.tileSize
         ir = iradius r
     in
         List.map (\(x,y) -> getXZ (ix0+x) (iz0+y)) ir

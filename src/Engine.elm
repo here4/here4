@@ -217,13 +217,15 @@ orient (Thing position orientation see) =
 look : (Int,Int) -> Model.Person -> Mat4
 look (w,h) person =
     M4.mul (M4.makePerspective 45 (toFloat w / toFloat h) 0.01 100)
-           (M4.makeLookAt person.pos (person.pos `add` Model.direction person) (Model.cameraUp person))
+           (M4.makeLookAt person.cameraPos
+                          (person.pos `add` (scale 3 (Model.direction person)))
+                          person.cameraUp)
 
 scene : List Thing -> (Int,Int) -> Time -> Float -> Model.Person -> Element
 scene things (w,h) t measuredFPS person =
   let
     see = mapApply (List.map orient things)
-    p = { cameraPos = person.pos
+    p = { cameraPos = person.cameraPos
         , viewMatrix = look (w,h) person
         , globalTime = t
         , resolution = (w,h)

@@ -213,7 +213,7 @@ gamepadToInputs : Time -> Gamepad.Gamepad -> Model.Inputs
 gamepadToInputs dt gamepad =
     let {x,y,mx,my} = gamepadToArrows gamepad
         {bA, bB, bX, bY, bBack, bStart} = gamepadToButtons gamepad
-    in  { noInput | reset = bStart, x = x, y = y, mx=mx, my=my, button_X = bX, dt = dt }
+    in  { noInput | reset = bStart, changeCamera = bB, x = x, y = y, mx=mx, my=my, button_X = bX, dt = dt }
 
 gamepadsToInputs : List (Maybe Gamepad.Gamepad) -> Time -> List Model.Inputs
 gamepadsToInputs gamepads dt = List.map (mapDefault noInput (gamepadToInputs dt)) gamepads
@@ -275,7 +275,7 @@ person2 placement terrain = Signal.foldp (Update.step placement terrain) Model.d
 main : Signal Element
 main = world Demo.demoThings
 
-world : (Array2D Float -> Signal (List Thing)) -> Signal Element
+world : (Array2D Float -> List (Signal Model.Person) -> Signal (List Thing)) -> Signal Element
 world thingsOnTerrain =
   let fs = Signal.map Time.inSeconds (fps 60)
       t = Signal.foldp (+) 0 fs
@@ -290,13 +290,16 @@ world thingsOnTerrain =
 
       seed0 = Random.initialSeed 7777
       (terrain, seed1) = Random.generate (randTerrain2D (placement.bigSide+1)) seed0
-      entities = thingsOnTerrain terrain
+
+      person1' = person1 placement terrain
+      person2' = person2 placement terrain
+      entities = thingsOnTerrain terrain [person1', person2']
 
       oneScene = Signal.map5 scene entities wh t measuredFPS (person1 placement terrain)
       dualScene =
             (Signal.map2 beside
-                (Signal.map5 scene entities wh2 t measuredFPS (person1 placement terrain))
-                (Signal.map5 scene entities wh2 t measuredFPS (person2 placement terrain)))
+                (Signal.map5 scene entities wh2 t measuredFPS person1')
+                (Signal.map5 scene entities wh2 t measuredFPS person2'))
 
       ifElse : (a -> Bool) -> b -> b -> a -> b
       ifElse p ifBranch elseBranch x = if p x then ifBranch else elseBranch

@@ -66,7 +66,8 @@ walk eyeLevel directions person =
         move = V3.scale (8.0 * directions.y) moveDir
         strafe = V3.scale (8.0 * directions.x) strafeDir
 
-        e = (eyeLevel person.pos) / 80.0
+        -- e = (eyeLevel person.pos) / 80.0 -- placement.yMult
+        e = (eyeLevel person.pos) / 20.0
 
         friction = if e > 0.8 then -0.1
                    else if e < 0.0 then 0.8

@@ -43,11 +43,11 @@ defaultPlacement =
     { xOffset = -256
     , xDelta  = 2
     , yOffset = 0
-    , yMult   = 80
+    , yMult   = 20
     , zOffset = -256
     , zDelta  = 2
     , tileSize = 8
-    , bigSide = 1024
+    , bigSide = 256
     }
 
 toNSV (y,rgb) = (y, rgb, 0.0, 0.0, 0.0)

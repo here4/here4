@@ -1,15 +1,18 @@
 module Demo (demoThings) where
 
 import Math.Vector3 exposing (..)
+import Math.Vector3 as V3
 import Random
 import Signal.Extra exposing ((<~), combine)
 import Time exposing (fps)
 
 import Array2D
 import Math.Procedural exposing (..)
+import Math.Quaternion as Qn -- for drive
 import Math.RandomVector exposing (randomVec3')
 import Util exposing (repeatedly)
 import Engine exposing (..)
+import Model
 import Things.Ground exposing (ground)
 import Things.BFly exposing (bfly)
 import Things.Cube exposing (cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, xvCube)
@@ -48,8 +51,13 @@ randomDrop = Random.map2
     (Random.map (add (vec3 0 30 0)) (randomVec3' 4.0))
     (randomVec3' 8.0)
 
-demoThings : Array2D.Array2D Float -> Signal (List Thing)
-demoThings terrain0 =
+drive : Model.Person -> Thing -> Thing
+drive person (Thing pos orientation see) =
+    -- Thing (person.pos) (Qn.vrotate person.orientQn orientation) see
+    Thing (person.pos) (Qn.vrotate person.orientQn V3.j) see
+
+demoThings : Array2D.Array2D Float -> List (Signal Model.Person) -> Signal (List Thing)
+demoThings terrain0 persons =
     let
         -- isOdd x = (floor x % 2) == 0
         -- ifelse cond x y = if cond then x else y
@@ -84,6 +92,12 @@ demoThings terrain0 =
 
         -- boids = foldTCont boidsTCont boids0 (fps 60)
 
+        cube : Signal Thing
+        cube = extractThing <~ fireCube
+
+        personThings : Signal (List Thing)
+        personThings = combine <| List.map (\person -> Signal.map2 drive person cube) persons
+
 {-
         (balls0, seed2) = Random.generate (Random.list 15 randomDrop) seed1
 
@@ -96,6 +110,7 @@ demoThings terrain0 =
 
         balls = List.map extractThing <~ foldTCont ballsTCont balls0 (fps 60)
 
+-}
         individuals : Signal (List Thing)
         individuals = combine [
             -- -- place   0   3   0 <~ teapot,
@@ -103,11 +118,11 @@ demoThings terrain0 =
             -- place   -30   -3   -10 <~ (extractThing <~ terrainSurface),
             -- place   0   1   0 <~ (extractThing <~ Signal.constant fogMountainsSphere),
             -- place   5 1.5   1 <~ cd,
-            place -10   0 -10 <~ (extractThing <~ fireCube),
+            -- place -10   0 -10 <~ (extractThing <~ fireCube),
+            -- personThing,
             -- lift2 (\y e -> place 0 y 0 e) s fireCube,
             place  10 1.5 -10 <~ (extractThing <~ fogMountainsCube)
             ]
--}
     in
         -- gather [ground, water, individuals, boids, balls]
-        gather [ground, water, boids]
+        gather [ground, water, personThings, boids]
