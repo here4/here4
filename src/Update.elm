@@ -39,8 +39,7 @@ step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson
 
             moveCamera person =
                 if person.cameraInside then
-                    { person | cameraPos = aboveTerrain eyeLevel
-                                   (person.pos `add` (V3.scale 1.5 (Model.direction person)))
+                    { person | cameraPos = aboveTerrain eyeLevel person.pos
                              , cameraUp = Model.cameraUp person }
                 else
                     let newCameraPos =

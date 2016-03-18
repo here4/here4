@@ -53,8 +53,12 @@ randomDrop = Random.map2
 
 drive : Model.Person -> Thing -> Thing
 drive person (Thing pos orientation see) =
-    -- Thing (person.pos) (Qn.vrotate person.orientQn orientation) see
-    Thing (person.pos) (Qn.vrotate person.orientQn V3.j) see
+    let
+        -- Move so the object does not obscure the camera
+        pos = person.pos `sub` (scale 1 (Model.direction person)) `sub` vec3 0 (Model.eyeLevel - 1.0) 0
+        orient = Qn.vrotate (Qn.negate person.orientQn) V3.k
+    in
+        Thing pos orient see
 
 demoThings : Array2D.Array2D Float -> List (Signal Model.Person) -> Signal (List Thing)
 demoThings terrain0 persons =
