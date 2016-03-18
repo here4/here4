@@ -101,7 +101,7 @@ gamepadToArrows gamepad =
         -- Interpret brake, accelerator as y input
         btns_y = case gamepad.buttons of
                     -- ©Microsoft Corporation Controller (STANDARD GAMEPAD Vendor: 045e Product: 028e)
-                    [a, b, x, y, lt, rt, l, r, back, start, lstick, rstick, padU, padD, padL, padR, logo] -> r.value - l.value
+                    [a, b, x, y, lb, rb, l, r, back, start, lstick, rstick, padU, padD, padL, padR, logo] -> r.value - l.value
 
 {-
                     -- Performance Designed Products Rock Candy Gamepad for Xbox 360 (Vendor: 0e6f Product: 011f)
@@ -127,7 +127,7 @@ toStandardGamepad gamepad =
         let (axes', buttons') = case (gamepad.axes, gamepad.buttons) of
             -- Performance Designed Products Rock Candy Gamepad for Xbox 360 (Vendor: 0e6f Product: 011f)
             ( [x1, y1, b1, x2, y2, b2, x3, y3]
-            , [a, b, x, y, lt, rt, back, start, logo, lstick, rstick]) ->
+            , [a, b, x, y, lb, rb, back, start, logo, lstick, rstick]) ->
                 let
                     toTrigger b = let b' = (b+1.0)/2.0 in
                         if b' > 0 then
@@ -149,7 +149,7 @@ toStandardGamepad gamepad =
 
                 in
                     ( [x1, y1, x2, y2]
-                    , [ a, b, x, y, lt, rt, b1', b2', back, start
+                    , [ a, b, x, y, lb, rb, b1', b2', back, start
                       , lstick, rstick, padU, padD, padL, padR, logo]
                     )
 
@@ -184,23 +184,30 @@ persistentGamepads =
         a = Automaton.hiddenState [] step
     in Automaton.run a [] standardGamepads
 
-{- a b x y ltop rtop l r 
+{- a b x y lbumper rbumper l r
 l tiny (back), r tiny (start)
 stick l down, stick r down
 4way: u d l r
 Xbox-logo
 -}
 
-type alias GamepadButtons = { bA : Bool, bB : Bool, bX : Bool, bY : Bool, bBack : Bool, bStart : Bool }
+type alias GamepadButtons =
+    { bA : Bool, bB : Bool, bX : Bool, bY : Bool
+    , bLeftBumper : Bool, bRightBumper : Bool
+    , bBack : Bool, bStart : Bool }
 
-gamepadButtonsNone = { bA = False, bB = False, bX = False, bY = False, bBack = False, bStart = False }
+gamepadButtonsNone =
+    { bA = False, bB = False, bX = False, bY = False
+    , bLeftBumper = False, bRightBumper = False
+    , bBack = False, bStart = False }
 
 gamepadToButtons : Gamepad.Gamepad -> GamepadButtons
 gamepadToButtons gamepad =
     case gamepad.buttons of
-        (a::b::x::y::lt::rt::l::r::back::start::_) ->
-            { bA = a.pressed, bB = b.pressed, bX = x.pressed, bY = y.pressed,
-              bBack = back.pressed, bStart = start.pressed }
+        (a::b::x::y::lb::rb::l::r::back::start::_) ->
+            { bA = a.pressed, bB = b.pressed, bX = x.pressed, bY = y.pressed
+            , bLeftBumper = lb.pressed, bRightBumper = rb.pressed
+            , bBack = back.pressed, bStart = start.pressed }
 
         _ -> gamepadButtonsNone
 
@@ -212,8 +219,8 @@ gamepadsToButtons = List.map gamepadToButtons
 gamepadToInputs : Time -> Gamepad.Gamepad -> Model.Inputs
 gamepadToInputs dt gamepad =
     let {x,y,mx,my} = gamepadToArrows gamepad
-        {bA, bB, bX, bY, bBack, bStart} = gamepadToButtons gamepad
-    in  { noInput | reset = bStart, changeCamera = bB, x = x, y = y, mx=mx, my=my, button_X = bX, dt = dt }
+        bs = gamepadToButtons gamepad
+    in  { noInput | reset = bs.bStart, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX, dt = dt }
 
 gamepadsToInputs : List (Maybe Gamepad.Gamepad) -> Time -> List Model.Inputs
 gamepadsToInputs gamepads dt = List.map (mapDefault noInput (gamepadToInputs dt)) gamepads
