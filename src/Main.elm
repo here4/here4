@@ -288,7 +288,7 @@ world thingsOnTerrain =
 
       placement = defaultPlacement
 
-      seed0 = Random.initialSeed 1337
+      seed0 = Random.initialSeed 50001
       (terrain, seed1) = Random.generate (randTerrain2D (placement.bigSide+1)) seed0
 
       person1' = person1 placement terrain
