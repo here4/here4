@@ -288,14 +288,14 @@ world thingsOnTerrain =
 
       placement = defaultPlacement
 
-      seed0 = Random.initialSeed 7777
+      seed0 = Random.initialSeed 1337
       (terrain, seed1) = Random.generate (randTerrain2D (placement.bigSide+1)) seed0
 
       person1' = person1 placement terrain
       person2' = person2 placement terrain
       entities = thingsOnTerrain terrain [person1', person2']
 
-      oneScene = Signal.map5 scene entities wh t measuredFPS (person1 placement terrain)
+      oneScene = Signal.map5 scene entities wh t measuredFPS person1'
       dualScene =
             (Signal.map2 beside
                 (Signal.map5 scene entities wh2 t measuredFPS person1')
