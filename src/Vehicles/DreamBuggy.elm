@@ -45,13 +45,14 @@ turn eyeLevel dx dy person =
         frontTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 0 0 0.1)))
         rightTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 0.1 0 0)))
         leftTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 -0.1 0 0)))
-        tirePitch = atan ((frontTireY - personY)/0.1)
-        tireRoll  = atan (-(rightTireY - leftTireY)/0.1)
+        tirePitch = atan ((frontTireY - personY)/0.01)
+        tireRoll  = atan (-(rightTireY - leftTireY)/2)
         (yaw, pitch, roll) =
             if getY person.pos > (eyeLevel person.pos) + 5 then
                 (yaw0-(dx * 5), pitch0*0.9 + dy*0.1, 0)
             else
-                (yaw0-dx, pitch0*0.95 + (tirePitch+dy)*0.05, roll0*0.95 + (tireRoll*0.05))
+                -- (yaw0-dx, pitch0*0.95 + (tirePitch+dy)*0.05, roll0*0.95 + (tireRoll*0.05))
+                (yaw0-dx, pitch0*0.95 + (tirePitch+dy)*0.05, tireRoll)
 
         orientQn = clampBuggy (Qn.fromEuler (roll, pitch, yaw))
     in

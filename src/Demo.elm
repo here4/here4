@@ -55,7 +55,7 @@ drive : Model.Person -> Thing -> Thing
 drive person (Thing pos orientation see) =
     let
         -- Move so the object does not obscure the camera
-        pos = person.pos `sub` (scale 1 (Model.direction person)) `sub` vec3 0 (Model.eyeLevel - 1.0) 0
+        pos = person.pos `sub` (scale 1.1 (Model.direction person)) `sub` vec3 0 (Model.eyeLevel - 1.0) 0
         orient = Qn.vrotate (Qn.negate person.orientQn) V3.k
     in
         Thing pos orient see
