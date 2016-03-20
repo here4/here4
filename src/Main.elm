@@ -9,12 +9,14 @@ module Main (main) where
 import Automaton
 import Char exposing (toCode)
 import Graphics.Element exposing (..)
+import Http
 import Maybe.Extra exposing (mapDefault)
 import Random
 import Set
 import Signal exposing (dropRepeats, sampleOn, merge)
 import Signal.Extra exposing (combine)
 import String exposing (contains)
+import Task exposing (Task, andThen)
 import Text
 import Time exposing (Time, fps)
 
@@ -26,6 +28,7 @@ import Window
 
 import Array2D exposing (Array2D)
 import Gamepad
+import LoadObj exposing (objMailbox, sendRaw)
 import Math.Procedural exposing (..)
 import Model exposing (noInput)
 import Engine exposing (..)
@@ -55,6 +58,13 @@ port requestPointerLock =
 port exitPointerLock : Signal ()
 port exitPointerLock =
     Signal.map (always ()) (Signal.filter (Set.member 27) Set.empty Keyboard.keysDown)
+
+----------------------------------------------------------------------
+-- Resource loading
+
+port fetchObj : Task Http.Error ()
+port fetchObj =
+    Http.getString "resources/wt_teapot.obj" `andThen` sendRaw
 
 ----------------------------------------------------------------------
 -- Gamepad

@@ -50,7 +50,7 @@ eyeLevel = 1.8
 
 defaultPerson : Person
 defaultPerson =
-    { pos = vec3 10 300 -10 
+    { pos = vec3 0 30 0 
     , velocity = vec3 0 0 0
     , orientQn = Qn.unit
     , flying = False

@@ -20,7 +20,7 @@ import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Things.Portal exposing (plasmaPortal)
 import Things.Sphere exposing (spheres, cloudsSphere, fogMountainsSphere)
 import Things.Surface2D exposing (..)
--- import Things.Teapot exposing (teapot)
+import Things.Teapot exposing (teapot)
 import Things.Terrain as Terrain
 
 
@@ -117,7 +117,7 @@ demoThings terrain0 persons =
 -}
         individuals : Signal (List Thing)
         individuals = combine [
-            -- -- place   0   3   0 <~ teapot,
+            place   0   10   0 <~ (extractThing <~ teapot),
             place   3   3   1 <~ (extractThing <~ plasmaPortal),
             -- place   -30   -3   -10 <~ (extractThing <~ terrainSurface),
             -- place   0   1   0 <~ (extractThing <~ Signal.constant fogMountainsSphere),
@@ -129,4 +129,4 @@ demoThings terrain0 persons =
             ]
     in
         -- gather [ground, water, individuals, boids, balls]
-        gather [ground, water, personThings, boids]
+        gather [ground, water, personThings, individuals, boids]
