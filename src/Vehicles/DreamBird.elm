@@ -34,6 +34,7 @@ fly eyeLevel inputs person =
         roll  =  6 * inputs.mx * inputs.dt
 
         orientQn = Qn.hamilton person.orientQn (Qn.fromEuler (roll, pitch, yaw))
+
         orient = Qn.vrotate orientQn
         dv = V3.scale (50 * thrust * inputs.dt) <| orient V3.k
         du = V3.scale (20 * thrust * inputs.dt) <| orient V3.j

@@ -8,10 +8,14 @@ import Task exposing (Task, andThen)
 
 
 import Math.Vector3 exposing (..)
+import Math.Vector3 as V3
 import Math.Matrix4 exposing (..)
+import Math.Matrix4 as M4
 import WebGL exposing (..)
 
 import Engine exposing (..)
+
+import Debug
 
 type alias VertV = {position: Vec3}
 type alias VertVT = {position : Vec3, texCoord : Vec3}
@@ -112,6 +116,50 @@ parseFaceVert vArr vtArr vnArr str = case String.split "//" str of
 deIndexVert : Array.Array Vec3 -> String -> Maybe Vec3
 deIndexVert vArr s = Maybe.andThen (Result.toMaybe (String.toInt s)) (\i -> Array.get (i-1) vArr)
 
+normalize : List Vec3 -> List Vec3
+normalize list =
+    let
+        findMinMax minCoord maxCoord list = case list of
+            [] -> (minCoord, maxCoord)
+            (v :: vs) ->
+                let r = V3.toRecord v
+                    minCoord' = min minCoord (min r.x (min r.y r.z))
+                    maxCoord' = max maxCoord (max r.x (max r.y r.z))
+                in findMinMax minCoord' maxCoord' vs
+        (minCoord, maxCoord) = Debug.log "findMinMax" <| findMinMax 1000000 -1000000 list
+        range = maxCoord - minCoord
+        norm x = 4 * (x - minCoord) / range
+        normV v = let r = V3.toRecord v in vec3 (norm r.x) (norm r.y) (norm r.z)
+    in
+        List.map normV list
+
+recenter : List Vec3 -> List Vec3
+recenter list =
+    let
+        fltMax = 1000000
+        fltMin = -1000000
+        findMinMax minX maxX minY maxY minZ maxZ list = case list of
+            [] -> (minX, maxX, minY, maxY, minZ, maxZ)
+            (v :: vs) ->
+                let r = V3.toRecord v
+                    minX' = min minX r.x
+                    maxX' = max maxX r.x
+                    minY' = min minY r.y
+                    maxY' = max maxY r.y
+                    minZ' = min minZ r.z
+                    maxZ' = max maxZ r.z
+                in findMinMax minX' maxX' minY' maxY' minZ' maxZ' vs
+        (minX, maxX, minY, maxY, minZ, maxZ) = Debug.log "findMinMax" <| findMinMax fltMax fltMin fltMax fltMin fltMax fltMin list
+        rangeX = maxX - minX
+        rangeY = maxY - minY
+        rangeZ = maxZ - minZ
+        cX x = x - minX - (rangeX/2)
+        cY y = y - minY - (rangeY/2)
+        cZ z = z - minZ - (rangeZ/2)
+        centerV v = let r = V3.toRecord v in vec3 (cX r.x) (cY r.y) (cZ r.z)
+    in
+        List.map centerV list
+
 --Parse an OBJ file into a list of triangles  
 parseObj : String -> List (Triple FaceVert)
 parseObj inFile = 
@@ -119,7 +167,7 @@ parseObj inFile =
     lines = String.lines inFile
     
     vLines = List.filter isVertexLine lines
-    vertices = Array.fromList <| List.filterMap lineToVert vLines
+    vertices = Array.fromList <| normalize <| recenter <| List.filterMap lineToVert vLines
     
     vtLines = List.filter isVtLine lines
     texCoords = Array.fromList <| List.filterMap lineToVt vtLines
@@ -147,17 +195,33 @@ inFileSig infile = let
 objMailbox : Signal.Mailbox String
 objMailbox = Signal.mailbox ""
 
-sendRaw : String -> Task x ()
-sendRaw plush = Signal.send objMailbox.address plush
-
+sendRaw : Signal.Mailbox String -> String -> Task x ()
+sendRaw mb plush = Signal.send mb.address plush
  
 -- loadMesh infile = Signal.map mesh (inFileSig infile)
 loadMesh infile = Signal.map mesh objMailbox.signal
+
 
 objThing : Drawable VertVTN -> Perception -> List Renderable
 objThing mesh p = [render vertexShader fragmentShader mesh { view = p.viewMatrix }]
 
 loadObj infile = Signal.map objThing (loadMesh infile)
+
+objJeepMailbox : Signal.Mailbox String
+objJeepMailbox = Signal.mailbox ""
+
+loadJeepMesh = Signal.map mesh objJeepMailbox.signal
+
+jeepThing : Drawable VertVTN -> Perception -> List Renderable
+jeepThing mesh p =
+    let
+        rv = p.viewMatrix
+             |> M4.translate (vec3 -2 -2 0)
+             |> M4.rotate (degrees -90) V3.i
+    in
+        [render vertexShader fragmentShader mesh { view = rv }]
+
+loadJeep infile = Signal.map jeepThing loadJeepMesh
 
 --Based off the triangle rendering code from http://elm-lang.org/edit/examples/WebGL/Triangle.elm
   
@@ -204,7 +268,7 @@ void main () {
     
     //http://www.lighthouse3d.com/tutorials/glsl-core-tutorial/directional-lights/
     
-    vec3 diffuse = vec3(1,1,0);
+    vec3 diffuse = vec3(1,1,1);
     
     vec3 l_dir = vec3(3,0,0);
     

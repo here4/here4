@@ -28,7 +28,7 @@ import Window
 
 import Array2D exposing (Array2D)
 import Gamepad
-import LoadObj exposing (objMailbox, sendRaw)
+import LoadObj exposing (objMailbox, sendRaw, objJeepMailbox)
 import Math.Procedural exposing (..)
 import Model exposing (noInput)
 import Engine exposing (..)
@@ -38,6 +38,7 @@ import Things.Surface2D exposing (Placement, defaultPlacement)
 import Demo
 
 import Debug
+import Math.Quaternion as Qn
 
 -- Pointer Lock information
 port movement : Signal (Int,Int)
@@ -64,7 +65,11 @@ port exitPointerLock =
 
 port fetchObj : Task Http.Error ()
 port fetchObj =
-    Http.getString "resources/wt_teapot.obj" `andThen` sendRaw
+    Http.getString "resources/wt_teapot.obj" `andThen` sendRaw objMailbox
+
+port fetchJeep : Task Http.Error ()
+port fetchJeep =
+    Http.getString "resources/Jeep.obj" `andThen` sendRaw objJeepMailbox
 
 ----------------------------------------------------------------------
 -- Gamepad
@@ -248,7 +253,7 @@ kbMouseInputs =
       dirKeys = merge Keyboard.arrows Keyboard.wasd
       yo x = x / 500
       handleKeys s bx {x,y} kdt = dbg_X
-          { noInput | isJumping = s, button_X = bx, x = toFloat x, y = toFloat y, dt=kdt }
+          { noInput | isJumping = s, button_X = bx, x = (toFloat x)/1000, y = (toFloat y)*1000, dt=kdt }
       dbg_X i = if i.button_X then Debug.log "Button X pressed" i else i
       x_key = Keyboard.isDown 88
   in  merge
@@ -323,9 +328,16 @@ world thingsOnTerrain =
       chooseScene = Signal.map3 (ifElse (\l -> List.length l > 1)) dualScene oneScene persistentGamepads
   in 
       -- Signal.map3 lockMessage wh isLocked
-      -- Signal.map2 debugLayer
+      Signal.map2 debugLayer
           --(combine [Signal.map show Gamepad.gamepads, Signal.map show gamepadInputs])
+          (combine [Signal.map (show << mapTriple (round << toDegrees)) (Signal.map (Qn.toEuler << .orientQn) person1')])
             chooseScene
+
+mapTriple : (a -> b) -> (a,a,a) -> (b,b,b)
+mapTriple f (x,y,z) = (f x, f y, f z)
+
+toDegrees : Float -> Float
+toDegrees rad = 360 * rad / (2*pi)
 
 debugLayer : List Element -> Element -> Element
 debugLayer xs e = layers [ e, flow down xs ]

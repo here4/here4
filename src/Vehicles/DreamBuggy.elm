@@ -28,8 +28,8 @@ welcome person = { person | orientQn = clampBuggy person.orientQn }
 clampBuggy : Qn.Quaternion -> Qn.Quaternion
 clampBuggy q =
     let (roll, pitch, yaw) = Qn.toEuler q
-        roll' = clamp (degrees -30) (degrees 30) (roll/2)
-        pitch' = clamp (degrees -60) (degrees 60) (pitch/2)
+        roll' = clamp (degrees -10) (degrees 10) (roll/2)
+        pitch' = clamp (degrees -15) (degrees 15) (pitch/2)
     in Qn.fromEuler (roll', pitch', yaw)
 
 flatten : Vec3 -> Vec3
@@ -41,18 +41,18 @@ turn : Model.EyeLevel -> Float -> Float -> Model.Person -> Model.Person
 turn eyeLevel dx dy person =
     let
         (roll0, pitch0, yaw0) = Qn.toEuler person.orientQn
-        personY = getY person.pos
-        frontTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 0 0 0.1)))
-        rightTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 0.1 0 0)))
-        leftTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 -0.1 0 0)))
-        tirePitch = atan ((frontTireY - personY)/0.01)
-        tireRoll  = atan (-(rightTireY - leftTireY)/2)
+        personY = eyeLevel person.pos
+        frontTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 0 0 1)))
+        rightTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 1 0 0)))
+        leftTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 -1 0 0)))
+        tirePitch = atan (-(frontTireY - personY)/1)
+        tireRoll  = atan ((rightTireY - leftTireY)/2)
         (yaw, pitch, roll) =
             if getY person.pos > (eyeLevel person.pos) + 5 then
-                (yaw0-(dx * 5), pitch0*0.9 + dy*0.1, 0)
+                (yaw0-(dx * 5), pitch0*0.1 + dy*0.9, 0)
             else
-                -- (yaw0-dx, pitch0*0.95 + (tirePitch+dy)*0.05, roll0*0.95 + (tireRoll*0.05))
-                (yaw0-dx, pitch0*0.95 + (tirePitch+dy)*0.05, tireRoll)
+                (yaw0-dx, pitch0*0.05 + (tirePitch+dy)*0.95, roll0*0.05 + (tireRoll*0.95))
+                -- (yaw0-dx, pitch0*0.05 + tirePitch*0.95, tireRoll)
 
         orientQn = clampBuggy (Qn.fromEuler (roll, pitch, yaw))
     in

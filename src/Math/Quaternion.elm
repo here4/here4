@@ -127,12 +127,20 @@ conjugate q =
 {-| Hamilton product -}
 hamilton : Quaternion -> Quaternion -> Quaternion
 hamilton q1 q2 =
+    let (a1, b1, c1, d1) = toTuple q1
+        (a2, b2, c2, d2) = toTuple q2
+    in quaternion (a1*a2 - b1*b2 - c1*c2 - d1*d2)
+                  (a1*b2 + b1*a2 + c1*d2 - d1*c2)
+                  (a1*c2 - b1*d2 + c1*a2 + d1*b2)
+                  (a1*d2 + b1*c2 - c1*b2 + d1*a2)
+{-
     let (s1, v1) = toSV q1
         (s2, v2) = toSV q2
         s = s1*s2 - V3.dot v1 v2
         v3_add = V3.add
         v = V3.scale s1 v2 `v3_add` V3.scale s2 v1 `v3_add` V3.cross v1 v2
     in fromSV (s,v)
+-}
 
 {-| Multiplication of a quaternion by a vector -}
 multv : Quaternion -> Vec3 -> Quaternion

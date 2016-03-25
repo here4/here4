@@ -20,7 +20,7 @@ import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Things.Portal exposing (plasmaPortal)
 import Things.Sphere exposing (spheres, cloudsSphere, fogMountainsSphere)
 import Things.Surface2D exposing (..)
-import Things.Teapot exposing (teapot)
+import Things.Teapot exposing (..)
 import Things.Terrain as Terrain
 
 
@@ -55,7 +55,8 @@ drive : Model.Person -> Thing -> Thing
 drive person (Thing pos orientation see) =
     let
         -- Move so the object does not obscure the camera
-        pos = person.pos `sub` (scale 1.1 (Model.direction person)) `sub` vec3 0 (Model.eyeLevel - 1.0) 0
+        -- pos = person.pos `sub` (scale 1.1 (Model.direction person)) `sub` vec3 0 (Model.eyeLevel - 1.0) 0
+        pos = person.pos -- `sub` (scale 1.1 (Model.direction person)) `sub` vec3 0 (Model.eyeLevel - 1.0) 0
         orient = Qn.vrotate (Qn.negate person.orientQn) V3.k
     in
         Thing pos orient see
@@ -96,11 +97,12 @@ demoThings terrain0 persons =
 
         -- boids = foldTCont boidsTCont boids0 (fps 60)
 
-        cube : Signal Thing
-        cube = extractThing <~ fireCube
+        car : Signal Thing
+        car = extractThing <~ jeep
+        -- car = extractThing <~ fireCube
 
         personThings : Signal (List Thing)
-        personThings = combine <| List.map (\person -> Signal.map2 drive person cube) persons
+        personThings = combine <| List.map (\person -> Signal.map2 drive person car) persons
 
 {-
         (balls0, seed2) = Random.generate (Random.list 15 randomDrop) seed1
@@ -117,7 +119,7 @@ demoThings terrain0 persons =
 -}
         individuals : Signal (List Thing)
         individuals = combine [
-            place   0   10   0 <~ (extractThing <~ teapot),
+            -- place   0   10   0 <~ (extractThing <~ teapot),
             place   3   3   1 <~ (extractThing <~ plasmaPortal),
             -- place   -30   -3   -10 <~ (extractThing <~ terrainSurface),
             -- place   0   1   0 <~ (extractThing <~ Signal.constant fogMountainsSphere),

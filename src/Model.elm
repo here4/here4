@@ -46,7 +46,7 @@ type alias Person =
     }
 
 eyeLevel : Float
-eyeLevel = 1.8
+eyeLevel = 1.0
 
 defaultPerson : Person
 defaultPerson =
@@ -66,4 +66,5 @@ direction : Person -> Vec3
 direction person = orient person V3.k
 
 cameraUp : Person -> Vec3
-cameraUp person = orient person V3.j
+-- cameraUp person = orient person V3.j
+cameraUp person = Qn.vrotate (Qn.negate person.orientQn) V3.j
