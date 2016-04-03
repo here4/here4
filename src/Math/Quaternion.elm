@@ -76,11 +76,13 @@ toRecord q =
 fromRecord : { s:Float, i:Float, j:Float, k:Float } -> Quaternion
 fromRecord {s,i,j,k} = quaternion s i j k
 
+{-| Convert a quaternion to a tuple of (scalar, vector) -}
 toSV : Quaternion -> (Float, Vec3)
 toSV q =
     let {x,y,z,w} = V4.toRecord q
     in (x, vec3 y z w)
 
+{-| Construct a Quaternion from its representation as a scalar and a vector -}
 fromSV : (Float, Vec3) -> Quaternion
 fromSV (s,v) =
     let {x,y,z} = V3.toRecord v
