@@ -37,6 +37,12 @@ import Things.Surface2D exposing (Placement, defaultPlacement)
 
 import Demo
 
+import Color exposing (black, white)
+import FontAwesome
+import Html exposing (toElement)
+
+import Graphics.Collage exposing (collage, defaultLine, outlinedText, text)
+
 import Debug
 import Math.Quaternion as Qn
 
@@ -330,8 +336,43 @@ world thingsOnTerrain =
       -- Signal.map3 lockMessage wh isLocked
       Signal.map2 debugLayer
           --(combine [Signal.map show Gamepad.gamepads, Signal.map show gamepadInputs])
-          (combine [Signal.map (show << mapTriple (round << toDegrees)) (Signal.map (Qn.toEuler << .orientQn) person1')])
+          -- (combine [Signal.map (show << mapTriple (round << toDegrees)) (Signal.map (Qn.toEuler << .orientQn) person1')])
+            (Signal.map infoLayer person1')
             chooseScene
+
+infoLayer : Model.Person -> Int -> Element
+infoLayer person w = container w 84 middle <| flow right <|
+    [ vehicleInfo person
+    , flow right [bigIcon FontAwesome.diamond, bigShow 7]
+    , bigShow <| mapTriple (round << toDegrees) (Qn.toEuler person.orientQn)
+    ]
+
+vehicleInfo : Model.Person -> Element
+vehicleInfo person =
+    let
+        vehicleName = if person.flying then "Dreambird" else "Dreambuggy"
+        vehicleIcon = if person.flying then FontAwesome.plane else FontAwesome.car
+        wher = if person.cameraInside then "Inside" else "Outside"
+    in
+        flow right <|
+            [-- bigIcon vehicleIcon, spacer 48 72,
+            bigText vehicleName
+            ,bigText wher
+            ]
+
+bigIcon : (Color.Color -> Int -> Html.Html) -> Element
+bigIcon icon = container 48 72 middle <| Html.toElement 48 48 (icon white 48)
+
+textElement : Int -> Int -> Text.Text -> Element
+textElement w h t = container w 72 middle <| collage w h [text t, outlinedText defaultLine t]
+
+bigShow = toString >> bigText
+
+bigText = Text.fromString
+    >> Text.height 48
+    >> Text.typeface ["helvetica","arial","sans-serif"]
+    >> Text.color white
+    >> textElement 300 72
 
 mapTriple : (a -> b) -> (a,a,a) -> (b,b,b)
 mapTriple f (x,y,z) = (f x, f y, f z)
@@ -339,8 +380,15 @@ mapTriple f (x,y,z) = (f x, f y, f z)
 toDegrees : Float -> Float
 toDegrees rad = 360 * rad / (2*pi)
 
-debugLayer : List Element -> Element -> Element
-debugLayer xs e = layers [ e, flow down xs ]
+debugLayer : (Int -> Element) -> Element -> Element
+debugLayer dbgF e =
+    let
+        dbg = dbgF (widthOf e)
+        r = spacer (widthOf e) (heightOf dbg)
+            |> color black
+            |> opacity 0.3
+    in
+        layers [ e, r, dbg ]
 
 lockMessage : (Int,Int) -> Bool -> Element -> Element
 lockMessage (w,h) isLocked e =
