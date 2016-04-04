@@ -172,13 +172,16 @@ vrotate q v = toVec3 <| hamilton q (vmult v (conjugate q))
 {-| Construction from Euler angles representing (roll, pitch, yaw),
 often denoted phi, tau, psi -}
 fromEuler : (Float, Float, Float) -> Quaternion
+{-
 fromEuler (phi, tau, psi) =
     let
         roll  = quaternion (cos (phi/2)) 0 0 (sin (phi/2))
         pitch = quaternion (cos (tau/2)) (sin (tau/2)) 0 0
         yaw   = quaternion (cos (psi/2)) 0 (sin (psi/2)) 0
-    in yaw `hamilton` pitch `hamilton` roll
-{-
+    -- in yaw `hamilton` pitch `hamilton` roll
+    in roll `hamilton` pitch `hamilton` yaw -- TODO: modify toEuler likewise
+-}
+fromEuler (phi, tau, psi) =
     let
         sphi = sin (phi/2)
         cphi = cos (phi/2)
@@ -187,17 +190,19 @@ fromEuler (phi, tau, psi) =
         spsi = sin (psi/2)
         cpsi = cos (psi/2)
 
+        -- https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Conversion
         s = cphi * ctau * cpsi + sphi * stau * spsi
         i = sphi * ctau * cpsi - cphi * stau * spsi
         j = cphi * stau * cpsi + sphi * ctau * spsi
         k = cphi * ctau * spsi - sphi * stau * cpsi
-    in quaternion s j k i
--}
+    -- in quaternion s j k i
+    in quaternion s i j k
         
 {-| Convert to Euler angles representing (roll, pitch, yaw),
 often denoted (phi, tau, psi) -}
 toEuler : Quaternion -> (Float, Float, Float)
 toEuler q =
+{-
     let
         {s,i,j,k} = toRecord q
         q00 = s * s
@@ -226,3 +231,13 @@ toEuler q =
                 pitch = asin -r31
                 yaw = atan2 r21 r11
             in (roll, pitch, yaw)
+-}
+    let
+        (q0, q1, q2, q3) = toTuple q
+
+        -- https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_Angles_from_Quaternion
+        phi = atan2 (2 * (q0*q1 + q2*q3)) (1 - 2 * (q1*q1 + q2*q2))
+        tau = asin  (2 * (q0*q2 - q3*q1))
+        psi = atan2 (2 * (q0*q3 + q1*q2)) (1 - 2 * (q2*q2 + q3*q3))
+    in
+        (phi, tau, psi)
