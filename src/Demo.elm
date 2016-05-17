@@ -22,6 +22,7 @@ import Things.Sphere exposing (spheres, cloudsSphere, fogMountainsSphere)
 import Things.Surface2D exposing (..)
 import Things.Teapot exposing (..)
 import Things.Terrain as Terrain
+import Things.Wedge exposing (wedge)
 
 
 import Shaders.FogMountains exposing (fogMountains)
@@ -98,7 +99,8 @@ demoThings terrain0 persons =
         -- boids = foldTCont boidsTCont boids0 (fps 60)
 
         car : Signal Thing
-        car = extractThing <~ jeep
+        car = extractThing <~ wedge
+        -- car = extractThing <~ teapot
         -- car = extractThing <~ fireCube
 
         personThings : Signal (List Thing)
