@@ -12,6 +12,7 @@ import Things.Surface2D exposing (Placement)
 import Things.Terrain as Terrain
 import Vehicles.DreamBird as DreamBird
 import Vehicles.DreamBuggy as DreamBuggy
+import Vehicles.DreamDebug as DreamDebug
 
 import Debug
 
@@ -29,7 +30,7 @@ step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson
             eyeLevel pos = Model.eyeLevel + Terrain.elevation placement terrain pos
             move person =
                 if person.flying then
-                      DreamBird.move eyeLevel inputs person
+                      DreamDebug.move eyeLevel inputs person
                 else
                       DreamBuggy.move eyeLevel inputs person
             bounds person = { person | pos = Terrain.bounds placement person.pos }
@@ -40,8 +41,9 @@ step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson
             moveCamera person =
                 if person.cameraInside then
                     -- let behind = person.pos `sub` (V3.scale 2.5 (Model.direction person)) `sub` (vec3 0 0.5 0)
-                    let inside = person.pos `add`
-                                     Qn.vrotate person.orientQn (vec3 0.38 0.5 -2.3)
+                    let inside = person.pos
+                                     -- Inside Jeep driver's seat
+                                     -- `add` Qn.vrotate person.orientQn (vec3 0.38 0.5 -2.3)
                     in
                         { person | cameraPos = inside -- aboveTerrain eyeLevel behind
                                  , cameraUp = Model.cameraUp person }
@@ -58,12 +60,14 @@ step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson
                                 -- vec3 0 2 0 `add` behind
                                 vec3 0 -2 0 `add` behind
                         cameraPos = aboveTerrain eyeLevel
-                            (V3.scale 0.5 newCameraPos `add` V3.scale 0.5 person.cameraPos)
+                            -- (V3.scale 0.5 newCameraPos `add` V3.scale 0.5 person.cameraPos) -- smooth
+                            newCameraPos
                         newCameraUp = Model.cameraUp person
 
                     in  { person | cameraPos = Terrain.bounds placement cameraPos
                                  , cameraUp =
-                            V3.scale 0.1 newCameraUp `add` V3.scale 0.9 person.cameraUp }
+                            -- V3.scale 0.1 newCameraUp `add` V3.scale 0.9 person.cameraUp }
+                               newCameraUp }
         in
             person0
                 |> gravity eyeLevel inputs.dt
@@ -82,8 +86,11 @@ selectVehicle inputs person =
         if not switch then
             person
         else if flying then
+{-
           Debug.log "Switch to flying!" <|
             DreamBird.welcome { person | flying = True }
+-}
+            DreamDebug.welcome { person | flying = True }
         else
           Debug.log "Switch to buggy!" <|
             DreamBuggy.welcome { person | flying = False }
