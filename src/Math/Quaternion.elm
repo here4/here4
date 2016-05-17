@@ -1,5 +1,6 @@
 module Math.Quaternion where
 
+import Math.Matrix4 as M4
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Math.Vector4 exposing (Vec4, vec4)
@@ -152,6 +153,10 @@ multv q v = hamilton q (fromVec3 v)
 vmult : Vec3 -> Quaternion -> Quaternion
 vmult v q = hamilton (fromVec3 v) q
 
+orient : Vec3 -> Quaternion
+orient v = normalize (fromVec3 v)
+-- orient v = normalize (conjugate (fromVec3 v))
+
 {-| Angle of rotation -}
 getAngle : Quaternion -> Float
 getAngle q = 2.0 * acos (getScalar q)
@@ -195,7 +200,6 @@ fromEuler (phi, tau, psi) =
         i = sphi * ctau * cpsi - cphi * stau * spsi
         j = cphi * stau * cpsi + sphi * ctau * spsi
         k = cphi * ctau * spsi - sphi * stau * cpsi
-    -- in quaternion s j k i
     in quaternion s i j k
         
 {-| Convert to Euler angles representing (roll, pitch, yaw),
@@ -241,3 +245,18 @@ toEuler q =
         psi = atan2 (2 * (q0*q3 + q1*q2)) (1 - 2 * (q2*q2 + q3*q3))
     in
         (phi, tau, psi)
+
+toMat4 : Quaternion -> M4.Mat4
+toMat4 q =
+    let
+        (phi, tau, psi) = toEuler q
+    in
+        -- M4.makeRotate (phi+pi) V3.k
+        M4.makeRotate (phi) V3.k
+        |> M4.rotate tau V3.i
+        |> M4.rotate psi V3.j
+{-
+        M4.makeRotate psi V3.j
+        |> M4.rotate tau V3.i
+        |> M4.rotate phi V3.k
+-}
