@@ -35,11 +35,19 @@ type World =
     }
 -}
 
+type alias WhichVehicle = Int
+vehicleBuggy = 0
+vehicleBird = 1
+vehicleDebug = 2
+
+nextVehicle : WhichVehicle -> WhichVehicle
+nextVehicle v = (v+1) % 3
+
 type alias Person =
     { pos : Vec3
     , velocity : Vec3
     , orientQn: Qn.Quaternion
-    , flying : Bool
+    , vehicle : WhichVehicle
     , cameraInside : Bool
     , cameraPos : Vec3
     , cameraUp : Vec3
@@ -53,7 +61,7 @@ defaultPerson =
     { pos = vec3 0 30 0 
     , velocity = vec3 0 0 0
     , orientQn = Qn.unit
-    , flying = False
+    , vehicle = vehicleBuggy
     , cameraInside = True
     , cameraPos = vec3 0 eyeLevel 0
     , cameraUp = V3.j

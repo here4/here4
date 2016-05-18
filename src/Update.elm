@@ -29,10 +29,12 @@ step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson
         let 
             eyeLevel pos = Model.eyeLevel + Terrain.elevation placement terrain pos
             move person =
-                if person.flying then
-                      DreamDebug.move eyeLevel inputs person
-                else
+                if person.vehicle == Model.vehicleBird then
+                      DreamBird.move eyeLevel inputs person
+                else if person.vehicle == Model.vehicleBuggy then
                       DreamBuggy.move eyeLevel inputs person
+                else
+                      DreamDebug.move eyeLevel inputs person
             bounds person = { person | pos = Terrain.bounds placement person.pos }
 
             checkCamera person = { person | cameraInside =
@@ -81,19 +83,20 @@ selectVehicle : Model.Inputs -> Model.Person -> Model.Person
 selectVehicle inputs person =
     let
         switch = inputs.button_X
-        flying = switch `xor` person.flying
+        newVehicle = Model.nextVehicle person.vehicle
     in
         if not switch then
             person
-        else if flying then
-{-
-          Debug.log "Switch to flying!" <|
-            DreamBird.welcome { person | flying = True }
--}
-            DreamDebug.welcome { person | flying = True }
+        else if newVehicle == Model.vehicleBuggy then
+            Debug.log "Switch to buggy!" <|
+                DreamBuggy.welcome { person | vehicle = newVehicle }
+        else if newVehicle == Model.vehicleBird then
+            Debug.log "Switch to flying!" <|
+                DreamBird.welcome { person | vehicle = newVehicle }
+        -- else if newVehicle == vehicleDebug then
         else
-          Debug.log "Switch to buggy!" <|
-            DreamBuggy.welcome { person | flying = False }
+            Debug.log "Switch to debug!" <|
+                DreamDebug.welcome { person | vehicle = newVehicle }
 
 gravity : Model.EyeLevel -> Float -> Model.Person -> Model.Person
 gravity eyeLevel dt person =

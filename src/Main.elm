@@ -350,8 +350,12 @@ infoLayer person w = container w 84 middle <| flow right <|
 vehicleInfo : Model.Person -> Element
 vehicleInfo person =
     let
-        vehicleName = if person.flying then "Dreambird" else "Dreambuggy"
-        vehicleIcon = if person.flying then FontAwesome.plane else FontAwesome.car
+        vehicleName = if person.vehicle == Model.vehicleBird then
+                          "Dreambird"
+                      else if person.vehicle == Model.vehicleBuggy then
+                           "Dreambuggy"
+                      else "DreamDebug"
+        -- vehicleIcon = if person.flying then FontAwesome.plane else FontAwesome.car
         wher = if person.cameraInside then "Inside" else "Outside"
     in
         flow right <|
