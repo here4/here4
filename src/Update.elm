@@ -44,6 +44,7 @@ step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson
                 if person.cameraInside then
                     -- let behind = person.pos `sub` (V3.scale 2.5 (Model.direction person)) `sub` (vec3 0 0.5 0)
                     let inside = person.pos
+                                     `add` Qn.vrotate person.orientQn (vec3 0 0 1) -- wedge
                                      -- Inside Jeep driver's seat
                                      -- `add` Qn.vrotate person.orientQn (vec3 0.38 0.5 -2.3)
                     in
