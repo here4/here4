@@ -3,7 +3,7 @@ module Vehicles.DreamBird (move, welcome) where
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (..)
-import Math.Quaternion as Qn
+import Orientation exposing (..)
 import Util exposing (v3_clamp)
 
 import Array2D exposing (Array2D)
@@ -33,9 +33,12 @@ fly eyeLevel inputs person =
         pitch =  4 * inputs.my * inputs.dt
         roll  =  6 * inputs.mx * inputs.dt
 
-        orientQn = Qn.hamilton person.orientQn (Qn.fromEuler (roll, pitch, yaw))
+        -- orientQn = Qn.hamilton person.orientQn (Qn.fromEuler (roll, pitch, yaw))
+        -- orient = Qn.vrotate orientQn
+        orpy = fromRollPitchYaw (roll, pitch, yaw)
+        orientation = person.orientation `followedBy` orpy
+        orient = rotateBodyV orientation
 
-        orient = Qn.vrotate orientQn
         dv = V3.scale (50 * thrust * inputs.dt) <| orient V3.k
         du = V3.scale (20 * thrust * inputs.dt) <| orient V3.j
         dv' = dv `add` du
@@ -43,7 +46,7 @@ fly eyeLevel inputs person =
         vel = (V3.scale 0.8 dv') `add` (V3.scale 0.95 person.velocity)
         
     in
-        { person | orientQn = orientQn
+        { person | orientation = orientation
                  , velocity = vel
         }
 

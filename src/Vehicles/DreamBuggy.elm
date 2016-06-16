@@ -3,7 +3,7 @@ module Vehicles.DreamBuggy (move, welcome) where
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (..)
-import Math.Quaternion as Qn
+import Orientation exposing (..)
 import Util exposing (v3_clamp)
 
 import Array2D exposing (Array2D)
@@ -23,14 +23,14 @@ move eyeLevel inputs person =
 
 -- | Welcome a new driver to the DreamBuggy
 welcome : Model.Person -> Model.Person
-welcome person = { person | orientQn = clampBuggy person.orientQn }
+welcome person = { person | orientation = clampBuggy person.orientation }
 
-clampBuggy : Qn.Quaternion -> Qn.Quaternion
-clampBuggy q =
-    let (roll, pitch, yaw) = Qn.toEuler q
+clampBuggy : Orientation -> Orientation
+clampBuggy o =
+    let (roll, pitch, yaw) = Orientation.toRollPitchYaw o
         roll' = clamp (degrees -10) (degrees 10) (roll/2)
         pitch' = clamp (degrees -15) (degrees 15) (pitch/2)
-    in Qn.fromEuler (roll', pitch', yaw)
+    in Orientation.fromRollPitchYaw (roll', pitch', yaw)
 
 flatten : Vec3 -> Vec3
 flatten v =
@@ -40,11 +40,11 @@ flatten v =
 turn : Model.EyeLevel -> Float -> Float -> Model.Person -> Model.Person
 turn eyeLevel dx dy person =
     let
-        (roll0, pitch0, yaw0) = Qn.toEuler person.orientQn
+        (roll0, pitch0, yaw0) = toRollPitchYaw person.orientation
         personY = eyeLevel person.pos
-        frontTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 0 0 1)))
-        rightTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 1 0 0)))
-        leftTireY = eyeLevel (person.pos `add` (Qn.vrotate person.orientQn (vec3 -1 0 0)))
+        frontTireY = eyeLevel (person.pos `add` (rotateBodyV person.orientation (vec3 0 0 1)))
+        rightTireY = eyeLevel (person.pos `add` (rotateBodyV person.orientation (vec3 1 0 0)))
+        leftTireY = eyeLevel (person.pos `add` (rotateBodyV person.orientation (vec3 -1 0 0)))
         tirePitch = atan (-(frontTireY - personY)/1)
         tireRoll  = atan ((rightTireY - leftTireY)/2)
         (yaw, pitch, roll) =
@@ -54,9 +54,9 @@ turn eyeLevel dx dy person =
                 (yaw0-dx, pitch0*0.05 + (tirePitch+dy)*0.95, roll0*0.05 + (tireRoll*0.95))
                 -- (yaw0-dx, pitch0*0.05 + tirePitch*0.95, tireRoll)
 
-        orientQn = clampBuggy (Qn.fromEuler (roll, pitch, yaw))
+        orientation = clampBuggy (fromRollPitchYaw (roll, pitch, yaw))
     in
-        { person | orientQn = orientQn }
+        { person | orientation = orientation }
 
 walk : Model.EyeLevel -> { a | x:Float, y:Float, dt:Float } -> Model.Person -> Model.Person
 walk eyeLevel directions person =

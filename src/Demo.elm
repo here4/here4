@@ -8,8 +8,8 @@ import Time exposing (fps)
 
 import Array2D
 import Math.Procedural exposing (..)
-import Math.Quaternion as Qn -- for drive
 import Math.RandomVector exposing (randomVec3')
+import Orientation
 import Util exposing (repeatedly)
 import Engine exposing (..)
 import Model
@@ -58,7 +58,7 @@ drive person (Thing pos orientation see) =
         -- Move so the object does not obscure the camera
         -- pos = person.pos `sub` (scale 1.1 (Model.direction person)) `sub` vec3 0 (Model.eyeLevel - 1.0) 0
         pos = person.pos -- `sub` (scale 1.1 (Model.direction person)) `sub` vec3 0 (Model.eyeLevel - 1.0) 0
-        orient = Qn.vrotate (Qn.negate person.orientQn) V3.k
+        orient = Orientation.rotateLabV person.orientation V3.k
     in
         Thing pos orient see
 

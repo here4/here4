@@ -3,7 +3,8 @@ module Model where
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (makeRotate, transform)
-import Math.Quaternion as Qn
+
+import Orientation
 
 type alias EyeLevel = Vec3 -> Float
 
@@ -46,7 +47,7 @@ nextVehicle v = (v+1) % 3
 type alias Person =
     { pos : Vec3
     , velocity : Vec3
-    , orientQn: Qn.Quaternion
+    , orientation : Orientation.Orientation
     , vehicle : WhichVehicle
     , cameraInside : Bool
     , cameraPos : Vec3
@@ -60,7 +61,7 @@ defaultPerson : Person
 defaultPerson =
     { pos = vec3 0 30 0 
     , velocity = vec3 0 0 0
-    , orientQn = Qn.unit
+    , orientation = Orientation.initial
     , vehicle = vehicleBuggy
     , cameraInside = True
     , cameraPos = vec3 0 eyeLevel 0
@@ -68,11 +69,12 @@ defaultPerson =
     }
 
 orient : Person -> Vec3 -> Vec3
-orient person = Qn.vrotate person.orientQn
+orient person = Orientation.rotateBodyV person.orientation
 
 direction : Person -> Vec3
 direction person = orient person V3.k
 
 cameraUp : Person -> Vec3
 -- cameraUp person = orient person V3.j
-cameraUp person = Qn.vrotate (Qn.negate person.orientQn) V3.j
+-- cameraUp person = Qn.vrotate (Qn.negate person.orientQn) V3.j
+cameraUp person = Orientation.rotateLabV person.orientation V3.j

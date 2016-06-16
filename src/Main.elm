@@ -44,7 +44,7 @@ import Html exposing (toElement)
 import Graphics.Collage exposing (collage, defaultLine, outlinedText, text)
 
 import Debug
-import Math.Quaternion as Qn
+import Orientation
 
 -- Pointer Lock information
 port movement : Signal (Int,Int)
@@ -344,7 +344,7 @@ infoLayer : Model.Person -> Int -> Element
 infoLayer person w = container w 84 middle <| flow right <|
     [ vehicleInfo person
     , flow right [bigIcon FontAwesome.diamond, bigShow 7]
-    , bigShow <| mapTriple (round << toDegrees) (Qn.toEuler person.orientQn)
+    , bigShow <| mapTriple (round << toDegrees) (Orientation.toRollPitchYaw person.orientation)
     ]
 
 vehicleInfo : Model.Person -> Element
