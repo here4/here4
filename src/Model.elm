@@ -10,6 +10,7 @@ type alias EyeLevel = Vec3 -> Float
 
 type alias Inputs =
     { reset : Bool
+    , changeVR : Bool
     , changeCamera : Bool
     , isJumping: Bool
     , button_X: Bool
@@ -22,7 +23,7 @@ type alias Inputs =
     }
 
 noInput : Inputs
-noInput = { reset = False, changeCamera = False, isJumping = False, button_X = False, x=0, y=0, dt=0, mx=0, my=0, mt=0 }
+noInput = { reset = False, changeVR = False, changeCamera = False, isJumping = False, button_X = False, x=0, y=0, dt=0, mx=0, my=0, mt=0 }
 
 -- TODO: Make a new model type with both Person and Things
 -- but the Things are passed in and can be added/subtracted
@@ -49,6 +50,7 @@ type alias Person =
     , velocity : Vec3
     , orientation : Orientation.Orientation
     , vehicle : WhichVehicle
+    , cameraVR : Bool
     , cameraInside : Bool
     , cameraPos : Vec3
     , cameraUp : Vec3
@@ -63,6 +65,7 @@ defaultPerson =
     , velocity = vec3 0 0 0
     , orientation = Orientation.initial
     , vehicle = vehicleBuggy
+    , cameraVR = False
     , cameraInside = True
     , cameraPos = vec3 0 eyeLevel 0
     , cameraUp = V3.j

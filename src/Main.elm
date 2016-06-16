@@ -241,7 +241,7 @@ gamepadToInputs : Time -> Gamepad.Gamepad -> Model.Inputs
 gamepadToInputs dt gamepad =
     let {x,y,mx,my} = gamepadToArrows gamepad
         bs = gamepadToButtons gamepad
-    in  { noInput | reset = bs.bStart, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX, dt = dt }
+    in  { noInput | reset = bs.bStart, changeVR = bs.bLeftBumper, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX, dt = dt }
 
 gamepadsToInputs : List (Maybe Gamepad.Gamepad) -> Time -> List Model.Inputs
 gamepadsToInputs gamepads dt = List.map (mapDefault noInput (gamepadToInputs dt)) gamepads
@@ -328,10 +328,15 @@ world thingsOnTerrain =
             (Signal.map2 beside
                 (Signal.map5 scene entities wh2 t measuredFPS person1')
                 (Signal.map5 scene entities wh2 t measuredFPS person2'))
+      vrScene =
+            (Signal.map2 beside
+                (Signal.map5 scene entities wh2 t measuredFPS person1')
+                (Signal.map5 scene entities wh2 t measuredFPS person1'))
 
       ifElse : (a -> Bool) -> b -> b -> a -> b
       ifElse p ifBranch elseBranch x = if p x then ifBranch else elseBranch
-      chooseScene = Signal.map3 (ifElse (\l -> List.length l > 1)) dualScene oneScene persistentGamepads
+      oneOrTwoPlayerScene = Signal.map3 (ifElse (\l -> List.length l > 1)) dualScene oneScene persistentGamepads
+      chooseScene = Signal.map3 (ifElse (\p -> p.cameraVR)) vrScene oneOrTwoPlayerScene person1'
   in 
       -- Signal.map3 lockMessage wh isLocked
       Signal.map2 debugLayer

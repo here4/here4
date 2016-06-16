@@ -37,8 +37,15 @@ step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson
                       DreamDebug.move eyeLevel inputs person
             bounds person = { person | pos = Terrain.bounds placement person.pos }
 
-            checkCamera person = { person | cameraInside =
-                if inputs.changeCamera then not person.cameraInside else person.cameraInside }
+            checkCamera person = { person |
+                cameraInside = if inputs.changeCamera then
+                                   not person.cameraInside
+                               else
+                                   person.cameraInside,
+                cameraVR = if inputs.changeVR then
+                                   not person.cameraVR
+                               else
+                                   person.cameraVR }
 
             moveCamera person =
                 if person.cameraInside then
