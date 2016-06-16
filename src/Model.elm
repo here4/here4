@@ -55,7 +55,7 @@ type alias Person =
     }
 
 eyeLevel : Float
-eyeLevel = 1.0
+eyeLevel = 1.8 -- Make this a function of Vehicle
 
 defaultPerson : Person
 defaultPerson =

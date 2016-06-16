@@ -45,13 +45,13 @@ turn eyeLevel dx dy person =
         frontTireY = eyeLevel (person.pos `add` (rotateBodyV person.orientation (vec3 0 0 1)))
         rightTireY = eyeLevel (person.pos `add` (rotateBodyV person.orientation (vec3 1 0 0)))
         leftTireY = eyeLevel (person.pos `add` (rotateBodyV person.orientation (vec3 -1 0 0)))
-        tirePitch = atan (-(frontTireY - personY)/1)
-        tireRoll  = atan ((rightTireY - leftTireY)/2)
+        tirePitch = atan (-(frontTireY - personY)/0.01)
+        tireRoll  = atan ((rightTireY - leftTireY)/0.1)
         (yaw, pitch, roll) =
             if getY person.pos > (eyeLevel person.pos) + 5 then
-                (yaw0-(dx * 5), pitch0*0.1 + dy*0.9, 0)
+                (yaw0-(dx * 5), pitch0*0.9 + dy*0.1, 0)
             else
-                (yaw0-dx, pitch0*0.05 + (tirePitch+dy)*0.95, roll0*0.05 + (tireRoll*0.95))
+                (yaw0-dx, pitch0*0.95 + (tirePitch+dy)*0.05, roll0*0.95 + (tireRoll*0.05))
                 -- (yaw0-dx, pitch0*0.05 + tirePitch*0.95, tireRoll)
 
         orientation = clampBuggy (fromRollPitchYaw (roll, pitch, yaw))
@@ -107,7 +107,7 @@ physics eyeLevel dt person =
 
         (pos', dv) = if p.y < e then
                          let vy = if ((e < (0.8*80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10*dt) then
-                             clamp 0 10 (V3.length person.velocity * (e-p.y)*dt) else 0
+                             clamp 0 10 (V3.length person.velocity * (e-p.y)*dt*5) else 0
                          in (vec3 p.x e p.z, vec3 0 vy 0)
                      else
                          (pos, vec3 0 0 0)
