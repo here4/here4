@@ -13,6 +13,7 @@ import Math.Matrix4 as M4
 import WebGL exposing (..)
 
 import Model
+import Orientation
 
 type alias Perception = {
     cameraPos  : Vec3,
@@ -213,20 +214,28 @@ orient (Thing position orientation see) =
     in
         tview (M4.translate position) << tview (M4.rotate rot_angle rot_axis) <| see
 
+eyeOffset : Model.Person -> Model.Eye -> Vec3
+eyeOffset person eye =
+    if eye == Model.LeftEye then
+        Orientation.rotateLabV person.orientation (vec3 (-0.04) 0 0)
+    else if eye == Model.RightEye then
+        Orientation.rotateLabV person.orientation (vec3 0.04 0 0)
+    else
+        vec3 0 0 0
 
-look : (Int,Int) -> Model.Person -> Mat4
-look (w,h) person =
+look : (Int,Int) -> Model.Person -> Model.Eye -> Mat4
+look (w,h) person eye =
     M4.mul (M4.makePerspective 45 (toFloat w / toFloat h) 0.01 100)
-           (M4.makeLookAt person.cameraPos
+           (M4.makeLookAt (person.cameraPos `add` eyeOffset person eye)
                           (person.pos `add` (scale 3 (Model.direction person)))
                           person.cameraUp)
 
-scene : List Thing -> (Int,Int) -> Time -> Float -> Model.Person -> Element
-scene things (w,h) t measuredFPS person =
+scene : Model.Eye -> List Thing -> (Int,Int) -> Time -> Float -> Model.Person -> Element
+scene eye things (w,h) t measuredFPS person =
   let
     see = mapApply (List.map orient things)
     p = { cameraPos = person.cameraPos
-        , viewMatrix = look (w,h) person
+        , viewMatrix = look (w,h) person eye
         , globalTime = t
         , resolution = (w,h)
         , measuredFPS = measuredFPS

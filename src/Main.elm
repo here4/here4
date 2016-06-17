@@ -323,15 +323,15 @@ world thingsOnTerrain =
       person2' = person2 placement terrain
       entities = thingsOnTerrain terrain [person1', person2']
 
-      oneScene = Signal.map5 scene entities wh t measuredFPS person1'
+      oneScene = Signal.map5 (scene Model.OneEye) entities wh t measuredFPS person1'
       dualScene =
             (Signal.map2 beside
-                (Signal.map5 scene entities wh2 t measuredFPS person1')
-                (Signal.map5 scene entities wh2 t measuredFPS person2'))
+                (Signal.map5 (scene Model.OneEye) entities wh2 t measuredFPS person1')
+                (Signal.map5 (scene Model.OneEye) entities wh2 t measuredFPS person2'))
       vrScene =
             (Signal.map2 beside
-                (Signal.map5 scene entities wh2 t measuredFPS person1')
-                (Signal.map5 scene entities wh2 t measuredFPS person1'))
+                (Signal.map5 (scene Model.LeftEye) entities wh2 t measuredFPS person1')
+                (Signal.map5 (scene Model.RightEye) entities wh2 t measuredFPS person1'))
 
       ifElse : (a -> Bool) -> b -> b -> a -> b
       ifElse p ifBranch elseBranch x = if p x then ifBranch else elseBranch

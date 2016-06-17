@@ -56,6 +56,8 @@ type alias Person =
     , cameraUp : Vec3
     }
 
+type Eye = OneEye | LeftEye | RightEye
+
 eyeLevel : Float
 eyeLevel = 1.8 -- Make this a function of Vehicle
 
