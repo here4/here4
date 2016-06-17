@@ -241,7 +241,7 @@ gamepadToInputs : Time -> Gamepad.Gamepad -> Model.Inputs
 gamepadToInputs dt gamepad =
     let {x,y,mx,my} = gamepadToArrows gamepad
         bs = gamepadToButtons gamepad
-    in  { noInput | reset = bs.bStart, changeVR = bs.bLeftBumper, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX, dt = dt }
+    in  { noInput | reset = bs.bStart, changeVR = bs.bB, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX, dt = dt }
 
 gamepadsToInputs : List (Maybe Gamepad.Gamepad) -> Time -> List Model.Inputs
 gamepadsToInputs gamepads dt = List.map (mapDefault noInput (gamepadToInputs dt)) gamepads
