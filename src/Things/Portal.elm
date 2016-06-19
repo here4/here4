@@ -48,7 +48,8 @@ seePortal vertexShader fragmentShader p =
         s = p.globalTime
     in
         [render vertexShader fragmentShader mesh
-            { iResolution=resolution, iGlobalTime=s, view=p.viewMatrix }]
+            { iResolution=resolution, iGlobalTime=s
+            , iLensDistort=p.lensDistort, view=p.viewMatrix }]
 
 -- mesh : List (Triple Vertex)
 mesh : Drawable Vertex

@@ -56,7 +56,7 @@ seeCube vertexShader fragmentShader p =
         s = p.globalTime
     in
         [render vertexShader fragmentShader mesh
-            { iResolution=resolution, iGlobalTime=s, view=p.viewMatrix }]
+            { iResolution=resolution, iGlobalTime=s, iLensDistort=p.lensDistort, view=p.viewMatrix }]
 
 {-
 cloudsCube : (Int,Int) -> Time -> Mat4 -> Renderable

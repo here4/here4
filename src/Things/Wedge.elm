@@ -28,9 +28,11 @@ seeWedge p =
         detail = p.measuredFPS / 3.0
     in
         [ render worldVertex voronoiDistances topMesh
-            { iResolution=resolution, iGlobalTime=s, view=p.viewMatrix }
+            { iResolution=resolution, iGlobalTime=s
+            , iLensDistort=p.lensDistort, view=p.viewMatrix }
         , render noiseVertex noiseColorFragment bottomMesh
-            { iResolution=resolution, iDetail=detail, iGlobalTime=s, iGlobalTimeV=s, view=p.viewMatrix }
+            { iResolution=resolution, iDetail=detail, iGlobalTime=s
+            , iGlobalTimeV=s, iLensDistort=p.lensDistort, view=p.viewMatrix }
         ]
 
 topMesh : Drawable Vertex

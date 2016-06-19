@@ -20,7 +20,8 @@ seeGround p =
         s = p.globalTime
     in
         [render worldVertex colorFragment groundMesh
-            { iResolution=resolution, iGlobalTime=s, view=p.viewMatrix }]
+            { iResolution=resolution, iGlobalTime=s
+            , iLensDistort=p.lensDistort, view=p.viewMatrix }]
 
 
 -- The mesh for the ground

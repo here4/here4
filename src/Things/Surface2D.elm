@@ -70,7 +70,10 @@ seeSurface vertexShader fragmentShader mesh p =
         detail = p.measuredFPS / 3.0
     in
         [render vertexShader fragmentShader mesh
-            { iResolution=resolution, iDetail=detail, iGlobalTime=s, iGlobalTimeV=s, view=p.viewMatrix }]
+            { iGlobalTime=s, iResolution=resolution, iDetail=detail
+            , iGlobalTimeV=s, iLensDistort=p.lensDistort, view=p.viewMatrix
+            }
+        ]
 
 
 rippleNoiseSurface2D skip ripple placement xz = rippleSurface rippleNoiseVertex noiseColorFragment ripple
@@ -87,7 +90,10 @@ rippleSeeSurface vertexShader fragmentShader ripple mesh p =
         detail = p.measuredFPS / 3.0
     in
         [render vertexShader fragmentShader mesh
-            { iResolution=resolution, iDetail=detail, iGlobalTime=s, iGlobalTimeV=s, view=p.viewMatrix, iRipple=ripple }]
+            { iGlobalTime=s, iResolution=resolution, iDetail=detail
+            , iGlobalTimeV=s, iLensDistort=p.lensDistort, view=p.viewMatrix, iRipple=ripple
+            }
+        ]
 
 ----------------------------------------------------------------------
 

@@ -31,8 +31,8 @@ seeBFly vertexShader fragmentShader flapStart p =
         flapR = makeRotate (flap * 3*pi/8) (vec3 0 0 1)
     in
         [render vertexShader fragmentShader mesh
-            { iResolution=resolution, iGlobalTime=s, view=p.viewMatrix,
-              flapL=flapL, flapR=flapR }
+            { iResolution=resolution, iGlobalTime=s
+            , iLensDistort=p.lensDistort, view=p.viewMatrix, flapL=flapL, flapR=flapR }
         ]
 
 mesh : Drawable BoidVertex
@@ -45,24 +45,49 @@ mesh =
     in
         Triangle <| [ (bHead, bTail, bLeft), (bHead, bTail, bRight) ]
 
-bflyVertex : Shader BoidVertex { u | view:Mat4, flapL:Mat4, flapR:Mat4 } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
+bflyVertex : Shader BoidVertex { u | iLensDistort:Float, view:Mat4, flapL:Mat4, flapR:Mat4 } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
 bflyVertex = [glsl|
 
 attribute vec3 pos;
 attribute vec3 color;
 attribute vec3 coord;
 attribute vec3 wing;
+uniform float iLensDistort;
 uniform mat4 view;
 uniform mat4 flapL;
 uniform mat4 flapR;
 varying vec3 elm_FragColor;
 varying vec2 elm_FragCoord;
+
+vec4 distort(vec4 p)
+{
+  vec2 v = p.xy / p.w;
+
+  // Convert to polar coords
+  float theta = atan(v.y, v.x);
+  float radius = length(v);
+
+  // Distort
+  radius = pow(radius, iLensDistort);
+
+  // Convert back to Cartesian
+  v.x = radius * cos(theta);
+  v.y = radius * sin(theta);
+  p.xy = v.xy * p.w;
+  return p;
+}
+
 void main () {
   mat4 flap;
   if (wing.x < 0.0) { flap = flapL; }
   else if (wing.x > 0.0) { flap = flapR; }
   else { flap = mat4(1.0); }
-  gl_Position = view * flap * vec4(pos, 1.0);
+  vec4 p = view * flap * vec4(pos, 1.0);
+  if (iLensDistort > 0.0) {
+    gl_Position = distort(p);
+  } else {
+    gl_Position = p;
+  }
   elm_FragColor = color;
   elm_FragCoord = coord.xy;
 }

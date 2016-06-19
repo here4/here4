@@ -8,7 +8,7 @@ import WebGL exposing (..)
 
 type alias NoiseVertex = { pos:Vec3, color:Vec4, coord:Vec3, textureScale:Float, timeScale:Float, smoothing:Float }
 
-noiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, view:Mat4 } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
+noiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4 } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
 noiseVertex = [glsl|
 
 attribute vec3 pos;
@@ -18,6 +18,7 @@ attribute float textureScale;
 attribute float timeScale;
 attribute float smoothing;
 uniform float iGlobalTimeV;
+uniform float iLensDistort;
 uniform mat4 view;
 varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
@@ -34,7 +35,7 @@ vec4 distort(vec4 p)
   float radius = length(v);
 
   // Distort
-  radius = pow(radius, 0.85);
+  radius = pow(radius, iLensDistort);
 
   // Convert back to Cartesian
   v.x = radius * cos(theta);
@@ -44,17 +45,26 @@ vec4 distort(vec4 p)
 }
 
 void main () {
-  gl_Position = distort(view * vec4(pos, 1.0));
   elm_FragColor = color;
   elm_FragCoord = coord.xy;
   iTextureScale = textureScale;
   iTimeScale = timeScale;
   iSmoothing = smoothing;
+
+  vec4 p = view * vec4(pos, 1.0);
+  if (iLensDistort > 0.0) {
+    vec4 d = distort(p);
+    gl_Position = d;
+    //if (d.x < -30.0 || d.x > 30.0 || d.y < -30.0 || d.y > 30.0)
+    //  elm_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  } else {
+    gl_Position = p;
+  }
 }
 
 |]
 
-rippleNoiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, view:Mat4, iRipple:Float } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
+rippleNoiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4, iRipple:Float } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
 rippleNoiseVertex = [glsl|
 
 attribute vec3 pos;
@@ -64,6 +74,7 @@ attribute float textureScale;
 attribute float timeScale;
 attribute float smoothing;
 uniform float iGlobalTimeV;
+uniform float iLensDistort;
 uniform float iRipple;
 uniform mat4 view;
 varying vec4 elm_FragColor;
@@ -81,7 +92,7 @@ vec4 distort(vec4 p)
   float radius = length(v);
 
   // Distort
-  radius = pow(radius, 0.85);
+  radius = pow(radius, iLensDistort);
 
   // Convert back to Cartesian
   v.x = radius * cos(theta);
@@ -93,7 +104,17 @@ vec4 distort(vec4 p)
 void main () {
   float y = pos.y + iRipple*sin(coord.x*coord.y + iGlobalTimeV);
   vec3 newPos = vec3(pos.x, y, pos.z);
-  gl_Position = distort(view * vec4(newPos, 1.0));
+
+  vec4 p = view * vec4(newPos, 1.0);
+  if (iLensDistort > 0.0) {
+    vec4 d = distort(p);
+    gl_Position = d;
+    //if (d.x < -30.0 || d.x > 30.0 || d.y < -30.0 || d.y > 30.0)
+    //  elm_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  } else {
+    gl_Position = p;
+  }
+
   elm_FragColor = color;
   elm_FragCoord = coord.xy;
   iTextureScale = textureScale;

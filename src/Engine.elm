@@ -20,6 +20,7 @@ type alias Perception = {
     resolution : (Int, Int),
     globalTime : Time,
     viewMatrix : Mat4,
+    lensDistort : Float,
     measuredFPS : Float
 }
 
@@ -234,10 +235,12 @@ scene : Model.Eye -> List Thing -> (Int,Int) -> Time -> Float -> Model.Person ->
 scene eye things (w,h) t measuredFPS person =
   let
     see = mapApply (List.map orient things)
+    lensDistort = if person.cameraVR then 0.85 else 0.9
     p = { cameraPos = person.cameraPos
         , viewMatrix = look (w,h) person eye
         , globalTime = t
         , resolution = (w,h)
+        , lensDistort = lensDistort
         , measuredFPS = measuredFPS
         }
   in

@@ -46,7 +46,8 @@ seeSphere vertexShader fragmentShader p =
         s = p.globalTime
     in
         [render vertexShader fragmentShader sphereMesh
-            { iResolution=resolution, iGlobalTime=s, view=p.viewMatrix }]
+            { iResolution=resolution, iGlobalTime=s
+            , iLensDistort=p.lensDistort, view=p.viewMatrix }]
 
 unfold : Int -> (a -> a) -> a -> List a
 unfold n f x = if n==0 then [] else

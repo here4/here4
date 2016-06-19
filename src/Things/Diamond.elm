@@ -41,7 +41,8 @@ seeDiamond vertexShader fragmentShader p =
         s = p.globalTime
     in
         [render vertexShader fragmentShader diamondMesh
-            { iResolution=resolution, iGlobalTime=s, view=p.viewMatrix }]
+            { iResolution=resolution, iGlobalTime=s
+            , iLensDistort=p.lensDistort, view=p.viewMatrix }]
 
 {-
 type alias Triangle a = (a,a,a)
