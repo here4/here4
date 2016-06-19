@@ -336,14 +336,15 @@ world thingsOnTerrain =
       ifElse : (a -> Bool) -> b -> b -> a -> b
       ifElse p ifBranch elseBranch x = if p x then ifBranch else elseBranch
       oneOrTwoPlayerScene = Signal.map3 (ifElse (\l -> List.length l > 1)) dualScene oneScene persistentGamepads
-      chooseScene = Signal.map3 (ifElse (\p -> p.cameraVR)) vrScene oneOrTwoPlayerScene person1'
-  in 
       -- Signal.map3 lockMessage wh isLocked
-      Signal.map2 debugLayer
+      info2DView = Signal.map2 debugLayer
           --(combine [Signal.map show Gamepad.gamepads, Signal.map show gamepadInputs])
           -- (combine [Signal.map (show << mapTriple (round << toDegrees)) (Signal.map (Qn.toEuler << .orientQn) person1')])
             (Signal.map infoLayer person1')
-            chooseScene
+            oneOrTwoPlayerScene
+  in
+      -- If person1' is in VR mode then just show that, else the 2D view with infolayer
+      Signal.map3 (ifElse (\p -> p.cameraVR)) vrScene info2DView person1'
 
 infoLayer : Model.Person -> Int -> Element
 infoLayer person w = container w 84 middle <| flow right <|
