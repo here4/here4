@@ -101,9 +101,9 @@ void texture() {
 }
 
 void main() {
-        texture();
+//        texture();
 //	if (int(iDetail) == 0) {
-//		gl_FragColor = elm_FragColor;
+		gl_FragColor = elm_FragColor;
 //	} else {
 //		texture();
 //	}

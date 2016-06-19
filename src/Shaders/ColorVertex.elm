@@ -16,8 +16,26 @@ uniform mat4 view;
 
 varying vec3 elm_FragColor;
 
+vec4 distort(vec4 p)
+{
+  vec2 v = p.xy / p.w;
+
+  // Convert to polar coords
+  float theta = atan(v.y, v.x);
+  float radius = length(v);
+
+  // Distort
+  radius = pow(radius, 0.85);
+
+  // Convert back to Cartesian
+  v.x = radius * cos(theta);
+  v.y = radius * sin(theta);
+  p.xy = v.xy * p.w;
+  return p;
+}
+
 void main () {
-    gl_Position = view * vec4(pos, 1.0);
+    gl_Position = distort(view * vec4(pos, 1.0));
     vcolor = color;
 }
 

@@ -24,8 +24,27 @@ varying vec2 elm_FragCoord;
 varying float iTextureScale;
 varying float iTimeScale;
 varying float iSmoothing;
+
+vec4 distort(vec4 p)
+{
+  vec2 v = p.xy / p.w;
+
+  // Convert to polar coords
+  float theta = atan(v.y, v.x);
+  float radius = length(v);
+
+  // Distort
+  radius = pow(radius, 0.85);
+
+  // Convert back to Cartesian
+  v.x = radius * cos(theta);
+  v.y = radius * sin(theta);
+  p.xy = v.xy * p.w;
+  return p;
+}
+
 void main () {
-  gl_Position = view * vec4(pos, 1.0);
+  gl_Position = distort(view * vec4(pos, 1.0));
   elm_FragColor = color;
   elm_FragCoord = coord.xy;
   iTextureScale = textureScale;
@@ -52,10 +71,29 @@ varying vec2 elm_FragCoord;
 varying float iTextureScale;
 varying float iTimeScale;
 varying float iSmoothing;
+
+vec4 distort(vec4 p)
+{
+  vec2 v = p.xy / p.w;
+
+  // Convert to polar coords
+  float theta = atan(v.y, v.x);
+  float radius = length(v);
+
+  // Distort
+  radius = pow(radius, 0.85);
+
+  // Convert back to Cartesian
+  v.x = radius * cos(theta);
+  v.y = radius * sin(theta);
+  p.xy = v.xy * p.w;
+  return p;
+}
+
 void main () {
   float y = pos.y + iRipple*sin(coord.x*coord.y + iGlobalTimeV);
   vec3 newPos = vec3(pos.x, y, pos.z);
-  gl_Position = view * vec4(newPos, 1.0);
+  gl_Position = distort(view * vec4(newPos, 1.0));
   elm_FragColor = color;
   elm_FragCoord = coord.xy;
   iTextureScale = textureScale;
