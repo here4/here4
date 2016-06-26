@@ -1,4 +1,4 @@
-module Shaders.NoiseVertex (NoiseVertex, noiseVertex, rippleNoiseVertex) where
+module Shaders.NoiseVertex exposing (NoiseVertex, noiseVertex, rippleNoiseVertex)
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (Vec3)

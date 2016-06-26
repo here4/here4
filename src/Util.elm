@@ -1,4 +1,4 @@
-module Util where
+module Util exposing (..)
 
 import List.Extra exposing (splitAt)
 

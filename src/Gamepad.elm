@@ -1,8 +1,8 @@
-module Gamepad
+module Gamepad exposing
   ( gamepads
   , Button
   , Gamepad
-  ) where
+  )
 
 {-| Library for working with gamepads
 # button

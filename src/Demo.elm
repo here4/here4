@@ -1,4 +1,4 @@
-module Demo (demoThings) where
+module Demo exposing (demoThings)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3

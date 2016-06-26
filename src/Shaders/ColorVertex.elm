@@ -1,4 +1,4 @@
-module Shaders.ColorVertex (ColorVertex, colorVertex) where
+module Shaders.ColorVertex exposing (ColorVertex, colorVertex)
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)

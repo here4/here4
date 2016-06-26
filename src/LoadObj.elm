@@ -1,5 +1,5 @@
 -- module LoadObj (loadObj) where
-module LoadObj where
+module LoadObj exposing (..)
 
 import String
 import Array

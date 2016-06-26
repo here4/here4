@@ -1,4 +1,4 @@
-module Orientation where
+module Orientation exposing (..)
 
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Quaternion as Qn

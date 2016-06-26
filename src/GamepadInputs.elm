@@ -1,4 +1,4 @@
-module GamepadInputs (gamepadInputs, persistentGamepads) where
+module GamepadInputs exposing (gamepadInputs, persistentGamepads)
 
 {-| This module drives a virtuul wurld
 

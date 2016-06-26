@@ -1,4 +1,4 @@
-module Shaders.ColorFragment (colorFragment, noiseColorFragment) where
+module Shaders.ColorFragment exposing (colorFragment, noiseColorFragment)
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (Vec3)

@@ -1,4 +1,4 @@
-module Zipper where
+module Zipper exposing (..)
 
 type Zipper a = Zipper (List a) (List a)
 {-

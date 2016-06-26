@@ -1,4 +1,4 @@
-module Array2D where
+module Array2D exposing (..)
 
 import Array
 import Util exposing (splitEvery)

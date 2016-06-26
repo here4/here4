@@ -1,4 +1,4 @@
-module Zipper2D where
+module Zipper2D exposing (..)
 
 import Maybe.Extra exposing (join)
 
