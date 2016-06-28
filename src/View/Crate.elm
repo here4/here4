@@ -18,34 +18,35 @@ import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 type alias Triple a = (a,a,a)
 
-cloudsCube : Window.Size -> Time -> Mat4 -> Renderable
+-- cloudsCube : Window.Size -> Time -> Mat4 -> Renderable
 cloudsCube = cube worldVertex clouds
 
-fireCube : Window.Size -> Time -> Mat4 -> Renderable
+-- fireCube : Window.Size -> Time -> Mat4 -> Renderable
 fireCube = cube worldVertex fire
 
-fogMountainsCube : Window.Size -> Time -> Mat4 -> Renderable
+-- fogMountainsCube : Window.Size -> Time -> Mat4 -> Renderable
 fogMountainsCube = cube worldVertex fogMountains
 
-plasmaCube : Window.Size -> Time -> Mat4 -> Renderable
+-- plasmaCube : Window.Size -> Time -> Mat4 -> Renderable
 plasmaCube = cube worldVertex simplePlasma
 
-voronoiCube : Window.Size -> Time -> Mat4 -> Renderable
+-- voronoiCube : Window.Size -> Time -> Mat4 -> Renderable
 voronoiCube = cube worldVertex voronoiDistances
 
 -- cube : Shader attributes uniforms varying -> Shader {} uniforms varyings
 --    -> (Int,Int) -> Time -> Mat4 -> Renderable
-cube vertexShader fragmentShader windowSize t view =
-    let resolution = vec3 (toFloat windowSize.width) (toFloat windowSize.height) 0
-        s = inSeconds t
+cube vertexShader fragmentShader p =
+    let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+        s = inSeconds p.globalTime
     in
         render vertexShader fragmentShader mesh
-            { iResolution=resolution, iGlobalTime=s
-            , iLensDistort = 0.9, view=view }
+            { iResolution = resolution, iGlobalTime = s
+            , iLensDistort = p.lensDistort, view = p.viewMatrix }
 
-textureCube : WebGL.Texture -> Mat4 -> WebGL.Renderable
-textureCube texture perspective =
-    WebGL.render worldVertex textureFragment mesh { iTexture = texture, iLensDistort = 0.9, view = perspective }
+-- textureCube : WebGL.Texture -> Mat4 -> WebGL.Renderable
+textureCube texture p =
+    render worldVertex textureFragment mesh
+        { iTexture = texture, iLensDistort = p.lensDistort, view = p.viewMatrix }
 
 {-| The mesh for a cube -}
 mesh : Drawable Vertex

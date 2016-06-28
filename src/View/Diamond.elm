@@ -19,21 +19,22 @@ import Shaders.WorldVertex exposing (Vertex, worldVertex)
 type alias Triangle a = (a,a,a)
 -- type alias Vertex = { pos:Vec3, coord:Vec3 }
 
-cloudsDiamond : Window.Size -> Time -> Mat4 -> Renderable
+-- cloudsDiamond : Window.Size -> Time -> Mat4 -> Renderable
 cloudsDiamond = diamond worldVertex clouds
 
-fogMountainsDiamond : Window.Size -> Time -> Mat4 -> Renderable
+-- fogMountainsDiamond : Window.Size -> Time -> Mat4 -> Renderable
 fogMountainsDiamond = diamond worldVertex fogMountains
 
 -- diamond : Shader attributes uniforms varying -> Shader {} uniforms varyings
 --    -> (Int,Int) -> Time -> Mat4 -> Renderable
-diamond vertexShader fragmentShader windowSize t view =
-    let resolution = vec3 (toFloat windowSize.width) (toFloat windowSize.height) 0
-        s = inSeconds t
+-- diamond vertexShader fragmentShader windowSize t view =
+diamond vertexShader fragmentShader p =
+    let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+        s = inSeconds p.globalTime
     in
         render vertexShader fragmentShader diamondMesh
-            { iResolution=resolution, iGlobalTime=s
-            , iLensDistort=0.9, view=view }
+            { iResolution = resolution, iGlobalTime = s
+            , iLensDistort = p.lensDistort, view = p.viewMatrix }
 
 unfold : Int -> (a -> a) -> a -> List a
 unfold n f x = if n==0 then [] else

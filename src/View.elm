@@ -15,6 +15,17 @@ import Html.Attributes exposing (width, height, style)
 import Model exposing (Model, Msg)
 import Window
 
+type alias Perception = {
+    cameraPos  : Vec3,
+    resolution : (Int, Int),
+    globalTime : Time,
+    viewMatrix : Mat4,
+    lensDistort : Float,
+    measuredFPS : Float
+}
+
+-- type alias See = Perception -> List Renderable
+
 {-| Generate a View from a Model
 -}
 view : Model -> Html Msg
@@ -58,18 +69,25 @@ layoutScene windowSize t isLocked texture person =
             )
         ]
 
+translateP position p = { p | viewMatrix = translate position p.viewMatrix }
+
 {-| Set up 3D world
 -}
 renderWorld : Window.Size -> Time -> WebGL.Texture -> Mat4 -> List WebGL.Renderable
 renderWorld windowSize t texture perspective =
     let
+        p = { viewMatrix = perspective
+            , globalTime = t
+            , windowSize = windowSize
+            , lensDistort = 0.9
+            }
         renderCrates =
-            [ View.Diamond.fogMountainsDiamond windowSize t (translate3 0 1.5 0 perspective)
-            , View.Diamond.cloudsDiamond windowSize t (translate3 5 1.5 1 perspective)
-            , View.Crate.voronoiCube windowSize t (translate3 10 0 10 perspective)
-            , View.Crate.fireCube windowSize t (translate3 -10 0 -10 perspective)
-            , View.Crate.fogMountainsCube windowSize t (translate3 10 1.5 -10 perspective)
-            , View.Crate.textureCube texture (translate3 -2 0 -17 perspective)
+            [ View.Diamond.fogMountainsDiamond (translateP (vec3 0 1.5 0) p)
+            , View.Diamond.cloudsDiamond (translateP (vec3 5 1.5 1) p)
+            , View.Crate.voronoiCube (translateP (vec3 10 0 10) p)
+            , View.Crate.fireCube (translateP (vec3 -10 0 -10) p)
+            , View.Crate.fogMountainsCube (translateP (vec3 10 1.5 -10) p)
+            , View.Crate.textureCube texture (translateP (vec3 -2 0 -17) p)
             ]
     in
         (View.Ground.renderGround perspective) :: renderCrates
