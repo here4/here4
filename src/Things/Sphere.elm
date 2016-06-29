@@ -1,13 +1,14 @@
-module Things.Sphere (spheres, cloudsSphere, fogMountainsSphere, sphere) where
+module Things.Sphere exposing (spheres, cloudsSphere, fogMountainsSphere, sphere)
 
 import Random exposing (float, list)
 import List exposing (drop, concat, map, map2)
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
+import Time exposing (inSeconds)
 import WebGL exposing (..)
 
-import Signal.Extra exposing ((<~))
+-- import Signal.Extra exposing ((<~))
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Fire exposing (fire)
@@ -17,19 +18,19 @@ import Shaders.FogMountains exposing (fogMountains)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 import Model
-import Engine exposing (..)
+-- import Engine exposing (..)
 
 type alias Triangle a = (a,a,a)
 
 spheres n fragmentShader = map (always (sphere worldVertex fragmentShader)) [0..n]
 
 -- cloudsSphere : (Int,Int) -> Time -> Mat4 -> Renderable
-cloudsSphere : Oriented (Visible {})
-cloudsSphere = sphere worldVertex clouds
+-- cloudsSphere : Oriented (Visible {})
+cloudsSphere = seeSphere worldVertex clouds
 
 -- fogMountainsSphere : (Int,Int) -> Time -> Mat4 -> Renderable
 -- fogMountainsSphere : Signal (Oriented (Visible a))
-fogMountainsSphere = sphere worldVertex fogMountains
+fogMountainsSphere = seeSphere worldVertex fogMountains
 
 sphere vertexShader fragmentShader =
     let see = seeSphere vertexShader fragmentShader
@@ -41,13 +42,14 @@ type alias ShadertoyUniforms a = { a | iResolution : Vec3, iGlobalTime : Float, 
 --    -> (Int,Int) -> Time -> Mat4 -> Renderable
 -- sphere : Shader attributes (ShadertoyUniforms {}) varyings -> Shader {} (ShadertoyUniforms {})  varyings -> Perception -> Renderable
 seeSphere vertexShader fragmentShader p =
-    let (w,h) = p.resolution
-        resolution = vec3 (toFloat w) (toFloat h) 0
-        s = p.globalTime
+    -- let (w,h) = p.resolution
+    --     resolution = vec3 (toFloat w) (toFloat h) 0
+    let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+        s = inSeconds p.globalTime
     in
         [render vertexShader fragmentShader sphereMesh
             { iResolution=resolution, iGlobalTime=s
-            , iLensDistort=p.lensDistort, view=p.viewMatrix }]
+            , iLensDistort = p.lensDistort, view = p.viewMatrix }]
 
 unfold : Int -> (a -> a) -> a -> List a
 unfold n f x = if n==0 then [] else

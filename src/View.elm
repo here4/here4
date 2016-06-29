@@ -8,7 +8,7 @@ import Time exposing (Time)
 import Model
 import View.Crate
 import View.Diamond
-import View.Sphere
+import Things.Sphere exposing (cloudsSphere)
 import View.Ground
 import WebGL
 import Html exposing (Html, text, div, p)
@@ -85,7 +85,7 @@ renderWorld windowSize t texture perspective =
         renderCrates = List.concat
             [ View.Diamond.fogMountainsDiamond (translateP (vec3 0 1.5 0) p)
             , View.Diamond.cloudsDiamond (translateP (vec3 5 1.5 1) p)
-            , View.Sphere.cloudsSphere (translateP (vec3 3 10 5) p)
+            , cloudsSphere (translateP (vec3 3 10 5) p)
             , View.Crate.voronoiCube (translateP (vec3 10 0 10) p)
             , View.Crate.fireCube (translateP (vec3 -10 0 -10) p)
             , View.Crate.fogMountainsCube (translateP (vec3 10 1.5 -10) p)
