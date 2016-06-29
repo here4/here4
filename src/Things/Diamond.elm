@@ -1,12 +1,13 @@
-module Things.Diamond (cloudsDiamond, fogMountainsDiamond, diamond) where
+module Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond, diamond)
 
 import List exposing (map2, repeat)
-import Time exposing (Time)
+import Time exposing (Time, inSeconds)
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
+import Window
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Fire exposing (fire)
@@ -15,54 +16,25 @@ import Shaders.FogMountains exposing (fogMountains)
 --import Shaders.VoronoiDistances exposing (voronoiDistances)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
-import Model
-import Engine exposing (..)
-
--- cloudsDiamond : (Int,Int) -> Time -> Mat4 -> Renderable
--- cloudsDiamond : Signal Thing
-cloudsDiamond = Signal.constant <| diamond worldVertex clouds
-
--- fogMountainsDiamond : (Int,Int) -> Time -> Mat4 -> Renderable
--- fogMountainsDiamond : Signal Thing
-fogMountainsDiamond = Signal.constant <| diamond worldVertex fogMountains
-
-diamond vertexShader fragmentShader =
-    let see = seeDiamond vertexShader fragmentShader
-    in { pos = (vec3 0 0 0), orientation = vec3 1 0 1, see = see }
-
--- type ShadertoyUniforms a = { a | iResolution : Vec3, iGlobalTime : Float, view : (Int,Int) }
-
--- diamond : Shader attributes uniforms varying -> Shader {} uniforms varyings
---    -> (Int,Int) -> Time -> Mat4 -> Renderable
--- diamond : Shader attributes (ShadertoyUniforms {}) varyings -> Shader {} (ShadertoyUniforms {})  varyings -> Perception -> Renderable
-seeDiamond vertexShader fragmentShader p =
-    let (w,h) = p.resolution
-        resolution = vec3 (toFloat w) (toFloat h) 0
-        s = p.globalTime
-    in
-        [render vertexShader fragmentShader diamondMesh
-            { iResolution=resolution, iGlobalTime=s
-            , iLensDistort=p.lensDistort, view=p.viewMatrix }]
-
-{-
 type alias Triangle a = (a,a,a)
-type alias Vertex = { pos:Vec3, coord:Vec3 }
+-- type alias Vertex = { pos:Vec3, coord:Vec3 }
 
-cloudsDiamond : (Int,Int) -> Time -> Mat4 -> Renderable
+-- cloudsDiamond : Window.Size -> Time -> Mat4 -> Renderable
 cloudsDiamond = diamond worldVertex clouds
 
-fogMountainsDiamond : (Int,Int) -> Time -> Mat4 -> Renderable
+-- fogMountainsDiamond : Window.Size -> Time -> Mat4 -> Renderable
 fogMountainsDiamond = diamond worldVertex fogMountains
 
 -- diamond : Shader attributes uniforms varying -> Shader {} uniforms varyings
 --    -> (Int,Int) -> Time -> Mat4 -> Renderable
-diamond vertexShader fragmentShader (w,h) t view =
-    let resolution = vec3 (toFloat w) (toFloat h) 0
-        s = t
+-- diamond vertexShader fragmentShader windowSize t view =
+diamond vertexShader fragmentShader p =
+    let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+        s = inSeconds p.globalTime
     in
-        render vertexShader fragmentShader diamondMesh
-            { iResolution=resolution, iGlobalTime=s, view=view }
--}
+        [ render vertexShader fragmentShader diamondMesh
+            { iResolution = resolution, iGlobalTime = s
+            , iLensDistort = p.lensDistort, view = p.viewMatrix } ]
 
 unfold : Int -> (a -> a) -> a -> List a
 unfold n f x = if n==0 then [] else
@@ -76,6 +48,9 @@ zip3 xs ys zs =
 
 rotY n = makeRotate (2*pi/n) (vec3 0 1 0)
 rotZ n = makeRotate (-2*pi/n) (vec3 0 0 1)
+
+-- rotBoth : Float -> Vertex -> Vertex
+-- rotBoth n x = { pos = transform (rotY n) x.pos, coord = transform (rotZ n) x.coord }
 
 rotBoth : Float -> Vertex -> Vertex
 rotBoth n x = { x | pos = transform (rotY n) x.pos, coord = transform (rotZ n) x.coord }

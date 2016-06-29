@@ -7,7 +7,7 @@ import Time exposing (Time)
 
 import Model
 import Things.Cube exposing (textureCube, fireCube, fogMountainsCube, voronoiCube)
-import View.Diamond
+import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Things.Sphere exposing (cloudsSphere)
 import View.Ground
 import WebGL
@@ -83,8 +83,8 @@ renderWorld windowSize t texture perspective =
             , lensDistort = 0.9
             }
         renderCrates = List.concat
-            [ View.Diamond.fogMountainsDiamond (translateP (vec3 0 1.5 0) p)
-            , View.Diamond.cloudsDiamond (translateP (vec3 5 1.5 1) p)
+            [ fogMountainsDiamond (translateP (vec3 0 1.5 0) p)
+            , cloudsDiamond (translateP (vec3 5 1.5 1) p)
             , cloudsSphere (translateP (vec3 3 10 5) p)
             , voronoiCube (translateP (vec3 10 0 10) p)
             , fireCube (translateP (vec3 -10 0 -10) p)
