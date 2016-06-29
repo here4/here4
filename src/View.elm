@@ -9,7 +9,7 @@ import Model
 import Things.Cube exposing (textureCube, fireCube, fogMountainsCube, voronoiCube)
 import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Things.Sphere exposing (cloudsSphere)
-import View.Ground
+import Things.Ground exposing (renderGround)
 import WebGL
 import Html exposing (Html, text, div, p)
 import Html.Attributes exposing (width, height, style)
@@ -82,7 +82,7 @@ renderWorld windowSize t texture perspective =
             , windowSize = windowSize
             , lensDistort = 0.9
             }
-        renderCrates = List.concat
+        worldObjects = List.concat
             [ fogMountainsDiamond (translateP (vec3 0 1.5 0) p)
             , cloudsDiamond (translateP (vec3 5 1.5 1) p)
             , cloudsSphere (translateP (vec3 3 10 5) p)
@@ -90,9 +90,10 @@ renderWorld windowSize t texture perspective =
             , fireCube (translateP (vec3 -10 0 -10) p)
             , fogMountainsCube (translateP (vec3 10 1.5 -10) p)
             , textureCube texture (translateP (vec3 -2 0 -17) p)
+            , renderGround p
             ]
     in
-        (View.Ground.renderGround perspective) :: renderCrates
+        worldObjects
 
 {-| Calculate the viewer's field of view
 -}

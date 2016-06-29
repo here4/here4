@@ -1,7 +1,8 @@
-module Things.Ground (ground) where
+module Things.Ground exposing (renderGround)
 
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
+import Time exposing (inSeconds)
 import WebGL exposing (..)
 
 import Util exposing (hslToVec3)
@@ -9,15 +10,14 @@ import Util exposing (hslToVec3)
 import Shaders.ColorFragment exposing (colorFragment)
 -- import Shaders.ColorVertex exposing (ColorVertex, colorVertex)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
-import Engine exposing (..)
+-- import Engine exposing (..)
 
-ground : Signal Thing
-ground = Signal.constant <| Thing (vec3 0 0 0) (vec3 1 0 1) seeGround
+-- ground : Signal Thing
+-- ground = Signal.constant <| Thing (vec3 0 0 0) (vec3 1 0 1) seeGround
 
-seeGround p =
-    let (w,h) = p.resolution
-        resolution = vec3 (toFloat w) (toFloat h) 0
-        s = p.globalTime
+renderGround p =
+    let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+        s = inSeconds p.globalTime
     in
         [render worldVertex colorFragment groundMesh
             { iResolution=resolution, iGlobalTime=s
