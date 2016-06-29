@@ -1,4 +1,4 @@
-module Math.Procedural where
+module Math.Procedural exposing (..)
 
 import Array
 import Array2D exposing (..)

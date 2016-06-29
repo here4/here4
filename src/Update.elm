@@ -16,6 +16,8 @@ update msg model =
             ( { model | message = "Error loading texture" }, Cmd.none )
         Model.TextureLoaded texture ->
             ( { model | maybeTexture = Just texture }, Cmd.none )
+        Model.TerrainGenerated terrain ->
+            ( { model | maybeTerrain = Just terrain }, Cmd.none )
         Model.KeyChange keyfunc ->
             ( { model | keys = keyfunc model.keys }, Cmd.none )
         Model.Resize windowSize ->

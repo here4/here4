@@ -1,8 +1,8 @@
-module Things.Terrain
+module Things.Terrain exposing
     ( bounds, elevation
     , paint, ripplePaint
     , mountains, sea
-    ) where
+    )
 
 import List.Extra exposing (splitAt)
 import Math.Matrix4 as M4
@@ -16,9 +16,8 @@ import Math.Vector3 exposing (..)
 import Util exposing (..)
 import Zipper2D exposing (Zipper2D, map)
 
+import Thing exposing (..)
 import Things.Surface2D exposing (..)
-
-import Engine exposing (..)
 
 ----------------------------------------------------------------------
 

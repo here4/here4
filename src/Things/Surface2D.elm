@@ -1,8 +1,8 @@
-module Things.Surface2D
+module Things.Surface2D exposing
     ( SurfaceVertex, surface2D
     , NoiseSurfaceVertex, noiseSurface2D, rippleNoiseSurface2D
     , Placement, defaultPlacement
-    ) where
+    )
 
 import Array
 import Array2D exposing (Array2D)
@@ -13,14 +13,14 @@ import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4)
 import Math.Matrix4 exposing (..)
 import Maybe.Extra exposing (isJust)
-import Time exposing (Time)
+import Time exposing (Time, inSeconds)
 import Util exposing (subsample)
 import WebGL exposing (..)
 
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
 
-import Model
+-- import Model
 
 type alias Placement =
     { xOffset : Float
@@ -64,9 +64,8 @@ surface vertexShader fragmentShader mesh =
     in { pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
 seeSurface vertexShader fragmentShader mesh p =
-    let (w,h) = p.resolution
-        resolution = vec3 (toFloat w) (toFloat h) 0
-        s = p.globalTime
+    let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+        s = inSeconds p.globalTime
         detail = p.measuredFPS / 3.0
     in
         [render vertexShader fragmentShader mesh
@@ -84,9 +83,8 @@ rippleSurface vertexShader fragmentShader ripple mesh =
     in { pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
 rippleSeeSurface vertexShader fragmentShader ripple mesh p =
-    let (w,h) = p.resolution
-        resolution = vec3 (toFloat w) (toFloat h) 0
-        s = p.globalTime
+    let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+        s = inSeconds p.globalTime
         detail = p.measuredFPS / 3.0
     in
         [render vertexShader fragmentShader mesh

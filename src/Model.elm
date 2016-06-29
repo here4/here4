@@ -6,6 +6,11 @@ import Window
 import Time exposing (..)
 import Task exposing (Task)
 
+import Array2D exposing (Array2D)
+import Random
+import Things.Surface2D exposing (Placement, defaultPlacement)
+import Math.Procedural exposing (..)
+
 {-| Every half a second there's an event coming through;
 these are all the valid actions we could receive.
 # Move - the user is trying to jump using the space key, move using the
@@ -16,6 +21,7 @@ arrow keys, or the window is being resized.
 type Msg
     = TextureError Error
     | TextureLoaded Texture
+    | TerrainGenerated (Array2D Float)
     | KeyChange (Keys -> Keys)
     | MouseMove MouseMovement
     | LockRequest Bool
@@ -47,6 +53,7 @@ type alias Model =
     { person : Person
     , lifetime : Time
     , maybeTexture : Maybe Texture
+    , maybeTerrain : Maybe (Array2D Float)
     , maybeWindowSize : Maybe Window.Size
     , keys : Keys
     , wantToBeLocked : Bool
@@ -67,6 +74,8 @@ It's still a useful example using Html.programWithFlags though.
 -}
 init : Args -> (Model, Cmd Msg)
 init { movement, isLocked } =
+    let placement = defaultPlacement
+    in
     ( { person =
             { position = vec3 0 eyeLevel -10
             , velocity = vec3 0 0 0
@@ -75,6 +84,7 @@ init { movement, isLocked } =
             }
       , lifetime = 0
       , maybeTexture = Nothing
+      , maybeTerrain = Nothing
       , maybeWindowSize = Nothing
       , keys = Keys False False False False False
       , wantToBeLocked = True
@@ -85,6 +95,7 @@ init { movement, isLocked } =
         [ loadTexture "resources/woodCrate.jpg"
             |> Task.perform TextureError TextureLoaded
         , Window.size |> Task.perform (always Resize (0, 0)) Resize
+        , Random.generate TerrainGenerated (randTerrain2D (placement.bigSide+1))
         ]
     )
 
