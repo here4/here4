@@ -1,92 +1,56 @@
-module Things.Cube (cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, xvCube, cube) where
+module Things.Cube exposing (textureCube, cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, cube)
 
-import List exposing (concatMap, map)
-import Time exposing (Time)
+import Time exposing (Time, inSeconds)
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
+import Window
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Fire exposing (fire)
 import Shaders.FogMountains exposing (fogMountains)
 import Shaders.SimplePlasma exposing (simplePlasma)
 import Shaders.VoronoiDistances exposing (voronoiDistances)
+import Shaders.TextureFragment exposing (textureFragment)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
-
-import Model
-import Engine exposing (..)
-
--- <<<<<<< HEAD:src/Things/Cube.elm
-import Char exposing (..)
-import Keyboard exposing (isDown)
 
 type alias Triple a = (a,a,a)
 
--- cloudsCube : Signal Thing
-cloudsCube = Signal.constant <| cube worldVertex clouds
-
--- fireCube : Signal Thing
-fireCube = Signal.constant <| cube worldVertex fire
-
--- fogMountainsCube : Signal Thing
-fogMountainsCube = Signal.constant <| cube worldVertex fogMountains
-
--- plasmaCube : Signal Thing
-plasmaCube = Signal.constant <| cube worldVertex simplePlasma
-
--- voronoiCube : Signal Thing
-voronoiCube = Signal.constant <| cube worldVertex voronoiDistances
-
--- xvCube : Signal (Bool, Thing)
-xvCube = Signal.map2 (,) (isDown (toCode 'x')) voronoiCube
-
--- cube : Oriented (Visible {})
-cube vertexShader fragmentShader =
-    let see = seeCube vertexShader fragmentShader
-    -- in { pos = vec3 0 0 0, orientation = always (vec3 1 0 1), see = see }
-    in { pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
-
--- cube : Shader attributes uniforms varying -> Shader {} uniforms varyings
---    -> Perception -> Renderable
-seeCube vertexShader fragmentShader p =
-    let (w,h) = p.resolution
-        resolution = vec3 (toFloat w) (toFloat h) 0
-        s = p.globalTime
-    in
-        [render vertexShader fragmentShader mesh
-            { iResolution=resolution, iGlobalTime=s, iLensDistort=p.lensDistort, view=p.viewMatrix }]
-
-{-
-cloudsCube : (Int,Int) -> Time -> Mat4 -> Renderable
+-- cloudsCube : Window.Size -> Time -> Mat4 -> Renderable
 cloudsCube = cube worldVertex clouds
 
-fireCube : (Int,Int) -> Time -> Mat4 -> Renderable
+-- fireCube : Window.Size -> Time -> Mat4 -> Renderable
 fireCube = cube worldVertex fire
 
-fogMountainsCube : (Int,Int) -> Time -> Mat4 -> Renderable
+-- fogMountainsCube : Window.Size -> Time -> Mat4 -> Renderable
 fogMountainsCube = cube worldVertex fogMountains
 
-plasmaCube : (Int,Int) -> Time -> Mat4 -> Renderable
+-- plasmaCube : Window.Size -> Time -> Mat4 -> Renderable
 plasmaCube = cube worldVertex simplePlasma
 
-voronoiCube : (Int,Int) -> Time -> Mat4 -> Renderable
+-- voronoiCube : Window.Size -> Time -> Mat4 -> Renderable
 voronoiCube = cube worldVertex voronoiDistances
 
 -- cube : Shader attributes uniforms varying -> Shader {} uniforms varyings
 --    -> (Int,Int) -> Time -> Mat4 -> Renderable
-cube vertexShader fragmentShader (w,h) t view =
-    let resolution = vec3 (toFloat w) (toFloat h) 0
-        s = t
+cube vertexShader fragmentShader p =
+    let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+        s = inSeconds p.globalTime
     in
-        render vertexShader fragmentShader mesh
-            { iResolution=resolution, iGlobalTime=s, view=view }
--}
+        [ render vertexShader fragmentShader mesh
+            { iResolution = resolution, iGlobalTime = s
+            , iLensDistort = p.lensDistort, view = p.viewMatrix } ]
 
--- The mesh for a crate
+-- textureCube : WebGL.Texture -> Mat4 -> WebGL.Renderable
+textureCube texture p =
+    [ render worldVertex textureFragment mesh
+        { iTexture = texture, iLensDistort = p.lensDistort, view = p.viewMatrix } ]
+
+{-| The mesh for a cube -}
 mesh : Drawable Vertex
-mesh = Triangle <| concatMap rotatedFace [ (0,0), (90,0), (180,0), (270,0), (0,90), (0,-90) ]
+mesh = Triangle <| List.concatMap rotatedFace [ (0,0), (90,0), (180,0), (270,0), (0,90), (0,-90) ]
 
 -- rotatedFace : (Float,Float) -> List ({ pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 })
 rotatedFace : (Float,Float) -> List (Triple Vertex)

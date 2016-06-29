@@ -6,7 +6,7 @@ import Math.Vector3 exposing (..)
 import Time exposing (Time)
 
 import Model
-import View.Crate
+import Things.Cube exposing (textureCube, fireCube, fogMountainsCube, voronoiCube)
 import View.Diamond
 import Things.Sphere exposing (cloudsSphere)
 import View.Ground
@@ -86,10 +86,10 @@ renderWorld windowSize t texture perspective =
             [ View.Diamond.fogMountainsDiamond (translateP (vec3 0 1.5 0) p)
             , View.Diamond.cloudsDiamond (translateP (vec3 5 1.5 1) p)
             , cloudsSphere (translateP (vec3 3 10 5) p)
-            , View.Crate.voronoiCube (translateP (vec3 10 0 10) p)
-            , View.Crate.fireCube (translateP (vec3 -10 0 -10) p)
-            , View.Crate.fogMountainsCube (translateP (vec3 10 1.5 -10) p)
-            , View.Crate.textureCube texture (translateP (vec3 -2 0 -17) p)
+            , voronoiCube (translateP (vec3 10 0 10) p)
+            , fireCube (translateP (vec3 -10 0 -10) p)
+            , fogMountainsCube (translateP (vec3 10 1.5 -10) p)
+            , textureCube texture (translateP (vec3 -2 0 -17) p)
             ]
     in
         (View.Ground.renderGround perspective) :: renderCrates
