@@ -106,6 +106,8 @@ direction person =
     in
         vec3 (cos h) (sin v) (sin h)
 
+type alias EyeLevel = Vec3 -> Float
+
 eyeLevel : Float
 eyeLevel = 2
 

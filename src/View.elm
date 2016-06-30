@@ -83,12 +83,23 @@ orient (Thing position orientation see) =
     in
         tview (M4.translate position) << tview (M4.rotate rot_angle rot_axis) <| see
 
+aboveTerrain : Model.EyeLevel -> Vec3 -> Vec3
+aboveTerrain eyeLevel pos =
+    let
+        p = toRecord pos
+        e = eyeLevel pos
+    in
+        if p.y < e then vec3 p.x e p.z else pos
+
 {-| Set up 3D world
 -}
 renderWorld : Window.Size -> Time -> WebGL.Texture -> Array2D Float -> Model.Person -> List WebGL.Renderable
 renderWorld windowSize t texture terrain person =
     let
-        p = { cameraPos = person.position
+        placement = defaultPlacement
+        eyeLevel pos = Model.eyeLevel + Terrain.elevation placement terrain pos
+
+        p = { cameraPos = Terrain.bounds placement (aboveTerrain eyeLevel person.position)
             , viewMatrix = perspective windowSize person
             , globalTime = t
             , windowSize = windowSize
@@ -96,10 +107,6 @@ renderWorld windowSize t texture terrain person =
             , measuredFPS = 7.0
             }
 
-        placement = defaultPlacement
-
-        -- seed0 = Random.initialSeed 7777
-        -- (terrain, seed1) = Random.generate (randTerrain2D (placement.bigSide+1)) seed0
 
         ground = Terrain.paint Terrain.mountains defaultPlacement terrain
         water = Terrain.ripplePaint Terrain.sea 0.3 defaultPlacement terrain
