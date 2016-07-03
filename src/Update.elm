@@ -5,6 +5,7 @@ import Math.Vector3 as V3
 import Math.Matrix4 exposing (makeRotate, transform)
 
 import Model
+import Orientation
 import Ports
 
 {-| Take a Msg and a Model and return an updated Model
@@ -61,12 +62,13 @@ flatten v =
 turn : Model.MouseMovement -> Model.Person -> Model.Person
 turn (dx,dy) person =
     let yo x = toFloat (clamp -10 10 x) / 500
-        h' = person.horizontalAngle + yo dx
-        v' = person.verticalAngle   - yo dy
+        (roll, pitch, yaw) = Orientation.toRollPitchYaw person.orientation
+        yaw' = yaw + yo dx
+        pitch' = pitch - yo dy
+        pitch'' = clamp (degrees -45) (degrees 45) pitch'
+        orientation = Orientation.fromRollPitchYaw (0, pitch'', yaw')
     in
-        { person | horizontalAngle = h'
-                 , verticalAngle = clamp (degrees -45) (degrees 45) v'
-        }
+        { person | orientation = orientation }
 
 walk : { x:Int, y:Int } -> Model.Person -> Model.Person
 walk directions person =

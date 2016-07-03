@@ -1,13 +1,15 @@
 module Model exposing (..)
 
 import Math.Vector3 exposing (Vec3, vec3)
-import WebGL exposing (..)
-import Window
+import Math.Vector3 as V3
+import Random
 import Time exposing (..)
 import Task exposing (Task)
+import WebGL exposing (..)
+import Window
 
 import Array2D exposing (Array2D)
-import Random
+import Orientation
 import Things.Surface2D exposing (Placement, defaultPlacement)
 import Math.Procedural exposing (..)
 
@@ -32,8 +34,7 @@ type Msg
 type alias Person =
     { position : Vec3
     , velocity : Vec3
-    , horizontalAngle : Float
-    , verticalAngle   : Float
+    , orientation : Orientation.Orientation
     }
 
 type alias Keys =
@@ -79,8 +80,7 @@ init { movement, isLocked } =
     ( { person =
             { position = vec3 0 eyeLevel -10
             , velocity = vec3 0 0 0
-            , horizontalAngle = degrees 90
-            , verticalAngle = 0
+            , orientation = Orientation.initial
             }
       , lifetime = 0
       , maybeTexture = Nothing
@@ -99,12 +99,14 @@ init { movement, isLocked } =
         ]
     )
 
+{-
 direction : Person -> Vec3
 direction person =
     let h = person.horizontalAngle
         v = person.verticalAngle
     in
         vec3 (cos h) (sin v) (sin h)
+-}
 
 type alias EyeLevel = Vec3 -> Float
 
@@ -185,6 +187,7 @@ defaultPerson =
     , cameraPos = vec3 0 eyeLevel 0
     , cameraUp = V3.j
     }
+-}
 
 orient : Person -> Vec3 -> Vec3
 orient person = Orientation.rotateBodyV person.orientation
@@ -196,4 +199,3 @@ cameraUp : Person -> Vec3
 -- cameraUp person = orient person V3.j
 -- cameraUp person = Qn.vrotate (Qn.negate person.orientQn) V3.j
 cameraUp person = Orientation.rotateLabV person.orientation V3.j
--}

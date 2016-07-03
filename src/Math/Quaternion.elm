@@ -1,4 +1,4 @@
-module Math.Quaternion where
+module Math.Quaternion exposing (..)
 
 import Math.Matrix4 as M4
 import Math.Vector3 exposing (Vec3, vec3)
