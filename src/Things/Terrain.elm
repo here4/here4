@@ -1,5 +1,6 @@
 module Things.Terrain exposing
-    ( bounds, elevation
+    ( Terrain, generate
+    , bounds, elevation
     , paint, ripplePaint
     , mountains, sea
     )
@@ -8,6 +9,7 @@ import List.Extra exposing (splitAt)
 import Math.Matrix4 as M4
 import Math.Vector3 as V3
 import Math.Vector4 as V4
+import Random
 import WebGL exposing (..)
 
 import Array
@@ -16,8 +18,31 @@ import Math.Vector3 exposing (..)
 import Util exposing (..)
 import Zipper2D exposing (Zipper2D, map)
 
+import Math.Procedural exposing (..)
 import Thing exposing (..)
 import Things.Surface2D exposing (..)
+
+----------------------------------------------------------------------
+
+type alias Terrain =
+    { placement : Placement
+    , elevations : Array2D Float
+    , groundMesh : List Thing
+    , waterMesh : List Thing
+    }
+
+type Tag = TTag (Array2D Float)
+
+generate : (Terrain -> msg) -> Placement -> Cmd msg
+generate tagger placement =
+    let elGen = randTerrain2D (placement.bigSide+1)
+        makeTerrain elevations =
+            { placement = placement
+            , elevations = elevations
+            , groundMesh = paint mountains placement elevations
+            , waterMesh = ripplePaint sea 0.3 placement elevations
+            }
+    in Random.generate tagger (Random.map makeTerrain elGen)
 
 ----------------------------------------------------------------------
 
@@ -50,8 +75,9 @@ sea h =
 
 ----------------------------------------------------------------------
 
-bounds : Placement -> Vec3 -> Vec3
-bounds placement pos =
+-- bounds : Placement -> Vec3 -> Vec3
+bounds : Terrain -> Vec3 -> Vec3
+bounds { placement } pos =
     let bound x low high = if (x < low) then low else (if x > high then high else x)
         (x,y,z) = V3.toTuple pos
     -- in vec3 (bound x -246 1782) (bound y 0 1000) (bound z -246 1782)
@@ -62,8 +88,9 @@ bounds placement pos =
 
 -- Elevation of terrain at a given coordinate
 -- Linearly interpolated on the mesh triangle
-elevation : Placement -> Array2D Float -> Vec3 -> Float
-elevation placement terrain pos =
+-- elevation : Placement -> Array2D Float -> Vec3 -> Float
+elevation : Terrain -> Vec3 -> Float
+elevation { placement, elevations } pos =
     let
         ix0 = (getX pos + 256) / 2
         ix  = floor ix0
@@ -73,7 +100,7 @@ elevation placement terrain pos =
         iz  = floor iz0
         izf = iz0 - toFloat iz
 
-        getXZ x z = (Array2D.getXY x z 0 terrain) * placement.yMult
+        getXZ x z = (Array2D.getXY x z 0 elevations) * placement.yMult
 
         i00 = getXZ ix     iz      --     00 ... 10  -> x
         i10 = getXZ (ix+1) iz      --  |  .    /  .

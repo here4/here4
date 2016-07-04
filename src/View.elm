@@ -18,7 +18,8 @@ import Thing exposing (..)
 import Things.Cube exposing (textureCube, fireCube, fogMountainsCube, voronoiCube)
 import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Things.Sphere exposing (cloudsSphere)
--- import Things.Ground exposing (renderGround)
+import Things.Terrain exposing (Terrain)
+import Things.Ground exposing (renderGround)
 import Things.Surface2D exposing (Placement, defaultPlacement)
 import Things.Terrain as Terrain
 
@@ -34,7 +35,7 @@ view { person, lifetime, maybeWindowSize, maybeTexture, maybeTerrain, isLocked }
         (Just windowSize, Just texture, Just terrain) ->
             layoutScene windowSize lifetime isLocked texture terrain person
 
-layoutScene : Window.Size -> Time -> Bool -> WebGL.Texture -> Array2D Float -> Model.Person -> Html Msg
+layoutScene : Window.Size -> Time -> Bool -> WebGL.Texture -> Terrain -> Model.Person -> Html Msg
 layoutScene windowSize t isLocked texture terrain person =
     div
         [ style
@@ -93,13 +94,13 @@ aboveTerrain eyeLevel pos =
 
 {-| Set up 3D world
 -}
-renderWorld : Window.Size -> Time -> WebGL.Texture -> Array2D Float -> Model.Person -> List WebGL.Renderable
+renderWorld : Window.Size -> Time -> WebGL.Texture -> Terrain -> Model.Person -> List WebGL.Renderable
 renderWorld windowSize t texture terrain person =
     let
-        placement = defaultPlacement
-        eyeLevel pos = Model.eyeLevel + Terrain.elevation placement terrain pos
+        -- placement = defaultPlacement
+        eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
 
-        p = { cameraPos = Terrain.bounds placement (aboveTerrain eyeLevel person.position)
+        p = { cameraPos = Terrain.bounds terrain (aboveTerrain eyeLevel person.position)
             , viewMatrix = perspective windowSize person
             , globalTime = t
             , windowSize = windowSize
@@ -107,13 +108,8 @@ renderWorld windowSize t texture terrain person =
             , measuredFPS = 7.0
             }
 
-
-        ground = Terrain.paint Terrain.mountains defaultPlacement terrain
-        water = Terrain.ripplePaint Terrain.sea 0.3 defaultPlacement terrain
-
-        things = ground ++ water
-
-        seeThings = mapApply (List.map orient things)
+        terrainThings = terrain.groundMesh ++ terrain.waterMesh
+        seeTerrain = mapApply (List.map orient terrainThings)
 
         worldObjects = List.concat
             [ fogMountainsDiamond (translateP (vec3 0 1.5 0) p)
@@ -126,7 +122,7 @@ renderWorld windowSize t texture terrain person =
             -- , renderGround p
             ]
     in
-        seeThings p ++ worldObjects
+        seeTerrain p ++ worldObjects
 
 {-| Calculate the viewer's field of view
 -}
