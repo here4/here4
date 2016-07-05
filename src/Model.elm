@@ -30,10 +30,42 @@ type Msg
     | Animate Time
     | Resize Window.Size
 
+type alias WhichVehicle = Int
+vehicleBuggy = 0
+vehicleBird = 1
+vehicleDebug = 2
+
+nextVehicle : WhichVehicle -> WhichVehicle
+nextVehicle v = (v+1) % 3
+
 type alias Person =
-    { position : Vec3
+    { pos : Vec3
     , velocity : Vec3
     , orientation : Orientation.Orientation
+    , vehicle : WhichVehicle
+    , cameraVR : Bool
+    , cameraInside : Bool
+    , cameraPos : Vec3
+    , cameraUp : Vec3
+    }
+
+type Eye = OneEye | LeftEye | RightEye
+
+type alias EyeLevel = Vec3 -> Float
+
+eyeLevel : Float
+eyeLevel = 1.8 -- Make this a function of Vehicle
+
+defaultPerson : Person
+defaultPerson =
+    { pos = vec3 0 30 0 
+    , velocity = vec3 0 0 0
+    , orientation = Orientation.initial
+    , vehicle = vehicleBuggy
+    , cameraVR = False
+    , cameraInside = True
+    , cameraPos = vec3 0 eyeLevel 0
+    , cameraUp = V3.j
     }
 
 type alias Keys =
@@ -43,6 +75,40 @@ type alias Keys =
     , down : Bool
     , space : Bool
     }
+
+type alias Inputs =
+    { reset : Bool
+    , changeVR : Bool
+    , changeCamera : Bool
+    , isJumping: Bool
+    , button_X: Bool
+    , x: Float
+    , y: Float
+    , dt: Float
+    }
+
+noInput : Inputs
+noInput = { reset = False
+          , changeVR = False
+          , changeCamera = False
+          , isJumping = False
+          , button_X = False
+          , x = 0
+          , y = 0
+          , dt = 0
+          }
+
+keysToInputs : Keys -> Time -> Inputs
+keysToInputs keys dt =
+    let minusPlus a b = if a && not b then -1 else if b && not a then 1 else 0
+    in
+        { noInput | x = minusPlus keys.left keys.right
+                  , y = minusPlus keys.down keys.up
+                  , isJumping = keys.space
+                  , dt = dt
+        }
+ 
+
 
 {-| This type is returned by the fullscreen JS api in PointerLock.js
 for mouse movement -}
@@ -74,11 +140,7 @@ It's still a useful example using Html.programWithFlags though.
 -}
 init : Args -> (Model, Cmd Msg)
 init { movement, isLocked } =
-    ( { person =
-            { position = vec3 0 eyeLevel -10
-            , velocity = vec3 0 0 0
-            , orientation = Orientation.initial
-            }
+    ( { person = defaultPerson
       , lifetime = 0
       , maybeTexture = Nothing
       , maybeTerrain = Nothing
@@ -105,20 +167,10 @@ direction person =
         vec3 (cos h) (sin v) (sin h)
 -}
 
-type alias EyeLevel = Vec3 -> Float
-
-eyeLevel : Float
-eyeLevel = 2
-
 {-
-
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (makeRotate, transform)
-
-import Orientation
-
-type alias EyeLevel = Vec3 -> Float
 
 type alias Inputs =
     { reset : Bool
@@ -149,41 +201,6 @@ type World =
     }
 -}
 
-type alias WhichVehicle = Int
-vehicleBuggy = 0
-vehicleBird = 1
-vehicleDebug = 2
-
-nextVehicle : WhichVehicle -> WhichVehicle
-nextVehicle v = (v+1) % 3
-
-type alias Person =
-    { pos : Vec3
-    , velocity : Vec3
-    , orientation : Orientation.Orientation
-    , vehicle : WhichVehicle
-    , cameraVR : Bool
-    , cameraInside : Bool
-    , cameraPos : Vec3
-    , cameraUp : Vec3
-    }
-
-type Eye = OneEye | LeftEye | RightEye
-
-eyeLevel : Float
-eyeLevel = 1.8 -- Make this a function of Vehicle
-
-defaultPerson : Person
-defaultPerson =
-    { pos = vec3 0 30 0 
-    , velocity = vec3 0 0 0
-    , orientation = Orientation.initial
-    , vehicle = vehicleBuggy
-    , cameraVR = False
-    , cameraInside = True
-    , cameraPos = vec3 0 eyeLevel 0
-    , cameraUp = V3.j
-    }
 -}
 
 orient : Person -> Vec3 -> Vec3

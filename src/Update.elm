@@ -8,6 +8,12 @@ import Model
 import Orientation
 import Ports
 
+import Things.Terrain as Terrain
+import Things.Terrain exposing (Terrain)
+-- import Vehicles.DreamBird as DreamBird
+import Vehicles.DreamBuggy as DreamBuggy
+-- import Vehicles.DreamDebug as DreamDebug
+
 {-| Take a Msg and a Model and return an updated Model
 -}
 update : Model.Msg -> Model.Model -> (Model.Model, Cmd Model.Msg)
@@ -37,14 +43,21 @@ update msg model =
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
         Model.Animate dt ->
-            ( { model | lifetime = model.lifetime + dt
-                      , person = model.person
+            let model' = case model.maybeTerrain of
+                Nothing -> model
+                Just terrain ->
+                    let inputs = Model.keysToInputs model.keys (dt / 500)
+                    in
+                        { model | lifetime = model.lifetime + dt
+                                , person = step terrain inputs model.person
+                        }
+{-
                           |> walk (directions model.keys)
                           |> jump model.keys.space
                           |> gravity (dt / 500)
                           |> physics (dt / 500)
-              }
-            , Cmd.none )
+-}
+            in ( model', Cmd.none )
 
 directions : Model.Keys -> { x : Int, y : Int }
 directions { left, right, up, down } =
@@ -63,16 +76,17 @@ turn : Model.MouseMovement -> Model.Person -> Model.Person
 turn (dx,dy) person =
     let yo x = toFloat (clamp -10 10 x) / 500
         (roll, pitch, yaw) = Orientation.toRollPitchYaw person.orientation
-        yaw' = yaw + yo dx
+        yaw' = yaw - yo dx
         pitch' = pitch - yo dy
         pitch'' = clamp (degrees -45) (degrees 45) pitch'
         orientation = Orientation.fromRollPitchYaw (0, pitch'', yaw')
     in
         { person | orientation = orientation }
 
+{-
 walk : { x:Int, y:Int } -> Model.Person -> Model.Person
 walk directions person =
-  if getY person.position > Model.eyeLevel then person else
+--   if getY person.position > Model.eyeLevel then person else
     let moveDir = normalize (flatten (Model.direction person))
         strafeDir = transform (makeRotate (degrees -90) j) moveDir
 
@@ -111,6 +125,7 @@ gravity dt person =
     let v = toRecord person.velocity
     in
         { person | velocity = vec3 v.x (v.y - 2 * dt) v.z }
+-}
 
 {-
 import Math.Vector3 exposing (..)
@@ -128,6 +143,7 @@ import Vehicles.DreamBuggy as DreamBuggy
 import Vehicles.DreamDebug as DreamDebug
 
 import Debug
+-}
 
 aboveTerrain : Model.EyeLevel -> Vec3 -> Vec3
 aboveTerrain eyeLevel pos =
@@ -137,18 +153,18 @@ aboveTerrain eyeLevel pos =
     in
         if p.y < e then vec3 p.x e p.z else pos
 
-step : Placement -> Array2D Float -> Model.Inputs -> Model.Person -> Model.Person
-step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson else
+step : Terrain -> Model.Inputs -> Model.Person -> Model.Person
+step terrain inputs person0 = if inputs.reset then Model.defaultPerson else
         let 
-            eyeLevel pos = Model.eyeLevel + Terrain.elevation placement terrain pos
+            eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
             move person =
-                if person.vehicle == Model.vehicleBird then
-                      DreamBird.move eyeLevel inputs person
-                else if person.vehicle == Model.vehicleBuggy then
+                -- if person.vehicle == Model.vehicleBird then
+                --       DreamBird.move eyeLevel inputs person
+                -- else if person.vehicle == Model.vehicleBuggy then
                       DreamBuggy.move eyeLevel inputs person
-                else
-                      DreamDebug.move eyeLevel inputs person
-            bounds person = { person | pos = Terrain.bounds placement person.pos }
+                -- else
+                --       DreamDebug.move eyeLevel inputs person
+            bounds person = { person | pos = Terrain.bounds terrain person.pos }
 
             checkCamera person = { person |
                 cameraInside = if inputs.changeCamera then
@@ -187,20 +203,21 @@ step placement terrain inputs person0 = if inputs.reset then Model.defaultPerson
                             newCameraPos
                         newCameraUp = Model.cameraUp person
 
-                    in  { person | cameraPos = Terrain.bounds placement cameraPos
+                    in  { person | cameraPos = Terrain.bounds terrain cameraPos
                                  , cameraUp =
                             -- V3.scale 0.1 newCameraUp `add` V3.scale 0.9 person.cameraUp }
                                newCameraUp }
         in
             person0
                 |> gravity eyeLevel inputs.dt
-                |> selectVehicle inputs
+                -- |> selectVehicle inputs
                 |> move
                 |> bounds
                 |> checkCamera
                 |> moveCamera
 
-selectVehicle : Model.Inputs -> Model.Person -> Model.Person
+{-
+selectVehicle : Model.Keys -> Model.Person -> Model.Person
 selectVehicle inputs person =
     let
         switch = inputs.button_X
@@ -218,6 +235,7 @@ selectVehicle inputs person =
         else
             Debug.log "Switch to debug!" <|
                 DreamDebug.welcome { person | vehicle = newVehicle }
+-}
 
 gravity : Model.EyeLevel -> Float -> Model.Person -> Model.Person
 gravity eyeLevel dt person =
@@ -225,4 +243,3 @@ gravity eyeLevel dt person =
     let v = toRecord person.velocity
     in
         { person | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }
--}

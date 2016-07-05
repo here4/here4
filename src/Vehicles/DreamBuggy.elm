@@ -1,4 +1,4 @@
-module Vehicles.DreamBuggy (move, welcome) where
+module Vehicles.DreamBuggy exposing (move, welcome)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
@@ -16,7 +16,7 @@ import Debug
 
 move : Model.EyeLevel -> Model.Inputs -> Model.Person -> Model.Person
 move eyeLevel inputs person =
-    person |> turn eyeLevel inputs.mx inputs.my
+    person -- |> turn eyeLevel inputs.mx inputs.my
            |> walk eyeLevel inputs
            -- |> jump eyeLevel inputs.isJumping
            |> physics eyeLevel inputs.dt
@@ -59,13 +59,13 @@ turn eyeLevel dx dy person =
         { person | orientation = orientation }
 
 walk : Model.EyeLevel -> { a | x:Float, y:Float, dt:Float } -> Model.Person -> Model.Person
-walk eyeLevel directions person =
+walk eyeLevel inputs person =
   -- if getY person.pos > eyeLevel person.pos then person else
     let moveDir = normalize (flatten (Model.direction person))
         strafeDir = transform (makeRotate (degrees -90) j) moveDir
 
-        move = V3.scale (8.0 * directions.y) moveDir
-        strafe = V3.scale (8.0 * directions.x) strafeDir
+        move = V3.scale (8.0 * inputs.y) moveDir
+        strafe = V3.scale (8.0 * inputs.x) strafeDir
 
         -- e = (eyeLevel person.pos) / 80.0 -- placement.yMult
         e = (eyeLevel person.pos) / 20.0
@@ -82,7 +82,7 @@ walk eyeLevel directions person =
                    else if e < 0.15 then 15
                    else 20
     in
-        { person | velocity = adjustVelocity maxSpeed friction (move `add` strafe) directions.dt person.velocity }
+        { person | velocity = adjustVelocity maxSpeed friction (move `add` strafe) inputs.dt person.velocity }
 
 adjustVelocity : Float -> Float -> Vec3 -> Float -> Vec3 -> Vec3
 adjustVelocity maxSpeed friction dv dt v =

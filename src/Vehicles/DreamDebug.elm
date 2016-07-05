@@ -1,4 +1,4 @@
-module Vehicles.DreamDebug (move, welcome) where
+module Vehicles.DreamDebug exposing (move, welcome)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3

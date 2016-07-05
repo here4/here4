@@ -100,12 +100,12 @@ renderWorld windowSize t texture terrain person =
         -- placement = defaultPlacement
         eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
 
-        p = { cameraPos = Terrain.bounds terrain (aboveTerrain eyeLevel person.position)
+        p = { cameraPos = Terrain.bounds terrain (aboveTerrain eyeLevel person.pos)
             , viewMatrix = perspective windowSize person
             , globalTime = t
             , windowSize = windowSize
             , lensDistort = 0.9
-            , measuredFPS = 7.0
+            , measuredFPS = 20.0
             }
 
         terrainThings = terrain.groundMesh ++ terrain.waterMesh
@@ -129,7 +129,7 @@ renderWorld windowSize t texture terrain person =
 perspective : Window.Size -> Model.Person -> Mat4
 perspective { width, height } person =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
-        (M4.makeLookAt person.position (person.position `add` Model.direction person) j)
+        (M4.makeLookAt person.pos (person.pos `add` Model.direction person) j)
 
 enterMsg : List (Html Msg)
 enterMsg = message "Click to go full screen and move your head with the mouse."
