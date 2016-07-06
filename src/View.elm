@@ -105,7 +105,7 @@ renderWorld windowSize t texture terrain person =
             , globalTime = t
             , windowSize = windowSize
             , lensDistort = 0.9
-            , measuredFPS = 20.0
+            , measuredFPS = 30.0
             }
 
         terrainThings = terrain.groundMesh ++ terrain.waterMesh

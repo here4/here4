@@ -163,7 +163,7 @@ nearby placement terrain pos sees =
         getXZ x z = Array2D.getXY z x (\_ -> []) sees
 
         -- The visible radius of tiles depends on the height of the camera
-        r = max 8 (floor ((getY pos - approxElevation placement terrain pos) / 10))
+        r = max 12 (floor ((getY pos - approxElevation placement terrain pos) / 10))
         -- r = (max 64 (floor ((getY pos - approxElevation placement terrain pos)))) // placement.tileSize
         ir = iradius r
     in
