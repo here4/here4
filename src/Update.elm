@@ -11,9 +11,9 @@ import Ports
 
 import Things.Terrain as Terrain
 import Things.Terrain exposing (Terrain)
--- import Vehicles.DreamBird as DreamBird
+import Vehicles.DreamBird as DreamBird
 import Vehicles.DreamBuggy as DreamBuggy
--- import Vehicles.DreamDebug as DreamDebug
+import Vehicles.DreamDebug as DreamDebug
 
 {-| Take a Msg and a Model and return an updated Model
 -}
@@ -67,7 +67,7 @@ keysToInputs keys inputs0 =
     in
         { inputs0 | x = minusPlus keys.left keys.right
                   , y = minusPlus keys.down keys.up
-                  , isJumping = keys.space
+                  , button_X = keys.space
         }
 
 mouseToInputs : Model.MouseMovement -> Model.Inputs -> Model.Inputs
@@ -107,12 +107,12 @@ step terrain inputs person0 = if inputs.reset then Model.defaultPerson else
         let 
             eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
             move person =
-                -- if person.vehicle == Model.vehicleBird then
-                --       DreamBird.move eyeLevel inputs person
-                -- else if person.vehicle == Model.vehicleBuggy then
-                      DreamBuggy.move eyeLevel inputs person
-                -- else
-                --       DreamDebug.move eyeLevel inputs person
+                if person.vehicle == Model.vehicleBird then
+                    DreamBird.move eyeLevel inputs person
+                else if person.vehicle == Model.vehicleBuggy then
+                    DreamBuggy.move eyeLevel inputs person
+                else
+                    DreamDebug.move eyeLevel inputs person
             bounds person = { person | pos = Terrain.bounds terrain person.pos }
 
             checkCamera person = { person |
@@ -159,14 +159,13 @@ step terrain inputs person0 = if inputs.reset then Model.defaultPerson else
         in
             person0
                 |> gravity eyeLevel inputs.dt
-                -- |> selectVehicle inputs
+                |> selectVehicle inputs
                 |> move
                 |> bounds
                 |> checkCamera
                 |> moveCamera
 
-{-
-selectVehicle : Model.Keys -> Model.Person -> Model.Person
+selectVehicle : Model.Inputs -> Model.Person -> Model.Person
 selectVehicle inputs person =
     let
         switch = inputs.button_X
@@ -184,7 +183,6 @@ selectVehicle inputs person =
         else
             Debug.log "Switch to debug!" <|
                 DreamDebug.welcome { person | vehicle = newVehicle }
--}
 
 gravity : Model.EyeLevel -> Float -> Model.Person -> Model.Person
 gravity eyeLevel dt person =
