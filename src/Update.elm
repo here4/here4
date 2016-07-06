@@ -3,6 +3,7 @@ module Update exposing (update)
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (makeRotate, transform)
+import Time exposing (Time)
 
 import Model
 import Orientation
@@ -26,11 +27,14 @@ update msg model =
         Model.TerrainGenerated terrain ->
             ( { model | maybeTerrain = Just terrain }, Cmd.none )
         Model.KeyChange keyfunc ->
-            ( { model | keys = keyfunc model.keys }, Cmd.none )
+            let keys = keyfunc model.keys in
+            ( { model | keys = keys
+                      , inputs = keysToInputs keys model.inputs }
+            , Cmd.none )
         Model.Resize windowSize ->
             ( { model | maybeWindowSize = Just windowSize }, Cmd.none )
         Model.MouseMove movement ->
-            ( { model | person = turn movement model.person }, Cmd.none )
+            ( { model | inputs = mouseToInputs movement model.inputs }, Cmd.none )
         Model.LockRequest wantToBeLocked ->
             ( { model | wantToBeLocked = wantToBeLocked }
             , if model.wantToBeLocked == model.isLocked then
@@ -46,10 +50,11 @@ update msg model =
             let model' = case model.maybeTerrain of
                 Nothing -> model
                 Just terrain ->
-                    let inputs = Model.keysToInputs model.keys (dt / 500)
+                    let inputs = timeToInputs dt model.inputs
                     in
                         { model | lifetime = model.lifetime + dt
                                 , person = step terrain inputs model.person
+                                , inputs = clearStationaryInputs inputs
                         }
 {-
                           |> walk (directions model.keys)
@@ -59,6 +64,25 @@ update msg model =
 -}
             in ( model', Cmd.none )
 
+timeToInputs : Time -> Model.Inputs -> Model.Inputs
+timeToInputs dt inputs0 = { inputs0 | dt = dt / 500 }
+
+keysToInputs : Model.Keys -> Model.Inputs -> Model.Inputs
+keysToInputs keys inputs0 =
+    let minusPlus a b = if a && not b then -1 else if b && not a then 1 else 0
+    in
+        { inputs0 | x = minusPlus keys.left keys.right
+                  , y = minusPlus keys.down keys.up
+                  , isJumping = keys.space
+        }
+
+mouseToInputs : Model.MouseMovement -> Model.Inputs -> Model.Inputs
+mouseToInputs (mx,my) inputs0 = { inputs0 | mx = toFloat mx / 500, my = toFloat my / 500 }
+
+clearStationaryInputs : Model.Inputs -> Model.Inputs
+clearStationaryInputs inputs0 = { inputs0 | mx = 0, my = 0 }
+
+{-
 directions : Model.Keys -> { x : Int, y : Int }
 directions { left, right, up, down } =
     let dir a b = case (a,b) of
@@ -83,7 +107,6 @@ turn (dx,dy) person =
     in
         { person | orientation = orientation }
 
-{-
 walk : { x:Int, y:Int } -> Model.Person -> Model.Person
 walk directions person =
 --   if getY person.position > Model.eyeLevel then person else

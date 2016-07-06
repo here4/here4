@@ -16,7 +16,7 @@ import Debug
 
 move : Model.EyeLevel -> Model.Inputs -> Model.Person -> Model.Person
 move eyeLevel inputs person =
-    person -- |> turn eyeLevel inputs.mx inputs.my
+    person |> turn eyeLevel inputs.mx inputs.my
            |> walk eyeLevel inputs
            -- |> jump eyeLevel inputs.isJumping
            |> physics eyeLevel inputs.dt

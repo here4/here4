@@ -84,6 +84,8 @@ type alias Inputs =
     , button_X: Bool
     , x: Float
     , y: Float
+    , mx: Float
+    , my: Float
     , dt: Float
     }
 
@@ -95,20 +97,10 @@ noInput = { reset = False
           , button_X = False
           , x = 0
           , y = 0
+          , mx = 0
+          , my = 0
           , dt = 0
           }
-
-keysToInputs : Keys -> Time -> Inputs
-keysToInputs keys dt =
-    let minusPlus a b = if a && not b then -1 else if b && not a then 1 else 0
-    in
-        { noInput | x = minusPlus keys.left keys.right
-                  , y = minusPlus keys.down keys.up
-                  , isJumping = keys.space
-                  , dt = dt
-        }
- 
-
 
 {-| This type is returned by the fullscreen JS api in PointerLock.js
 for mouse movement -}
@@ -122,6 +114,7 @@ type alias Model =
     , maybeTerrain : Maybe Terrain
     , maybeWindowSize : Maybe Window.Size
     , keys : Keys
+    , inputs : Inputs
     , wantToBeLocked : Bool
     , isLocked : Bool
     , message : String
@@ -146,6 +139,7 @@ init { movement, isLocked } =
       , maybeTerrain = Nothing
       , maybeWindowSize = Nothing
       , keys = Keys False False False False False
+      , inputs = noInput
       , wantToBeLocked = True
       , isLocked = isLocked
       , message = "No texture yet"
