@@ -11,6 +11,7 @@ import Ports
 
 import Behavior.Boids exposing (moveBoids)
 import Physics.Drop exposing (moveDrops)
+import Physics.Collisions exposing (collisions)
 import Things.Terrain as Terrain
 import Things.Terrain exposing (Terrain)
 import Vehicles.DreamBird as DreamBird
@@ -61,8 +62,8 @@ update msg model =
                         { model | lifetime = model.lifetime + dt
                                 , person = step terrain inputs model.person
                                 , inputs = clearStationaryInputs inputs
-                                , boids = moveBoids dt model.boids
-                                , balls = moveDrops dt model.balls
+                                , boids = moveBoids inputs.dt model.boids
+                                , balls = collisions inputs.dt (moveDrops inputs.dt model.balls)
                         }
             in ( model', Cmd.none )
 

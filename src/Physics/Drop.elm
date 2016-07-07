@@ -5,7 +5,7 @@ import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Matrix4 exposing (..)
 -- import Signal.Extra exposing ((<~))
-import Time exposing (Time, second)
+import Time exposing (Time)
 
 import Thing exposing (..)
 
@@ -41,7 +41,7 @@ bounds b =
                 vs
         (x,y,z) = V3.toTuple b.pos
         (vx,vy,vz) = V3.toTuple b.velocity
-    in { b | velocity = vec3 (bound vx x -20 20) (bound vy y (b.radius) 100) (bound vz z -20 20) }
+    in { b | velocity = vec3 (bound vx x -100 100) (bound vy y (b.radius) 100) (bound vz z -50 50) }
 
 gravity : a -> Vec3
 gravity _ = vec3 0 -9.8 0
@@ -51,6 +51,6 @@ moveDrops dt balls =
     let
         gs = List.map gravity balls
         applyRules b g = { b |
-            velocity = (b.velocity `V3.add` (V3.scale (dt / second) g)) }
+            velocity = (b.velocity `V3.add` (V3.scale dt g)) }
         bs = List.map bounds <| List.map2 applyRules balls gs
     in List.map (\x -> { x | orientation = dropOrientation x }) <| bs

@@ -110,9 +110,10 @@ renderWorld windowSize texture terrain model =
             , measuredFPS = 30.0
             }
 
-        bflyThing = place 10 40 10 <| extractThing <| bfly voronoiDistances 0.7
-        terrainThings = terrain.groundMesh ++ terrain.waterMesh ++ [bflyThing]
-        seeTerrain = mapApply (List.map orient terrainThings)
+        boidThings = List.map extractThing model.boids
+        ballThings = List.map extractThing model.balls
+        things = terrain.groundMesh ++ terrain.waterMesh ++ boidThings ++ ballThings
+        seeThings = mapApply (List.map orient things)
 
         worldObjects = List.concat
             [ fogMountainsDiamond (translateP (vec3 0 1.5 0) p)
@@ -125,7 +126,7 @@ renderWorld windowSize texture terrain model =
             -- , renderGround p
             ]
     in
-        seeTerrain p ++ worldObjects
+        seeThings p ++ worldObjects
 
 {-| Calculate the viewer's field of view
 -}

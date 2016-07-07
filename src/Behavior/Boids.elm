@@ -3,7 +3,7 @@ module Behavior.Boids exposing (..)
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Matrix4 exposing (..)
-import Time exposing (Time, second)
+import Time exposing (Time)
 
 import Thing exposing (..)
 
@@ -24,7 +24,7 @@ boidOrientation b =
     in V3.normalize (vec3 v.x (v.y/10) v.z)
 
 -- stepBoid : Time -> Moving a -> Moving a
-stepBoid dt b = { b | pos = b.pos `V3.add` (V3.scale (dt / second) b.velocity), orientation = boidOrientation b }
+stepBoid dt b = { b | pos = b.pos `V3.add` (V3.scale dt b.velocity), orientation = boidOrientation b }
 
 rule1 : Int -> Vec3 -> Boid a -> Vec3 
 rule1 n sumPos b =
@@ -66,7 +66,7 @@ moveBoids dt boids =
         r3s = List.map (rule3 nboids sumVel) boids
         box = List.map bounds boids
         applyRules b r1 r2 r3 r4 = { b |
-            velocity = boundVelocity (b.velocity `V3.add` (V3.scale (dt / second)
+            velocity = boundVelocity (b.velocity `V3.add` (V3.scale dt
                 (r1 `V3.add` r2 `V3.add` r3 `V3.add` r4))) }
         bs = List.map5 applyRules boids r1s r2s r3s box
     in List.map (stepBoid dt) bs

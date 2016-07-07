@@ -5,7 +5,7 @@ import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Matrix4 exposing (..)
 import Math.RandomVector exposing (..)
-import Time exposing (Time, second)
+import Time exposing (Time)
 
 import Thing exposing (..)
 
@@ -18,7 +18,7 @@ type alias BBall a = Massive (Spherical (Moving a))
 -- TODO: merge these next two functions
 -- timeStep : TimeLeft (Moving a) -> Moving a
 timeStep : TimeLeft (BBall a) -> TimeLeft (BBall a)
-timeStep (x, timeLeft) = ({ x  | pos = x.pos `V3.add` (V3.scale (timeLeft / second) x.velocity) }, timeLeft)
+timeStep (x, timeLeft) = ({ x  | pos = x.pos `V3.add` (V3.scale timeLeft x.velocity) }, timeLeft)
 
 stripTimeStep : TimeLeft a -> a
 stripTimeStep (x,_) = x
@@ -58,7 +58,7 @@ collide dt (a,ta) (b,tb) =
         surfaceDistance = centerDistance - sumRadii
 
         -- Relative movement V in timestep dt
-        relativeMovement = V3.scale (dt / second) (V3.sub a.velocity b.velocity)
+        relativeMovement = V3.scale dt (V3.sub a.velocity b.velocity)
 
         -- N: Normalized relative movement
         normRelMovement = V3.normalize relativeMovement
@@ -107,10 +107,10 @@ collide dt (a,ta) (b,tb) =
               collisionDelta = V3.length relativeCollision / V3.length relativeMovement
 
               -- Movement vector of A to point of collision
-              collisionVectorA = V3.scale (collisionDelta * dt / second) a.velocity
+              collisionVectorA = V3.scale (collisionDelta * dt) a.velocity
 
               -- Movement vector of B to point of collision
-              collisionVectorB = V3.scale (collisionDelta * dt / second) b.velocity
+              collisionVectorB = V3.scale (collisionDelta * dt) b.velocity
 
               timeLeft = (1.0 - collisionDelta) * dt
 
