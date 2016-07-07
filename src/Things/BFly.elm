@@ -1,15 +1,12 @@
-module Things.BFly (bfly) where
+module Things.BFly exposing (bfly)
 
 import Random exposing (float)
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
-import Signal.Extra exposing ((<~))
+-- import Signal.Extra exposing ((<~))
 import Time exposing (inSeconds, second)
 import WebGL exposing (..)
-
-import Model
-import Engine exposing (..)
 
 import Debug exposing (log)
 
@@ -22,10 +19,9 @@ makeBFly vertexShader fragmentShader flapStart =
     in { pos = (vec3 7 0 4), orientation = vec3 0 0 1, see = see }
 
 seeBFly vertexShader fragmentShader flapStart p =
-    let (w,h) = p.resolution
-        resolution = vec3 (toFloat w) (toFloat h) 0
+    let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+        s = inSeconds p.globalTime + inSeconds flapStart
         -- s = log (show flapStart) <| (p.globalTime + flapStart)
-        s = (p.globalTime + inSeconds flapStart)
         flap = -0.1 + (sin (s*8) + 1)/2
         flapL = makeRotate (-flap * 3*pi/8) (vec3 0 0 1)
         flapR = makeRotate (flap * 3*pi/8) (vec3 0 0 1)

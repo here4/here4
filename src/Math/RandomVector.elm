@@ -1,4 +1,4 @@
-module Math.RandomVector where
+module Math.RandomVector exposing (randomVec3')
 
 import Random
 

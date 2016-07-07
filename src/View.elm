@@ -23,6 +23,8 @@ import Things.Ground exposing (renderGround)
 import Things.Surface2D exposing (Placement, defaultPlacement)
 import Things.Terrain as Terrain
 
+import Things.BFly exposing (bfly)
+import Shaders.VoronoiDistances exposing (voronoiDistances)
 
 {-| Generate a View from a Model
 -}
@@ -108,7 +110,8 @@ renderWorld windowSize t texture terrain person =
             , measuredFPS = 30.0
             }
 
-        terrainThings = terrain.groundMesh ++ terrain.waterMesh
+        bflyThing = place 10 40 10 <| extractThing <| bfly voronoiDistances 0.7
+        terrainThings = terrain.groundMesh ++ terrain.waterMesh ++ [bflyThing]
         seeTerrain = mapApply (List.map orient terrainThings)
 
         worldObjects = List.concat

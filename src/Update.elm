@@ -9,6 +9,7 @@ import Model
 import Orientation
 import Ports
 
+import Behavior.Boids exposing (moveBoids)
 import Things.Terrain as Terrain
 import Things.Terrain exposing (Terrain)
 import Vehicles.DreamBird as DreamBird
@@ -26,6 +27,8 @@ update msg model =
             ( { model | maybeTexture = Just texture }, Cmd.none )
         Model.TerrainGenerated terrain ->
             ( { model | maybeTerrain = Just terrain }, Cmd.none )
+        Model.BoidsGenerated boids ->
+            ( { model | boids = boids }, Cmd.none )
         Model.KeyChange keyfunc ->
             let keys = keyfunc model.keys in
             ( { model | keys = keys
@@ -55,6 +58,7 @@ update msg model =
                         { model | lifetime = model.lifetime + dt
                                 , person = step terrain inputs model.person
                                 , inputs = clearStationaryInputs inputs
+                                , boids = moveBoids dt model.boids
                         }
             in ( model', Cmd.none )
 

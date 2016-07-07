@@ -1,12 +1,11 @@
-module Behavior.Boids where
+module Behavior.Boids exposing (..)
 
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Matrix4 exposing (..)
-import Signal.Extra exposing ((<~))
 import Time exposing (Time, second)
 
-import Engine exposing (..)
+import Thing exposing (..)
 
 type alias Boid a = Massive (Spherical (Moving a))
 
@@ -72,15 +71,18 @@ moveBoids dt boids =
         bs = List.map5 applyRules boids r1s r2s r3s box
     in List.map (stepBoid dt) bs
 
-
+{-
 boidsTCont : TCont (List (Boid a))
 boidsTCont = simpleTCont moveBoids
+-}
 
+{-
 -- runBoids : Signal [a] -> Signal Time -> Signal (TCont [Boid a])
 -- runBoids : Signal (List (Boid a)) -> Signal Time -> Signal (List (Boid a))
 runBoids : List (Boid a) -> Signal Time -> Signal (List (Boid a))
 -- runBoids boids0 t = foldSigTCont2 [] boidsTCont boids0 t
 runBoids = Signal.foldp moveBoids
+-}
 
 {-
 runBoids : Signal [Boid a] -> Signal Time -> Signal [Boid a]

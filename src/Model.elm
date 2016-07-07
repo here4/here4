@@ -2,15 +2,20 @@ module Model exposing (..)
 
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
+import Random
 import Time exposing (..)
 import Task exposing (Task)
 import WebGL exposing (..)
 import Window
 
 import Orientation
+import Thing exposing (..)
 import Things.Surface2D exposing (defaultPlacement)
 import Things.Terrain exposing (Terrain)
 import Things.Terrain as Terrain
+
+import Boids exposing (..)
+import Behavior.Boids exposing (Boid)
 
 {-| Every half a second there's an event coming through;
 these are all the valid actions we could receive.
@@ -29,6 +34,7 @@ type Msg
     | LockUpdate Bool
     | Animate Time
     | Resize Window.Size
+    | BoidsGenerated (List (Boid (Visible {})))
 
 type alias WhichVehicle = Int
 vehicleBuggy = 0
@@ -118,6 +124,8 @@ type alias Model =
     , wantToBeLocked : Bool
     , isLocked : Bool
     , message : String
+
+    , boids : List (Boid (Visible {}))
     }
 
 type alias Args =
@@ -143,12 +151,15 @@ init { movement, isLocked } =
       , wantToBeLocked = True
       , isLocked = isLocked
       , message = "No texture yet"
+
+      , boids = []
       }
     , Cmd.batch
         [ loadTexture "resources/woodCrate.jpg"
             |> Task.perform TextureError TextureLoaded
         , Window.size |> Task.perform (always Resize (0, 0)) Resize
         , Terrain.generate TerrainGenerated defaultPlacement
+        , Random.generate BoidsGenerated (randomBoids 100)
         ]
     )
 
