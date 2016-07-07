@@ -29,16 +29,16 @@ import Shaders.VoronoiDistances exposing (voronoiDistances)
 {-| Generate a View from a Model
 -}
 view : Model -> Html Msg
-view { person, lifetime, maybeWindowSize, maybeTexture, maybeTerrain, isLocked } =
-    case (maybeWindowSize, maybeTexture, maybeTerrain) of
+view model =
+    case (model.maybeWindowSize, model.maybeTexture, model.maybeTerrain) of
         (Nothing, _, _) -> text ""
         (_, Nothing, _) -> text ""
         (_, _, Nothing) -> text ""
         (Just windowSize, Just texture, Just terrain) ->
-            layoutScene windowSize lifetime isLocked texture terrain person
+            layoutScene windowSize texture terrain model
 
-layoutScene : Window.Size -> Time -> Bool -> WebGL.Texture -> Terrain -> Model.Person -> Html Msg
-layoutScene windowSize t isLocked texture terrain person =
+layoutScene : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
+layoutScene windowSize texture terrain model =
     div
         [ style
             [ ( "width", toString width ++ "px" )
@@ -52,7 +52,7 @@ layoutScene windowSize t isLocked texture terrain person =
             , height windowSize.height
             , style [ ( "display", "block" ) ]
             ]
-            (renderWorld windowSize t texture terrain person)
+            (renderWorld windowSize texture terrain model)
         , div
             [ style
                 [ ( "position", "absolute" )
@@ -63,7 +63,7 @@ layoutScene windowSize t isLocked texture terrain person =
                 , ( "top", "20px" )
                 ]
             ]
-            (if isLocked then
+            (if model.isLocked then
                 exitMsg
              else
                 enterMsg
@@ -96,21 +96,21 @@ aboveTerrain eyeLevel pos =
 
 {-| Set up 3D world
 -}
-renderWorld : Window.Size -> Time -> WebGL.Texture -> Terrain -> Model.Person -> List WebGL.Renderable
-renderWorld windowSize t texture terrain person =
+renderWorld : Window.Size -> WebGL.Texture -> Terrain -> Model.Model -> List WebGL.Renderable
+renderWorld windowSize texture terrain model =
     let
         -- placement = defaultPlacement
         eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
 
-        p = { cameraPos = Terrain.bounds terrain (aboveTerrain eyeLevel person.pos)
-            , viewMatrix = perspective windowSize person
-            , globalTime = t
+        p = { cameraPos = Terrain.bounds terrain (aboveTerrain eyeLevel model.person.pos)
+            , viewMatrix = perspective windowSize model.person
+            , globalTime = model.lifetime
             , windowSize = windowSize
             , lensDistort = 0.9
             , measuredFPS = 30.0
             }
 
-        -- bflyThing = place 10 40 10 <| extractThing <| bfly voronoiDistances 0.7
+        bflyThing = place 10 40 10 <| extractThing <| bfly voronoiDistances 0.7
         terrainThings = terrain.groundMesh ++ terrain.waterMesh ++ [bflyThing]
         seeTerrain = mapApply (List.map orient terrainThings)
 
