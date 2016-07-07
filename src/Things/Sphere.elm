@@ -17,7 +17,7 @@ import Shaders.FogMountains exposing (fogMountains)
 --import Shaders.VoronoiDistances exposing (voronoiDistances)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
-import Model
+-- import Model
 -- import Engine exposing (..)
 
 type alias Triangle a = (a,a,a)
@@ -30,7 +30,7 @@ cloudsSphere = seeSphere worldVertex clouds
 
 -- fogMountainsSphere : (Int,Int) -> Time -> Mat4 -> Renderable
 -- fogMountainsSphere : Signal (Oriented (Visible a))
-fogMountainsSphere = seeSphere worldVertex fogMountains
+fogMountainsSphere = sphere worldVertex fogMountains
 
 sphere vertexShader fragmentShader =
     let see = seeSphere vertexShader fragmentShader

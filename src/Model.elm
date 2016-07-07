@@ -17,6 +17,9 @@ import Things.Terrain as Terrain
 import Boids exposing (..)
 import Behavior.Boids exposing (Boid)
 
+import Balls exposing (..)
+import Physics.Drop exposing (Drop)
+
 {-| Every half a second there's an event coming through;
 these are all the valid actions we could receive.
 # Move - the user is trying to jump using the space key, move using the
@@ -35,6 +38,7 @@ type Msg
     | Animate Time
     | Resize Window.Size
     | BoidsGenerated (List (Boid (Visible {})))
+    | BallsGenerated (List (Drop (Visible {})))
 
 type alias WhichVehicle = Int
 vehicleBuggy = 0
@@ -126,6 +130,7 @@ type alias Model =
     , message : String
 
     , boids : List (Boid (Visible {}))
+    , balls : List (Drop (Visible {}))
     }
 
 type alias Args =
@@ -153,6 +158,7 @@ init { movement, isLocked } =
       , message = "No texture yet"
 
       , boids = []
+      , balls = []
       }
     , Cmd.batch
         [ loadTexture "resources/woodCrate.jpg"
@@ -160,6 +166,7 @@ init { movement, isLocked } =
         , Window.size |> Task.perform (always Resize (0, 0)) Resize
         , Terrain.generate TerrainGenerated defaultPlacement
         , Random.generate BoidsGenerated (randomBoids 100)
+        , Random.generate BallsGenerated (randomBalls 30)
         ]
     )
 

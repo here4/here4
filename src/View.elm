@@ -110,7 +110,7 @@ renderWorld windowSize t texture terrain person =
             , measuredFPS = 30.0
             }
 
-        bflyThing = place 10 40 10 <| extractThing <| bfly voronoiDistances 0.7
+        -- bflyThing = place 10 40 10 <| extractThing <| bfly voronoiDistances 0.7
         terrainThings = terrain.groundMesh ++ terrain.waterMesh ++ [bflyThing]
         seeTerrain = mapApply (List.map orient terrainThings)
 

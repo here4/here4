@@ -1,4 +1,4 @@
-module Physics.Collisions where
+module Physics.Collisions exposing (..)
 
 import Array
 import Math.Vector3 as V3
@@ -7,7 +7,7 @@ import Math.Matrix4 exposing (..)
 import Math.RandomVector exposing (..)
 import Time exposing (Time, second)
 
-import Engine exposing (..)
+import Thing exposing (..)
 
 import Debug exposing (log)
 

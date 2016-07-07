@@ -1,13 +1,13 @@
-module Physics.Drop where
+module Physics.Drop exposing (..)
 
 import Array
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Matrix4 exposing (..)
-import Signal.Extra exposing ((<~))
+-- import Signal.Extra exposing ((<~))
 import Time exposing (Time, second)
 
-import Engine exposing (..)
+import Thing exposing (..)
 
 import Physics.Collisions exposing (..)
 
