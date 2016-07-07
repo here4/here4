@@ -47,7 +47,7 @@ defaultPlacement =
     , zOffset = -256
     , zDelta  = 2
     , tileSize = 8
-    , bigSide = 512
+    , bigSide = 256
     }
 
 toNSV (y,rgb) = (y, rgb, 0.0, 0.0, 0.0)
