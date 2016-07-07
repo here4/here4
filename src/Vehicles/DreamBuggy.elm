@@ -45,7 +45,7 @@ turn eyeLevel dx dy person =
         frontTireY = eyeLevel (person.pos `add` (rotateBodyV person.orientation (vec3 0 0 1)))
         rightTireY = eyeLevel (person.pos `add` (rotateBodyV person.orientation (vec3 1 0 0)))
         leftTireY = eyeLevel (person.pos `add` (rotateBodyV person.orientation (vec3 -1 0 0)))
-        tirePitch = atan (-(frontTireY - personY)/0.01)
+        tirePitch = 0 -- atan (-(frontTireY - personY)/0.01)
         tireRoll  = atan ((rightTireY - leftTireY)/0.1)
         (yaw, pitch, roll) =
             if getY person.pos > (eyeLevel person.pos) + 5 then
