@@ -1,20 +1,19 @@
 module Gamepad exposing
-  ( gamepads
+  ( Gamepad
   , Button
-  , Gamepad
+  , gamepads
   )
 
-{-| Library for working with gamepads
-# button
-@docs Button
-# gamepad
-@docs Gamepad
-# pads
+{-| You might have some gamepads attached. This library helps you play.
+
+# Gamepads
 @docs gamepads
+
 -}
 
+import Task exposing (Task)
+
 import Native.Gamepad
-import Signal exposing (Signal)
 
 {-| Button -}
 type alias Button =
@@ -33,8 +32,10 @@ type alias Gamepad =
   -- timestamp
   }
 
-{-| gamepads -}
-gamepads : Signal (List Gamepad)
-gamepads =
-  Native.Gamepad.gamepads
+{-| Get the currently connected gamepads
+-}
+gamepads : (List Gamepad -> msg) -> Cmd msg
+gamepads tagger = getGamepads |> Task.perform (always tagger []) tagger
 
+getGamepads : Task x (List Gamepad)
+getGamepads = Native.Gamepad.gamepads 1.0

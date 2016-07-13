@@ -1,50 +1,9 @@
-module GamepadInputs exposing (gamepadInputs, persistentGamepads)
+module GamepadInputs exposing (GamepadButtons, toStandardGamepad, gamepadToArrows, gamepadToButtons)
 
-{-| This module drives a virtuul wurld
-
-# Program entry
-@docs main
--}
-
-import Automaton
-import Char exposing (toCode)
-import Graphics.Element exposing (..)
-import Http
-import Maybe.Extra exposing (mapDefault)
-import Random
-import Set
-import Signal exposing (dropRepeats, sampleOn, merge)
-import Signal.Extra exposing (combine)
+-- import Maybe.Extra exposing (mapDefault)
 import String exposing (contains)
-import Task exposing (Task, andThen)
-import Text
-import Time exposing (Time, fps)
 
-import WebGL exposing (..)
-import Math.Matrix4 exposing (..)
-import Keyboard
-import Mouse
-import Window
-
-import Array2D exposing (Array2D)
 import Gamepad
-import LoadObj exposing (objMailbox, sendRaw, objJeepMailbox)
-import Math.Procedural exposing (..)
-import Model exposing (noInput)
-import Engine exposing (..)
-import Update
-import Things.Surface2D exposing (Placement, defaultPlacement)
-
-import Demo
-
-import Color exposing (black, white)
-import FontAwesome
-import Html exposing (toElement)
-
-import Graphics.Collage exposing (collage, defaultLine, outlinedText, text)
-
-import Debug
-import Orientation
 
 ----------------------------------------------------------------------
 -- Gamepad
@@ -146,6 +105,7 @@ toStandardGamepad gamepad =
             _ -> (gamepad.axes, gamepad.buttons)
         in { gamepad | axes = axes', buttons = buttons' }
 
+{-
 standardGamepads : Signal (List Gamepad.Gamepad)
 standardGamepads = Signal.map (List.map toStandardGamepad) Gamepad.gamepads
 
@@ -173,6 +133,7 @@ persistentGamepads =
         step gs0 is0 = let gs = reorder is0 gs0 in (gs, remap is0 gs)
         a = Automaton.hiddenState [] step
     in Automaton.run a [] standardGamepads
+-}
 
 {- a b x y lbumper rbumper l r
 l tiny (back), r tiny (start)
@@ -206,6 +167,7 @@ gamepadsToButtons = List.map gamepadToButtons
 
 ----------------------------------------------------------------------
 
+{-
 gamepadToInputs : Time -> Gamepad.Gamepad -> Model.Inputs
 gamepadToInputs dt gamepad =
     let {x,y,mx,my} = gamepadToArrows gamepad
@@ -220,3 +182,4 @@ gamepadInputs =
   let dt = Signal.map Time.inSeconds (fps 60)
   in  sampleOn dt <| Signal.map2 gamepadsToInputs persistentGamepads dt
 
+-}

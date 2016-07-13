@@ -9,6 +9,9 @@ import Model
 import Orientation
 import Ports
 
+import Gamepad
+import GamepadInputs
+
 import Behavior.Boids exposing (moveBoids)
 import Physics.Drop exposing (moveDrops)
 import Physics.Collisions exposing (collisions)
@@ -42,6 +45,12 @@ update msg model =
             ( { model | maybeWindowSize = Just windowSize }, Cmd.none )
         Model.MouseMove movement ->
             ( { model | inputs = mouseToInputs movement model.inputs }, Cmd.none )
+        Model.GamepadUpdate gps ->
+            case gps of
+              [] ->
+                ( model, Cmd.none )
+              (gp::_) ->
+                ( { model | inputs = gamepadToInputs gp model.inputs }, Cmd.none )
         Model.LockRequest wantToBeLocked ->
             ( { model | wantToBeLocked = wantToBeLocked }
             , if model.wantToBeLocked == model.isLocked then
@@ -58,6 +67,8 @@ update msg model =
                 Nothing -> model
                 Just terrain ->
                     let inputs = timeToInputs dt model.inputs
+                        -- gps = Gamepad.gamepads
+                        -- bar = Debug.log "gamepads" (gps.buttonA > 8)
                     in
                         { model | lifetime = model.lifetime + dt
                                 , person = step terrain inputs model.person
@@ -65,7 +76,7 @@ update msg model =
                                 , boids = moveBoids inputs.dt model.boids
                                 , balls = collisions inputs.dt (moveDrops inputs.dt model.balls)
                         }
-            in ( model', Cmd.none )
+            in ( model', Cmd.batch [Gamepad.gamepads Model.GamepadUpdate] )
 
 timeToInputs : Time -> Model.Inputs -> Model.Inputs
 timeToInputs dt inputs0 = { inputs0 | dt = dt / 500 }
@@ -84,6 +95,13 @@ mouseToInputs (mx,my) inputs0 = { inputs0 | mx = toFloat mx / 500, my = toFloat 
 
 clearStationaryInputs : Model.Inputs -> Model.Inputs
 clearStationaryInputs inputs0 = { inputs0 | mx = 0, my = 0 }
+
+gamepadToInputs : Gamepad.Gamepad -> Model.Inputs -> Model.Inputs
+gamepadToInputs gamepad inputs0 =
+    let {x,y,mx,my} = GamepadInputs.gamepadToArrows gamepad
+        bs = GamepadInputs.gamepadToButtons gamepad
+    in  { inputs0 | reset = bs.bStart, changeVR = bs.bB, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX }
+
 
 {-
 import Math.Vector3 exposing (..)

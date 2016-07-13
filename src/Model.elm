@@ -14,6 +14,8 @@ import Things.Surface2D exposing (defaultPlacement)
 import Things.Terrain exposing (Terrain)
 import Things.Terrain as Terrain
 
+import Gamepad exposing (Gamepad, gamepads)
+
 import Boids exposing (..)
 import Behavior.Boids exposing (Boid)
 
@@ -33,6 +35,7 @@ type Msg
     | TerrainGenerated Terrain
     | KeyChange (Keys -> Keys)
     | MouseMove MouseMovement
+    | GamepadUpdate (List Gamepad)
     | LockRequest Bool
     | LockUpdate Bool
     | Animate Time
@@ -164,6 +167,7 @@ init { movement, isLocked } =
         [ loadTexture "resources/woodCrate.jpg"
             |> Task.perform TextureError TextureLoaded
         , Window.size |> Task.perform (always Resize (0, 0)) Resize
+        , gamepads GamepadUpdate
         , Terrain.generate TerrainGenerated defaultPlacement
         , Random.generate BoidsGenerated (randomBoids 100)
         , Random.generate BallsGenerated (randomBalls 30)
