@@ -106,8 +106,9 @@ clearStationaryInputs : Model.Inputs -> Model.Inputs
 clearStationaryInputs inputs0 = { inputs0 | mx = 0, my = 0 }
 
 gamepadToInputs : Gamepad.Gamepad -> Model.Inputs -> Model.Inputs
-gamepadToInputs gamepad inputs0 =
-    let {x,y,mx,my} = GamepadInputs.gamepadToArrows gamepad
+gamepadToInputs gamepad0 inputs0 =
+    let gamepad = GamepadInputs.toStandardGamepad gamepad0
+        {x,y,mx,my} = GamepadInputs.gamepadToArrows gamepad
         bs = GamepadInputs.gamepadToButtons gamepad
     in  { inputs0 | reset = bs.bStart, changeVR = bs.bB, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX }
 
