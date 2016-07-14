@@ -46,37 +46,7 @@ update msg model =
         Model.MouseMove movement ->
             ( { model | inputs = mouseToInputs movement model.inputs }, Cmd.none )
         Model.GamepadUpdate gps0 ->
-            let (gps, is) = GamepadInputs.persistentGamepads model.gamepadIds gps0 in
-            case gps of
-              [] ->
-                ( model, Cmd.none )
-              [Just gp] ->
-                ( { model | numPlayers = 1
-                          , inputs = gamepadToInputs gp model.inputs
-                          , gamepadIds = is
-                  }
-                , Cmd.none )
-              (Just gp :: Nothing :: _) ->
-                ( { model | numPlayers = 1
-                          , inputs = gamepadToInputs gp model.inputs
-                          , gamepadIds = is
-                  }
-                , Cmd.none )
-              (Nothing :: Just gp2 :: _) ->
-                ( { model | numPlayers = 2
-                          , inputs2 = gamepadToInputs gp2 model.inputs2
-                          , gamepadIds = is
-                  }
-                , Cmd.none )
-              (Just gp :: Just gp2 :: _) ->
-                ( { model | numPlayers = 2
-                          , inputs = gamepadToInputs gp model.inputs
-                          , inputs2 = gamepadToInputs gp2 model.inputs2
-                          , gamepadIds = is
-                  }
-                , Cmd.none )
-              _ ->
-                ( model, Cmd.none )
+            ( updateGamepads gps0 model, Cmd.none )
         Model.LockRequest wantToBeLocked ->
             ( { model | wantToBeLocked = wantToBeLocked }
             , if model.wantToBeLocked == model.isLocked then
@@ -129,6 +99,33 @@ gamepadToInputs gamepad0 inputs0 =
         bs = GamepadInputs.gamepadToButtons gamepad
     in  { inputs0 | reset = bs.bStart, changeVR = bs.bB, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX }
 
+updateGamepads : List Gamepad.Gamepad -> Model.Model -> Model.Model
+updateGamepads gps0 model =
+    let (gps, is) = GamepadInputs.persistentGamepads model.gamepadIds gps0 in
+    case gps of
+      [] -> model
+      [Just gp] ->
+        { model | numPlayers = 1
+                , inputs = gamepadToInputs gp model.inputs
+                , gamepadIds = is
+        }
+      (Just gp :: Nothing :: _) ->
+        { model | numPlayers = 1
+                , inputs = gamepadToInputs gp model.inputs
+                , gamepadIds = is
+        }
+      (Nothing :: Just gp2 :: _) ->
+        { model | numPlayers = 2
+                , inputs2 = gamepadToInputs gp2 model.inputs2
+                , gamepadIds = is
+        }
+      (Just gp :: Just gp2 :: _) ->
+        { model | numPlayers = 2
+                , inputs = gamepadToInputs gp model.inputs
+                , inputs2 = gamepadToInputs gp2 model.inputs2
+                , gamepadIds = is
+        }
+      _ -> model
 
 {-
 import Math.Vector3 exposing (..)
