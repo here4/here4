@@ -13,6 +13,7 @@ import Window
 
 import Array2D exposing (Array2D)
 import Model exposing (Model, Msg)
+import Orientation
 import Thing exposing (..)
 -- import Model
 import Things.Cube exposing (textureCube, fireCube, fogMountainsCube, voronoiCube)
@@ -39,6 +40,13 @@ view model =
 
 layoutScene : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
 layoutScene windowSize texture terrain model =
+    if model.person.cameraVR then
+        layoutSceneVR windowSize texture terrain model
+    else
+        layoutScene1 windowSize texture terrain model
+
+layoutScene1 : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
+layoutScene1 windowSize texture terrain model =
     div
         [ style
             [ ( "width", toString width ++ "px" )
@@ -52,7 +60,7 @@ layoutScene windowSize texture terrain model =
             , height windowSize.height
             , style [ ( "display", "block" ) ]
             ]
-            (renderWorld windowSize texture terrain model)
+            (renderWorld Model.OneEye windowSize texture terrain model model.person)
         , div
             [ style
                 [ ( "position", "absolute" )
@@ -68,6 +76,33 @@ layoutScene windowSize texture terrain model =
              else
                 enterMsg
             )
+        ]
+
+layoutSceneVR : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
+layoutSceneVR windowSize texture terrain model =
+    div
+        [ style
+            [ ( "width", toString windowSize.width ++ "px" )
+            , ( "height", toString windowSize.height ++ "px" )
+            , ( "backgroundColor", "rgb(135, 206, 235)" )
+            ]
+        ]
+        [ WebGL.toHtml
+            [ width (windowSize.width//2)
+            , height windowSize.height
+            , style [ ( "display", "block" )
+                    , ( "float", "left" )
+                    ]
+            ]
+            (renderWorld Model.LeftEye windowSize texture terrain model model.person)
+        , WebGL.toHtml
+            [ width (windowSize.width//2)
+            , height windowSize.height
+            , style [ ( "display", "block" )
+                    , ( "float", "right" )
+                    ]
+            ]
+            (renderWorld Model.RightEye windowSize texture terrain model model.person)
         ]
 
 translateP position p = { p | viewMatrix = M4.translate position p.viewMatrix }
@@ -86,6 +121,15 @@ orient (Thing position orientation see) =
     in
         tview (M4.translate position) << tview (M4.rotate rot_angle rot_axis) <| see
 
+eyeOffset : Model.Person -> Model.Eye -> Vec3
+eyeOffset person eye =
+    if eye == Model.LeftEye then
+        Orientation.rotateLabV person.orientation (vec3 (-0.04) 0 0)
+    else if eye == Model.RightEye then
+        Orientation.rotateLabV person.orientation (vec3 0.04 0 0)
+    else
+        vec3 0 0 0
+
 aboveTerrain : Model.EyeLevel -> Vec3 -> Vec3
 aboveTerrain eyeLevel pos =
     let
@@ -96,17 +140,18 @@ aboveTerrain eyeLevel pos =
 
 {-| Set up 3D world
 -}
-renderWorld : Window.Size -> WebGL.Texture -> Terrain -> Model.Model -> List WebGL.Renderable
-renderWorld windowSize texture terrain model =
+renderWorld : Model.Eye -> Window.Size -> WebGL.Texture -> Terrain -> Model.Model -> Model.Person -> List WebGL.Renderable
+renderWorld eye windowSize texture terrain model person =
     let
         -- placement = defaultPlacement
         eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
+        lensDistort = if person.cameraVR then 0.85 else 0.9
 
-        p = { cameraPos = Terrain.bounds terrain (aboveTerrain eyeLevel model.person.pos)
-            , viewMatrix = perspective windowSize model.person
+        p = { cameraPos = Terrain.bounds terrain (aboveTerrain eyeLevel person.pos)
+            , viewMatrix = perspective windowSize person eye
             , globalTime = model.lifetime
             , windowSize = windowSize
-            , lensDistort = 0.9
+            , lensDistort = lensDistort
             , measuredFPS = 30.0
             }
 
@@ -130,10 +175,12 @@ renderWorld windowSize texture terrain model =
 
 {-| Calculate the viewer's field of view
 -}
-perspective : Window.Size -> Model.Person -> Mat4
-perspective { width, height } person =
+perspective : Window.Size -> Model.Person -> Model.Eye -> Mat4
+perspective { width, height } person eye =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
-        (M4.makeLookAt person.pos (person.pos `add` Model.direction person) j)
+        (M4.makeLookAt (person.cameraPos `add` eyeOffset person eye)
+                       (person.pos `add` (scale 3 (Model.direction person)))
+                       person.cameraUp)
 
 enterMsg : List (Html Msg)
 enterMsg = message "Click to go full screen and move your head with the mouse."
