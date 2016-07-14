@@ -129,6 +129,7 @@ type alias Model =
     , maybeTerrain : Maybe Terrain
     , maybeWindowSize : Maybe Window.Size
     , keys : Keys
+    , gamepadIds : List String
     , inputs : Inputs
     , inputs2 : Inputs
     , wantToBeLocked : Bool
@@ -160,6 +161,7 @@ init { movement, isLocked } =
       , maybeTerrain = Nothing
       , maybeWindowSize = Nothing
       , keys = Keys False False False False False
+      , gamepadIds = []
       , inputs = noInput
       , inputs2 = noInput
       , wantToBeLocked = True

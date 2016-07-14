@@ -45,21 +45,38 @@ update msg model =
             ( { model | maybeWindowSize = Just windowSize }, Cmd.none )
         Model.MouseMove movement ->
             ( { model | inputs = mouseToInputs movement model.inputs }, Cmd.none )
-        Model.GamepadUpdate gps ->
+        Model.GamepadUpdate gps0 ->
+            let (gps, is) = GamepadInputs.persistentGamepads model.gamepadIds gps0 in
             case gps of
               [] ->
                 ( model, Cmd.none )
-              [gp] ->
+              [Just gp] ->
                 ( { model | numPlayers = 1
                           , inputs = gamepadToInputs gp model.inputs
+                          , gamepadIds = is
                   }
                 , Cmd.none )
-              (gp::gp2::_) ->
+              (Just gp :: Nothing :: _) ->
+                ( { model | numPlayers = 1
+                          , inputs = gamepadToInputs gp model.inputs
+                          , gamepadIds = is
+                  }
+                , Cmd.none )
+              (Nothing :: Just gp2 :: _) ->
+                ( { model | numPlayers = 2
+                          , inputs2 = gamepadToInputs gp2 model.inputs2
+                          , gamepadIds = is
+                  }
+                , Cmd.none )
+              (Just gp :: Just gp2 :: _) ->
                 ( { model | numPlayers = 2
                           , inputs = gamepadToInputs gp model.inputs
                           , inputs2 = gamepadToInputs gp2 model.inputs2
+                          , gamepadIds = is
                   }
                 , Cmd.none )
+              _ ->
+                ( model, Cmd.none )
         Model.LockRequest wantToBeLocked ->
             ( { model | wantToBeLocked = wantToBeLocked }
             , if model.wantToBeLocked == model.isLocked then

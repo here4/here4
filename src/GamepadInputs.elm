@@ -1,4 +1,4 @@
-module GamepadInputs exposing (GamepadButtons, toStandardGamepad, gamepadToArrows, gamepadToButtons)
+module GamepadInputs exposing (GamepadButtons, persistentGamepads, toStandardGamepad, gamepadToArrows, gamepadToButtons)
 
 -- import Maybe.Extra exposing (mapDefault)
 import String exposing (contains)
@@ -104,6 +104,30 @@ toStandardGamepad gamepad =
 
             _ -> (gamepad.axes, gamepad.buttons)
         in { gamepad | axes = axes', buttons = buttons' }
+
+persistentGamepads : List String -> List Gamepad.Gamepad -> (List (Maybe Gamepad.Gamepad), List String)
+persistentGamepads is0 gs0 = 
+    let
+        extract acc i gs0 = case gs0 of
+            []      -> (Nothing, List.reverse acc ++ gs0)
+            (g::gs) -> if g.id == i then (Just g, List.reverse acc ++ gs)
+                       else extract (g::acc) i gs
+
+        reorder is0 gs0 = case is0 of
+            []        -> List.map Just (List.sortBy getId gs0)
+            (i::is) -> let (gm,gs) = extract [] i gs0 in gm :: reorder is gs
+
+        getId g = g.id
+        catMaybes = List.filterMap Basics.identity
+
+        remap : List String -> List (Maybe Gamepad.Gamepad) -> List String
+        remap ids0 gs0 = case (ids0, gs0) of
+            ([], _)            -> catMaybes (List.map (Maybe.map getId) gs0)
+            (is, [])           -> is
+            ((i::is), (g::gs)) -> Maybe.withDefault i (Maybe.map getId g) :: remap is gs
+
+        gs = reorder is0 gs0
+    in (gs, remap is0 gs)
 
 {-
 standardGamepads : Signal (List Gamepad.Gamepad)
