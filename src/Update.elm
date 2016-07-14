@@ -49,8 +49,17 @@ update msg model =
             case gps of
               [] ->
                 ( model, Cmd.none )
-              (gp::_) ->
-                ( { model | inputs = gamepadToInputs gp model.inputs }, Cmd.none )
+              [gp] ->
+                ( { model | numPlayers = 1
+                          , inputs = gamepadToInputs gp model.inputs
+                  }
+                , Cmd.none )
+              (gp::gp2::_) ->
+                ( { model | numPlayers = 2
+                          , inputs = gamepadToInputs gp model.inputs
+                          , inputs2 = gamepadToInputs gp2 model.inputs2
+                  }
+                , Cmd.none )
         Model.LockRequest wantToBeLocked ->
             ( { model | wantToBeLocked = wantToBeLocked }
             , if model.wantToBeLocked == model.isLocked then
@@ -67,11 +76,11 @@ update msg model =
                 Nothing -> model
                 Just terrain ->
                     let inputs = timeToInputs dt model.inputs
-                        -- gps = Gamepad.gamepads
-                        -- bar = Debug.log "gamepads" (gps.buttonA > 8)
+                        inputs2 = timeToInputs dt model.inputs2
                     in
                         { model | lifetime = model.lifetime + dt
                                 , person = step terrain inputs model.person
+                                , player2 = step terrain inputs2 model.player2
                                 , inputs = clearStationaryInputs inputs
                                 , boids = moveBoids inputs.dt model.boids
                                 , balls = collisions inputs.dt (moveDrops inputs.dt model.balls)

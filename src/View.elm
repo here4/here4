@@ -42,6 +42,8 @@ layoutScene : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
 layoutScene windowSize texture terrain model =
     if model.person.cameraVR then
         layoutSceneVR windowSize texture terrain model
+    else if model.numPlayers == 2 then
+        layoutScene2 windowSize texture terrain model
     else
         layoutScene1 windowSize texture terrain model
 
@@ -76,6 +78,33 @@ layoutScene1 windowSize texture terrain model =
              else
                 enterMsg
             )
+        ]
+
+layoutScene2 : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
+layoutScene2 windowSize texture terrain model =
+    div
+        [ style
+            [ ( "width", toString windowSize.width ++ "px" )
+            , ( "height", toString windowSize.height ++ "px" )
+            , ( "backgroundColor", "rgb(135, 206, 235)" )
+            ]
+        ]
+        [ WebGL.toHtml
+            [ width (windowSize.width//2)
+            , height windowSize.height
+            , style [ ( "display", "block" )
+                    , ( "float", "left" )
+                    ]
+            ]
+            (renderWorld Model.OneEye windowSize texture terrain model model.person)
+        , WebGL.toHtml
+            [ width (windowSize.width//2)
+            , height windowSize.height
+            , style [ ( "display", "block" )
+                    , ( "float", "right" )
+                    ]
+            ]
+            (renderWorld Model.OneEye windowSize texture terrain model model.player2)
         ]
 
 layoutSceneVR : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg

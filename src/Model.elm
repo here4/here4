@@ -121,13 +121,16 @@ type alias MouseMovement = (Int, Int)
 
 {-| This is the application's Model data structure -}
 type alias Model =
-    { person : Person
+    { numPlayers : Int
+    , person : Person
+    , player2 : Person
     , lifetime : Time
     , maybeTexture : Maybe Texture
     , maybeTerrain : Maybe Terrain
     , maybeWindowSize : Maybe Window.Size
     , keys : Keys
     , inputs : Inputs
+    , inputs2 : Inputs
     , wantToBeLocked : Bool
     , isLocked : Bool
     , message : String
@@ -149,13 +152,16 @@ It's still a useful example using Html.programWithFlags though.
 -}
 init : Args -> (Model, Cmd Msg)
 init { movement, isLocked } =
-    ( { person = defaultPerson
+    ( { numPlayers = 1
+      , person = defaultPerson
+      , player2 = defaultPerson
       , lifetime = 0
       , maybeTexture = Nothing
       , maybeTerrain = Nothing
       , maybeWindowSize = Nothing
       , keys = Keys False False False False False
       , inputs = noInput
+      , inputs2 = noInput
       , wantToBeLocked = True
       , isLocked = isLocked
       , message = "No texture yet"
