@@ -63,22 +63,26 @@ layoutScene1 windowSize texture terrain model =
             , style [ ( "display", "block" ) ]
             ]
             (renderWorld Model.OneEye windowSize texture terrain model model.person)
-        , div
-            [ style
-                [ ( "position", "absolute" )
-                , ( "font-family", "monospace" )
-                , ( "text-align", "center" )
-                , ( "left", "20px" )
-                , ( "right", "20px" )
-                , ( "top", "20px" )
-                ]
-            ]
-            (if model.isLocked then
-                exitMsg
-             else
-                enterMsg
-            )
+        , hud windowSize model
         ]
+
+hud : Window.Size -> Model.Model -> Html Msg
+hud windowSize model =
+    div
+       [ style
+           [ ( "position", "absolute" )
+           , ( "font-family", "monospace" )
+           , ( "text-align", "center" )
+           , ( "left", "20px" )
+           , ( "right", "20px" )
+           , ( "top", "20px" )
+           ]
+       ]
+       (if model.isLocked then
+           exitMsg
+        else
+           enterMsg
+       )
 
 layoutScene2 : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
 layoutScene2 windowSize texture terrain model =
