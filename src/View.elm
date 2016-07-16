@@ -1,7 +1,9 @@
 module View exposing (view)
 
+import Color exposing (black, white)
+import FontAwesome
 -- import Html
-import Html exposing (Html, text, div, p)
+import Html exposing (Html, text, div, p, span)
 import Html.Attributes exposing (width, height, style)
 import Math.Matrix4 as M4
 import Math.Matrix4 exposing (Mat4)
@@ -63,26 +65,8 @@ layoutScene1 windowSize texture terrain model =
             , style [ ( "display", "block" ) ]
             ]
             (renderWorld Model.OneEye windowSize texture terrain model model.person)
-        , hud windowSize model
+        , hud model.person
         ]
-
-hud : Window.Size -> Model.Model -> Html Msg
-hud windowSize model =
-    div
-       [ style
-           [ ( "position", "absolute" )
-           , ( "font-family", "monospace" )
-           , ( "text-align", "center" )
-           , ( "left", "20px" )
-           , ( "right", "20px" )
-           , ( "top", "20px" )
-           ]
-       ]
-       (if model.isLocked then
-           exitMsg
-        else
-           enterMsg
-       )
 
 layoutScene2 : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
 layoutScene2 windowSize texture terrain model =
@@ -215,6 +199,38 @@ perspective { width, height } person eye =
                        (person.pos `add` (scale 3 (Model.direction person)))
                        person.cameraUp)
 
+hud : Model.Person -> Html Msg
+hud person =
+    let
+        vehicleName = if person.vehicle == Model.vehicleBird then
+                          "Dreambird"
+                      else if person.vehicle == Model.vehicleBuggy then
+                           "Dreambuggy"
+                      else "DreamDebug"
+        wher = if person.cameraInside then "Inside" else "Outside"
+    in div
+       [ style
+           [ ( "position", "absolute" )
+           , ( "font-family", "Verdana, Geneva, sans-serif" )
+           , ( "text-align", "center" )
+           , ( "left", "0px" )
+           , ( "right", "0px" )
+           , ( "top", "0px" )
+           , ( "background-color", "rgba(0,0,0,0.5)" )
+           , ( "color", "#fff" )
+           , ( "font-size", "xx-large" )
+           , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
+           , ( "z-index", "1" )
+           ]
+       ]
+       [
+           span []
+           [ Html.text vehicleName
+           , FontAwesome.diamond white 40
+           , Html.text wher
+           ]
+       ]
+
 enterMsg : List (Html Msg)
 enterMsg = message "Click to go full screen and move your head with the mouse."
 
@@ -223,6 +239,6 @@ exitMsg = message "Press <escape> to exit full screen."
 
 message : String -> List (Html Msg)
 message msg =
-    [ p [] [ Html.text "WASD keys to move, space bar to jump." ]
+    [ p [] [ Html.text "Use gamepad, arrows or WASD keys to move." ]
     , p [] [ Html.text msg ]
     ]
