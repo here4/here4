@@ -147,13 +147,8 @@ layoutSceneVR windowSize texture terrain model =
             (renderWorld Model.RightEye windowSize texture terrain model model.person)
         ]
 
-translateP position p = { p | viewMatrix = M4.translate position p.viewMatrix }
-
 mapApply : List (a -> List b) -> a -> List b
 mapApply fs x = List.concat <| List.map (\f -> f x) fs
-
-place : Float -> Float -> Float -> Thing -> Thing
-place x y z (Thing _ o s) = Thing (vec3 x y z) o s
 
 orient : Thing -> See
 orient (Thing position orientation see) =
@@ -185,7 +180,6 @@ aboveTerrain eyeLevel pos =
 renderWorld : Model.Eye -> Window.Size -> WebGL.Texture -> Terrain -> Model.Model -> Model.Person -> List WebGL.Renderable
 renderWorld eye windowSize texture terrain model person =
     let
-        -- placement = defaultPlacement
         eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
         lensDistort = if person.cameraVR then 0.85 else 0.9
 
@@ -199,21 +193,21 @@ renderWorld eye windowSize texture terrain model person =
 
         boidThings = List.map extractThing model.boids
         ballThings = List.map extractThing model.balls
-        things = terrain.groundMesh ++ terrain.waterMesh ++ boidThings ++ ballThings
-        seeThings = mapApply (List.map orient things)
 
-        worldObjects = List.concat
-            [ fogMountainsDiamond (translateP (vec3 0 1.5 0) p)
-            , cloudsDiamond (translateP (vec3 5 1.5 1) p)
-            , cloudsSphere (translateP (vec3 3 10 5) p)
-            , voronoiCube (translateP (vec3 10 0 10) p)
-            , fireCube (translateP (vec3 -10 0 -10) p)
-            , fogMountainsCube (translateP (vec3 10 1.5 -10) p)
-            , textureCube texture (translateP (vec3 -2 0 -17) p)
-            -- , renderGround p
+        worldThings =
+            [ put (vec3 0 1.5 0) fogMountainsDiamond
+            , put (vec3 5 1.5 1) cloudsDiamond
+            , put (vec3 3 10 5) cloudsSphere
+            , put (vec3 10 0 10) voronoiCube
+            , put (vec3 -10 0 -10) fireCube
+            , put (vec3 10 1.5 -10) fogMountainsCube
+            , put (vec3 -2 0 -17) (textureCube texture)
             ]
+
+        things = terrain.groundMesh ++ terrain.waterMesh ++ boidThings ++ ballThings ++ worldThings
+        seeThings = mapApply (List.map orient things)
     in
-        seeThings p ++ worldObjects
+        seeThings p
 
 {-| Calculate the viewer's field of view
 -}
