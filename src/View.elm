@@ -55,21 +55,26 @@ layoutScene1 windowSize texture terrain model =
         [ style
             [ ( "width", toString width ++ "px" )
             , ( "height", toString height ++ "px" )
-            , ( "position", "relative" )
             , ( "backgroundColor", "rgb(135, 206, 235)" )
             ]
         ]
         [ WebGL.toHtml
             [ width windowSize.width
             , height windowSize.height
-            , style [ ( "display", "block" ) ]
+            , style [ ( "display", "block" )
+                    , ( "position", "absolute" )
+                    , ( "top", "0px" )
+                    , ( "left", "0px" )
+                    , ( "right", "0px" )
+                    ]
             ]
             (renderWorld Model.OneEye windowSize texture terrain model model.person)
-        , hud model.person
+        , hud model.person 0 0
         ]
 
 layoutScene2 : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
 layoutScene2 windowSize texture terrain model =
+    let w2 = windowSize.width // 2 in
     div
         [ style
             [ ( "width", toString windowSize.width ++ "px" )
@@ -77,22 +82,42 @@ layoutScene2 windowSize texture terrain model =
             , ( "backgroundColor", "rgb(135, 206, 235)" )
             ]
         ]
-        [ WebGL.toHtml
-            [ width (windowSize.width//2)
-            , height windowSize.height
-            , style [ ( "display", "block" )
-                    , ( "float", "left" )
-                    ]
+        [ span [] [
+            div []
+            [ WebGL.toHtml
+              [ width w2
+              , height windowSize.height
+              , style [ ( "display", "block" )
+                      , ( "float", "left" )
+                      , ( "position", "absolute" )
+                      , ( "top", "0px" )
+                      , ( "left", "0px" )
+                      , ( "right", toString w2 ++ "px" )
+                      , ( "border", "0px" )
+                      , ( "padding", "0px" )
+                      ]
+              ]
+              (renderWorld Model.OneEye windowSize texture terrain model model.person)
+            , hud model.person 0 w2
             ]
-            (renderWorld Model.OneEye windowSize texture terrain model model.person)
-        , WebGL.toHtml
-            [ width (windowSize.width//2)
-            , height windowSize.height
-            , style [ ( "display", "block" )
-                    , ( "float", "right" )
-                    ]
+          , div []
+            [ WebGL.toHtml
+              [ width w2
+              , height windowSize.height
+              , style [ ( "display", "block" )
+                      , ( "float", "right" )
+                      , ( "position", "absolute" )
+                      , ( "top", "0px" )
+                      , ( "left", toString w2 ++ "px" )
+                      , ( "right", "0px" )
+                      , ( "border", "0px" )
+                      , ( "padding", "0px" )
+                      ]
+              ]
+              (renderWorld Model.OneEye windowSize texture terrain model model.player2)
+            , hud model.player2 w2 0
             ]
-            (renderWorld Model.OneEye windowSize texture terrain model model.player2)
+          ]
         ]
 
 layoutSceneVR : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
@@ -199,8 +224,8 @@ perspective { width, height } person eye =
                        (person.pos `add` (scale 3 (Model.direction person)))
                        person.cameraUp)
 
-hud : Model.Person -> Html Msg
-hud person =
+hud: Model.Person -> Int -> Int -> Html Msg
+hud person left right =
     let
         vehicleName = if person.vehicle == Model.vehicleBird then
                           "Dreambird"
@@ -213,9 +238,11 @@ hud person =
            [ ( "position", "absolute" )
            , ( "font-family", "Verdana, Geneva, sans-serif" )
            , ( "text-align", "center" )
-           , ( "left", "0px" )
-           , ( "right", "0px" )
+           , ( "left", toString left ++ "px" )
+           , ( "right", toString right ++ "px" )
            , ( "top", "0px" )
+           , ( "border", "0px" )
+           , ( "padding", "0px" )
            , ( "background-color", "rgba(0,0,0,0.5)" )
            , ( "color", "#fff" )
            , ( "font-size", "xx-large" )
@@ -226,7 +253,9 @@ hud person =
        [
            span []
            [ Html.text vehicleName
-           , FontAwesome.diamond white 40
+           , Html.text " "
+           , FontAwesome.diamond white 20
+           , Html.text " "
            , Html.text wher
            ]
        ]
