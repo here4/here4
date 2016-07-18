@@ -74,8 +74,10 @@ layoutScene1 windowSize texture terrain model =
 
 layoutScene2 : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
 layoutScene2 windowSize texture terrain model =
-    let w2 = windowSize.width // 2 in
-    div
+    let w2 = windowSize.width // 2
+        ws2 = { windowSize | width = w2 }
+    in
+      div
         [ style
             [ ( "width", toString windowSize.width ++ "px" )
             , ( "height", toString windowSize.height ++ "px" )
@@ -97,7 +99,7 @@ layoutScene2 windowSize texture terrain model =
                       , ( "padding", "0px" )
                       ]
               ]
-              (renderWorld Model.OneEye windowSize texture terrain model model.person)
+              (renderWorld Model.OneEye ws2 texture terrain model model.person)
             , hud model.person 0 w2
             ]
           , div []
@@ -114,7 +116,7 @@ layoutScene2 windowSize texture terrain model =
                       , ( "padding", "0px" )
                       ]
               ]
-              (renderWorld Model.OneEye windowSize texture terrain model model.player2)
+              (renderWorld Model.OneEye ws2 texture terrain model model.player2)
             , hud model.player2 w2 0
             ]
           ]
@@ -122,7 +124,10 @@ layoutScene2 windowSize texture terrain model =
 
 layoutSceneVR : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
 layoutSceneVR windowSize texture terrain model =
-    div
+    let w2 = windowSize.width // 2
+        ws2 = { windowSize | width = w2 }
+    in
+      div
         [ style
             [ ( "width", toString windowSize.width ++ "px" )
             , ( "height", toString windowSize.height ++ "px" )
@@ -130,21 +135,21 @@ layoutSceneVR windowSize texture terrain model =
             ]
         ]
         [ WebGL.toHtml
-            [ width (windowSize.width//2)
+            [ width w2
             , height windowSize.height
             , style [ ( "display", "block" )
                     , ( "float", "left" )
                     ]
             ]
-            (renderWorld Model.LeftEye windowSize texture terrain model model.person)
+            (renderWorld Model.LeftEye ws2 texture terrain model model.person)
         , WebGL.toHtml
-            [ width (windowSize.width//2)
+            [ width w2
             , height windowSize.height
             , style [ ( "display", "block" )
                     , ( "float", "right" )
                     ]
             ]
-            (renderWorld Model.RightEye windowSize texture terrain model model.person)
+            (renderWorld Model.RightEye ws2 texture terrain model model.person)
         ]
 
 mapApply : List (a -> List b) -> a -> List b
