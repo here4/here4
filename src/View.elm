@@ -190,7 +190,7 @@ renderWorld eye windowSize texture terrain model person =
 
         p = { cameraPos = Terrain.bounds terrain (aboveTerrain eyeLevel person.pos)
             , viewMatrix = perspective windowSize person eye
-            , globalTime = model.lifetime
+            , globalTime = model.globalTime
             , windowSize = windowSize
             , lensDistort = lensDistort
             , measuredFPS = 30.0

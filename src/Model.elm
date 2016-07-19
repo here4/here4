@@ -124,7 +124,7 @@ type alias Model =
     { numPlayers : Int
     , person : Person
     , player2 : Person
-    , lifetime : Time
+    , globalTime : Time
     , maybeTexture : Maybe Texture
     , maybeTerrain : Maybe Terrain
     , maybeWindowSize : Maybe Window.Size
@@ -156,7 +156,7 @@ init { movement, isLocked } =
     ( { numPlayers = 1
       , person = defaultPerson
       , player2 = defaultPerson
-      , lifetime = 0
+      , globalTime = 0
       , maybeTexture = Nothing
       , maybeTerrain = Nothing
       , maybeWindowSize = Nothing

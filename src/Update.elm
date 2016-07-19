@@ -65,7 +65,7 @@ update msg model =
                     let inputs = timeToInputs dt model.inputs
                         inputs2 = timeToInputs dt model.inputs2
                     in
-                        { model | lifetime = model.lifetime + dt
+                        { model | globalTime = model.globalTime + dt
                                 , person = step terrain inputs model.person
                                 , player2 = step terrain inputs2 model.player2
                                 , inputs = clearStationaryInputs inputs
