@@ -51,6 +51,10 @@ vehicleDebug = 2
 nextVehicle : WhichVehicle -> WhichVehicle
 nextVehicle v = (v+1) % 3
 
+type alias World = {
+    things : List Thing
+}
+
 type alias Person =
     { pos : Vec3
     , velocity : Vec3

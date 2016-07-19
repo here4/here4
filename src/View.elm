@@ -42,7 +42,20 @@ view model =
 
 layoutScene : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
 layoutScene windowSize texture terrain model =
-    let render eye ws person = renderWorld eye ws texture terrain model person
+    let
+        worldThings =
+            [ put (vec3 0 1.5 0) fogMountainsDiamond
+            , put (vec3 5 1.5 1) cloudsDiamond
+            , put (vec3 3 10 5) cloudsSphere
+            , put (vec3 10 0 10) voronoiCube
+            , put (vec3 -10 0 -10) fireCube
+            , put (vec3 10 1.5 -10) fogMountainsCube
+            , put (vec3 -2 0 -17) (textureCube texture)
+            ]
+
+        world = { things = worldThings }
+
+        render eye ws person = renderWorld eye ws texture terrain model world person
     in
         if model.person.cameraVR then
             layoutSceneVR windowSize model render
@@ -186,8 +199,8 @@ aboveTerrain eyeLevel pos =
 
 {-| Set up 3D world
 -}
-renderWorld : Model.Eye -> Window.Size -> WebGL.Texture -> Terrain -> Model.Model -> Model.Person -> List WebGL.Renderable
-renderWorld eye windowSize texture terrain model person =
+renderWorld : Model.Eye -> Window.Size -> WebGL.Texture -> Terrain -> Model.Model -> Model.World -> Model.Person -> List WebGL.Renderable
+renderWorld eye windowSize texture terrain model world person =
     let
         eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
         lensDistort = if person.cameraVR then 0.85 else 0.9
@@ -203,17 +216,7 @@ renderWorld eye windowSize texture terrain model person =
         boidThings = List.map extractThing model.boids
         ballThings = List.map extractThing model.balls
 
-        worldThings =
-            [ put (vec3 0 1.5 0) fogMountainsDiamond
-            , put (vec3 5 1.5 1) cloudsDiamond
-            , put (vec3 3 10 5) cloudsSphere
-            , put (vec3 10 0 10) voronoiCube
-            , put (vec3 -10 0 -10) fireCube
-            , put (vec3 10 1.5 -10) fogMountainsCube
-            , put (vec3 -2 0 -17) (textureCube texture)
-            ]
-
-        things = terrain.groundMesh ++ terrain.waterMesh ++ boidThings ++ ballThings ++ worldThings
+        things = terrain.groundMesh ++ terrain.waterMesh ++ boidThings ++ ballThings ++ world.things
         seeThings = mapApply (List.map orient things)
     in
         seeThings p
