@@ -38,10 +38,10 @@ view model =
         (_, Nothing, _) -> text ""
         (_, _, Nothing) -> text ""
         (Just windowSize, Just texture, Just terrain) ->
-            layoutScene windowSize texture terrain model
+            layoutScene windowSize model (demoWorld texture terrain model)
 
-layoutScene : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
-layoutScene windowSize texture terrain model =
+demoWorld : WebGL.Texture -> Terrain -> Model.Model -> Model.World
+demoWorld texture terrain model =
     let
         boidThings = List.map extractThing model.boids
         ballThings = List.map extractThing model.balls
@@ -55,10 +55,13 @@ layoutScene windowSize texture terrain model =
             , put (vec3 10 1.5 -10) fogMountainsCube
             , put (vec3 -2 0 -17) (textureCube texture)
             ]
+    in
+        { things = worldThings, terrain = terrain }
 
-        world = { things = worldThings, terrain = terrain }
-
-        render eye ws person = renderWorld eye ws model world person
+layoutScene : Window.Size -> Model.Model -> Model.World -> Html Msg
+layoutScene windowSize model world =
+    let
+        render = renderWorld model.globalTime world
     in
         if model.person.cameraVR then
             layoutSceneVR windowSize model render
@@ -202,15 +205,15 @@ aboveTerrain eyeLevel pos =
 
 {-| Set up 3D world
 -}
-renderWorld : Model.Eye -> Window.Size -> Model.Model -> Model.World -> Model.Person -> List WebGL.Renderable
-renderWorld eye windowSize model world person =
+renderWorld : Time -> Model.World -> Model.Eye -> Window.Size -> Model.Person -> List WebGL.Renderable
+renderWorld globalTime world eye windowSize person =
     let
         eyeLevel pos = Model.eyeLevel + Terrain.elevation world.terrain pos
         lensDistort = if person.cameraVR then 0.85 else 0.9
 
         p = { cameraPos = Terrain.bounds world.terrain (aboveTerrain eyeLevel person.pos)
             , viewMatrix = perspective windowSize person eye
-            , globalTime = model.globalTime
+            , globalTime = globalTime
             , windowSize = windowSize
             , lensDistort = lensDistort
             , measuredFPS = 30.0
@@ -230,7 +233,7 @@ perspective { width, height } person eye =
                        (person.pos `add` (scale 3 (Model.direction person)))
                        person.cameraUp)
 
-hud: Model.Person -> Int -> Int -> Html Msg
+hud : Model.Person -> Int -> Int -> Html Msg
 hud person left right =
     let
         vehicleName = if person.vehicle == Model.vehicleBird then
