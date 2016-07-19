@@ -43,7 +43,10 @@ view model =
 layoutScene : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
 layoutScene windowSize texture terrain model =
     let
-        worldThings =
+        boidThings = List.map extractThing model.boids
+        ballThings = List.map extractThing model.balls
+
+        worldThings = boidThings ++ ballThings ++
             [ put (vec3 0 1.5 0) fogMountainsDiamond
             , put (vec3 5 1.5 1) cloudsDiamond
             , put (vec3 3 10 5) cloudsSphere
@@ -213,10 +216,7 @@ renderWorld eye windowSize model world person =
             , measuredFPS = 30.0
             }
 
-        boidThings = List.map extractThing model.boids
-        ballThings = List.map extractThing model.balls
-
-        things = world.terrain.groundMesh ++ world.terrain.waterMesh ++ boidThings ++ ballThings ++ world.things
+        things = world.terrain.groundMesh ++ world.terrain.waterMesh ++ world.things
         seeThings = mapApply (List.map orient things)
     in
         seeThings p
