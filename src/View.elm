@@ -33,14 +33,21 @@ import Shaders.VoronoiDistances exposing (voronoiDistances)
 -}
 view : Model -> Html Msg
 view model =
-    case (model.maybeWindowSize, model.maybeTexture, model.maybeTerrain) of
-        (Nothing, _, _) -> text ""
-        (_, Nothing, _) -> text ""
-        (_, _, Nothing) -> text ""
-        (Just windowSize, Just texture, Just terrain) ->
-            layoutScene windowSize model (demoWorld texture terrain model)
+    case (model.maybeWindowSize, worldView model.worldModel) of
+        (Nothing, _) -> text ""
+        (_, Nothing) -> text ""
+        (Just windowSize, Just world) ->
+            layoutScene windowSize model world
 
-demoWorld : WebGL.Texture -> Terrain -> Model.Model -> Model.World
+worldView : Model.WorldModel -> Maybe Model.World
+worldView model =
+    case (model.maybeTexture, model.maybeTerrain) of
+        (Nothing, _) -> Nothing
+        (_, Nothing) -> Nothing
+        (Just texture, Just terrain) ->
+            Just (demoWorld texture terrain model)
+
+demoWorld : WebGL.Texture -> Terrain -> Model.WorldModel -> Model.World
 demoWorld texture terrain model =
     let
         boidThings = List.map extractThing model.boids

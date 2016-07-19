@@ -26,16 +26,9 @@ import Vehicles.DreamDebug as DreamDebug
 update : Model.Msg -> Model.Model -> (Model.Model, Cmd Model.Msg)
 update msg model =
     case msg of
-        Model.TextureError err ->
-            ( { model | message = "Error loading texture" }, Cmd.none )
-        Model.TextureLoaded texture ->
-            ( { model | maybeTexture = Just texture }, Cmd.none )
-        Model.TerrainGenerated terrain ->
-            ( { model | maybeTerrain = Just terrain }, Cmd.none )
-        Model.BoidsGenerated boids ->
-            ( { model | boids = boids }, Cmd.none )
-        Model.BallsGenerated balls ->
-            ( { model | balls = balls }, Cmd.none )
+        Model.WorldMessage worldMsg ->
+            let (worldModel, worldCmdMsg) = worldUpdate worldMsg model.worldModel in
+            ( { model | worldModel = worldModel }, Cmd.map Model.WorldMessage worldCmdMsg )
         Model.KeyChange keyfunc ->
             let keys = keyfunc model.keys in
             ( { model | keys = keys
@@ -59,7 +52,7 @@ update msg model =
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
         Model.Animate dt ->
-            let model' = case model.maybeTerrain of
+            let model' = case model.worldModel.maybeTerrain of
                 Nothing -> model
                 Just terrain ->
                     let inputs = timeToInputs dt model.inputs
@@ -69,10 +62,30 @@ update msg model =
                                 , person = step terrain inputs model.person
                                 , player2 = step terrain inputs2 model.player2
                                 , inputs = clearStationaryInputs inputs
-                                , boids = moveBoids inputs.dt model.boids
-                                , balls = collisions inputs.dt (moveDrops inputs.dt model.balls)
+                                , worldModel = worldAnimate inputs.dt model.worldModel
                         }
             in ( model', Cmd.batch [Gamepad.gamepads Model.GamepadUpdate] )
+
+worldUpdate : Model.WorldMsg -> Model.WorldModel -> (Model.WorldModel, Cmd Model.WorldMsg)
+worldUpdate msg model =
+    case msg of
+        Model.TextureError err ->
+            -- ( { model | message = "Error loading texture" }, Cmd.none )
+            ( model, Cmd.none )
+        Model.TextureLoaded texture ->
+            ( { model | maybeTexture = Just texture }, Cmd.none )
+        Model.TerrainGenerated terrain ->
+            ( { model | maybeTerrain = Just terrain }, Cmd.none )
+        Model.BoidsGenerated boids ->
+            ( { model | boids = boids }, Cmd.none )
+        Model.BallsGenerated balls ->
+            ( { model | balls = balls }, Cmd.none )
+
+worldAnimate : Time -> Model.WorldModel -> Model.WorldModel
+worldAnimate dt model = 
+    { model | boids = moveBoids dt model.boids
+            , balls = collisions dt (moveDrops dt model.balls)
+    }
 
 timeToInputs : Time -> Model.Inputs -> Model.Inputs
 timeToInputs dt inputs0 = { inputs0 | dt = dt / 500 }
