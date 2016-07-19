@@ -42,15 +42,19 @@ view model =
 
 layoutScene : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
 layoutScene windowSize texture terrain model =
-    if model.person.cameraVR then
-        layoutSceneVR windowSize texture terrain model
-    else if model.numPlayers == 2 then
-        layoutScene2 windowSize texture terrain model
-    else
-        layoutScene1 windowSize texture terrain model
+    let render eye ws person = renderWorld eye ws texture terrain model person
+    in
+        if model.person.cameraVR then
+            layoutSceneVR windowSize model render
+        else if model.numPlayers == 2 then
+            layoutScene2 windowSize model render
+        else
+            layoutScene1 windowSize model render
 
-layoutScene1 : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
-layoutScene1 windowSize texture terrain model =
+type alias RenderWorld = Model.Eye -> Window.Size -> Model.Person -> List WebGL.Renderable
+
+layoutScene1 : Window.Size -> Model.Model -> RenderWorld -> Html Msg
+layoutScene1 windowSize model render =
     div
         [ style
             [ ( "width", toString width ++ "px" )
@@ -68,12 +72,12 @@ layoutScene1 windowSize texture terrain model =
                     , ( "right", "0px" )
                     ]
             ]
-            (renderWorld Model.OneEye windowSize texture terrain model model.person)
+            (render Model.OneEye windowSize model.person)
         , hud model.person 0 0
         ]
 
-layoutScene2 : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
-layoutScene2 windowSize texture terrain model =
+layoutScene2 : Window.Size -> Model.Model -> RenderWorld -> Html Msg
+layoutScene2 windowSize model render =
     let w2 = windowSize.width // 2
         ws2 = { windowSize | width = w2 }
     in
@@ -99,7 +103,7 @@ layoutScene2 windowSize texture terrain model =
                       , ( "padding", "0px" )
                       ]
               ]
-              (renderWorld Model.OneEye ws2 texture terrain model model.person)
+              (render Model.OneEye ws2 model.person)
             , hud model.person 0 w2
             ]
           , div []
@@ -116,14 +120,14 @@ layoutScene2 windowSize texture terrain model =
                       , ( "padding", "0px" )
                       ]
               ]
-              (renderWorld Model.OneEye ws2 texture terrain model model.player2)
+              (render Model.OneEye ws2 model.player2)
             , hud model.player2 w2 0
             ]
           ]
         ]
 
-layoutSceneVR : Window.Size -> WebGL.Texture -> Terrain -> Model.Model-> Html Msg
-layoutSceneVR windowSize texture terrain model =
+layoutSceneVR : Window.Size -> Model.Model -> RenderWorld -> Html Msg
+layoutSceneVR windowSize model render =
     let w2 = windowSize.width // 2
         ws2 = { windowSize | width = w2 }
     in
@@ -141,7 +145,7 @@ layoutSceneVR windowSize texture terrain model =
                     , ( "float", "left" )
                     ]
             ]
-            (renderWorld Model.LeftEye ws2 texture terrain model model.person)
+            (render Model.LeftEye ws2 model.person)
         , WebGL.toHtml
             [ width w2
             , height windowSize.height
@@ -149,7 +153,7 @@ layoutSceneVR windowSize texture terrain model =
                     , ( "float", "right" )
                     ]
             ]
-            (renderWorld Model.RightEye ws2 texture terrain model model.person)
+            (render Model.RightEye ws2 model.person)
         ]
 
 mapApply : List (a -> List b) -> a -> List b
