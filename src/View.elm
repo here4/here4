@@ -53,9 +53,9 @@ layoutScene windowSize texture terrain model =
             , put (vec3 -2 0 -17) (textureCube texture)
             ]
 
-        world = { things = worldThings }
+        world = { things = worldThings, terrain = terrain }
 
-        render eye ws person = renderWorld eye ws texture terrain model world person
+        render eye ws person = renderWorld eye ws model world person
     in
         if model.person.cameraVR then
             layoutSceneVR windowSize model render
@@ -199,13 +199,13 @@ aboveTerrain eyeLevel pos =
 
 {-| Set up 3D world
 -}
-renderWorld : Model.Eye -> Window.Size -> WebGL.Texture -> Terrain -> Model.Model -> Model.World -> Model.Person -> List WebGL.Renderable
-renderWorld eye windowSize texture terrain model world person =
+renderWorld : Model.Eye -> Window.Size -> Model.Model -> Model.World -> Model.Person -> List WebGL.Renderable
+renderWorld eye windowSize model world person =
     let
-        eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
+        eyeLevel pos = Model.eyeLevel + Terrain.elevation world.terrain pos
         lensDistort = if person.cameraVR then 0.85 else 0.9
 
-        p = { cameraPos = Terrain.bounds terrain (aboveTerrain eyeLevel person.pos)
+        p = { cameraPos = Terrain.bounds world.terrain (aboveTerrain eyeLevel person.pos)
             , viewMatrix = perspective windowSize person eye
             , globalTime = model.globalTime
             , windowSize = windowSize
@@ -216,7 +216,7 @@ renderWorld eye windowSize texture terrain model world person =
         boidThings = List.map extractThing model.boids
         ballThings = List.map extractThing model.balls
 
-        things = terrain.groundMesh ++ terrain.waterMesh ++ boidThings ++ ballThings ++ world.things
+        things = world.terrain.groundMesh ++ world.terrain.waterMesh ++ boidThings ++ ballThings ++ world.things
         seeThings = mapApply (List.map orient things)
     in
         seeThings p

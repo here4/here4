@@ -51,8 +51,9 @@ vehicleDebug = 2
 nextVehicle : WhichVehicle -> WhichVehicle
 nextVehicle v = (v+1) % 3
 
-type alias World = {
-    things : List Thing
+type alias World =
+    { things : List Thing
+    , terrain : Terrain
 }
 
 type alias Person =
