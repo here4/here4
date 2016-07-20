@@ -29,41 +29,17 @@ import Things.Terrain as Terrain
 import Things.BFly exposing (bfly)
 import Shaders.VoronoiDistances exposing (voronoiDistances)
 
+import World exposing (..)
+
 {-| Generate a View from a Model
 -}
 view : Model -> Html Msg
 view model =
-    case (model.maybeWindowSize, worldView model.worldModel) of
+    case (model.maybeWindowSize, World.worldView model.worldModel) of
         (Nothing, _) -> text ""
         (_, Nothing) -> text ""
         (Just windowSize, Just world) ->
             layoutScene windowSize model world
-
-worldView : Model.WorldModel -> Maybe Model.World
-worldView model =
-    case (model.maybeTexture, model.maybeTerrain) of
-        (Nothing, _) -> Nothing
-        (_, Nothing) -> Nothing
-        (Just texture, Just terrain) ->
-            Just (demoWorld texture terrain model)
-
-demoWorld : WebGL.Texture -> Terrain -> Model.WorldModel -> Model.World
-demoWorld texture terrain model =
-    let
-        boidThings = List.map extractThing model.boids
-        ballThings = List.map extractThing model.balls
-
-        worldThings = boidThings ++ ballThings ++
-            [ put (vec3 0 1.5 0) fogMountainsDiamond
-            , put (vec3 5 1.5 1) cloudsDiamond
-            , put (vec3 3 10 5) cloudsSphere
-            , put (vec3 10 0 10) voronoiCube
-            , put (vec3 -10 0 -10) fireCube
-            , put (vec3 10 1.5 -10) fogMountainsCube
-            , put (vec3 -2 0 -17) (textureCube texture)
-            ]
-    in
-        { things = worldThings, terrain = terrain }
 
 layoutScene : Window.Size -> Model.Model -> Model.World -> Html Msg
 layoutScene windowSize model world =

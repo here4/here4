@@ -12,9 +12,8 @@ import Ports
 import Gamepad
 import GamepadInputs
 
-import Behavior.Boids exposing (moveBoids)
-import Physics.Drop exposing (moveDrops)
-import Physics.Collisions exposing (collisions)
+import World exposing (..)
+
 import Things.Terrain as Terrain
 import Things.Terrain exposing (Terrain)
 import Vehicles.DreamBird as DreamBird
@@ -27,7 +26,7 @@ update : Model.Msg -> Model.Model -> (Model.Model, Cmd Model.Msg)
 update msg model =
     case msg of
         Model.WorldMessage worldMsg ->
-            let (worldModel, worldCmdMsg) = worldUpdate worldMsg model.worldModel in
+            let (worldModel, worldCmdMsg) = World.worldUpdate worldMsg model.worldModel in
             ( { model | worldModel = worldModel }, Cmd.map Model.WorldMessage worldCmdMsg )
         Model.KeyChange keyfunc ->
             let keys = keyfunc model.keys in
@@ -62,30 +61,9 @@ update msg model =
                                 , person = step terrain inputs model.person
                                 , player2 = step terrain inputs2 model.player2
                                 , inputs = clearStationaryInputs inputs
-                                , worldModel = worldAnimate inputs.dt model.worldModel
+                                , worldModel = World.worldAnimate inputs.dt model.worldModel
                         }
             in ( model', Cmd.batch [Gamepad.gamepads Model.GamepadUpdate] )
-
-worldUpdate : Model.WorldMsg -> Model.WorldModel -> (Model.WorldModel, Cmd Model.WorldMsg)
-worldUpdate msg model =
-    case msg of
-        Model.TextureError err ->
-            -- ( { model | message = "Error loading texture" }, Cmd.none )
-            ( model, Cmd.none )
-        Model.TextureLoaded texture ->
-            ( { model | maybeTexture = Just texture }, Cmd.none )
-        Model.TerrainGenerated terrain ->
-            ( { model | maybeTerrain = Just terrain }, Cmd.none )
-        Model.BoidsGenerated boids ->
-            ( { model | boids = boids }, Cmd.none )
-        Model.BallsGenerated balls ->
-            ( { model | balls = balls }, Cmd.none )
-
-worldAnimate : Time -> Model.WorldModel -> Model.WorldModel
-worldAnimate dt model = 
-    { model | boids = moveBoids dt model.boids
-            , balls = collisions dt (moveDrops dt model.balls)
-    }
 
 timeToInputs : Time -> Model.Inputs -> Model.Inputs
 timeToInputs dt inputs0 = { inputs0 | dt = dt / 500 }

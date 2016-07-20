@@ -2,25 +2,17 @@ module Model exposing (..)
 
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
-import Random
 import Time exposing (..)
 import Task exposing (Task)
-import WebGL exposing (..)
 import Window
 
 import Orientation
 import Thing exposing (..)
-import Things.Surface2D exposing (defaultPlacement)
 import Things.Terrain exposing (Terrain)
-import Things.Terrain as Terrain
 
 import Gamepad exposing (Gamepad, gamepads)
 
-import Boids exposing (..)
-import Behavior.Boids exposing (Boid)
-
-import Balls exposing (..)
-import Physics.Drop exposing (Drop)
+import World exposing (..)
 
 {-| Every half a second there's an event coming through;
 these are all the valid actions we could receive.
@@ -28,13 +20,6 @@ these are all the valid actions we could receive.
 arrow keys, or the window is being resized.
 # TextureLoaded - a texture has been loaded across the wire
 -}
-
-type WorldMsg
-    = TextureError Error
-    | TextureLoaded Texture
-    | TerrainGenerated Terrain
-    | BoidsGenerated (List (Boid (Visible {})))
-    | BallsGenerated (List (Drop (Visible {})))
 
 type Msg
     = KeyChange (Keys -> Keys)
@@ -57,13 +42,6 @@ nextVehicle v = (v+1) % 3
 type alias World =
     { things : List Thing
     , terrain : Terrain
-    }
-
-type alias WorldModel =
-    { maybeTexture : Maybe Texture
-    , maybeTerrain : Maybe Terrain
-    , boids : List (Boid (Visible {}))
-    , balls : List (Drop (Visible {}))
     }
 
 type alias Person =
@@ -164,7 +142,7 @@ It's still a useful example using Html.programWithFlags though.
 -}
 init : Args -> (Model, Cmd Msg)
 init { movement, isLocked } =
-    let (worldModel, worldCmdMsg) = worldInit in
+    let (worldModel, worldCmdMsg) = World.worldInit in
     ( { numPlayers = 1
       , person = defaultPerson
       , player2 = defaultPerson
@@ -183,22 +161,6 @@ init { movement, isLocked } =
         [ Window.size |> Task.perform (always Resize (0, 0)) Resize
         , gamepads GamepadUpdate
         , Cmd.map WorldMessage worldCmdMsg
-        ]
-    )
-
-worldInit : (WorldModel, Cmd WorldMsg)
-worldInit =
-    ( { maybeTexture = Nothing
-      , maybeTerrain = Nothing
-      , boids = []
-      , balls = []
-      }
-    , Cmd.batch
-        [ loadTexture "resources/woodCrate.jpg"
-            |> Task.perform TextureError TextureLoaded
-        , Terrain.generate TerrainGenerated defaultPlacement
-        , Random.generate BoidsGenerated (randomBoids 100)
-        , Random.generate BallsGenerated (randomBalls 30)
         ]
     )
 
