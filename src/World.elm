@@ -43,6 +43,17 @@ type alias WorldModel =
     , balls : List (Drop (Visible {}))
     }
 
+world =
+    { init = worldInit 
+    , view = worldView
+    , update = worldUpdate
+    , animate = worldAnimate
+    , terrain = worldTerrain
+    }
+
+worldTerrain : WorldModel -> Maybe Terrain
+worldTerrain model = model.maybeTerrain
+
 worldInit : (WorldModel, Cmd WorldMsg)
 worldInit =
     ( { maybeTexture = Nothing

@@ -5,14 +5,13 @@ import Math.Vector3 as V3
 import Math.Matrix4 exposing (makeRotate, transform)
 import Time exposing (Time)
 
+import Model exposing (Model, Msg)
 import Model
 import Orientation
 import Ports
 
 import Gamepad
 import GamepadInputs
-
-import World exposing (..)
 
 import Things.Terrain as Terrain
 import Things.Terrain exposing (Terrain)
@@ -22,11 +21,14 @@ import Vehicles.DreamDebug as DreamDebug
 
 {-| Take a Msg and a Model and return an updated Model
 -}
-update : Model.Msg -> Model.Model -> (Model.Model, Cmd Model.Msg)
-update msg model =
+update : (worldMsg -> worldModel -> (worldModel, Cmd worldMsg))
+    -> (worldModel -> Maybe Terrain)
+    -> (Time -> worldModel -> worldModel)
+    -> Model.Msg worldMsg -> Model worldModel -> (Model worldModel, Cmd (Msg worldMsg))
+update worldUpdate worldTerrain worldAnimate msg model =
     case msg of
         Model.WorldMessage worldMsg ->
-            let (worldModel, worldCmdMsg) = World.worldUpdate worldMsg model.worldModel in
+            let (worldModel, worldCmdMsg) = worldUpdate worldMsg model.worldModel in
             ( { model | worldModel = worldModel }, Cmd.map Model.WorldMessage worldCmdMsg )
         Model.KeyChange keyfunc ->
             let keys = keyfunc model.keys in
@@ -51,7 +53,7 @@ update msg model =
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
         Model.Animate dt ->
-            let model' = case model.worldModel.maybeTerrain of
+            let model' = case worldTerrain model.worldModel of
                 Nothing -> model
                 Just terrain ->
                     let inputs = timeToInputs dt model.inputs
@@ -61,7 +63,7 @@ update msg model =
                                 , person = step terrain inputs model.person
                                 , player2 = step terrain inputs2 model.player2
                                 , inputs = clearStationaryInputs inputs
-                                , worldModel = World.worldAnimate inputs.dt model.worldModel
+                                , worldModel = worldAnimate inputs.dt model.worldModel
                         }
             in ( model', Cmd.batch [Gamepad.gamepads Model.GamepadUpdate] )
 
@@ -90,7 +92,7 @@ gamepadToInputs gamepad0 inputs0 =
         bs = GamepadInputs.gamepadToButtons gamepad
     in  { inputs0 | reset = bs.bStart, changeVR = bs.bB, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX }
 
-updateGamepads : List Gamepad.Gamepad -> Model.Model -> Model.Model
+updateGamepads : List Gamepad.Gamepad -> Model worldModel -> Model worldModel
 updateGamepads gps0 model =
     let (gps, is) = GamepadInputs.persistentGamepads model.gamepadIds gps0 in
     case gps of

@@ -18,20 +18,22 @@ import Model
 import Update
 import View
 
+import World exposing (world)
+
 {-| The main entrypoint -}
 main : Program Model.Args
 main =
     Html.programWithFlags
-        { init = Model.init
-        , update = Update.update
+        { init = Model.init world.init
+        , update = Update.update world.update world.terrain world.animate
         , subscriptions = subscriptions
-        , view = View.view
+        , view = View.view world.view
         }
 
 {- Subscribe to keychange events.
 Ignore anything that isn't an escape, space or WASD keys.
 -}
-keyChange : Bool -> Keyboard.KeyCode -> Model.Msg
+keyChange : Bool -> Keyboard.KeyCode -> Model.Msg worldMsg
 keyChange on keyCode =
     if keyCode == 27 && on then
         Model.LockRequest False
@@ -45,7 +47,7 @@ keyChange on keyCode =
             _  -> Basics.identity
         ) |> Model.KeyChange
 
-subscriptions : Model.Model -> Sub Model.Msg
+subscriptions : Model.Model worldModel -> Sub (Model.Msg worldMsg)
 subscriptions model =
     [ AnimationFrame.diffs Model.Animate
     , Keyboard.downs (keyChange True)

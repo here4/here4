@@ -17,7 +17,6 @@ import Array2D exposing (Array2D)
 import Model exposing (Model, Msg)
 import Orientation
 import Thing exposing (..)
--- import Model
 import Things.Cube exposing (textureCube, fireCube, fogMountainsCube, voronoiCube)
 import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Things.Sphere exposing (cloudsSphere)
@@ -29,19 +28,18 @@ import Things.Terrain as Terrain
 import Things.BFly exposing (bfly)
 import Shaders.VoronoiDistances exposing (voronoiDistances)
 
-import World exposing (..)
-
 {-| Generate a View from a Model
 -}
-view : Model -> Html Msg
-view model =
-    case (model.maybeWindowSize, World.worldView model.worldModel) of
+view : (worldModel -> Maybe Model.World)
+     -> Model worldModel -> Html (Msg worldMsg)
+view worldView model =
+    case (model.maybeWindowSize, worldView model.worldModel) of
         (Nothing, _) -> text ""
         (_, Nothing) -> text ""
         (Just windowSize, Just world) ->
             layoutScene windowSize model world
 
-layoutScene : Window.Size -> Model.Model -> Model.World -> Html Msg
+layoutScene : Window.Size -> Model worldModel -> Model.World -> Html (Msg worldMsg)
 layoutScene windowSize model world =
     let
         render = renderWorld model.globalTime world
@@ -55,7 +53,7 @@ layoutScene windowSize model world =
 
 type alias RenderWorld = Model.Eye -> Window.Size -> Model.Person -> List WebGL.Renderable
 
-layoutScene1 : Window.Size -> Model.Model -> RenderWorld -> Html Msg
+layoutScene1 : Window.Size -> Model worldModel -> RenderWorld -> Html (Msg worldMsg)
 layoutScene1 windowSize model render =
     div
         [ style
@@ -78,7 +76,7 @@ layoutScene1 windowSize model render =
         , hud model.person 0 0
         ]
 
-layoutScene2 : Window.Size -> Model.Model -> RenderWorld -> Html Msg
+layoutScene2 : Window.Size -> Model worldModel -> RenderWorld -> Html (Msg worldMsg)
 layoutScene2 windowSize model render =
     let w2 = windowSize.width // 2
         ws2 = { windowSize | width = w2 }
@@ -128,7 +126,7 @@ layoutScene2 windowSize model render =
           ]
         ]
 
-layoutSceneVR : Window.Size -> Model.Model -> RenderWorld -> Html Msg
+layoutSceneVR : Window.Size -> Model worldModel -> RenderWorld -> Html (Msg worldMsg)
 layoutSceneVR windowSize model render =
     let w2 = windowSize.width // 2
         ws2 = { windowSize | width = w2 }
@@ -216,7 +214,7 @@ perspective { width, height } person eye =
                        (person.pos `add` (scale 3 (Model.direction person)))
                        person.cameraUp)
 
-hud : Model.Person -> Int -> Int -> Html Msg
+hud : Model.Person -> Int -> Int -> Html (Msg worldMsg)
 hud person left right =
     let
         vehicleName = if person.vehicle == Model.vehicleBird then

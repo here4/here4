@@ -21,7 +21,7 @@ arrow keys, or the window is being resized.
 # TextureLoaded - a texture has been loaded across the wire
 -}
 
-type Msg
+type Msg worldMsg
     = KeyChange (Keys -> Keys)
     | MouseMove MouseMovement
     | GamepadUpdate (List Gamepad)
@@ -29,7 +29,7 @@ type Msg
     | LockUpdate Bool
     | Animate Time
     | Resize Window.Size
-    | WorldMessage WorldMsg
+    | WorldMessage worldMsg
 
 type alias WhichVehicle = Int
 vehicleBuggy = 0
@@ -113,7 +113,7 @@ for mouse movement -}
 type alias MouseMovement = (Int, Int)
 
 {-| This is the application's Model data structure -}
-type alias Model =
+type alias Model worldModel =
     { numPlayers : Int
     , person : Person
     , player2 : Person
@@ -126,7 +126,7 @@ type alias Model =
     , wantToBeLocked : Bool
     , isLocked : Bool
     , message : String
-    , worldModel : WorldModel
+    , worldModel : worldModel
     }
 
 type alias Args =
@@ -140,9 +140,9 @@ it's a carryover from the original, and the additional complexity
 to actually use it is probably not worth it in this case.
 It's still a useful example using Html.programWithFlags though.
 -}
-init : Args -> (Model, Cmd Msg)
-init { movement, isLocked } =
-    let (worldModel, worldCmdMsg) = World.worldInit in
+init : (worldModel, Cmd worldMsg) -> Args -> (Model worldModel, Cmd (Msg worldMsg))
+init worldInit { movement, isLocked } =
+    let (worldModel, worldCmdMsg) = worldInit in
     ( { numPlayers = 1
       , person = defaultPerson
       , player2 = defaultPerson
