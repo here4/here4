@@ -1,4 +1,4 @@
-module Main exposing (main)
+module App exposing (programWithFlags)
 
 {-| This module drives a virtuul wurld
 
@@ -10,6 +10,7 @@ import AnimationFrame
 import Html.App as Html
 import Keyboard
 import Mouse
+import Time exposing (Time)
 import Window
 
 import Ports
@@ -18,11 +19,17 @@ import Model
 import Update
 import View
 
-import World exposing (world)
+import Things.Terrain exposing (Terrain)
 
-{-| The main entrypoint -}
-main : Program Model.Args
-main =
+programWithFlags
+  : { init : ( model, Cmd msg )
+    , update : msg -> model -> ( model, Cmd msg )
+    , view : model -> Maybe Model.World
+    , animate : Time -> model -> model 
+    , terrain : model -> Maybe Terrain
+    }
+  -> Program Model.Args
+programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
         , update = Update.update world.update world.terrain world.animate

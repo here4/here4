@@ -12,8 +12,6 @@ import Things.Terrain exposing (Terrain)
 
 import Gamepad exposing (Gamepad, gamepads)
 
-import World exposing (..)
-
 {-| Every half a second there's an event coming through;
 these are all the valid actions we could receive.
 # Move - the user is trying to jump using the space key, move using the
