@@ -7,6 +7,7 @@ import Html exposing (Html, text, div, p, span)
 import Html.Attributes exposing (width, height, style)
 import Math.Matrix4 as M4
 import Math.Matrix4 exposing (Mat4)
+import Math.Vector3 as V3
 import Math.Vector3 exposing (..)
 import Random
 import Time exposing (Time)
@@ -160,12 +161,12 @@ mapApply : List (a -> List b) -> a -> List b
 mapApply fs x = List.concat <| List.map (\f -> f x) fs
 
 orient : Thing -> See
-orient (Thing position orientation see) =
+orient (Thing scale position orientation see) =
     let z_axis = vec3 0 0 1
         rot_angle = 0 - acos (dot orientation z_axis)
         rot_axis = normalize (cross orientation z_axis)
     in
-        tview (M4.translate position) << tview (M4.rotate rot_angle rot_axis) <| see
+        tview (M4.scale scale) << tview (M4.translate position) << tview (M4.rotate rot_angle rot_axis) <| see
 
 eyeOffset : Model.Person -> Model.Eye -> Vec3
 eyeOffset person eye =

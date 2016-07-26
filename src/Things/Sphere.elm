@@ -34,7 +34,7 @@ fogMountainsSphere = sphere worldVertex fogMountains
 
 sphere vertexShader fragmentShader =
     let see = seeSphere vertexShader fragmentShader
-    in { pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
+    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
 type alias ShadertoyUniforms a = { a | iResolution : Vec3, iGlobalTime : Float, view : (Int,Int) }
 

@@ -14,6 +14,7 @@ newBoid m r pos vel thing0 =
     { radius = r
     , mass = m
     , velocity = vel
+    , scale = thing0.scale
     , pos = pos
     , orientation = thing0.orientation
     , see = thing0.see

@@ -61,7 +61,7 @@ noiseSurface2D skip placement xz = surface noiseVertex noiseColorFragment
 
 surface vertexShader fragmentShader mesh =
     let see = seeSurface vertexShader fragmentShader mesh
-    in { pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
+    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
 seeSurface vertexShader fragmentShader mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
@@ -80,7 +80,7 @@ rippleNoiseSurface2D skip ripple placement xz = rippleSurface rippleNoiseVertex 
 
 rippleSurface vertexShader fragmentShader ripple mesh =
     let see = rippleSeeSurface vertexShader fragmentShader ripple mesh
-    in { pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
+    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
 rippleSeeSurface vertexShader fragmentShader ripple mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0

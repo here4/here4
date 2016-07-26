@@ -144,10 +144,10 @@ ripplePaint how ripple placement terrain =
 visibleTerrain : Placement -> Array2D Float -> Array2D Thing -> List Thing
 visibleTerrain placement terrain arr =
     let
-        sees = Array2D.map (\(Thing pos _ see) -> (tview (M4.translate pos) see)) arr
+        sees = Array2D.map (\(Thing _ pos _ see) -> (tview (M4.translate pos) see)) arr
     in
         List.map extractThing
-            [{ pos = vec3 0 0 0, orientation = vec3 1 0 1, see = seeTerrain placement terrain sees }]
+            [{ scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = seeTerrain placement terrain sees }]
 
 seeTerrain : Placement -> Array2D Float -> Array2D See -> See
 seeTerrain placement terrain sees p =
@@ -199,4 +199,7 @@ placeTerrain toSurface2D placement terrainsCoords =
         terrainSurfacesCoords = List.map (List.map (\(t,(x,z)) -> (toSurface2D placement (toFloat x * placement.xDelta, toFloat z * placement.zDelta) t, (x,z)))) terrainsCoords
         terrainz = Array2D.fromLists terrainSurfacesCoords
     in
-        Array2D.map (\(s,(x,z)) -> extractThing { s | pos = vec3 (toFloat x * placement.xDelta) 0 (toFloat z * placement.zDelta)}) terrainz
+        Array2D.map (\(s,(x,z)) -> extractThing { s | scale = vec3 1 1 1
+                                                    , pos = vec3 (toFloat x * placement.xDelta) 0 (toFloat z * placement.zDelta)
+                                                }
+                    ) terrainz

@@ -16,7 +16,7 @@ bfly fragmentShader f01 = makeBFly bflyVertex fragmentShader (f01 * second * pi 
 
 makeBFly vertexShader fragmentShader flapStart =
     let see = seeBFly vertexShader fragmentShader flapStart
-    in { pos = (vec3 7 0 4), orientation = vec3 0 0 1, see = see }
+    in { scale = vec3 1 1 1, pos = (vec3 7 0 4), orientation = vec3 0 0 1, see = see }
 
 seeBFly vertexShader fragmentShader flapStart p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0

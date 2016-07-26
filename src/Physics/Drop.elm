@@ -20,6 +20,7 @@ newDrop pos vel thing0 =
     { radius = 1.0
     , mass = 1.0
     , velocity = vel
+    , scale = thing0.scale
     , pos = pos
     , orientation = thing0.orientation
     , see = thing0.see
