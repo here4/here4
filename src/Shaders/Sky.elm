@@ -64,7 +64,8 @@ vec3 render(vec3 light, vec3 ro, vec3 rd, float resolution) {
     vec3 col;
 
     // Sky with haze
-    col = vec3(0.3, 0.55, 0.8) * (1.0 - 0.8 * rd.y) * 0.9;
+    //col = vec3(0.3, 0.55, 0.8) * (1.0 - 0.8 * rd.y) * 0.9;
+    col = vec3(0.09, 0.56, 1.00) * (1.0 - 0.8 * rd.y) * 0.9;
 
     // Sun
     float sundot = clamp(dot(rd, light), 0.0, 1.0);
