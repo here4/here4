@@ -48,8 +48,11 @@ cube vertexShader fragmentShader p =
 
 -- textureCube : WebGL.Texture -> Mat4 -> WebGL.Renderable
 textureCube texture p =
-    [ render worldVertex textureFragment mesh
-        { iTexture = texture, iLensDistort = p.lensDistort, view = p.viewMatrix } ]
+    let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+    in
+        [ render worldVertex textureFragment mesh
+            { iResolution = resolution, iTexture = texture
+            , iLensDistort = p.lensDistort, view = p.viewMatrix } ]
 
 {-| The mesh for a cube -}
 mesh : Drawable Vertex

@@ -15,6 +15,23 @@ uniform float iGlobalTime;
 varying vec3 elm_FragColor;
 varying vec2 elm_FragCoord;
 
+const vec2 Scale = vec2(0.1469278, 0.2350845);
+//const vec2 Scale = vec2(0.1469278, 0.2350845);
+const vec2 ScaleIn = vec2(4, 2.5);
+//const vec2 ScaleIn = vec2(2.5, 1.5);
+const vec4 HmdWarpParam   = vec4(1, 0.22, 0.24, 0);
+
+// Scales input texture coordinates for distortion.
+vec2 HmdWarp(vec2 in01, vec2 LensCenter)
+{
+	vec2 theta = (in01 - LensCenter) * ScaleIn; // Scales to [-1, 1]
+	float rSq = theta.x * theta.x + theta.y * theta.y;
+	vec2 rvector = theta * (HmdWarpParam.x + HmdWarpParam.y * rSq +
+		HmdWarpParam.z * rSq * rSq +
+		HmdWarpParam.w * rSq * rSq * rSq);
+	return LensCenter + Scale * rvector;
+}
+
 // by @301z
 
 float rand(vec2 n) { 
@@ -37,7 +54,8 @@ float fbm(vec2 n) {
 	return total;
 }
 
-void main() {
+void fire(vec2 tc)
+{
 	const vec3 c1 = vec3(0.1, 0.0, 0.0);
 	const vec3 c2 = vec3(0.7, 0.0, 0.0);
 	const vec3 c3 = vec3(0.2, 0.0, 0.0);
@@ -45,11 +63,28 @@ void main() {
 	const vec3 c5 = vec3(0.1);
 	const vec3 c6 = vec3(0.9);
 	//vec2 p = gl_FragCoord.xy * 8.0 / iResolution.xx;
-	vec2 p = elm_FragCoord.xy * 8.0;
+	vec2 p = tc.xy * 8.0;
 	float q = fbm(p - iGlobalTime * 0.1);
 	vec2 r = vec2(fbm(p + q + iGlobalTime * 0.7 - p.x - p.y), fbm(p + q - iGlobalTime * 0.4));
 	vec3 c = mix(c1, c2, fbm(p + r)) + mix(c3, c4, r.x) - mix(c5, c6, r.y);
 	gl_FragColor = vec4(c * cos(1.57 * gl_FragCoord.y / iResolution.y), 1.0);
+}
+
+void main() {
+    vec2 LensCenter = vec2(0.5, 0.5);
+    vec2 ScreenCenter = vec2(0.5, 0.5);
+
+    vec2 oTexCoord = gl_FragCoord.xy / iResolution.xy;
+
+    vec2 tc = HmdWarp(oTexCoord, LensCenter);
+    if (any(bvec2(clamp(tc,ScreenCenter-vec2(0.5,0.5), ScreenCenter+vec2(0.5,0.5)) - tc)))
+    {
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        return;
+    }
+
+    //fire(elm_FragCoord);
+    fire(tc);
 }
 
 |]

@@ -40,6 +40,29 @@ varying float iTextureScale;
 varying float iTimeScale;
 varying float iSmoothing;
 
+
+const vec2 LeftLensCenter = vec2(0.2863248, 0.5);
+const vec2 RightLensCenter = vec2(0.7136753, 0.5);
+const vec2 LeftScreenCenter = vec2(0.25, 0.5);
+const vec2 RightScreenCenter = vec2(0.75, 0.5);
+const vec2 Scale = vec2(0.1469278, 0.2350845);
+//const vec2 Scale = vec2(0.1469278, 0.2350845);
+const vec2 ScaleIn = vec2(4, 2.5);
+//const vec2 ScaleIn = vec2(2.5, 1.5);
+const vec4 HmdWarpParam   = vec4(1, 0.22, 0.24, 0);
+
+// Scales input texture coordinates for distortion.
+vec2 HmdWarp(vec2 in01, vec2 LensCenter)
+{
+	vec2 theta = (in01 - LensCenter) * ScaleIn; // Scales to [-1, 1]
+	float rSq = theta.x * theta.x + theta.y * theta.y;
+	vec2 rvector = theta * (HmdWarpParam.x + HmdWarpParam.y * rSq +
+		HmdWarpParam.z * rSq * rSq +
+		HmdWarpParam.w * rSq * rSq * rSq);
+	return LensCenter + Scale * rvector;
+}
+
+
 // by @301z
 
 float rand(vec2 n) { 
@@ -65,7 +88,7 @@ float fbm(vec2 n) {
 }
 
 
-void texture() {
+void texture(vec2 tc) {
 	vec3 c1 = vec3(elm_FragColor);
 	vec3 c2 = c1 * vec3(0.7, 0.7, 0.7);
 	vec3 c3 = c1 * vec3(0.6, 0.6, 0.6);
@@ -73,7 +96,8 @@ void texture() {
 	vec3 c5 = vec3(0.10);
 	vec3 c6 = vec3(0.50);
 
-	vec2 p = elm_FragCoord.xy * iTextureScale;
+	//vec2 p = elm_FragCoord.xy * iTextureScale;
+	vec2 p = tc.xy * iTextureScale;
 
         float scaledTime = iGlobalTime * iTimeScale;
         float q;
@@ -101,12 +125,29 @@ void texture() {
 }
 
 void main() {
+        vec2 LensCenter = vec2(0.5, 0.5);
+        vec2 ScreenCenter = vec2(0.5, 0.5);
+
+	vec2 oTexCoord = gl_FragCoord.xy / iResolution.xy;
+
+	vec2 tc = HmdWarp(oTexCoord, LensCenter);
+	if (any(bvec2(clamp(tc,ScreenCenter-vec2(0.5,0.5), ScreenCenter+vec2(0.5,0.5)) - tc)))
+	{
+		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+		return;
+	}
+
+	//tc.x = gl_FragCoord.x < 640 ? (2.0 * tc.x) : (2.0 * (tc.x - 0.5));
+	//gl_FragColor = texture2D(warpTexture, tc);
+
+
 //        texture();
 	if (int(iDetail) == 0) {
 		gl_FragColor = elm_FragColor;
 	} else {
-		texture();
+		texture(tc);
 	}
+
 }
 
 |]
