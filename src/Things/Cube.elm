@@ -1,4 +1,4 @@
-module Things.Cube exposing (textureCube, cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, cube)
+module Things.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, cube)
 
 import Time exposing (Time, inSeconds)
 
@@ -9,6 +9,7 @@ import WebGL exposing (..)
 import Window
 
 import Shaders.Clouds exposing (clouds)
+import Shaders.Sky exposing (sky)
 import Shaders.Fire exposing (fire)
 import Shaders.FogMountains exposing (fogMountains)
 import Shaders.SimplePlasma exposing (simplePlasma)
@@ -17,6 +18,8 @@ import Shaders.TextureFragment exposing (textureFragment)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 type alias Triple a = (a,a,a)
+
+skyCube = cube worldVertex sky
 
 -- cloudsCube : Window.Size -> Time -> Mat4 -> Renderable
 cloudsCube = cube worldVertex clouds
@@ -50,11 +53,11 @@ textureCube texture p =
 
 {-| The mesh for a cube -}
 mesh : Drawable Vertex
-mesh = Triangle <| List.concatMap rotatedFace [ (0,0), (90,0), (180,0), (270,0), (0,90), (0,-90) ]
+mesh = Triangle <| List.concatMap rotatedFace [ (0,0,0), (90,0,1), (180,0,2), (270,0,3), (0,90,0), (0,-90,0) ]
 
 -- rotatedFace : (Float,Float) -> List ({ pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 })
-rotatedFace : (Float,Float) -> List (Triple Vertex)
-rotatedFace (angleX,angleY) =
+rotatedFace : (Float,Float,Float) -> List (Triple Vertex)
+rotatedFace (angleX,angleY,coordX) =
   let
     x = makeRotate (degrees angleX) (vec3 1 0 0)
     y = makeRotate (degrees angleY) (vec3 0 1 0)
@@ -62,7 +65,7 @@ rotatedFace (angleX,angleY) =
     each f (a,b,c) =
       (f a, f b, f c)
   in
-    List.map (each (\x -> {x | pos = transform t x.pos })) face
+    List.map (each (\x -> {x | pos = transform t x.pos, coord = vec3 coordX 0 0 `add` x.coord })) face
 
 
 -- face : List ({ pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 })
