@@ -40,6 +40,7 @@ nextVehicle v = (v+1) % 3
 type alias World =
     { things : List Thing
     , terrain : Terrain
+    , skybox : Thing
     }
 
 type alias Person =

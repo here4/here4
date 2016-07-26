@@ -201,10 +201,12 @@ renderWorld globalTime world eye windowSize person =
             , measuredFPS = 30.0
             }
 
+        skybox = orientSkybox world.skybox { p | viewMatrix = skyboxMatrix windowSize person }
+
         things = world.terrain.groundMesh ++ world.terrain.waterMesh ++ world.things
         seeThings = mapApply (List.map orient things)
     in
-        seeThings p
+        skybox ++ seeThings p
 
 {-| Calculate the viewer's field of view
 -}
@@ -213,6 +215,21 @@ perspective { width, height } person eye =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
         (M4.makeLookAt (person.cameraPos `add` eyeOffset person eye)
                        (person.pos `add` (scale 3 (Model.direction person)))
+                       person.cameraUp)
+
+orientSkybox : Thing -> See
+orientSkybox (Thing scale _ orientation see) =
+    let z_axis = vec3 0 0 1
+        rot_angle = 0 - acos (dot orientation z_axis)
+        rot_axis = normalize (cross orientation z_axis)
+    in
+        tview (M4.scale scale) << tview (M4.rotate rot_angle rot_axis) <| see
+
+skyboxMatrix : Window.Size -> Model.Person -> Mat4
+skyboxMatrix { width, height } person =
+    M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
+        (M4.makeLookAt (vec3 0 0 0)
+                       (scale 3 (Model.direction person))
                        person.cameraUp)
 
 hud : Model.Person -> Int -> Int -> Html (Msg worldMsg)
