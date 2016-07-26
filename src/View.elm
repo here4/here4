@@ -191,13 +191,14 @@ renderWorld : Time -> Model.World -> Model.Eye -> Window.Size -> Model.Person ->
 renderWorld globalTime world eye windowSize person =
     let
         eyeLevel pos = Model.eyeLevel + Terrain.elevation world.terrain pos
-        lensDistort = if person.cameraVR then 0.85 else 0.9
+        lensDistort = if person.cameraVR then 0.85 else 0.95
 
         p = { cameraPos = Terrain.bounds world.terrain (aboveTerrain eyeLevel person.pos)
             , viewMatrix = perspective windowSize person eye
             , globalTime = globalTime
             , windowSize = windowSize
             , lensDistort = lensDistort
+            , cameraVR = person.cameraVR
             , measuredFPS = 30.0
             }
 

@@ -4,11 +4,12 @@ import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (Vec3)
 import WebGL exposing (Shader, Texture)
 
-textureFragment : Shader {} { u | iResolution:Vec3, iTexture:Texture } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
+textureFragment : Shader {} { u | iResolution:Vec3, iHMD:Float, iTexture:Texture } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
 textureFragment = [glsl|
 
 precision mediump float;
 uniform vec3 iResolution;
+uniform float iHMD;
 uniform sampler2D iTexture;
 
 varying vec3 elm_FragColor;
@@ -31,7 +32,7 @@ vec2 HmdWarp(vec2 in01, vec2 LensCenter)
 	return LensCenter + Scale * rvector;
 }
 
-void main() {
+void hmd() {
     vec2 LensCenter = vec2(0.5, 0.5);
     vec2 ScreenCenter = vec2(0.5, 0.5);
 
@@ -44,8 +45,14 @@ void main() {
         return;
     }
 
-    //gl_FragColor = texture2D(iTexture, elm_FragCoord);
     gl_FragColor = texture2D(iTexture, tc);
+}
+
+void main() {
+    if (iHMD == 1.0)
+        hmd();
+    else
+        gl_FragColor = texture2D(iTexture, elm_FragCoord);
 }
 
 |]

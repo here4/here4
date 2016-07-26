@@ -66,10 +66,11 @@ surface vertexShader fragmentShader mesh =
 seeSurface vertexShader fragmentShader mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = inSeconds p.globalTime
+        iHMD = if p.cameraVR then 1.0 else 0.0
         detail = p.measuredFPS / 3.0
     in
         [render vertexShader fragmentShader mesh
-            { iGlobalTime=s, iResolution=resolution, iDetail=detail
+            { iGlobalTime=s, iResolution=resolution, iHMD=iHMD, iDetail=detail
             , iGlobalTimeV=s, iLensDistort=p.lensDistort, view=p.viewMatrix
             }
         ]
@@ -85,10 +86,11 @@ rippleSurface vertexShader fragmentShader ripple mesh =
 rippleSeeSurface vertexShader fragmentShader ripple mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = inSeconds p.globalTime
+        iHMD = if p.cameraVR then 1.0 else 0.0
         detail = p.measuredFPS / 3.0
     in
         [render vertexShader fragmentShader mesh
-            { iGlobalTime=s, iResolution=resolution, iDetail=detail
+            { iGlobalTime=s, iResolution=resolution, iHMD=iHMD, iDetail=detail
             , iGlobalTimeV=s, iLensDistort=p.lensDistort, view=p.viewMatrix, iRipple=ripple
             }
         ]

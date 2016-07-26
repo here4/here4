@@ -5,12 +5,13 @@ import Math.Vector3 exposing (..)
 import WebGL exposing (..)
 
 -- https://www.shadertoy.com/view/XslGRr
-clouds : Shader {} { u | iResolution:Vec3, iGlobalTime:Float } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
+clouds : Shader {} { u | iResolution:Vec3, iGlobalTime:Float, iHMD:Float } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
 clouds = [glsl|
 
 precision mediump float;
 uniform vec3 iResolution;
 uniform float iGlobalTime;
+uniform float iHMD;
 
 varying vec3 elm_FragColor;
 varying vec2 elm_FragCoord;
@@ -139,7 +140,7 @@ void clouds(vec2 tc)
     gl_FragColor = vec4( col, 1.0 );
 }
 
-void main(void)
+void hmd(void)
 {
     vec2 LensCenter = vec2(0.5, 0.5);
     vec2 ScreenCenter = vec2(0.5, 0.5);
@@ -153,8 +154,13 @@ void main(void)
         return;
     }
 
-    //clouds(elm_FragCoord);
     clouds(tc);
 }
 
+void main() {
+    if (iHMD == 1.0)
+        hmd();
+    else
+        clouds(elm_FragCoord);
+}
 |]

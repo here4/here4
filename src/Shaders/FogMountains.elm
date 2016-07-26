@@ -5,7 +5,7 @@ import Math.Vector3 exposing (..)
 import WebGL exposing (..)
 
 -- https://www.shadertoy.com/view/XdsGD7
-fogMountains : Shader {} { u | iResolution:Vec3, iGlobalTime:Float } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
+fogMountains : Shader {} { u | iResolution:Vec3, iGlobalTime:Float, iHMD:Float } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
 fogMountains = [glsl|
 
 precision mediump float;
@@ -13,6 +13,7 @@ precision mediump float;
 //uniform sampler2D crate;
 uniform vec3 iResolution;
 uniform float iGlobalTime;
+uniform float iHMD;
 
 varying vec3 elm_FragColor;
 varying vec2 elm_FragCoord;
@@ -235,7 +236,7 @@ void fogMountains(vec2 tc)
   gl_FragColor = vec4 (color, 1.0 );
 }
 
-void main () {
+void hmd () {
     vec2 LensCenter = vec2(0.5, 0.5);
     vec2 ScreenCenter = vec2(0.5, 0.5);
 
@@ -250,6 +251,13 @@ void main () {
 
   //fogMountains(elm_FragCoord);
   fogMountains(tc);
+}
+
+void main() {
+    if (iHMD == 1.0)
+        hmd();
+    else
+        fogMountains(elm_FragCoord);
 }
 
 |]

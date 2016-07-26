@@ -21,13 +21,14 @@ makeBFly vertexShader fragmentShader flapStart =
 seeBFly vertexShader fragmentShader flapStart p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = inSeconds p.globalTime + inSeconds flapStart
+        iHMD = if p.cameraVR then 1.0 else 0.0
         -- s = log (show flapStart) <| (p.globalTime + flapStart)
         flap = -0.1 + (sin (s*8) + 1)/2
         flapL = makeRotate (-flap * 3*pi/8) (vec3 0 0 1)
         flapR = makeRotate (flap * 3*pi/8) (vec3 0 0 1)
     in
         [render vertexShader fragmentShader mesh
-            { iResolution=resolution, iGlobalTime=s
+            { iResolution=resolution, iGlobalTime=s, iHMD=iHMD
             , iLensDistort=p.lensDistort, view=p.viewMatrix, flapL=flapL, flapR=flapR }
         ]
 

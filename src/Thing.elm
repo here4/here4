@@ -13,6 +13,7 @@ type alias Perception = {
     globalTime : Time,
     viewMatrix : Mat4,
     lensDistort : Float,
+    cameraVR   : Bool,
     measuredFPS : Float
 }
 

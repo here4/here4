@@ -41,17 +41,19 @@ voronoiCube = cube worldVertex voronoiDistances
 cube vertexShader fragmentShader p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = inSeconds p.globalTime
+        iHMD = if p.cameraVR then 1.0 else 0.0
     in
         [ render vertexShader fragmentShader mesh
-            { iResolution = resolution, iGlobalTime = s
+            { iResolution = resolution, iHMD = iHMD, iGlobalTime = s
             , iLensDistort = p.lensDistort, view = p.viewMatrix } ]
 
 -- textureCube : WebGL.Texture -> Mat4 -> WebGL.Renderable
 textureCube texture p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+        iHMD = if p.cameraVR then 1.0 else 0.0
     in
         [ render worldVertex textureFragment mesh
-            { iResolution = resolution, iTexture = texture
+            { iResolution = resolution, iHMD = iHMD, iTexture = texture
             , iLensDistort = p.lensDistort, view = p.viewMatrix } ]
 
 {-| The mesh for a cube -}

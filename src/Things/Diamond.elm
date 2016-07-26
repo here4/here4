@@ -31,9 +31,10 @@ fogMountainsDiamond = diamond worldVertex fogMountains
 diamond vertexShader fragmentShader p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = inSeconds p.globalTime
+        iHMD = if p.cameraVR then 1.0 else 0.0
     in
         [ render vertexShader fragmentShader diamondMesh
-            { iResolution = resolution, iGlobalTime = s
+            { iResolution = resolution, iGlobalTime = s, iHMD=iHMD
             , iLensDistort = p.lensDistort, view = p.viewMatrix } ]
 
 unfold : Int -> (a -> a) -> a -> List a
