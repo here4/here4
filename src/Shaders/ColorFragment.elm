@@ -48,7 +48,7 @@ const vec2 LeftScreenCenter = vec2(0.25, 0.5);
 const vec2 RightScreenCenter = vec2(0.75, 0.5);
 const vec2 Scale = vec2(0.1469278, 0.2350845);
 //const vec2 Scale = vec2(0.1469278, 0.2350845);
-const vec2 ScaleIn = vec2(4, 2.5);
+const vec2 ScaleIn = vec2(3, 2.5);
 //const vec2 ScaleIn = vec2(2.5, 1.5);
 const vec4 HmdWarpParam   = vec4(1, 0.22, 0.24, 0);
 
