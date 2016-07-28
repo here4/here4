@@ -7,6 +7,17 @@ import Time exposing (Time)
 import WebGL exposing (Renderable)
 import Window
 
+import Dynamic exposing (Dynamic)
+
+type alias ThingID = Int
+type ThingMsg = TMsg String Dynamic
+
+wrapMsg : String -> a -> ThingMsg
+wrapMsg s x = TMsg s (Dynamic.pack x)
+
+unwrapMsg : ThingMsg -> (String, a)
+unwrapMsg (TMsg s x) = (s, Dynamic.unpack x)
+
 type alias Perception = {
     cameraPos  : Vec3,
     windowSize : Window.Size,
