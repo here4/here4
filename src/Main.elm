@@ -23,7 +23,7 @@ import Physics.Collisions exposing (collisions)
 
 import Things.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, voronoiCube)
 import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
-import Things.Sphere exposing (cloudsSphere)
+import Things.Sphere exposing (skySphere, cloudsSphere)
 import Things.Terrain exposing (Terrain)
 import Things.Ground exposing (renderGround)
 import Things.Surface2D exposing (Placement, defaultPlacement)
@@ -115,7 +115,7 @@ worldUpdate msg model =
             ( model, Cmd.none )
         TextureLoaded texture ->
             ( { model | maybeTexture = Just texture
-                      , maybeSkybox = Just <| resize 70 <| put (vec3 0 1 1) skyCube
+                      , maybeSkybox = Just <| resize 80 <| put (vec3 0 1 1) skySphere
               }
             , Cmd.none )
         TerrainGenerated terrain ->

@@ -1,4 +1,4 @@
-module Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond, diamond)
+module Things.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, diamond)
 
 import List exposing (map2, repeat)
 import Time exposing (Time, inSeconds)
@@ -10,6 +10,7 @@ import WebGL exposing (..)
 import Window
 
 import Shaders.Clouds exposing (clouds)
+import Shaders.Sky exposing (sky)
 import Shaders.Fire exposing (fire)
 import Shaders.FogMountains exposing (fogMountains)
 --import Shaders.SimplePlasma exposing (simplePlasma)
@@ -18,6 +19,8 @@ import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 type alias Triangle a = (a,a,a)
 -- type alias Vertex = { pos:Vec3, coord:Vec3 }
+
+skyDiamond = diamond worldVertex sky
 
 -- cloudsDiamond : Window.Size -> Time -> Mat4 -> Renderable
 cloudsDiamond = diamond worldVertex clouds

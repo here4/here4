@@ -1,4 +1,4 @@
-module Things.Sphere exposing (spheres, cloudsSphere, fogMountainsSphere, sphere)
+module Things.Sphere exposing (spheres, skySphere, cloudsSphere, fogMountainsSphere, sphere)
 
 import Random exposing (float, list)
 import List exposing (drop, concat, map, map2)
@@ -11,6 +11,7 @@ import WebGL exposing (..)
 -- import Signal.Extra exposing ((<~))
 
 import Shaders.Clouds exposing (clouds)
+import Shaders.Sky exposing (sky)
 import Shaders.Fire exposing (fire)
 import Shaders.FogMountains exposing (fogMountains)
 --import Shaders.SimplePlasma exposing (simplePlasma)
@@ -23,6 +24,8 @@ import Shaders.WorldVertex exposing (Vertex, worldVertex)
 type alias Triangle a = (a,a,a)
 
 spheres n fragmentShader = map (always (sphere worldVertex fragmentShader)) [0..n]
+
+skySphere = seeSphere worldVertex sky
 
 -- cloudsSphere : (Int,Int) -> Time -> Mat4 -> Renderable
 -- cloudsSphere : Oriented (Visible {})
