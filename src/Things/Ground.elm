@@ -2,7 +2,6 @@ module Things.Ground exposing (renderGround)
 
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
-import Time exposing (inSeconds)
 import WebGL exposing (..)
 
 import Util exposing (hslToVec3)
@@ -17,7 +16,7 @@ import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 renderGround p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
-        s = inSeconds p.globalTime
+        s = p.globalTime
     in
         [render worldVertex colorFragment groundMesh
             { iResolution=resolution, iGlobalTime=s

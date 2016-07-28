@@ -68,7 +68,7 @@ update worldUpdate worldTerrain worldAnimate msg model =
             in ( model', Cmd.batch [Gamepad.gamepads Model.GamepadUpdate] )
 
 timeToInputs : Time -> Model.Inputs -> Model.Inputs
-timeToInputs dt inputs0 = { inputs0 | dt = Time.inSeconds dt }
+timeToInputs dt inputs0 = { inputs0 | dt = dt }
 
 keysToInputs : Model.Keys -> Model.Inputs -> Model.Inputs
 keysToInputs keys inputs0 =

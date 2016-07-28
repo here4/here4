@@ -4,8 +4,7 @@ import Random exposing (float)
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
--- import Signal.Extra exposing ((<~))
-import Time exposing (inSeconds, second)
+import Time exposing (second)
 import WebGL exposing (..)
 
 import Debug exposing (log)
@@ -20,7 +19,7 @@ makeBFly vertexShader fragmentShader flapStart =
 
 seeBFly vertexShader fragmentShader flapStart p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
-        s = inSeconds p.globalTime + inSeconds flapStart
+        s = p.globalTime + flapStart
         iHMD = if p.cameraVR then 1.0 else 0.0
         -- s = log (show flapStart) <| (p.globalTime + flapStart)
         flap = -0.1 + (sin (s*8) + 1)/2

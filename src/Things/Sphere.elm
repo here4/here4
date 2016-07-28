@@ -5,7 +5,6 @@ import List exposing (drop, concat, map, map2)
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
-import Time exposing (inSeconds)
 import WebGL exposing (..)
 
 -- import Signal.Extra exposing ((<~))
@@ -48,7 +47,7 @@ seeSphere vertexShader fragmentShader p =
     -- let (w,h) = p.resolution
     --     resolution = vec3 (toFloat w) (toFloat h) 0
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
-        s = inSeconds p.globalTime
+        s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0
     in
         [render vertexShader fragmentShader sphereMesh

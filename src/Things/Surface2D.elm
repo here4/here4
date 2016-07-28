@@ -13,7 +13,6 @@ import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4)
 import Math.Matrix4 exposing (..)
 import Maybe.Extra exposing (isJust)
-import Time exposing (Time, inSeconds)
 import Util exposing (subsample)
 import WebGL exposing (..)
 
@@ -65,7 +64,7 @@ surface vertexShader fragmentShader mesh =
 
 seeSurface vertexShader fragmentShader mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
-        s = inSeconds p.globalTime
+        s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0
         detail = p.measuredFPS / 3.0
     in
@@ -85,7 +84,7 @@ rippleSurface vertexShader fragmentShader ripple mesh =
 
 rippleSeeSurface vertexShader fragmentShader ripple mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
-        s = inSeconds p.globalTime
+        s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0
         detail = p.measuredFPS / 3.0
     in

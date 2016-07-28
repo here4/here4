@@ -56,7 +56,7 @@ keyChange on keyCode =
 
 subscriptions : Model.Model worldModel -> Sub (Model.Msg worldMsg)
 subscriptions model =
-    [ AnimationFrame.diffs Model.Animate
+    [ AnimationFrame.diffs (Model.Animate << Time.inSeconds)
     , Keyboard.downs (keyChange True)
     , Keyboard.ups (keyChange False)
     , Window.resizes Model.Resize

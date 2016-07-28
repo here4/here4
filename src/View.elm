@@ -26,7 +26,6 @@ import Things.Ground exposing (renderGround)
 import Things.Surface2D exposing (Placement, defaultPlacement)
 import Things.Terrain as Terrain
 
-import Things.BFly exposing (bfly)
 import Shaders.VoronoiDistances exposing (voronoiDistances)
 
 {-| Generate a View from a Model
