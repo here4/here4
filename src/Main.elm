@@ -17,9 +17,7 @@ import Things.Terrain as Terrain
 
 import Boids exposing (Boids)
 
-import Balls exposing (..)
-import Physics.Drop exposing (Drop, moveDrops)
-import Physics.Collisions exposing (collisions)
+import Balls exposing (Balls)
 
 import Things.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, voronoiCube)
 import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
@@ -34,15 +32,18 @@ type WorldMsg
     | TextureLoaded Texture
     | TerrainGenerated Terrain
     -- | BoidsGenerated Boids
-    | BallsGenerated (List (Drop (Visible {})))
+    -- | BallsGenerated (List (Drop (Visible {})))
     | ThingMessage ThingID String Dynamic
+
+toThingMessage : ThingID -> ThingMsg -> WorldMsg
+toThingMessage thingID (TMsg s dyn) = ThingMessage thingID s dyn
 
 type alias WorldModel =
     { maybeTexture : Maybe Texture
     , maybeTerrain : Maybe Terrain
     , maybeSkybox : Maybe Thing
     , boids : Boids
-    , balls : List (Drop (Visible {}))
+    , balls : Balls
     }
 
 main : Program Args
@@ -62,20 +63,21 @@ worldSkybox model = model.maybeSkybox
 
 worldInit : (WorldModel, Cmd WorldMsg)
 worldInit =
-    let (boidsModel, boidsCmdMsg) = Boids.init 100 in
+    let (boidsModel, boidsCmdMsg) = Boids.init 100
+        (ballsModel, ballsCmdMsg) = Balls.init 30
+    in
     ( { maybeTexture = Nothing
       , maybeTerrain = Nothing
       , maybeSkybox = Nothing
       , boids = boidsModel
-      , balls = []
+      , balls = ballsModel
       }
     , Cmd.batch
         [ loadTexture "resources/woodCrate.jpg"
             |> Task.perform TextureError TextureLoaded
         , Terrain.generate TerrainGenerated defaultPlacement
-        -- , Boids.generate BoidsGenerated 100
-        , Cmd.map (\(TMsg s dyn) -> ThingMessage 7 s dyn) boidsCmdMsg
-        , Random.generate BallsGenerated (randomBalls 30)
+        , Cmd.map (toThingMessage 7) boidsCmdMsg
+        , Cmd.map (toThingMessage 8) ballsCmdMsg
         ]
     )
 
@@ -91,8 +93,8 @@ worldView model =
 demoWorld : WebGL.Texture -> Terrain -> Thing -> WorldModel -> Model.World
 demoWorld texture terrain skybox model =
     let
-        boidThings = List.map extractThing model.boids
-        ballThings = List.map extractThing model.balls
+        boidThings = Boids.things model.boids
+        ballThings = Balls.things model.balls
 
         worldThings = boidThings ++ ballThings ++
             [ put (vec3 0 1.5 0) fogMountainsDiamond
@@ -106,9 +108,6 @@ demoWorld texture terrain skybox model =
     in
         { things = worldThings, terrain = terrain, skybox = skybox }
 
-toThingMessage : ThingID -> ThingMsg -> WorldMsg
-toThingMessage thingID (TMsg s dyn) = ThingMessage thingID s dyn
-
 worldUpdate : WorldMsg -> WorldModel -> (WorldModel, Cmd WorldMsg)
 worldUpdate msg model =
     case msg of
@@ -116,6 +115,8 @@ worldUpdate msg model =
             case thingID of
                 7 -> let (boidsModel, boidsCmdMsg) = Boids.update (TMsg s dyn) model.boids in
                      ( { model | boids = boidsModel }, Cmd.map (toThingMessage 7) boidsCmdMsg )
+                8 -> let (ballsModel, ballsCmdMsg) = Balls.update (TMsg s dyn) model.balls in
+                     ( { model | balls = ballsModel }, Cmd.map (toThingMessage 8) ballsCmdMsg )
                 _ -> ( model, Cmd.none )
 
         TextureError err ->
@@ -130,12 +131,12 @@ worldUpdate msg model =
             ( { model | maybeTerrain = Just terrain }, Cmd.none )
         -- BoidsGenerated boids ->
         --     ( { model | boids = boids }, Cmd.none )
-        BallsGenerated balls ->
-            ( { model | balls = balls }, Cmd.none )
+        -- BallsGenerated balls ->
+        --     ( { model | balls = balls }, Cmd.none )
 
 worldAnimate : Time -> WorldModel -> WorldModel
 worldAnimate dt model = 
     { model | boids = Boids.animate dt model.boids
-            , balls = collisions dt (moveDrops dt model.balls)
+            , balls = Balls.animate dt model.balls
     }
 

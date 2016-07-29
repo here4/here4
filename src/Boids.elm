@@ -1,4 +1,4 @@
-module Boids exposing (Boids, init, update, animate)
+module Boids exposing (Boids, init, update, animate, things)
 
 import Math.Vector3 exposing (add, vec3)
 import Random
@@ -34,3 +34,6 @@ update msg boids = let (_, newBoids) = unwrapMsg msg in (newBoids, Cmd.none)
 
 animate : Time -> Boids -> Boids
 animate dt boids = moveBoids dt boids
+
+things : Boids -> List Thing
+things = List.map extractThing
