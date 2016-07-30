@@ -31,8 +31,6 @@ type WorldMsg
     = TextureError Error
     | TextureLoaded Texture
     | TerrainGenerated Terrain
-    -- | BoidsGenerated Boids
-    -- | BallsGenerated (List (Drop (Visible {})))
     | ThingMessage ThingID String Dynamic
 
 toThingMessage : ThingID -> ThingMsg -> WorldMsg
@@ -55,6 +53,7 @@ main =
     , animate = worldAnimate
     , terrain = worldTerrain
     }
+
 worldTerrain : WorldModel -> Maybe Terrain
 worldTerrain model = model.maybeTerrain
 
@@ -129,10 +128,6 @@ worldUpdate msg model =
             , Cmd.none )
         TerrainGenerated terrain ->
             ( { model | maybeTerrain = Just terrain }, Cmd.none )
-        -- BoidsGenerated boids ->
-        --     ( { model | boids = boids }, Cmd.none )
-        -- BallsGenerated balls ->
-        --     ( { model | balls = balls }, Cmd.none )
 
 worldAnimate : Time -> WorldModel -> WorldModel
 worldAnimate dt model = 
