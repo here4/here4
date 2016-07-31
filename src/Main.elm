@@ -26,23 +26,6 @@ import Things.Terrain exposing (Terrain)
 import Things.Surface2D exposing (Placement, defaultPlacement)
 import Things.Terrain as Terrain
 
-type WorldMsg
-    = TextureError Error
-    | TextureLoaded Texture
-    | TerrainGenerated Terrain
-    | ThingMessage Bag.Key Dynamic
-
-toThingMessage : Bag.Key -> ThingMsg -> WorldMsg
-toThingMessage key (TMsg dyn) = ThingMessage key dyn
-
-type alias WorldModel =
-    { maybeTexture : Maybe Texture
-    , maybeTerrain : Maybe Terrain
-    , skybox : Thing
-    , staticThings : List Thing
-    , thingsBag : Bag Things
-    }
-
 main : Program Args
 main =
   App.programWithFlags
@@ -63,6 +46,23 @@ main =
     , update = worldUpdate
     , animate = worldAnimate
     , terrain = worldTerrain
+    }
+
+type WorldMsg
+    = TextureError Error
+    | TextureLoaded Texture
+    | TerrainGenerated Terrain
+    | ThingMessage Bag.Key Dynamic
+
+toThingMessage : Bag.Key -> ThingMsg -> WorldMsg
+toThingMessage key (TMsg dyn) = ThingMessage key dyn
+
+type alias WorldModel =
+    { maybeTexture : Maybe Texture
+    , maybeTerrain : Maybe Terrain
+    , skybox : Thing
+    , staticThings : List Thing
+    , thingsBag : Bag Things
     }
 
 worldTerrain : WorldModel -> Maybe Terrain
@@ -102,13 +102,12 @@ worldView model =
         (Nothing, _) -> Nothing
         (_, Nothing) -> Nothing
         (Just texture, Just terrain) ->
-            Just (demoWorld texture terrain model)
+            Just (makeWorld texture terrain model)
 
-demoWorld : WebGL.Texture -> Terrain -> WorldModel -> Model.World
-demoWorld texture terrain model =
+makeWorld : WebGL.Texture -> Terrain -> WorldModel -> Model.World
+makeWorld texture terrain model =
     let
         myThings = List.concatMap Thing.things (Bag.items model.thingsBag)
-
         worldThings = myThings ++ model.staticThings
     in
         { things = worldThings, terrain = terrain, skybox = model.skybox }
