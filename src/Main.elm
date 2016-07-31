@@ -58,24 +58,29 @@ worldTerrain model = model.maybeTerrain
 worldSkybox : WorldModel -> Maybe Thing
 worldSkybox model = model.maybeSkybox
 
+worldThings : List (Things, Cmd ThingMsg) -> (Bag Things, Cmd WorldMsg)
+worldThings ts =
+    let f (newThings, newCmdMsg) (oldBag, oldCmdMsgs) =
+            let (key, newBag) = Bag.insert newThings oldBag
+            in (newBag, oldCmdMsgs ++ [Cmd.map (toThingMessage key) newCmdMsg])
+
+        (bag, unbatched) = List.foldl f (Bag.empty, []) ts
+    in (bag, Cmd.batch unbatched)
+
 worldInit : (WorldModel, Cmd WorldMsg)
 worldInit =
-    let (boidsModel, boidsCmdMsg) = Boids.create 100
-        (ballsModel, ballsCmdMsg) = Balls.create 30
-        (boidsKey, bag1) = Bag.insert boidsModel Bag.empty
-        (ballsKey, bag2) = Bag.insert ballsModel bag1
+    let (bag, thingCmds) = worldThings [Boids.create 100, Balls.create 30]
     in
     ( { maybeTexture = Nothing
       , maybeTerrain = Nothing
       , maybeSkybox = Nothing
-      , thingsBag = bag2
+      , thingsBag = bag
       }
     , Cmd.batch
         [ loadTexture "resources/woodCrate.jpg"
             |> Task.perform TextureError TextureLoaded
         , Terrain.generate TerrainGenerated defaultPlacement
-        , Cmd.map (toThingMessage boidsKey) boidsCmdMsg
-        , Cmd.map (toThingMessage ballsKey) ballsCmdMsg
+        , thingCmds
         ]
     )
 
