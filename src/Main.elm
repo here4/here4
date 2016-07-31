@@ -38,14 +38,17 @@ toThingMessage key (TMsg dyn) = ThingMessage key dyn
 type alias WorldModel =
     { maybeTexture : Maybe Texture
     , maybeTerrain : Maybe Terrain
-    , maybeSkybox : Maybe Thing
+    , skybox : Thing
     , thingsBag : Bag Things
     }
 
 main : Program Args
 main =
   App.programWithFlags
-    { init = worldInit [Boids.create 100, Balls.create 30]
+    { init = worldInit 
+          { things = [Boids.create 100, Balls.create 30]
+          , skybox = resize 80 <| put (vec3 0 1 1) skySphere
+          }
     , view = worldView
     , update = worldUpdate
     , animate = worldAnimate
@@ -54,9 +57,6 @@ main =
 
 worldTerrain : WorldModel -> Maybe Terrain
 worldTerrain model = model.maybeTerrain
-
-worldSkybox : WorldModel -> Maybe Thing
-worldSkybox model = model.maybeSkybox
 
 worldThings : List (Things, Cmd ThingMsg) -> (Bag Things, Cmd WorldMsg)
 worldThings ts =
@@ -67,13 +67,14 @@ worldThings ts =
         (bag, unbatched) = List.foldl f (Bag.empty, []) ts
     in (bag, Cmd.batch unbatched)
 
-worldInit : List (Things, Cmd ThingMsg) -> (WorldModel, Cmd WorldMsg)
-worldInit initThings =
-    let (bag, thingCmds) = worldThings initThings
+worldInit : { things : List (Things, Cmd ThingMsg) , skybox : Thing }
+    -> (WorldModel, Cmd WorldMsg)
+worldInit details =
+    let (bag, thingCmds) = worldThings details.things
     in
     ( { maybeTexture = Nothing
       , maybeTerrain = Nothing
-      , maybeSkybox = Nothing
+      , skybox = details.skybox
       , thingsBag = bag
       }
     , Cmd.batch
@@ -86,15 +87,14 @@ worldInit initThings =
 
 worldView : WorldModel -> Maybe Model.World
 worldView model =
-    case (model.maybeTexture, model.maybeTerrain, model.maybeSkybox) of
-        (Nothing, _, _) -> Nothing
-        (_, Nothing, _) -> Nothing
-        (_, _, Nothing) -> Nothing
-        (Just texture, Just terrain, Just skybox) ->
-            Just (demoWorld texture terrain skybox model)
+    case (model.maybeTexture, model.maybeTerrain) of
+        (Nothing, _) -> Nothing
+        (_, Nothing) -> Nothing
+        (Just texture, Just terrain) ->
+            Just (demoWorld texture terrain model)
 
-demoWorld : WebGL.Texture -> Terrain -> Thing -> WorldModel -> Model.World
-demoWorld texture terrain skybox model =
+demoWorld : WebGL.Texture -> Terrain -> WorldModel -> Model.World
+demoWorld texture terrain model =
     let
         myThings = List.concatMap Thing.things (Bag.items model.thingsBag)
 
@@ -108,7 +108,7 @@ demoWorld texture terrain skybox model =
             , put (vec3 -2 0 -17) (textureCube texture)
             ]
     in
-        { things = worldThings, terrain = terrain, skybox = skybox }
+        { things = worldThings, terrain = terrain, skybox = model.skybox }
 
 worldUpdate : WorldMsg -> WorldModel -> (WorldModel, Cmd WorldMsg)
 worldUpdate msg model =
@@ -127,7 +127,6 @@ worldUpdate msg model =
             ( model, Cmd.none )
         TextureLoaded texture ->
             ( { model | maybeTexture = Just texture
-                      , maybeSkybox = Just <| resize 80 <| put (vec3 0 1 1) skySphere
               }
             , Cmd.none )
         TerrainGenerated terrain ->
