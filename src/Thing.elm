@@ -101,8 +101,6 @@ animate dt { methods, model } =
 things : Things -> List Thing
 things { methods, model } = methods.things model
 
-type alias ThingID = Int
-
 type alias Perception = {
     cameraPos  : Vec3,
     windowSize : Window.Size,
