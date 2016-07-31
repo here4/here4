@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Dict exposing (Dict)
 import Math.Vector3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
@@ -38,8 +39,7 @@ type alias WorldModel =
     { maybeTexture : Maybe Texture
     , maybeTerrain : Maybe Terrain
     , maybeSkybox : Maybe Thing
-    , boids : Things
-    , balls : Things
+    , thingsDict : Dict ThingID Things
     }
 
 main : Program Args
@@ -66,8 +66,9 @@ worldInit =
     ( { maybeTexture = Nothing
       , maybeTerrain = Nothing
       , maybeSkybox = Nothing
-      , boids = boidsModel
-      , balls = ballsModel
+      , thingsDict = Dict.empty
+          |> Dict.insert 7 boidsModel
+          |> Dict.insert 8 ballsModel
       }
     , Cmd.batch
         [ loadTexture "resources/woodCrate.jpg"
@@ -90,10 +91,9 @@ worldView model =
 demoWorld : WebGL.Texture -> Terrain -> Thing -> WorldModel -> Model.World
 demoWorld texture terrain skybox model =
     let
-        boidThings = Thing.things model.boids
-        ballThings = Thing.things model.balls
+        myThings = List.concatMap Thing.things (Dict.values model.thingsDict)
 
-        worldThings = boidThings ++ ballThings ++
+        worldThings = myThings ++
             [ put (vec3 0 1.5 0) fogMountainsDiamond
             , put (vec3 5 1.5 1) cloudsDiamond
             , put (vec3 3 10 5) cloudsSphere
@@ -109,13 +109,14 @@ worldUpdate : WorldMsg -> WorldModel -> (WorldModel, Cmd WorldMsg)
 worldUpdate msg model =
     case msg of
         ThingMessage thingID thingMsg ->
-            case thingID of
-                7 -> let (boidsModel, boidsCmdMsg) = Thing.update (TMsg thingMsg) model.boids in
-                     ( { model | boids = boidsModel }, Cmd.map (toThingMessage 7) boidsCmdMsg )
-                8 -> let (ballsModel, ballsCmdMsg) = Thing.update (TMsg thingMsg) model.balls in
-                   ( { model | balls = ballsModel }, Cmd.map (toThingMessage 8) ballsCmdMsg )
-                _ -> ( model, Cmd.none )
-
+           case Dict.get thingID model.thingsDict of
+               Nothing ->
+                   ( model, Cmd.none )
+               Just t ->
+                   let (thingModel, thingCmdMsg) = Thing.update (TMsg thingMsg) t in
+                   ( { model | thingsDict = Dict.insert thingID thingModel model.thingsDict }
+                   , Cmd.map (toThingMessage thingID) thingCmdMsg
+                   )
         TextureError err ->
             -- ( { model | message = "Error loading texture" }, Cmd.none )
             ( model, Cmd.none )
@@ -129,7 +130,5 @@ worldUpdate msg model =
 
 worldAnimate : Time -> WorldModel -> WorldModel
 worldAnimate dt model =
-    { model | boids = Thing.animate dt model.boids
-            , balls = Thing.animate dt model.balls
-    }
+    { model | thingsDict = Dict.map (\_ ts -> Thing.animate dt ts) model.thingsDict }
 
