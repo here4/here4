@@ -39,6 +39,7 @@ type alias WorldModel =
     { maybeTexture : Maybe Texture
     , maybeTerrain : Maybe Terrain
     , skybox : Thing
+    , staticThings : List Thing
     , thingsBag : Bag Things
     }
 
@@ -47,6 +48,15 @@ main =
   App.programWithFlags
     { init = worldInit 
           { things = [Boids.create 100, Balls.create 30]
+          , staticThings =
+              [ put (vec3 0 1.5 0) fogMountainsDiamond
+              , put (vec3 5 1.5 1) cloudsDiamond
+              , put (vec3 3 10 5) cloudsSphere
+              , put (vec3 10 0 10) voronoiCube
+              , put (vec3 -10 0 -10) skyCube -- fireCube
+              , put (vec3 10 1.5 -10) fogMountainsCube
+              -- , put (vec3 -2 0 -17) (textureCube texture) -- TODO: texture loader thing
+              ]
           , skybox = resize 80 <| put (vec3 0 1 1) skySphere
           }
     , view = worldView
@@ -67,7 +77,7 @@ worldThings ts =
         (bag, unbatched) = List.foldl f (Bag.empty, []) ts
     in (bag, Cmd.batch unbatched)
 
-worldInit : { things : List (Things, Cmd ThingMsg) , skybox : Thing }
+worldInit : { things : List (Things, Cmd ThingMsg) , staticThings : List Thing, skybox : Thing }
     -> (WorldModel, Cmd WorldMsg)
 worldInit details =
     let (bag, thingCmds) = worldThings details.things
@@ -75,6 +85,7 @@ worldInit details =
     ( { maybeTexture = Nothing
       , maybeTerrain = Nothing
       , skybox = details.skybox
+      , staticThings = details.staticThings
       , thingsBag = bag
       }
     , Cmd.batch
@@ -98,15 +109,7 @@ demoWorld texture terrain model =
     let
         myThings = List.concatMap Thing.things (Bag.items model.thingsBag)
 
-        worldThings = myThings ++
-            [ put (vec3 0 1.5 0) fogMountainsDiamond
-            , put (vec3 5 1.5 1) cloudsDiamond
-            , put (vec3 3 10 5) cloudsSphere
-            , put (vec3 10 0 10) voronoiCube
-            , put (vec3 -10 0 -10) skyCube -- fireCube
-            , put (vec3 10 1.5 -10) fogMountainsCube
-            , put (vec3 -2 0 -17) (textureCube texture)
-            ]
+        worldThings = myThings ++ model.staticThings
     in
         { things = worldThings, terrain = terrain, skybox = model.skybox }
 
