@@ -9,8 +9,8 @@ type Bag v = Bag Int (Dict Key v)
 empty : Bag v
 empty = Bag 0 (Dict.empty)
 
-insert : v -> Bag v -> Bag v
-insert v (Bag n dict) = Bag (n+1) (Dict.insert n v dict)
+insert : v -> Bag v -> (Key, Bag v)
+insert v (Bag n dict) = (n, Bag (n+1) (Dict.insert n v dict))
 
 -- If you do Bag.replace with a key that you didn't get from an insert, then you might lose this
 -- item on a subsequent insert

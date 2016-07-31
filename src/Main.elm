@@ -62,20 +62,20 @@ worldInit : (WorldModel, Cmd WorldMsg)
 worldInit =
     let (boidsModel, boidsCmdMsg) = Boids.create 100
         (ballsModel, ballsCmdMsg) = Balls.create 30
+        (boidsKey, bag1) = Bag.insert boidsModel Bag.empty
+        (ballsKey, bag2) = Bag.insert ballsModel bag1
     in
     ( { maybeTexture = Nothing
       , maybeTerrain = Nothing
       , maybeSkybox = Nothing
-      , thingsBag = Bag.empty
-          |> Bag.insert boidsModel
-          |> Bag.insert ballsModel
+      , thingsBag = bag2
       }
     , Cmd.batch
         [ loadTexture "resources/woodCrate.jpg"
             |> Task.perform TextureError TextureLoaded
         , Terrain.generate TerrainGenerated defaultPlacement
-        , Cmd.map (toThingMessage 7) boidsCmdMsg
-        , Cmd.map (toThingMessage 8) ballsCmdMsg
+        , Cmd.map (toThingMessage boidsKey) boidsCmdMsg
+        , Cmd.map (toThingMessage ballsKey) ballsCmdMsg
         ]
     )
 
