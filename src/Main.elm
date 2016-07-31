@@ -45,7 +45,7 @@ type alias WorldModel =
 main : Program Args
 main =
   App.programWithFlags
-    { init = worldInit 
+    { init = worldInit [Boids.create 100, Balls.create 30]
     , view = worldView
     , update = worldUpdate
     , animate = worldAnimate
@@ -67,9 +67,9 @@ worldThings ts =
         (bag, unbatched) = List.foldl f (Bag.empty, []) ts
     in (bag, Cmd.batch unbatched)
 
-worldInit : (WorldModel, Cmd WorldMsg)
-worldInit =
-    let (bag, thingCmds) = worldThings [Boids.create 100, Balls.create 30]
+worldInit : List (Things, Cmd ThingMsg) -> (WorldModel, Cmd WorldMsg)
+worldInit initThings =
+    let (bag, thingCmds) = worldThings initThings
     in
     ( { maybeTexture = Nothing
       , maybeTerrain = Nothing
