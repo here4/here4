@@ -1,4 +1,4 @@
-module Boids exposing (Boids, init, update, animate, things)
+module Boids exposing (create)
 
 import Math.Vector3 exposing (add, vec3)
 import Random
@@ -13,6 +13,15 @@ import Shaders.VoronoiDistances exposing (voronoiDistances)
 
 type alias Boids = List (Boid (Visible {}))
 
+type Msg = BoidsGenerated Boids
+
+create : Int -> (Things, Cmd ThingMsg)
+create n = createThings (init n)
+    { update = update
+    , animate = animate
+    , things = things
+    }
+
 randomBFly : Random.Generator (Visible (Oriented {}))
 randomBFly = Random.map (bfly voronoiDistances) (Random.float 0.0 1.0)
 
@@ -26,14 +35,16 @@ randomBoid = Random.map3
 randomBoids : Int -> Random.Generator Boids
 randomBoids n = Random.list n randomBoid
 
-init : Int -> (Boids, Cmd ThingMsg)
-init n = ([], Random.generate (wrapMsg "boidsgenerated") (randomBoids n))
+init : Int -> (Boids, Cmd Msg)
+init n = ([], Random.generate BoidsGenerated (randomBoids n))
 
-update : ThingMsg -> Boids -> (Boids, Cmd ThingMsg)
-update msg boids = let (_, newBoids) = unwrapMsg msg in (newBoids, Cmd.none)
+update : Msg -> Boids -> (Boids, Cmd Msg)
+update msg _ = case msg of
+    BoidsGenerated newBoids -> (newBoids, Cmd.none)
 
 animate : Time -> Boids -> Boids
 animate dt boids = moveBoids dt boids
 
 things : Boids -> List Thing
 things = List.map extractThing
+

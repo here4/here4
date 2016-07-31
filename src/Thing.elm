@@ -9,14 +9,99 @@ import Window
 
 import Dynamic exposing (Dynamic)
 
+{-
+type alias ThingModel model msg =
+    { update : msg -> model -> (model, Cmd msg)
+    , things : model -> List Thing
+    }
+-}
+
+{-
+type alias DynamicModel =
+    { update : ThingMsg -> Dynamic -> (Dynamic, Cmd ThingMsg)
+    , things : Dynamic -> 
+    }
+-}
+
+-- type alias Animated a = ThingModel { a | animate : Time -> a -> a }
+-- type alias Animated a = ThingModel { a | animate : Time -> a -> a }
+
+type alias Animated model msg =
+    { update : msg -> model -> (model, Cmd msg)
+    , things : model -> List Thing
+    , animate : Time -> model -> model
+    }
+
+type ThingModel = TM Dynamic
+type ThingMsg = TMsg Dynamic
+
+type alias Things =
+    { methods : Animated ThingModel ThingMsg
+    , model: ThingModel
+    }
+
+packInit : (model, Cmd msg) -> (ThingModel, Cmd ThingMsg)
+packInit (x, cmd) = (TM (Dynamic.pack x), Cmd.map (TMsg << Dynamic.pack) cmd)
+
+packUpdate : (msg -> model -> (model, Cmd msg)) -> ThingMsg -> ThingModel -> (ThingModel, Cmd ThingMsg)
+packUpdate f (TMsg msg) (TM dyn) =
+    let (newModel, newCmdMsg) = f (Dynamic.unpack msg) (Dynamic.unpack dyn)
+    in (TM (Dynamic.pack newModel), Cmd.map (TMsg << Dynamic.pack) newCmdMsg)
+
+packAnimate : (Time -> model -> model) -> Time -> ThingModel -> ThingModel
+packAnimate f dt (TM dyn) = TM (Dynamic.pack (f dt (Dynamic.unpack dyn)))
+
+packThings : (a -> List Thing) -> ThingModel -> List Thing
+packThings f (TM dyn) = f (Dynamic.unpack dyn)
+
+
+packThingMethods : Animated model msg -> Animated ThingModel ThingMsg
+packThingMethods { update, animate, things } =
+    { update = packUpdate update
+    , animate = packAnimate animate
+    , things = packThings things
+    }
+
+createThings : (model, Cmd msg) -> Animated model msg -> (Things, Cmd ThingMsg)
+createThings (model, msg) methods =
+    ( { methods = packThingMethods methods
+      , model = TM (Dynamic.pack model)
+      }
+    , Cmd.map (TMsg << Dynamic.pack) msg
+    ) 
+
+{-
+----------------------------------------------------------------------
+-- Debugging: noop Things
+
+update0 _ m = (m, Cmd.none)
+animate0 dt t = t
+things0 _ = []
+methods0 = { update = update0, animate = animate0, things = things0 }
+
+createThings0 : (model, Cmd msg) -> Things
+createThings0 (model, msg) =
+    { methods = methods0
+    , model = TM (Dynamic.pack model)
+    }
+----------------------------------------------------------------------
+-}
+
+update : ThingMsg -> Things -> (Things, Cmd ThingMsg)
+update msg { methods, model } =
+    let (newModel, newCmdMsg) = methods.update msg model
+    in ({ methods = methods, model = newModel }, newCmdMsg)
+
+-- animate : Time -> Things -> (Things, Cmd ThingMsg)
+animate : Time -> Things -> Things
+animate dt { methods, model } =
+    let newModel = methods.animate dt model
+    in { methods = methods, model = newModel }
+
+things : Things -> List Thing
+things { methods, model } = methods.things model
+
 type alias ThingID = Int
-type ThingMsg = TMsg String Dynamic
-
-wrapMsg : String -> a -> ThingMsg
-wrapMsg s x = TMsg s (Dynamic.pack x)
-
-unwrapMsg : ThingMsg -> (String, a)
-unwrapMsg (TMsg s x) = (s, Dynamic.unpack x)
 
 type alias Perception = {
     cameraPos  : Vec3,

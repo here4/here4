@@ -1,4 +1,4 @@
-module Balls exposing (Balls, init, update, animate, things)
+module Balls exposing (create)
 
 import Math.Vector3 exposing (add, vec3)
 import Random
@@ -14,6 +14,15 @@ import Shaders.FogMountains exposing (fogMountains)
 
 type alias Balls = List (Drop (Visible {}))
 
+type Msg = BallsGenerated Balls
+
+create : Int -> (Things, Cmd ThingMsg)
+create n = createThings (init n)
+    { update = update
+    , animate = animate
+    , things = things
+    }
+
 randomDrop : Random.Generator (Drop (Visible {}))
 randomDrop = Random.map2
     (\pos vel -> newDrop pos vel fogMountainsSphere)
@@ -23,11 +32,12 @@ randomDrop = Random.map2
 randomBalls : Int -> Random.Generator Balls
 randomBalls n = Random.list n randomDrop
 
-init : Int -> (Balls, Cmd ThingMsg)
-init n = ([], Random.generate (wrapMsg "ballsgenerated") (randomBalls n))
+init : Int -> (Balls, Cmd Msg)
+init n = ([], Random.generate BallsGenerated (randomBalls n))
 
-update : ThingMsg -> Balls -> (Balls, Cmd ThingMsg)
-update msg balls = let (_, newBalls) = unwrapMsg msg in (newBalls, Cmd.none)
+update : Msg -> Balls -> (Balls, Cmd Msg)
+update msg balls = case msg of
+    BallsGenerated newBalls -> (newBalls, Cmd.none)
 
 animate : Time -> Balls -> Balls
 animate dt balls = collisions dt (moveDrops dt balls)
