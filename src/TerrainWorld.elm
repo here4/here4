@@ -37,10 +37,7 @@ create details =
 
 type WorldMsg
     = TerrainGenerated Terrain
-    | ThingMessage Bag.Key Dynamic
-
-toThingMessage : Bag.Key -> ThingMsg -> WorldMsg
-toThingMessage key (TMsg dyn) = ThingMessage key dyn
+    | Send Bag.Key Dynamic
 
 type alias WorldModel =
     { maybeTerrain : Maybe Terrain
@@ -56,26 +53,26 @@ worldThings : List (Things, Cmd ThingMsg) -> (Bag Things, Cmd WorldMsg)
 worldThings ts =
     let f (newThings, newCmdMsg) (oldBag, oldCmdMsgs) =
             let (key, newBag) = Bag.insert newThings oldBag
-            in (newBag, oldCmdMsgs ++ [Cmd.map (toThingMessage key) newCmdMsg])
-
+            in (newBag, oldCmdMsgs ++ [Cmd.map (Send key) newCmdMsg])
         (bag, unbatched) = List.foldl f (Bag.empty, []) ts
-    in (bag, Cmd.batch unbatched)
+    in
+        (bag, Cmd.batch unbatched)
 
 worldInit : { things : List (Things, Cmd ThingMsg) , staticThings : List Thing, skybox : Thing }
     -> (WorldModel, Cmd WorldMsg)
 worldInit details =
     let (bag, thingCmds) = worldThings details.things
     in
-    ( { maybeTerrain = Nothing
-      , skybox = details.skybox
-      , staticThings = details.staticThings
-      , thingsBag = bag
-      }
-    , Cmd.batch
-        [ Terrain.generate TerrainGenerated defaultPlacement
-        , thingCmds
-        ]
-    )
+        ( { maybeTerrain = Nothing
+          , skybox = details.skybox
+          , staticThings = details.staticThings
+          , thingsBag = bag
+          }
+        , Cmd.batch
+            [ Terrain.generate TerrainGenerated defaultPlacement
+            , thingCmds
+            ]
+        )
 
 worldView : WorldModel -> Maybe Model.World
 worldView model =
@@ -94,15 +91,16 @@ makeWorld terrain model =
 worldUpdate : WorldMsg -> WorldModel -> (WorldModel, Cmd WorldMsg)
 worldUpdate msg model =
     case msg of
-        ThingMessage key thingMsg ->
+        Send key thingMsg ->
            case Bag.get key model.thingsBag of
                Nothing ->
                    ( model, Cmd.none )
                Just t ->
-                   let (thingModel, thingCmdMsg) = Thing.update (TMsg thingMsg) t in
-                  ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
-                   , Cmd.map (toThingMessage key) thingCmdMsg
-                   )
+                   let (thingModel, thingCmdMsg) = Thing.update thingMsg t
+                   in
+                       ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
+                       , Cmd.map (Send key) thingCmdMsg
+                       )
         TerrainGenerated terrain ->
             ( { model | maybeTerrain = Just terrain }, Cmd.none )
 

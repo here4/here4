@@ -9,31 +9,14 @@ import Window
 
 import Dynamic exposing (Dynamic)
 
-{-
-type alias ThingModel model msg =
-    { update : msg -> model -> (model, Cmd msg)
-    , things : model -> List Thing
-    }
--}
-
-{-
-type alias DynamicModel =
-    { update : ThingMsg -> Dynamic -> (Dynamic, Cmd ThingMsg)
-    , things : Dynamic -> 
-    }
--}
-
--- type alias Animated a = ThingModel { a | animate : Time -> a -> a }
--- type alias Animated a = ThingModel { a | animate : Time -> a -> a }
-
 type alias Animated model msg =
     { update : msg -> model -> (model, Cmd msg)
     , things : model -> List Thing
     , animate : Time -> model -> model
     }
 
-type ThingModel = TM Dynamic
-type ThingMsg = TMsg Dynamic
+type alias ThingModel = Dynamic
+type alias ThingMsg = Dynamic
 
 type alias Things =
     { methods : Animated ThingModel ThingMsg
@@ -41,18 +24,18 @@ type alias Things =
     }
 
 packInit : (model, Cmd msg) -> (ThingModel, Cmd ThingMsg)
-packInit (x, cmd) = (TM (Dynamic.pack x), Cmd.map (TMsg << Dynamic.pack) cmd)
+packInit (x, cmd) = (Dynamic.pack x, Cmd.map Dynamic.pack cmd)
 
 packUpdate : (msg -> model -> (model, Cmd msg)) -> ThingMsg -> ThingModel -> (ThingModel, Cmd ThingMsg)
-packUpdate f (TMsg msg) (TM dyn) =
+packUpdate f msg dyn =
     let (newModel, newCmdMsg) = f (Dynamic.unpack msg) (Dynamic.unpack dyn)
-    in (TM (Dynamic.pack newModel), Cmd.map (TMsg << Dynamic.pack) newCmdMsg)
+    in (Dynamic.pack newModel, Cmd.map Dynamic.pack newCmdMsg)
 
 packAnimate : (Time -> model -> model) -> Time -> ThingModel -> ThingModel
-packAnimate f dt (TM dyn) = TM (Dynamic.pack (f dt (Dynamic.unpack dyn)))
+packAnimate f dt dyn = Dynamic.pack (f dt (Dynamic.unpack dyn))
 
 packThings : (a -> List Thing) -> ThingModel -> List Thing
-packThings f (TM dyn) = f (Dynamic.unpack dyn)
+packThings f dyn = f (Dynamic.unpack dyn)
 
 
 packThingMethods : Animated model msg -> Animated ThingModel ThingMsg
@@ -65,9 +48,9 @@ packThingMethods { update, animate, things } =
 createThings : (model, Cmd msg) -> Animated model msg -> (Things, Cmd ThingMsg)
 createThings (model, msg) methods =
     ( { methods = packThingMethods methods
-      , model = TM (Dynamic.pack model)
+      , model = Dynamic.pack model
       }
-    , Cmd.map (TMsg << Dynamic.pack) msg
+    , Cmd.map Dynamic.pack msg
     ) 
 
 {-
@@ -82,7 +65,7 @@ methods0 = { update = update0, animate = animate0, things = things0 }
 createThings0 : (model, Cmd msg) -> Things
 createThings0 (model, msg) =
     { methods = methods0
-    , model = TM (Dynamic.pack model)
+    , model = Dynamic.pack model
     }
 ----------------------------------------------------------------------
 -}
