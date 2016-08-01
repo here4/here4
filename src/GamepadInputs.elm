@@ -8,7 +8,7 @@ import Gamepad
 ----------------------------------------------------------------------
 -- Gamepad
 
-gamepadToArrows : Gamepad.Gamepad -> { x : Float, y : Float, mx : Float, my : Float }
+gamepadToArrows : Gamepad.Gamepad -> { x : Float, y : Float, mx : Float, my : Float, cx : Float, cy : Float }
 gamepadToArrows gamepad =
     let
         sgn x = if x < 0 then -1 else 1
@@ -37,32 +37,35 @@ gamepadToArrows gamepad =
                   [x1, y1, x2, y2] ->
                       { x = deadzone x1 / 10
                       , y = deadzone (-1.0 * y1) / 10
-                      , mx= deadzone x2 / 20
-                      , my= deadzone (-1.0 * y2) / 20
+                      , mx = deadzone x2 / 20
+                      , my = deadzone (-1.0 * y2) / 20
+                      , cx = 0
+                      , cy = 0
                       }
 
                   [x1,y1] ->
-                      { x = x1/10, y = (-1.0 * y1)/10, mx = 0, my = 0 }
+                      { x = x1/10, y = (-1.0 * y1)/10, mx = 0, my = 0, cx = 0, cy = 0 }
 
                   _ ->
-                      {x = 0, y = 0, mx = 0, my = 0 }
+                      {x = 0, y = 0, mx = 0, my = 0, cx = 0, cy = 0 }
 
         -- Interpret brake, accelerator as y input
-        btns_y = case gamepad.buttons of
+        (btns_y, cx, cy) = case gamepad.buttons of
                     -- ©Microsoft Corporation Controller (STANDARD GAMEPAD Vendor: 045e Product: 028e)
-                    [a, b, x, y, lb, rb, l, r, back, start, lstick, rstick, padU, padD, padL, padR, logo] -> r.value - l.value
+                    [a, b, x, y, lb, rb, l, r, back, start, lstick, rstick, padU, padD, padL, padR, logo]
+                        -> ( r.value - l.value, padR.value - padL.value, padU.value - padD.value )
 
 {-
                     -- Performance Designed Products Rock Candy Gamepad for Xbox 360 (Vendor: 0e6f Product: 011f)
                     [a, b, x, y, lt, rt, back, start, logo, lstick, rstick] -> 0
 -}
 
-                    _ -> 0
+                    _ -> ( 0, 0, 0 )
 
     in
-        { axs | y = btns_y + axs.y }
+        { axs | y = btns_y + axs.y, cx = cx, cy = cy }
 
-gamepadsToArrows : List Gamepad.Gamepad -> List { x : Float, y : Float, mx : Float, my : Float }
+gamepadsToArrows : List Gamepad.Gamepad -> List { x : Float, y : Float, mx : Float, my : Float, cx : Float, cy : Float }
 gamepadsToArrows = List.map gamepadToArrows
 
 gamepadNothing : Gamepad.Gamepad
@@ -93,8 +96,8 @@ toStandardGamepad gamepad =
                             ({ pressed = False, value = 0 }, { pressed = True, value = -ax })
                         else
                             ({ pressed = False, value = 0 }, { pressed = False, value = 0 })
-                    (padL, padR) = toPads x3
-                    (padU, padD) = toPads y3
+                    (padR, padL) = toPads x3
+                    (padD, padU) = toPads y3
 
                 in
                     ( [x1, y1, x2, y2]

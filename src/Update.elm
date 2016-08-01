@@ -66,10 +66,8 @@ update worldUpdate worldAnything  worldTerrain worldAnimate msg model =
                         (wm2, wmCmdMsg) = case worldAnything model.worldModel of
                             Nothing -> (wm, Cmd.none)
                             Just focKey ->
-                                let tt = model.globalTime + dt
-                                    dp = vec3 (cos tt) (sin tt) 0
+                                let dp = vec3 inputs.cx inputs.cy 0
                                 in worldUpdate (Down (Model.Move focKey dp)) wm
-                                  -- (wm, e (Send focKey (Move dp))
                         newModel =
                             { model | globalTime = model.globalTime + dt
                                     , person = step terrain inputs model.person
@@ -107,9 +105,9 @@ clearStationaryInputs inputs0 = { inputs0 | mx = 0, my = 0 }
 gamepadToInputs : Gamepad.Gamepad -> Model.Inputs -> Model.Inputs
 gamepadToInputs gamepad0 inputs0 =
     let gamepad = GamepadInputs.toStandardGamepad gamepad0
-        {x,y,mx,my} = GamepadInputs.gamepadToArrows gamepad
+        {x,y,mx,my,cx,cy} = GamepadInputs.gamepadToArrows gamepad
         bs = GamepadInputs.gamepadToButtons gamepad
-    in  { inputs0 | reset = bs.bStart, changeVR = bs.bB, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX }
+    in  { inputs0 | reset = bs.bStart, changeVR = bs.bB, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, cx=cx, cy=cy, button_X = bs.bX }
 
 updateGamepads : List Gamepad.Gamepad -> Model worldModel -> Model worldModel
 updateGamepads gps0 model =
