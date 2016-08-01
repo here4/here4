@@ -2,7 +2,6 @@ module TerrainWorld exposing (create)
 
 import Bag exposing (Bag)
 import Math.Vector3 exposing (Vec3, vec3)
-import Task exposing (Task)
 import Time exposing (Time)
 import WebGL exposing (..)
 
@@ -22,7 +21,6 @@ import Things.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMoun
 import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Things.Sphere exposing (skySphere, cloudsSphere)
 import Things.Terrain exposing (Terrain)
--- import Things.Ground exposing (renderGround)
 import Things.Surface2D exposing (Placement, defaultPlacement)
 import Things.Terrain as Terrain
 
@@ -38,17 +36,14 @@ create details =
     }
 
 type WorldMsg
-    = TextureError Error
-    | TextureLoaded Texture
-    | TerrainGenerated Terrain
+    = TerrainGenerated Terrain
     | ThingMessage Bag.Key Dynamic
 
 toThingMessage : Bag.Key -> ThingMsg -> WorldMsg
 toThingMessage key (TMsg dyn) = ThingMessage key dyn
 
 type alias WorldModel =
-    { maybeTexture : Maybe Texture
-    , maybeTerrain : Maybe Terrain
+    { maybeTerrain : Maybe Terrain
     , skybox : Thing
     , staticThings : List Thing
     , thingsBag : Bag Things
@@ -71,30 +66,25 @@ worldInit : { things : List (Things, Cmd ThingMsg) , staticThings : List Thing, 
 worldInit details =
     let (bag, thingCmds) = worldThings details.things
     in
-    ( { maybeTexture = Nothing
-      , maybeTerrain = Nothing
+    ( { maybeTerrain = Nothing
       , skybox = details.skybox
       , staticThings = details.staticThings
       , thingsBag = bag
       }
     , Cmd.batch
-        [ loadTexture "resources/woodCrate.jpg"
-            |> Task.perform TextureError TextureLoaded
-        , Terrain.generate TerrainGenerated defaultPlacement
+        [ Terrain.generate TerrainGenerated defaultPlacement
         , thingCmds
         ]
     )
 
 worldView : WorldModel -> Maybe Model.World
 worldView model =
-    case (model.maybeTexture, model.maybeTerrain) of
-        (Nothing, _) -> Nothing
-        (_, Nothing) -> Nothing
-        (Just texture, Just terrain) ->
-            Just (makeWorld texture terrain model)
+    case model.maybeTerrain of
+        Nothing      -> Nothing
+        Just terrain -> Just (makeWorld terrain model)
 
-makeWorld : WebGL.Texture -> Terrain -> WorldModel -> Model.World
-makeWorld texture terrain model =
+makeWorld : Terrain -> WorldModel -> Model.World
+makeWorld terrain model =
     let
         myThings = List.concatMap Thing.things (Bag.items model.thingsBag)
         worldThings = myThings ++ model.staticThings
@@ -113,13 +103,6 @@ worldUpdate msg model =
                   ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
                    , Cmd.map (toThingMessage key) thingCmdMsg
                    )
-        TextureError err ->
-            -- ( { model | message = "Error loading texture" }, Cmd.none )
-            ( model, Cmd.none )
-        TextureLoaded texture ->
-            ( { model | maybeTexture = Just texture
-              }
-            , Cmd.none )
         TerrainGenerated terrain ->
             ( { model | maybeTerrain = Just terrain }, Cmd.none )
 

@@ -8,6 +8,7 @@ import Thing exposing (..)
 
 import Boids
 import Balls
+import TextureCube
 
 import Things.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, voronoiCube)
 import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
@@ -17,7 +18,11 @@ import Things.Terrain exposing (Terrain)
 main : Program Args
 main =
   TerrainWorld.create
-    { things = [Boids.create 100, Balls.create 30]
+    { things =
+        [ Boids.create 100
+        , Balls.create 30
+        , TextureCube.create "resources/woodCrate.jpg"
+        ]
     , staticThings =
         [ put (vec3 0 1.5 0) fogMountainsDiamond
         , put (vec3 5 1.5 1) cloudsDiamond
@@ -25,7 +30,6 @@ main =
         , put (vec3 10 0 10) voronoiCube
         , put (vec3 -10 0 -10) skyCube -- fireCube
         , put (vec3 10 1.5 -10) fogMountainsCube
-        -- , put (vec3 -2 0 -17) (textureCube texture) -- TODO: texture loader thing
         ]
     , skybox = resize 80 <| put (vec3 0 1 1) skySphere
     }
