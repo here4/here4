@@ -6,6 +6,7 @@ import Time exposing (..)
 import Task exposing (Task)
 import Window
 
+import Bag
 import Orientation
 import Thing exposing (..)
 import Things.Terrain exposing (Terrain)
@@ -19,6 +20,8 @@ arrow keys, or the window is being resized.
 # TextureLoaded - a texture has been loaded across the wire
 -}
 
+-- TODO: reparameterize this using My|Ex
+
 type Msg worldMsg
     = KeyChange (Keys -> Keys)
     | MouseMove MouseMovement
@@ -28,6 +31,9 @@ type Msg worldMsg
     | Animate Time
     | Resize Window.Size
     | WorldMessage worldMsg
+
+type WorldCtrl
+    = Move Bag.Key Vec3
 
 type alias WhichVehicle = Int
 vehicleBuggy = 0
@@ -52,6 +58,7 @@ type alias Person =
     , cameraInside : Bool
     , cameraPos : Vec3
     , cameraUp : Vec3
+    , focusMove : Maybe Vec3
     }
 
 type Eye = OneEye | LeftEye | RightEye
@@ -71,6 +78,7 @@ defaultPerson =
     , cameraInside = True
     , cameraPos = vec3 0 eyeLevel 0
     , cameraUp = V3.j
+    , focusMove = Nothing
     }
 
 type alias Keys =
@@ -91,6 +99,8 @@ type alias Inputs =
     , y: Float
     , mx: Float
     , my: Float
+    , cx: Float
+    , cy: Float
     , dt: Float
     }
 
@@ -104,6 +114,8 @@ noInput = { reset = False
           , y = 0
           , mx = 0
           , my = 0
+          , cx = 0
+          , cy = 0
           , dt = 0
           }
 

@@ -6,8 +6,9 @@ import Time exposing (Time)
 import WebGL exposing (..)
 
 import App
+import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
-import Model exposing (Args)
+import Model exposing (Args, WorldCtrl)
 
 import Thing exposing (..)
 import Things.Surface2D exposing (defaultPlacement)
@@ -31,13 +32,16 @@ create details =
     { init = worldInit details
     , view = worldView
     , update = worldUpdate
+    , anyThing = worldAnything
     , animate = worldAnimate
     , terrain = worldTerrain
     }
 
-type WorldMsg
+type MyWorldMsg
     = TerrainGenerated Terrain
     | Send Bag.Key (MyMsg Dynamic)
+
+type alias WorldMsg = Dispatch WorldCtrl MyWorldMsg
 
 type alias WorldModel =
     { maybeTerrain : Maybe Terrain
@@ -49,11 +53,16 @@ type alias WorldModel =
 worldTerrain : WorldModel -> Maybe Terrain
 worldTerrain model = model.maybeTerrain
 
+worldAnything : WorldModel -> Maybe Bag.Key
+worldAnything model = case Bag.keys model.thingsBag of
+    (somekey :: _) -> Just somekey
+    _ -> Nothing
+
 worldThings : List (Things, Cmd ThingMsg) -> (Bag Things, Cmd WorldMsg)
 worldThings ts =
     let f (newThings, newCmdMsg) (oldBag, oldCmdMsgs) =
             let (key, newBag) = Bag.insert newThings oldBag
-            in (newBag, oldCmdMsgs ++ [Cmd.map (Send key) newCmdMsg])
+            in (newBag, oldCmdMsgs ++ [Cmd.map (Self << Send key) newCmdMsg])
         (bag, unbatched) = List.foldl f (Bag.empty, []) ts
     in
         (bag, Cmd.batch unbatched)
@@ -69,7 +78,7 @@ worldInit details =
           , thingsBag = bag
           }
         , Cmd.batch
-            [ Terrain.generate TerrainGenerated defaultPlacement
+            [ Terrain.generate (Self << TerrainGenerated) defaultPlacement
             , thingCmds
             ]
         )
@@ -91,7 +100,7 @@ makeWorld terrain model =
 worldUpdate : WorldMsg -> WorldModel -> (WorldModel, Cmd WorldMsg)
 worldUpdate msg model =
     case msg of
-        Send key thingMsg ->
+        Self (Send key thingMsg) ->
            case Bag.get key model.thingsBag of
                Nothing ->
                    ( model, Cmd.none )
@@ -99,10 +108,21 @@ worldUpdate msg model =
                    let (thingModel, thingCmdMsg) = Thing.update thingMsg t
                    in
                        ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
-                       , Cmd.map (Send key) thingCmdMsg
+                       , Cmd.map (Self << Send key) thingCmdMsg
                        )
-        TerrainGenerated terrain ->
+        Self (TerrainGenerated terrain) ->
             ( { model | maybeTerrain = Just terrain }, Cmd.none )
+
+        Down (Model.Move key dp) ->
+           case Bag.get key model.thingsBag of
+               Nothing ->
+                   ( model, Cmd.none )
+               Just t ->
+                   let (thingModel, thingCmdMsg) = Thing.update (Ex (Thing.Move dp)) t
+                   in
+                       ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
+                       , Cmd.map (Self << Send key) thingCmdMsg
+                       )
 
 worldAnimate : Time -> WorldModel -> WorldModel
 worldAnimate dt model =

@@ -1,4 +1,4 @@
-module Bag exposing (Bag, Key, empty, insert, replace, get, items, map)
+module Bag exposing (Bag, Key, empty, insert, replace, get, keys, items, map)
 
 import Dict exposing (Dict)
 
@@ -19,6 +19,9 @@ replace key v (Bag n dict) = Bag n (Dict.insert key v dict)
 
 get : Key -> Bag v -> Maybe v
 get key (Bag _ dict) = Dict.get key dict
+
+keys : Bag v -> List Key
+keys (Bag _ dict) = Dict.keys dict
 
 items : Bag v -> List v
 items (Bag _ dict) = Dict.values dict

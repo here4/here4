@@ -35,7 +35,7 @@ update msg model = case msg of
         ( model, Cmd.none )
     My (TextureLoaded texture) ->
         ( [ put (vec3 -2 20 -17) (textureCube texture) ] , Cmd.none )
-    _ -> ( model, Cmd.none )
+    Ex (Move dp) -> ( List.map (translate dp) model, Cmd.none )
 
 animate : Time -> TextureCube -> TextureCube
 animate dt cube = cube

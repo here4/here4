@@ -19,9 +19,9 @@ main : Program Args
 main =
   TerrainWorld.create
     { things =
-        [ Boids.create 100
+        [ TextureCube.create "resources/woodCrate.jpg"
+        , Boids.create 100
         , Balls.create 30
-        , TextureCube.create "resources/woodCrate.jpg"
         ]
     , staticThings =
         [ put (vec3 0 1.5 0) fogMountainsDiamond

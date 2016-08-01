@@ -5,7 +5,9 @@ import Math.Vector3 as V3
 import Math.Matrix4 exposing (makeRotate, transform)
 import Time exposing (Time)
 
-import Model exposing (Model, Msg)
+import Bag
+import Dispatch exposing (..)
+import Model exposing (Model, Msg, WorldCtrl)
 import Model
 import Orientation
 import Ports
@@ -21,11 +23,13 @@ import Vehicles.DreamDebug as DreamDebug
 
 {-| Take a Msg and a Model and return an updated Model
 -}
-update : (worldMsg -> worldModel -> (worldModel, Cmd worldMsg))
+update : (Dispatch WorldCtrl worldMsg -> worldModel -> (worldModel, Cmd (Dispatch WorldCtrl worldMsg)))
+    -> (worldModel -> Maybe Bag.Key)
     -> (worldModel -> Maybe Terrain)
     -> (Time -> worldModel -> worldModel)
-    -> Model.Msg worldMsg -> Model worldModel -> (Model worldModel, Cmd (Msg worldMsg))
-update worldUpdate worldTerrain worldAnimate msg model =
+    -> Model.Msg (Dispatch WorldCtrl worldMsg) -> Model worldModel
+    -> (Model worldModel, Cmd (Msg (Dispatch WorldCtrl worldMsg)))
+update worldUpdate worldAnything  worldTerrain worldAnimate msg model =
     case msg of
         Model.WorldMessage worldMsg ->
             let (worldModel, worldCmdMsg) = worldUpdate worldMsg model.worldModel in
@@ -53,19 +57,34 @@ update worldUpdate worldTerrain worldAnimate msg model =
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
         Model.Animate dt ->
-            let model' = case worldTerrain model.worldModel of
-                Nothing -> model
+            let (model', newCmdMsg) = case worldTerrain model.worldModel of
+                Nothing -> (model, Cmd.none)
                 Just terrain ->
                     let inputs = timeToInputs dt model.inputs
                         inputs2 = timeToInputs dt model.inputs2
+                        wm = worldAnimate inputs.dt model.worldModel
+                        (wm2, wmCmdMsg) = case worldAnything model.worldModel of
+                            Nothing -> (wm, Cmd.none)
+                            Just focKey ->
+                                let tt = model.globalTime + dt
+                                    dp = vec3 (cos tt) (sin tt) 0
+                                in worldUpdate (Down (Model.Move focKey dp)) wm
+                                  -- (wm, e (Send focKey (Move dp))
+                        newModel =
+                            { model | globalTime = model.globalTime + dt
+                                    , person = step terrain inputs model.person
+                                    , player2 = step terrain inputs2 model.player2
+                                    , inputs = clearStationaryInputs inputs
+                                    , worldModel = wm2
+                            }
                     in
-                        { model | globalTime = model.globalTime + dt
-                                , person = step terrain inputs model.person
-                                , player2 = step terrain inputs2 model.player2
-                                , inputs = clearStationaryInputs inputs
-                                , worldModel = worldAnimate inputs.dt model.worldModel
-                        }
-            in ( model', Cmd.batch [Gamepad.gamepads Model.GamepadUpdate] )
+                        (newModel, Cmd.map Model.WorldMessage wmCmdMsg)
+            in ( model'
+               , Cmd.batch
+                   [ Gamepad.gamepads Model.GamepadUpdate
+                   , newCmdMsg
+                   ]
+               )
 
 timeToInputs : Time -> Model.Inputs -> Model.Inputs
 timeToInputs dt inputs0 = { inputs0 | dt = dt }
@@ -119,24 +138,6 @@ updateGamepads gps0 model =
                 , gamepadIds = is
         }
       _ -> model
-
-{-
-import Math.Vector3 exposing (..)
-import Math.Vector3 as V3
-import Math.Matrix4 exposing (..)
-import Orientation
-import Util exposing (v3_clamp)
-
-import Array2D exposing (Array2D)
-import Model
-import Things.Surface2D exposing (Placement)
-import Things.Terrain as Terrain
-import Vehicles.DreamBird as DreamBird
-import Vehicles.DreamBuggy as DreamBuggy
-import Vehicles.DreamDebug as DreamDebug
-
-import Debug
--}
 
 aboveTerrain : Model.EyeLevel -> Vec3 -> Vec3
 aboveTerrain eyeLevel pos =

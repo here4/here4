@@ -15,24 +15,28 @@ import Window
 
 import Ports
 
-import Model
+import Bag
+import Dispatch exposing (..)
+import Model exposing (WorldCtrl)
 import Update
 import View
 
+import Thing exposing (Things)
 import Things.Terrain exposing (Terrain)
 
 programWithFlags
-  : { init : ( model, Cmd msg )
-    , update : msg -> model -> ( model, Cmd msg )
+  : { init : ( model, Cmd (Dispatch WorldCtrl msg) )
+    , update : Dispatch WorldCtrl msg -> model -> ( model, Cmd (Dispatch WorldCtrl msg) )
     , view : model -> Maybe Model.World
     , animate : Time -> model -> model 
     , terrain : model -> Maybe Terrain
+    , anyThing : model -> Maybe Bag.Key
     }
   -> Program Model.Args
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.terrain world.animate
+        , update = Update.update world.update world.anyThing world.terrain world.animate
         , subscriptions = subscriptions
         , view = View.view world.view
         }
