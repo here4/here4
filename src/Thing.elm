@@ -16,20 +16,38 @@ type alias Animated model msg =
     }
 
 type alias ThingModel = Dynamic
-type alias ThingMsg = Dynamic
+
+type CtrlMsg
+    = Move Vec3
+
+type MyMsg a
+    = My a
+    | Ex CtrlMsg
+
+type alias ThingMsg = MyMsg Dynamic
 
 type alias Things =
     { methods : Animated ThingModel ThingMsg
     , model: ThingModel
     }
 
-packInit : (model, Cmd msg) -> (ThingModel, Cmd ThingMsg)
-packInit (x, cmd) = (Dynamic.pack x, Cmd.map Dynamic.pack cmd)
+msgUnpack : MyMsg Dynamic -> MyMsg a
+msgUnpack msg = case msg of
+    My m -> My (Dynamic.unpack m)
+    Ex c -> Ex c
 
-packUpdate : (msg -> model -> (model, Cmd msg)) -> ThingMsg -> ThingModel -> (ThingModel, Cmd ThingMsg)
+msgPack : MyMsg a -> MyMsg Dynamic
+msgPack msg = case msg of
+    My m -> My (Dynamic.pack m)
+    Ex c -> Ex c
+
+packInit : (model, Cmd msg) -> (ThingModel, Cmd ThingMsg)
+packInit (x, cmd) = (Dynamic.pack x, Cmd.map (My << Dynamic.pack) cmd)
+
+packUpdate : (MyMsg msg -> model -> (model, Cmd (MyMsg msg))) -> ThingMsg -> ThingModel -> (ThingModel, Cmd ThingMsg)
 packUpdate f msg dyn =
-    let (newModel, newCmdMsg) = f (Dynamic.unpack msg) (Dynamic.unpack dyn)
-    in (Dynamic.pack newModel, Cmd.map Dynamic.pack newCmdMsg)
+    let (newModel, newCmdMsg) = f (msgUnpack msg) (Dynamic.unpack dyn)
+    in (Dynamic.pack newModel, Cmd.map msgPack newCmdMsg)
 
 packAnimate : (Time -> model -> model) -> Time -> ThingModel -> ThingModel
 packAnimate f dt dyn = Dynamic.pack (f dt (Dynamic.unpack dyn))
@@ -38,19 +56,19 @@ packThings : (a -> List Thing) -> ThingModel -> List Thing
 packThings f dyn = f (Dynamic.unpack dyn)
 
 
-packThingMethods : Animated model msg -> Animated ThingModel ThingMsg
+packThingMethods : Animated model (MyMsg msg) -> Animated ThingModel ThingMsg
 packThingMethods { update, animate, things } =
     { update = packUpdate update
     , animate = packAnimate animate
     , things = packThings things
     }
 
-createThings : (model, Cmd msg) -> Animated model msg -> (Things, Cmd ThingMsg)
+createThings : (model, Cmd (MyMsg msg)) -> Animated model (MyMsg msg) -> (Things, Cmd ThingMsg)
 createThings (model, msg) methods =
     ( { methods = packThingMethods methods
       , model = Dynamic.pack model
       }
-    , Cmd.map Dynamic.pack msg
+    , Cmd.map msgPack msg
     ) 
 
 {-

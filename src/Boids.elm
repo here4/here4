@@ -35,12 +35,13 @@ randomBoid = Random.map3
 randomBoids : Int -> Random.Generator Boids
 randomBoids n = Random.list n randomBoid
 
-init : Int -> (Boids, Cmd Msg)
-init n = ([], Random.generate BoidsGenerated (randomBoids n))
+init : Int -> (Boids, Cmd (MyMsg Msg))
+init n = ([], Random.generate (My << BoidsGenerated) (randomBoids n))
 
-update : Msg -> Boids -> (Boids, Cmd Msg)
-update msg _ = case msg of
-    BoidsGenerated newBoids -> (newBoids, Cmd.none)
+update : MyMsg Msg -> Boids -> (Boids, Cmd (MyMsg Msg))
+update msg model = case msg of
+    My (BoidsGenerated newBoids) -> (newBoids, Cmd.none)
+    _ -> (model, Cmd.none)
 
 animate : Time -> Boids -> Boids
 animate dt boids = moveBoids dt boids

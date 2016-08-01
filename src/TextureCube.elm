@@ -21,16 +21,21 @@ create path = createThings (init path)
     , things = things
     }
 
-init : String -> (TextureCube, Cmd Msg)
-init path = ([], loadTexture path |> Task.perform TextureError TextureLoaded)
+init : String -> (TextureCube, Cmd (MyMsg Msg))
+init path =
+    ( []
+    , loadTexture path
+        |> Task.perform (My << TextureError) (My << TextureLoaded)
+    )
 
-update : Msg -> TextureCube -> (TextureCube, Cmd Msg)
+update : MyMsg Msg -> TextureCube -> (TextureCube, Cmd (MyMsg Msg))
 update msg model = case msg of
-    TextureError err ->
+    My (TextureError err) ->
         -- ( { model | message = "Error loading texture" }, Cmd.none )
         ( model, Cmd.none )
-    TextureLoaded texture ->
+    My (TextureLoaded texture) ->
         ( [ put (vec3 -2 20 -17) (textureCube texture) ] , Cmd.none )
+    _ -> ( model, Cmd.none )
 
 animate : Time -> TextureCube -> TextureCube
 animate dt cube = cube

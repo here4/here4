@@ -37,7 +37,7 @@ create details =
 
 type WorldMsg
     = TerrainGenerated Terrain
-    | Send Bag.Key Dynamic
+    | Send Bag.Key (MyMsg Dynamic)
 
 type alias WorldModel =
     { maybeTerrain : Maybe Terrain

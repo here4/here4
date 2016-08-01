@@ -32,12 +32,13 @@ randomDrop = Random.map2
 randomBalls : Int -> Random.Generator Balls
 randomBalls n = Random.list n randomDrop
 
-init : Int -> (Balls, Cmd Msg)
-init n = ([], Random.generate BallsGenerated (randomBalls n))
+init : Int -> (Balls, Cmd (MyMsg Msg))
+init n = ([], Random.generate (My << BallsGenerated) (randomBalls n))
 
-update : Msg -> Balls -> (Balls, Cmd Msg)
+update : MyMsg Msg -> Balls -> (Balls, Cmd (MyMsg Msg))
 update msg balls = case msg of
-    BallsGenerated newBalls -> (newBalls, Cmd.none)
+    My (BallsGenerated newBalls) -> (newBalls, Cmd.none)
+    _ -> (balls, Cmd.none)
 
 animate : Time -> Balls -> Balls
 animate dt balls = collisions dt (moveDrops dt balls)
