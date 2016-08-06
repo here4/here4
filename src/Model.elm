@@ -38,10 +38,11 @@ type WorldCtrl
 type alias WhichVehicle = Int
 vehicleBuggy = 0
 vehicleBird = 1
-vehicleDebug = 2
+vehicleLookAt = 2
+vehicleDebug = 3
 
 nextVehicle : WhichVehicle -> WhichVehicle
-nextVehicle v = (v+1) % 3
+nextVehicle v = (v+1) % (vehicleDebug+1) 
 
 type alias World =
     { things : List Thing

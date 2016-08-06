@@ -19,6 +19,7 @@ import Things.Terrain as Terrain
 import Things.Terrain exposing (Terrain)
 import Vehicles.DreamBird as DreamBird
 import Vehicles.DreamBuggy as DreamBuggy
+import Vehicles.LookAt as LookAt
 import Vehicles.DreamDebug as DreamDebug
 
 {-| Take a Msg and a Model and return an updated Model
@@ -68,10 +69,11 @@ update worldUpdate worldAnything  worldTerrain worldAnimate msg model =
                             Just focKey ->
                                 let dp = vec3 inputs.cx inputs.cy 0
                                 in worldUpdate (Down (Model.Move focKey dp)) wm
+                        focPos = vec3 -2 20 -17
                         newModel =
                             { model | globalTime = model.globalTime + dt
-                                    , person = step terrain inputs model.person
-                                    , player2 = step terrain inputs2 model.player2
+                                    , person = step terrain inputs (Just focPos) model.person
+                                    , player2 = step terrain inputs2 Nothing model.player2
                                     , inputs = clearStationaryInputs inputs
                                     , worldModel = wm2
                             }
@@ -107,7 +109,14 @@ gamepadToInputs gamepad0 inputs0 =
     let gamepad = GamepadInputs.toStandardGamepad gamepad0
         {x,y,mx,my,cx,cy} = GamepadInputs.gamepadToArrows gamepad
         bs = GamepadInputs.gamepadToButtons gamepad
-    in  { inputs0 | reset = bs.bStart, changeVR = bs.bB, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, cx=cx, cy=cy, button_X = bs.bX }
+        risingEdge old new = new && (not old)
+    in  { inputs0 | reset = bs.bStart
+                  , changeVR = risingEdge inputs0.changeVR bs.bB
+                  , changeCamera = risingEdge inputs0.changeCamera bs.bRightBumper
+                  , x = x, y = y
+                  , mx=mx, my=my
+                  , cx=cx, cy=cy
+                  , button_X = risingEdge inputs0.button_X bs.bX }
 
 updateGamepads : List Gamepad.Gamepad -> Model worldModel -> Model worldModel
 updateGamepads gps0 model =
@@ -145,8 +154,8 @@ aboveTerrain eyeLevel pos =
     in
         if p.y < e then vec3 p.x e p.z else pos
 
-step : Terrain -> Model.Inputs -> Model.Person -> Model.Person
-step terrain inputs person0 = if inputs.reset then Model.defaultPerson else
+step : Terrain -> Model.Inputs -> Maybe Vec3 -> Model.Person -> Model.Person
+step terrain inputs focPos person0 = if inputs.reset then Model.defaultPerson else
         let 
             eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
             move person =
@@ -154,6 +163,8 @@ step terrain inputs person0 = if inputs.reset then Model.defaultPerson else
                     DreamBird.move eyeLevel inputs person
                 else if person.vehicle == Model.vehicleBuggy then
                     DreamBuggy.move eyeLevel inputs person
+                else if person.vehicle == Model.vehicleLookAt then
+                    LookAt.move eyeLevel inputs focPos person
                 else
                     DreamDebug.move eyeLevel inputs person
             bounds person = { person | pos = Terrain.bounds terrain person.pos }
@@ -222,6 +233,9 @@ selectVehicle inputs person =
         else if newVehicle == Model.vehicleBird then
             Debug.log "Switch to flying!" <|
                 DreamBird.welcome { person | vehicle = newVehicle }
+        else if newVehicle == Model.vehicleLookAt then
+            Debug.log "Switch to LookAt!" <|
+                LookAt.welcome { person | vehicle = newVehicle }
         -- else if newVehicle == vehicleDebug then
         else
             Debug.log "Switch to debug!" <|

@@ -239,6 +239,8 @@ hud person left right =
                           "Dreambird"
                       else if person.vehicle == Model.vehicleBuggy then
                            "Dreambuggy"
+                      else if person.vehicle == Model.vehicleLookAt then
+                           "Look at"
                       else "DreamDebug"
         wher = if person.cameraInside then "Inside" else "Outside"
     in div

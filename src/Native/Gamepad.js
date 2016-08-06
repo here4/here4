@@ -202,8 +202,6 @@ function gamepads(x)
             //if (!haveEvents) scangamepads();
             updateGamepads();
 
-            console.log("Got " + controllers.length + " gamepads: " + controllers);
-
 	    callback(_elm_lang$core$Native_Scheduler.succeed(
                 _elm_lang$core$Native_List.fromArray(controllers)
             ));

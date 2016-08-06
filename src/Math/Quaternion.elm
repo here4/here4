@@ -165,6 +165,30 @@ getAngle q = 2.0 * acos (getScalar q)
 getAxis : Quaternion -> Vec3
 getAxis q = V3.normalize (toVec3 q)
 
+fromTo : Vec3 -> Vec3 -> Quaternion
+fromTo v1 v2 =
+    let d2 l1 l2 = sqrt (l1*l1 * l2*l2) in
+    normalize <| fromSV (d2 (V3.length v1) (V3.length v2) + V3.dot v1 v2, V3.cross v1 v2)
+
+-- Quaternion from two vectors
+-- http://lolengine.net/blog/2014/02/24/quaternion-from-two-vectors-final
+fromTo2 : Vec3 -> Vec3 -> Quaternion
+fromTo2 u v =
+    let norm_u_norm_v = sqrt (V3.dot u u * V3.dot v v)
+        (real_part, w) =
+            if real_part < 1e-6 * norm_u_norm_v then
+                let w =
+                    if abs (V3.getX u) > abs (V3.getZ u) then
+                        vec3 -(V3.getY u) (V3.getX u) 0
+                    else
+                        vec3 0 -(V3.getZ u) (V3.getY u)
+                in (0,  w)
+            else
+                (norm_u_norm_v + V3.dot u v, V3.cross u v)
+
+    in normalize <| fromSV (real_part, w)
+                
+
 {-| Rotate quaternion q1 by quaternion q2 -}
 rotate : Quaternion -> Quaternion -> Quaternion
 rotate q1 q2 = hamilton q1 (hamilton q2 (conjugate q1))
@@ -172,11 +196,13 @@ rotate q1 q2 = hamilton q1 (hamilton q2 (conjugate q1))
 {-| Rotate a vector v by the unit quaternion q -}
 vrotate : Quaternion -> Vec3 -> Vec3
 -- vrotate q v = toVec3 <| hamilton (multv q v) (conjugate q)
-vrotate q v = toVec3 <| hamilton q (vmult v (conjugate q))
+-- vrotate q v = toVec3 <| hamilton q (vmult v (conjugate q))
+vrotate q v = toVec3 <| hamilton q (hamilton (fromSV (0, v)) (conjugate q))
 
 {-| Multiplication of a vector by a quaternion -}
 worldvmult : Vec3 -> Quaternion -> Quaternion
 worldvmult v q = hamilton (fromWorldVec3 v) q
+
 {-| Rotate a vector v by the unit quaternion q -}
 worldVRotate : Quaternion -> Vec3 -> Vec3
 -- vrotate q v = toWorldVec3 <| hamilton (multv q v) (conjugate q)
@@ -187,6 +213,15 @@ fromWorldVec3 : Vec3 -> Quaternion
 fromWorldVec3 v =
     let {x,y,z} = V3.toRecord v
     in vec4 0 z x (-y)
+
+{-| Construction of a right quaternion -}
+fromAngleAxis : Float -> Vec3 -> Quaternion
+fromAngleAxis twoTheta v =
+    let {x,y,z} = V3.toRecord v
+        theta = twoTheta / 2
+        c = cos theta
+        s = sin theta
+    in vec4 c (x*s) (y*s) (z*s)
 
 {-| Extract the axis of rotation -}
 toWorldVec3 : Quaternion -> Vec3
