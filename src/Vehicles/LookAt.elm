@@ -30,15 +30,18 @@ move eyeLevel inputs focPos person = case focPos of
         upDown = V3.scale (3.0 * inputs.y) (V3.normalize p)
 
         cPos = person.pos `V3.add` upDown
+
+        -- Limit how close you can get. This should be a function of the size of the thing.
         closePos = if V3.length (fpos `V3.sub` cPos) < 3.0 then person.pos else cPos
 
         yaw = Qn.normalize <| Qn.fromAngleAxis (inputs.mx * 30 * inputs.dt) V3.j
-        pitch = Qn.normalize <| Qn.fromAngleAxis (inputs.my * 30 * inputs.dt) V3.i
+        xzPos = Qn.vrotate yaw <| V3.sub closePos fpos
+
+        pitchDir = if (V3.getZ xzPos < 0) then 1 else -1
+        pitch = Qn.normalize <| Qn.fromAngleAxis (pitchDir * inputs.my * 30 * inputs.dt) V3.i
         wantPos = -- V3.setY (V3.getY fpos)
                   V3.add fpos
-                  <| Qn.vrotate pitch
-                  <| Qn.vrotate yaw
-                  <| V3.sub closePos fpos
+                  <| Qn.vrotate pitch xzPos
 
         unboundPos = V3.scale 0.3 wantPos `V3.add` V3.scale 0.7 person.pos
 
@@ -50,9 +53,17 @@ move eyeLevel inputs focPos person = case focPos of
                else
                    unboundPos
 
-        f = fpos `V3.sub` newPos
+        -- Find the orientation looking at fpos from newPos
+        f = V3.normalize (fpos `V3.sub` newPos)
+        orPos = Qn.fromTo2 V3.k f
 
-        orientation = Qn.fromTo2 V3.k f
+        -- Ensure the camera is in an upright plane
+        camAxis = V3.cross f (V3.setY (V3.getY f + 1) f)
+        camQ = Qn.fromAngleAxis (pi/2) camAxis
+        cam = V3.normalize <| Qn.vrotate camQ f
+
+        orCam = Qn.fromTo (Qn.vrotate orPos V3.j) cam
+        orientation = Qn.hamilton orCam orPos
         
     in
         { person | pos = newPos, orientation = orientation }
