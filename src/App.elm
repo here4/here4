@@ -17,16 +17,16 @@ import Ports
 
 import Bag
 import Dispatch exposing (..)
-import Model exposing (WorldCtrl)
+import Model
 import Update
 import View
 
-import Thing exposing (Focus, Things)
+import Thing exposing (CtrlMsg, Focus, Things)
 import Things.Terrain exposing (Terrain)
 
 programWithFlags
-  : { init : ( model, Cmd (Dispatch WorldCtrl msg) )
-    , update : Dispatch WorldCtrl msg -> model -> ( model, Cmd (Dispatch WorldCtrl msg) )
+  : { init : ( model, Cmd (Dispatch CtrlMsg msg) )
+    , update : Dispatch CtrlMsg msg -> model -> ( model, Cmd (Dispatch CtrlMsg msg) )
     , view : model -> Maybe Model.World
     , animate : Time -> model -> model 
     , terrain : model -> Maybe Terrain

@@ -8,7 +8,7 @@ import WebGL exposing (..)
 import App
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
-import Model exposing (Args, WorldCtrl)
+import Model exposing (Args)
 
 import Thing exposing (..)
 import Things.Surface2D exposing (defaultPlacement)
@@ -41,7 +41,7 @@ type MyWorldMsg
     = TerrainGenerated Terrain
     | Send Bag.Key (MyMsg Dynamic)
 
-type alias WorldMsg = Dispatch WorldCtrl MyWorldMsg
+type alias WorldMsg = Dispatch CtrlMsg MyWorldMsg
 
 type alias WorldModel =
     { maybeTerrain : Maybe Terrain
@@ -115,7 +115,7 @@ worldUpdate msg model =
         Self (TerrainGenerated terrain) ->
             ( { model | maybeTerrain = Just terrain }, Cmd.none )
 
-        Down (Model.Move dp) ->
+        Down (Move dp) ->
            case model.focusKey of
                Nothing ->
                    ( model, Cmd.none )

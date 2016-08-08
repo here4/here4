@@ -7,7 +7,7 @@ import Time exposing (Time)
 
 import Bag
 import Dispatch exposing (..)
-import Model exposing (Model, Msg, WorldCtrl)
+import Model exposing (Model, Msg)
 import Model
 import Orientation
 import Ports
@@ -15,7 +15,7 @@ import Ports
 import Gamepad
 import GamepadInputs
 
-import Thing exposing (Focus)
+import Thing exposing (CtrlMsg, Focus)
 import Things.Terrain as Terrain
 import Things.Terrain exposing (Terrain)
 import Vehicles.DreamBird as DreamBird
@@ -25,12 +25,12 @@ import Vehicles.DreamDebug as DreamDebug
 
 {-| Take a Msg and a Model and return an updated Model
 -}
-update : (Dispatch WorldCtrl worldMsg -> worldModel -> (worldModel, Cmd (Dispatch WorldCtrl worldMsg)))
+update : (Dispatch CtrlMsg worldMsg -> worldModel -> (worldModel, Cmd (Dispatch CtrlMsg worldMsg)))
     -> (worldModel -> Maybe Focus)
     -> (worldModel -> Maybe Terrain)
     -> (Time -> worldModel -> worldModel)
-    -> Model.Msg (Dispatch WorldCtrl worldMsg) -> Model worldModel
-    -> (Model worldModel, Cmd (Msg (Dispatch WorldCtrl worldMsg)))
+    -> Model.Msg (Dispatch CtrlMsg worldMsg) -> Model worldModel
+    -> (Model worldModel, Cmd (Msg (Dispatch CtrlMsg worldMsg)))
 update worldUpdate worldFocus worldTerrain worldAnimate msg model =
     case msg of
         Model.WorldMessage worldMsg ->
@@ -68,7 +68,7 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                         (wm2, wmCmdMsg, focPos) = case worldFocus model.worldModel of
                             Just focus ->
                                 let dp = vec3 inputs.cx inputs.cy 0
-                                    (wm2, wmCmdMsg) = worldUpdate (Down (Model.Move dp)) wm
+                                    (wm2, wmCmdMsg) = worldUpdate (Down (Thing.Move dp)) wm
                                 in (wm2, wmCmdMsg, Just focus.pos)
                             _ -> (wm, Cmd.none, Nothing)
                         newModel =

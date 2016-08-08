@@ -32,9 +32,6 @@ type Msg worldMsg
     | Resize Window.Size
     | WorldMessage worldMsg
 
-type WorldCtrl
-    = Move Vec3
-
 type alias WhichVehicle = Int
 vehicleBuggy = 0
 vehicleBird = 1
