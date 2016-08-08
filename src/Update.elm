@@ -67,7 +67,7 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                         wm = worldAnimate inputs.dt model.worldModel
                         (wm2, wmCmdMsg, focPos) = case worldFocus model.worldModel of
                             Just focus ->
-                                let dp = vec3 inputs.cx inputs.cy 0
+                                let dp = inputsToMove inputs model.person
                                     (wm2, wmCmdMsg) = worldUpdate (Down (Thing.Move dp)) wm
                                 in (wm2, wmCmdMsg, Just focus.pos)
                             _ -> (wm, Cmd.none, Nothing)
@@ -86,6 +86,11 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                    , newCmdMsg
                    ]
                )
+
+inputsToMove : Model.Inputs -> Model.Person -> Vec3
+inputsToMove inputs person =
+    let dp = vec3 -inputs.cx inputs.cy 0
+    in Orientation.rotateBodyV person.orientation dp
 
 timeToInputs : Time -> Model.Inputs -> Model.Inputs
 timeToInputs dt inputs0 = { inputs0 | dt = dt }
