@@ -32,7 +32,6 @@ create details =
     { init = worldInit details
     , view = worldView
     , update = worldUpdate
-    , anyThing = worldAnything
     , focus = worldFocus
     , animate = worldAnimate
     , terrain = worldTerrain
@@ -49,15 +48,11 @@ type alias WorldModel =
     , skybox : Thing
     , staticThings : List Thing
     , thingsBag : Bag Things
+    , focusKey : Maybe Bag.Key
     }
 
 worldTerrain : WorldModel -> Maybe Terrain
 worldTerrain model = model.maybeTerrain
-
-worldAnything : WorldModel -> Maybe Bag.Key
-worldAnything model = case Bag.keys model.thingsBag of
-    (somekey :: _) -> Just somekey
-    _ -> Nothing
 
 worldFocus : WorldModel -> Maybe Focus
 worldFocus model = case Bag.items model.thingsBag of
@@ -82,6 +77,7 @@ worldInit details =
           , skybox = details.skybox
           , staticThings = details.staticThings
           , thingsBag = bag
+          , focusKey = List.head (Bag.keys bag)
           }
         , Cmd.batch
             [ Terrain.generate (Self << TerrainGenerated) defaultPlacement
@@ -119,16 +115,20 @@ worldUpdate msg model =
         Self (TerrainGenerated terrain) ->
             ( { model | maybeTerrain = Just terrain }, Cmd.none )
 
-        Down (Model.Move key dp) ->
-           case Bag.get key model.thingsBag of
+        Down (Model.Move dp) ->
+           case model.focusKey of
                Nothing ->
                    ( model, Cmd.none )
-               Just t ->
-                   let (thingModel, thingCmdMsg) = Thing.update (Ex (Thing.Move dp)) t
-                   in
-                       ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
-                       , Cmd.map (Self << Send key) thingCmdMsg
-                       )
+               Just key ->
+                   case Bag.get key model.thingsBag of
+                       Nothing ->
+                           ( model, Cmd.none )
+                       Just t ->
+                           let (thingModel, thingCmdMsg) = Thing.update (Ex (Thing.Move dp)) t
+                           in
+                               ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
+                               , Cmd.map (Self << Send key) thingCmdMsg
+                               )
 
 worldAnimate : Time -> WorldModel -> WorldModel
 worldAnimate dt model =

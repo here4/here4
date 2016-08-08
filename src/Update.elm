@@ -26,13 +26,12 @@ import Vehicles.DreamDebug as DreamDebug
 {-| Take a Msg and a Model and return an updated Model
 -}
 update : (Dispatch WorldCtrl worldMsg -> worldModel -> (worldModel, Cmd (Dispatch WorldCtrl worldMsg)))
-    -> (worldModel -> Maybe Bag.Key)
     -> (worldModel -> Maybe Focus)
     -> (worldModel -> Maybe Terrain)
     -> (Time -> worldModel -> worldModel)
     -> Model.Msg (Dispatch WorldCtrl worldMsg) -> Model worldModel
     -> (Model worldModel, Cmd (Msg (Dispatch WorldCtrl worldMsg)))
-update worldUpdate worldAnything worldFocus worldTerrain worldAnimate msg model =
+update worldUpdate worldFocus worldTerrain worldAnimate msg model =
     case msg of
         Model.WorldMessage worldMsg ->
             let (worldModel, worldCmdMsg) = worldUpdate worldMsg model.worldModel in
@@ -66,13 +65,12 @@ update worldUpdate worldAnything worldFocus worldTerrain worldAnimate msg model 
                     let inputs = timeToInputs dt model.inputs
                         inputs2 = timeToInputs dt model.inputs2
                         wm = worldAnimate inputs.dt model.worldModel
-                        (wm2, wmCmdMsg, focPos) = case (worldAnything model.worldModel, worldFocus model.worldModel) of
-                            (Just focKey, Just focus) ->
+                        (wm2, wmCmdMsg, focPos) = case worldFocus model.worldModel of
+                            Just focus ->
                                 let dp = vec3 inputs.cx inputs.cy 0
-                                    (wm2, wmCmdMsg) = worldUpdate (Down (Model.Move focKey dp)) wm
+                                    (wm2, wmCmdMsg) = worldUpdate (Down (Model.Move dp)) wm
                                 in (wm2, wmCmdMsg, Just focus.pos)
                             _ -> (wm, Cmd.none, Nothing)
-                        -- focPos = vec3 -2 20 -17
                         newModel =
                             { model | globalTime = model.globalTime + dt
                                     , person = step terrain inputs focPos model.person

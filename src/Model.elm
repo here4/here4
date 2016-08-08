@@ -33,7 +33,7 @@ type Msg worldMsg
     | WorldMessage worldMsg
 
 type WorldCtrl
-    = Move Bag.Key Vec3
+    = Move Vec3
 
 type alias WhichVehicle = Int
 vehicleBuggy = 0
