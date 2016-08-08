@@ -21,7 +21,7 @@ import Model exposing (WorldCtrl)
 import Update
 import View
 
-import Thing exposing (Things)
+import Thing exposing (Focus, Things)
 import Things.Terrain exposing (Terrain)
 
 programWithFlags
@@ -31,12 +31,13 @@ programWithFlags
     , animate : Time -> model -> model 
     , terrain : model -> Maybe Terrain
     , anyThing : model -> Maybe Bag.Key
+    , focus : model -> Maybe Focus
     }
   -> Program Model.Args
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.anyThing world.terrain world.animate
+        , update = Update.update world.update world.anyThing world.focus world.terrain world.animate
         , subscriptions = subscriptions
         , view = View.view world.view
         }

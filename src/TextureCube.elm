@@ -19,6 +19,7 @@ create path = createThings (init path)
     { update = update
     , animate = animate
     , things = things
+    , focus = focus
     }
 
 init : String -> (TextureCube, Cmd (MyMsg Msg))
@@ -42,3 +43,7 @@ animate dt cube = cube
 
 things : TextureCube -> List Thing
 things = identity
+
+focus : TextureCube -> Maybe Focus
+focus cube = Maybe.map thingToFocus (List.head cube)
+    

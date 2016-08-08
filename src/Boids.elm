@@ -20,6 +20,7 @@ create n = createThings (init n)
     { update = update
     , animate = animate
     , things = things
+    , focus = focus
     }
 
 randomBFly : Random.Generator (Visible (Oriented {}))
@@ -48,4 +49,7 @@ animate dt boids = moveBoids dt boids
 
 things : Boids -> List Thing
 things = List.map extractThing
+
+focus : Boids -> Maybe Focus
+focus boids = Maybe.map orientedToFocus (List.head boids)
 

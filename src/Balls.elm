@@ -21,6 +21,7 @@ create n = createThings (init n)
     { update = update
     , animate = animate
     , things = things
+    , focus = focus
     }
 
 randomDrop : Random.Generator (Drop (Visible {}))
@@ -45,3 +46,6 @@ animate dt balls = collisions dt (moveDrops dt balls)
 
 things : Balls -> List Thing
 things = List.map extractThing
+
+focus : Balls -> Maybe Focus
+focus balls = Maybe.map orientedToFocus (List.head balls)

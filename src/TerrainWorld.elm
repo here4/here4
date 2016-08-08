@@ -33,6 +33,7 @@ create details =
     , view = worldView
     , update = worldUpdate
     , anyThing = worldAnything
+    , focus = worldFocus
     , animate = worldAnimate
     , terrain = worldTerrain
     }
@@ -56,6 +57,11 @@ worldTerrain model = model.maybeTerrain
 worldAnything : WorldModel -> Maybe Bag.Key
 worldAnything model = case Bag.keys model.thingsBag of
     (somekey :: _) -> Just somekey
+    _ -> Nothing
+
+worldFocus : WorldModel -> Maybe Focus
+worldFocus model = case Bag.items model.thingsBag of
+    (someitem :: _) -> Thing.focus someitem
     _ -> Nothing
 
 worldThings : List (Things, Cmd ThingMsg) -> (Bag Things, Cmd WorldMsg)

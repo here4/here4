@@ -13,6 +13,7 @@ type alias Animated model msg =
     { update : msg -> model -> (model, Cmd msg)
     , things : model -> List Thing
     , animate : Time -> model -> model
+    , focus : model -> Maybe Focus
     }
 
 type alias ThingModel = Dynamic
@@ -28,7 +29,7 @@ type alias ThingMsg = MyMsg Dynamic
 
 type alias Things =
     { methods : Animated ThingModel ThingMsg
-    , model: ThingModel
+    , model : ThingModel
     }
 
 msgUnpack : MyMsg Dynamic -> MyMsg a
@@ -55,12 +56,16 @@ packAnimate f dt dyn = Dynamic.pack (f dt (Dynamic.unpack dyn))
 packThings : (a -> List Thing) -> ThingModel -> List Thing
 packThings f dyn = f (Dynamic.unpack dyn)
 
+packFocus : (a -> Maybe Focus) -> ThingModel -> Maybe Focus
+packFocus f dyn = f (Dynamic.unpack dyn)
+
 
 packThingMethods : Animated model (MyMsg msg) -> Animated ThingModel ThingMsg
-packThingMethods { update, animate, things } =
+packThingMethods { update, animate, things, focus } =
     { update = packUpdate update
     , animate = packAnimate animate
     , things = packThings things
+    , focus = packFocus focus
     }
 
 createThings : (model, Cmd (MyMsg msg)) -> Animated model (MyMsg msg) -> (Things, Cmd ThingMsg)
@@ -102,6 +107,9 @@ animate dt { methods, model } =
 things : Things -> List Thing
 things { methods, model } = methods.things model
 
+focus : Things -> Maybe Focus
+focus { methods, model } = methods.focus model
+
 type alias Perception = {
     cameraPos  : Vec3,
     windowSize : Window.Size,
@@ -110,6 +118,11 @@ type alias Perception = {
     lensDistort : Float,
     cameraVR   : Bool,
     measuredFPS : Float
+}
+
+-- TODO: focus on a plane/surface/controls
+type alias Focus = {
+    pos : Vec3
 }
 
 type alias See = Perception -> List Renderable
@@ -141,3 +154,8 @@ translate t (Thing scale p o s) = Thing scale (V3.add t p) o s
 resize : Float -> Thing -> Thing
 resize scale (Thing scale0 p o s) = Thing (V3.scale scale scale0) p o s
 
+thingToFocus : Thing -> Focus
+thingToFocus (Thing _ p _ _) = { pos = p }
+
+orientedToFocus : Oriented a -> Focus
+orientedToFocus x = { pos = x.pos }
