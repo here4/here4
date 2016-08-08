@@ -199,21 +199,6 @@ vrotate : Quaternion -> Vec3 -> Vec3
 -- vrotate q v = toVec3 <| hamilton q (vmult v (conjugate q))
 vrotate q v = toVec3 <| hamilton q (hamilton (fromSV (0, v)) (conjugate q))
 
-{-| Multiplication of a vector by a quaternion -}
-worldvmult : Vec3 -> Quaternion -> Quaternion
-worldvmult v q = hamilton (fromWorldVec3 v) q
-
-{-| Rotate a vector v by the unit quaternion q -}
-worldVRotate : Quaternion -> Vec3 -> Vec3
--- vrotate q v = toWorldVec3 <| hamilton (multv q v) (conjugate q)
-worldVRotate q v = toWorldVec3 <| hamilton q (worldvmult v (conjugate q))
-
-{-| Construction of a right quaternion -}
-fromWorldVec3 : Vec3 -> Quaternion
-fromWorldVec3 v =
-    let {x,y,z} = V3.toRecord v
-    in vec4 0 z x (-y)
-
 {-| Construction of a right quaternion -}
 fromAngleAxis : Float -> Vec3 -> Quaternion
 fromAngleAxis twoTheta v =
@@ -222,12 +207,6 @@ fromAngleAxis twoTheta v =
         c = cos theta
         s = sin theta
     in vec4 c (x*s) (y*s) (z*s)
-
-{-| Extract the axis of rotation -}
-toWorldVec3 : Quaternion -> Vec3
--- toWorldVec3 q = let {x,y,z,w} = V4.toRecord q in vec3 y z w
-toWorldVec3 q = let {x,y,z,w} = V4.toRecord q in vec3 z (-w) y
-
 
 {-| Construction from Euler angles representing (roll, pitch, yaw),
 often denoted phi, tau, psi -}
@@ -253,54 +232,21 @@ fromEuler (phi, tau, psi) =
         i = sphi * ctau * cpsi - cphi * stau * spsi
         j = cphi * stau * cpsi + sphi * ctau * spsi
         k = cphi * ctau * spsi - sphi * stau * cpsi
-    -- in quaternion s j k i
-
-    -- q_lab2Body
-    in quaternion s i j k
+    in quaternion s j k i -- fromFlightDynamics
         
 {-| Convert to Euler angles representing (roll, pitch, yaw),
 often denoted (phi, tau, psi) -}
 toEuler : Quaternion -> (Float, Float, Float)
 toEuler q =
-{-
     let
-        {s,i,j,k} = toRecord q
-        q00 = s * s
-        q11 = k * k
-        q22 = i * i
-        q33 = j * j
-        r11 = q00 + q11 - q22 - q33
-        r21 = 2 * (k*i + s*j)
-        r31 = 2 * (k*j - s*i)
-        r32 = 2 * (i*j + s*k)
-        r33 = q00 - q11 - q22 + q33
-
-        tmp = abs r31
-    in
-        if (tmp > 0.999999) then
-            let    
-                r12 = 2 * (k*i - s*j)
-                r13 = 2 * (k*j + s*i)
-                roll = 0
-                pitch = -(pi/2) * r31/tmp
-                yaw = atan2 -r12 (-r31*r13)
-            in (roll, pitch, yaw)
-        else
-            let    
-                roll = atan2 r32 r33
-                pitch = asin -r31
-                yaw = atan2 r21 r11
-            in (roll, pitch, yaw)
--}
-    let
-        (q0, q1, q2, q3) = toTuple q
+        -- Translate from flight dynamics coordinate system
+        (q0, q2, q3, q1) = toTuple q
 
         -- https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_Angles_from_Quaternion
         phi = atan2 (2 * (q0*q1 + q2*q3)) (1 - 2 * (q1*q1 + q2*q2))
         tau = asin  (2 * (q0*q2 - q3*q1))
         psi = atan2 (2 * (q0*q3 + q1*q2)) (1 - 2 * (q2*q2 + q3*q3))
     in
-        -- (psi, tau, phi)
         (phi, tau, psi)
 
 toMat4 : Quaternion -> M4.Mat4

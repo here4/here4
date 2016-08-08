@@ -18,7 +18,6 @@ move : Model.EyeLevel -> Model.Inputs -> Model.Person -> Model.Person
 move eyeLevel inputs person =
     person |> turn eyeLevel inputs.mx inputs.my
            |> walk eyeLevel inputs
-           -- |> jump eyeLevel inputs.isJumping
            |> physics eyeLevel inputs.dt
 
 -- | Welcome a new driver to the DreamBuggy
@@ -87,16 +86,6 @@ walk eyeLevel inputs person =
 adjustVelocity : Float -> Float -> Vec3 -> Float -> Vec3 -> Vec3
 adjustVelocity maxSpeed friction dv dt v =
     v3_clamp maxSpeed <| add (V3.scale dt dv) (V3.scale (1.0-(friction*dt)) v)
-
-{-
-jump : Model.EyeLevel -> Bool -> Model.Person -> Model.Person
-jump eyeLevel isJumping person =
-  -- if not isJumping || getY person.pos > eyeLevel person.pos then person else
-  if not isJumping then person else
-    let v = toRecord person.velocity
-    in
-        { person | velocity = vec3 v.x (1.0*80) v.z }
--}
 
 physics : Model.EyeLevel -> Float -> Model.Person -> Model.Person
 physics eyeLevel dt person =

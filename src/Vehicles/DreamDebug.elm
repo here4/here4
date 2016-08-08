@@ -33,9 +33,6 @@ fly eyeLevel inputs person =
         pitch =  4 * inputs.my * inputs.dt
         roll  =  6 * inputs.mx * inputs.dt
 
-        -- orientQn = Qn.hamilton (Qn.fromEuler (roll, pitch, yaw)) person.orientQn
-        -- orientQn = Qn.hamilton person.orientQn (Qn.fromEuler (roll, pitch, yaw))
-        -- orient = Qn.vrotate orientQn
         orpy = fromRollPitchYaw (roll, pitch, yaw)
         orientation = person.orientation `followedBy` orpy
         orient = rotateBodyV orientation
