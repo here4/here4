@@ -87,7 +87,7 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
 
 inputsToMove : Model.Inputs -> Model.Person -> Vec3
 inputsToMove inputs person =
-    let dp = vec3 -inputs.cx inputs.cy 0
+    let dp = vec3 -inputs.cx 0 inputs.cy
     in Orientation.rotateBodyV person.orientation dp
 
 timeToInputs : Time -> Model.Inputs -> Model.Inputs
