@@ -9,7 +9,7 @@ import WebGL exposing (..)
 
 type alias NoiseVertex = { pos:Vec3, color:Vec4, coord:Vec3, textureScale:Float, timeScale:Float, smoothing:Float }
 
-type alias NoiseVertexInput = -- u = { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4 }
+type alias NoiseVertexInput =
           { iDetail : Float
           , iGlobalTime : Time
           , iGlobalTimeV : Time
@@ -21,7 +21,6 @@ type alias NoiseVertexInput = -- u = { u | iGlobalTimeV:Float, iLensDistort:Floa
 
 type alias NoiseVertexOutput = { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
 
--- type alias RippleNoiseVertexInput u = { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4, iRipple:Float }
 type alias RippleNoiseVertexInput =
            { iDetail : Float
            , iGlobalTime : Time
@@ -33,7 +32,6 @@ type alias RippleNoiseVertexInput =
            , view : Mat4
            }
 
--- noiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4 } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
 noiseVertex : Shader NoiseVertex (NoiseVertexInput) NoiseVertexOutput
 noiseVertex = [glsl|
 
