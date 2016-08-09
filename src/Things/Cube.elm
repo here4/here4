@@ -1,12 +1,10 @@
 module Things.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, cube)
 
-import Time exposing (Time)
-
-import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
-import Window
+
+import Thing exposing (Perception)
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
@@ -19,21 +17,22 @@ import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 type alias Triple a = (a,a,a)
 
+skyCube : Perception -> List Renderable
 skyCube = cube worldVertex sky
 
--- cloudsCube : Window.Size -> Time -> Mat4 -> Renderable
+cloudsCube : Perception -> List Renderable
 cloudsCube = cube worldVertex clouds
 
--- fireCube : Window.Size -> Time -> Mat4 -> Renderable
+fireCube : Perception -> List Renderable
 fireCube = cube worldVertex fire
 
--- fogMountainsCube : Window.Size -> Time -> Mat4 -> Renderable
+fogMountainsCube : Perception -> List Renderable
 fogMountainsCube = cube worldVertex fogMountains
 
--- plasmaCube : Window.Size -> Time -> Mat4 -> Renderable
+plasmaCube : Perception -> List Renderable
 plasmaCube = cube worldVertex simplePlasma
 
--- voronoiCube : Window.Size -> Time -> Mat4 -> Renderable
+voronoiCube : Perception -> List Renderable
 voronoiCube = cube worldVertex voronoiDistances
 
 -- cube : Shader attributes uniforms varying -> Shader {} uniforms varyings

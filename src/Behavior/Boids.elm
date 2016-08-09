@@ -2,7 +2,6 @@ module Behavior.Boids exposing (..)
 
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
-import Math.Matrix4 exposing (..)
 import Time exposing (Time)
 
 import Thing exposing (..)
@@ -20,11 +19,12 @@ newBoid m r pos vel thing0 =
     , see = thing0.see
     }
 
+boidOrientation : Moving a -> Vec3
 boidOrientation b =
     let v = V3.toRecord b.velocity
     in V3.normalize (vec3 v.x (v.y/10) v.z)
 
--- stepBoid : Time -> Moving a -> Moving a
+stepBoid : Time -> Moving a -> Moving a
 stepBoid dt b = { b | pos = b.pos `V3.add` (V3.scale dt b.velocity), orientation = boidOrientation b }
 
 rule1 : Int -> Vec3 -> Boid a -> Vec3 

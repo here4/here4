@@ -174,6 +174,7 @@ type alias GamepadButtons =
     , bLeftBumper : Bool, bRightBumper : Bool
     , bBack : Bool, bStart : Bool }
 
+gamepadButtonsNone : GamepadButtons
 gamepadButtonsNone =
     { bA = False, bB = False, bX = False, bY = False
     , bLeftBumper = False, bRightBumper = False

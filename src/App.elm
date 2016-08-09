@@ -15,7 +15,6 @@ import Window
 
 import Ports
 
-import Bag
 import Dispatch exposing (..)
 import Model
 import Update

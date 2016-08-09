@@ -6,10 +6,7 @@ import Math.Matrix4 exposing (..)
 import Orientation exposing (..)
 import Util exposing (v3_clamp)
 
-import Array2D exposing (Array2D)
 import Model
-
-import Debug
 
 ----------------------------------------------------------------------
 -- DreamBuggy

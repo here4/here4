@@ -2,17 +2,10 @@ module Vehicles.LookAt exposing (move, welcome)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
-import Math.Matrix4 exposing (..)
-import Math.Matrix4 as M4
-import Orientation exposing (..)
-import Util exposing (v3_clamp)
 
 import Math.Quaternion as Qn
 
-import Array2D exposing (Array2D)
 import Model
-
-import Debug
 
 ----------------------------------------------------------------------
 -- LookAt

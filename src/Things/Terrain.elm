@@ -5,18 +5,15 @@ module Things.Terrain exposing
     , mountains, sea
     )
 
-import List.Extra exposing (splitAt)
 import Math.Matrix4 as M4
 import Math.Vector3 as V3
 import Math.Vector4 as V4
 import Random
-import WebGL exposing (..)
 
 import Array
 import Array2D exposing (Array2D)
 import Math.Vector3 exposing (..)
 import Util exposing (..)
-import Zipper2D exposing (Zipper2D, map)
 
 import Math.Procedural exposing (..)
 import Thing exposing (..)

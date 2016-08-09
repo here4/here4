@@ -6,7 +6,6 @@ import Time exposing (..)
 import Task exposing (Task)
 import Window
 
-import Bag
 import Orientation
 import Thing exposing (..)
 import Things.Terrain exposing (Terrain)
@@ -33,9 +32,17 @@ type Msg worldMsg
     | WorldMessage worldMsg
 
 type alias WhichVehicle = Int
+
+vehicleBuggy : Int
 vehicleBuggy = 0
+
+vehicleBird : Int
 vehicleBird = 1
+
+vehicleLookAt : Int
 vehicleLookAt = 2
+
+vehicleDebug : Int
 vehicleDebug = 3
 
 nextVehicle : WhichVehicle -> WhichVehicle

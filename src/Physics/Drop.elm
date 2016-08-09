@@ -1,17 +1,12 @@
 module Physics.Drop exposing (..)
 
-import Array
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
-import Math.Matrix4 exposing (..)
--- import Signal.Extra exposing ((<~))
 import Time exposing (Time)
 
 import Thing exposing (..)
 
 import Physics.Collisions exposing (..)
-
-import Debug exposing (log)
 
 type alias Drop a = Massive (Spherical (Moving a))
 
@@ -27,6 +22,7 @@ newDrop pos vel thing0 =
     }
 
 -- TODO: add spin?
+dropOrientation : Moving a -> Vec3
 dropOrientation d =
     let v = V3.toRecord d.velocity
     in V3.normalize (vec3 v.x 0 v.z)

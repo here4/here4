@@ -9,24 +9,15 @@ import Math.Matrix4 as M4
 import Math.Matrix4 exposing (Mat4)
 import Math.Vector3 as V3
 import Math.Vector3 exposing (..)
-import Random
 import Time exposing (Time)
 import WebGL
 import Window
 
-import Array2D exposing (Array2D)
 import Model exposing (Model, Msg)
 import Orientation
 import Thing exposing (..)
-import Things.Cube exposing (textureCube, fireCube, fogMountainsCube, voronoiCube)
-import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
-import Things.Sphere exposing (cloudsSphere)
 import Things.Terrain exposing (Terrain)
-import Things.Ground exposing (renderGround)
-import Things.Surface2D exposing (Placement, defaultPlacement)
 import Things.Terrain as Terrain
-
-import Shaders.VoronoiDistances exposing (voronoiDistances)
 
 {-| Generate a View from a Model
 -}

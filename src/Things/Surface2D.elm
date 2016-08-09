@@ -4,15 +4,9 @@ module Things.Surface2D exposing
     , Placement, defaultPlacement
     )
 
-import Array
-import Array2D exposing (Array2D)
 import List exposing (..)
-import List.Extra exposing (splitAt)
-import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4)
-import Math.Matrix4 exposing (..)
-import Maybe.Extra exposing (isJust)
 import Util exposing (subsample)
 import WebGL exposing (..)
 
@@ -49,6 +43,7 @@ defaultPlacement =
     , bigSide = 512
     }
 
+toNSV : (Float, Vec4) -> NoiseSurfaceVertex
 toNSV (y,rgb) = (y, rgb, 0.0, 0.0, 0.0)
 
 surface2D skip placement xz = surface noiseVertex noiseColorFragment

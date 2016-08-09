@@ -1,13 +1,10 @@
 module Things.BFly exposing (bfly)
 
-import Random exposing (float)
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import Time exposing (second)
 import WebGL exposing (..)
-
-import Debug exposing (log)
 
 type alias BoidVertex = { pos:Vec3, color:Vec3, coord:Vec3, wing:Vec3 }
 

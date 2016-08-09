@@ -3,13 +3,9 @@ module Physics.Collisions exposing (..)
 import Array
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
-import Math.Matrix4 exposing (..)
-import Math.RandomVector exposing (..)
 import Time exposing (Time)
 
 import Thing exposing (..)
-
-import Debug exposing (log)
 
 type alias TimeLeft a = (a, Float)
 

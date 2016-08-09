@@ -1,9 +1,7 @@
 module TerrainWorld exposing (create)
 
 import Bag exposing (Bag)
-import Math.Vector3 exposing (Vec3, vec3)
 import Time exposing (Time)
-import WebGL exposing (..)
 
 import App
 import Dispatch exposing (..)
@@ -15,12 +13,7 @@ import Things.Surface2D exposing (defaultPlacement)
 import Things.Terrain exposing (Terrain)
 import Things.Terrain as Terrain
 
-import Boids
-import Balls
 
-import Things.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, voronoiCube)
-import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
-import Things.Sphere exposing (skySphere, cloudsSphere)
 import Things.Terrain exposing (Terrain)
 import Things.Surface2D exposing (Placement, defaultPlacement)
 import Things.Terrain as Terrain

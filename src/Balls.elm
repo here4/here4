@@ -10,7 +10,6 @@ import Things.Sphere exposing (fogMountainsSphere)
 import Math.RandomVector exposing (randomVec3')
 import Physics.Collisions exposing (collisions)
 import Physics.Drop exposing (..)
-import Shaders.FogMountains exposing (fogMountains)
 
 type alias Balls = List (Drop (Visible {}))
 

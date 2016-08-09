@@ -1,20 +1,14 @@
 module Things.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, diamond)
 
 import List exposing (map2, repeat)
-import Time exposing (Time)
 
-import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
-import Window
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
-import Shaders.Fire exposing (fire)
 import Shaders.FogMountains exposing (fogMountains)
---import Shaders.SimplePlasma exposing (simplePlasma)
---import Shaders.VoronoiDistances exposing (voronoiDistances)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 type alias Triangle a = (a,a,a)
@@ -50,7 +44,10 @@ zip3 xs ys zs =
     (x::xs', y::ys', z::zs') -> (x,y,z) :: zip3 xs' ys' zs'
     _ -> []
 
+rotY : Float -> Mat4
 rotY n = makeRotate (2*pi/n) (vec3 0 1 0)
+
+rotZ : Float -> Mat4
 rotZ n = makeRotate (-2*pi/n) (vec3 0 0 1)
 
 -- rotBoth : Float -> Vertex -> Vertex
@@ -62,6 +59,7 @@ rotBoth n x = { x | pos = transform (rotY n) x.pos, coord = transform (rotZ n) x
 seven : Vertex -> List Vertex
 seven = unfold 7 (rotBoth 8)
 
+eights : Vertex -> (List Vertex, List Vertex)
 eights x = let x7 = seven x in (x::x7, x7++[x])
 
 diamondMesh : Drawable Vertex

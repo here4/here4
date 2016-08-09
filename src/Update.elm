@@ -2,10 +2,8 @@ module Update exposing (update)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
-import Math.Matrix4 exposing (makeRotate, transform)
 import Time exposing (Time)
 
-import Bag
 import Dispatch exposing (..)
 import Model exposing (Model, Msg)
 import Model

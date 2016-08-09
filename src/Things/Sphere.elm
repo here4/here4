@@ -1,8 +1,6 @@
 module Things.Sphere exposing (spheres, skySphere, cloudsSphere, fogMountainsSphere, sphere)
 
-import Random exposing (float, list)
 import List exposing (drop, concat, map, map2)
-import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
@@ -11,7 +9,6 @@ import WebGL exposing (..)
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
-import Shaders.Fire exposing (fire)
 import Shaders.FogMountains exposing (fogMountains)
 --import Shaders.SimplePlasma exposing (simplePlasma)
 --import Shaders.VoronoiDistances exposing (voronoiDistances)
@@ -64,7 +61,10 @@ zip3 xs ys zs =
     (x::xs', y::ys', z::zs') -> (x,y,z) :: zip3 xs' ys' zs'
     _ -> []
 
+rotY : Float -> Mat4
 rotY n = makeRotate (2*pi/n) (vec3 0 1 0)
+
+rotZ : Float -> Mat4
 rotZ n = makeRotate (-2*pi/n) (vec3 0 0 1)
 
 rotBoth : Float -> Vertex -> Vertex
@@ -77,11 +77,13 @@ rotMercator n v = { v | pos = transform (rotY n) v.pos,
 seven : Vertex -> List Vertex
 seven = unfold 7 (rotMercator 8)
 
+eights : Vertex -> (List Vertex, List Vertex)
 eights x = let x7 = seven x in (x::x7, x7++[x])
 
 unfoldMercator : Int -> Vertex -> List Vertex
 unfoldMercator n = unfold (n-1) (rotMercator (toFloat n))
 
+verticesMercator : Int -> Vertex -> (List Vertex, List Vertex)
 verticesMercator n x = let xs = unfoldMercator n x in (x::xs, xs++[x])
 
 -- sphereMesh : List (Triangle Vertex)

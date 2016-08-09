@@ -2,8 +2,6 @@ module Orientation exposing (..)
 
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
-import Math.Matrix4 exposing (Mat4)
-import Math.Matrix4 as M4
 import Math.Quaternion as Qn
 
 type alias Orientation = Qn.Quaternion
