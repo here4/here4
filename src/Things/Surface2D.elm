@@ -59,10 +59,14 @@ noiseSurface2D : Int -> Placement -> (Float, Float)
 noiseSurface2D skip placement xz = surface noiseVertex noiseColorFragment
     << surfaceMesh xz skip placement
 
+surface : Shader NoiseVertex NoiseVertexInput b -> Shader {} NoiseVertexInput b
+    -> Drawable NoiseVertex -> Oriented (Visible {})
 surface vertexShader fragmentShader mesh =
     let see = seeSurface vertexShader fragmentShader mesh
     in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
+seeSurface : Shader NoiseVertex NoiseVertexInput b -> Shader {} NoiseVertexInput b
+    -> Drawable NoiseVertex -> See
 seeSurface vertexShader fragmentShader mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
@@ -81,13 +85,14 @@ rippleNoiseSurface2D : Int -> Float -> Placement -> (Float, Float)
 rippleNoiseSurface2D skip ripple placement xz = rippleSurface rippleNoiseVertex noiseColorFragment ripple
     << surfaceMeshMaybe xz skip placement
 
--- rippleSurface : Shader a (NoiseVertexInput ThingShaderInput) 
+rippleSurface : Shader NoiseVertex RippleNoiseVertexInput b -> Shader {} RippleNoiseVertexInput b -> Float
+    -> Drawable NoiseVertex -> Oriented (Visible {})
 rippleSurface vertexShader fragmentShader ripple mesh =
     let see = rippleSeeSurface vertexShader fragmentShader ripple mesh
     in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
--- rippleSeeSurface : Shader NoiseVertex (RippleNoiseVertexInput a) NoiseVertexOutput -> Shader {} (RippleNoiseVertexInput a) NoiseVertexOutput
- --    -> Float -> Drawable a -> See
+rippleSeeSurface : Shader NoiseVertex RippleNoiseVertexInput b -> Shader {} RippleNoiseVertexInput b -> Float
+    -> Drawable NoiseVertex -> See
 rippleSeeSurface vertexShader fragmentShader ripple mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime

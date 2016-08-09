@@ -21,7 +21,17 @@ type alias NoiseVertexInput = -- u = { u | iGlobalTimeV:Float, iLensDistort:Floa
 
 type alias NoiseVertexOutput = { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
 
-type alias RippleNoiseVertexInput u = { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4, iRipple:Float }
+-- type alias RippleNoiseVertexInput u = { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4, iRipple:Float }
+type alias RippleNoiseVertexInput =
+           { iDetail : Float
+           , iGlobalTime : Time
+           , iGlobalTimeV : Time
+           , iHMD : Float
+           , iLensDistort : Float
+           , iResolution : Vec3
+           , iRipple : Float
+           , view : Mat4
+           }
 
 -- noiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4 } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
 noiseVertex : Shader NoiseVertex (NoiseVertexInput) NoiseVertexOutput
@@ -80,8 +90,7 @@ void main () {
 
 |]
 
--- rippleNoiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4, iRipple:Float } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
-rippleNoiseVertex : Shader NoiseVertex (RippleNoiseVertexInput a) NoiseVertexOutput
+rippleNoiseVertex : Shader NoiseVertex RippleNoiseVertexInput NoiseVertexOutput
 rippleNoiseVertex = [glsl|
 
 attribute vec3 pos;
