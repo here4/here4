@@ -1,48 +1,42 @@
 module Things.Sphere exposing (spheres, skySphere, cloudsSphere, fogMountainsSphere, sphere)
 
 import List exposing (drop, concat, map, map2)
+import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
 
--- import Signal.Extra exposing ((<~))
+import Thing exposing (..)
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
 import Shaders.FogMountains exposing (fogMountains)
---import Shaders.SimplePlasma exposing (simplePlasma)
---import Shaders.VoronoiDistances exposing (voronoiDistances)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
-
--- import Model
--- import Engine exposing (..)
 
 type alias Triangle a = (a,a,a)
 
+spheres : Int -> Shader {} ThingShaderInput { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+    -> List (Oriented (Visible {}))
 spheres n fragmentShader = map (always (sphere worldVertex fragmentShader)) [0..n]
 
+skySphere : Perception -> List Renderable
 skySphere = seeSphere worldVertex sky
 
--- cloudsSphere : (Int,Int) -> Time -> Mat4 -> Renderable
--- cloudsSphere : Oriented (Visible {})
+cloudsSphere : Perception -> List Renderable
 cloudsSphere = seeSphere worldVertex clouds
 
--- fogMountainsSphere : (Int,Int) -> Time -> Mat4 -> Renderable
--- fogMountainsSphere : Signal (Oriented (Visible a))
+fogMountainsSphere : Oriented (Visible {})
 fogMountainsSphere = sphere worldVertex fogMountains
 
+sphere : Shader Vertex ThingShaderInput a -> Shader {} ThingShaderInput a -> Oriented (Visible {})
 sphere vertexShader fragmentShader =
     let see = seeSphere vertexShader fragmentShader
     in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
 type alias ShadertoyUniforms a = { a | iResolution : Vec3, iGlobalTime : Float, view : (Int,Int) }
 
--- sphere : Shader attributes uniforms varying -> Shader {} uniforms varyings
---    -> (Int,Int) -> Time -> Mat4 -> Renderable
--- sphere : Shader attributes (ShadertoyUniforms {}) varyings -> Shader {} (ShadertoyUniforms {})  varyings -> Perception -> Renderable
+seeSphere : Shader Vertex ThingShaderInput a -> Shader {} ThingShaderInput a -> See
 seeSphere vertexShader fragmentShader p =
-    -- let (w,h) = p.resolution
-    --     resolution = vec3 (toFloat w) (toFloat h) 0
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0
@@ -86,7 +80,6 @@ unfoldMercator n = unfold (n-1) (rotMercator (toFloat n))
 verticesMercator : Int -> Vertex -> (List Vertex, List Vertex)
 verticesMercator n x = let xs = unfoldMercator n x in (x::xs, xs++[x])
 
--- sphereMesh : List (Triangle Vertex)
 sphereMesh : Drawable Vertex
 sphereMesh =
   let

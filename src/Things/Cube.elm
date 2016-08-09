@@ -4,7 +4,7 @@ import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
 
-import Thing exposing (Perception)
+import Thing exposing (ThingShaderInput, See, Perception)
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
@@ -35,8 +35,7 @@ plasmaCube = cube worldVertex simplePlasma
 voronoiCube : Perception -> List Renderable
 voronoiCube = cube worldVertex voronoiDistances
 
--- cube : Shader attributes uniforms varying -> Shader {} uniforms varyings
---    -> (Int,Int) -> Time -> Mat4 -> Renderable
+cube : Shader Vertex ThingShaderInput a -> Shader {} ThingShaderInput a -> See
 cube vertexShader fragmentShader p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
@@ -46,7 +45,7 @@ cube vertexShader fragmentShader p =
             { iResolution = resolution, iHMD = iHMD, iGlobalTime = s
             , iLensDistort = p.lensDistort, view = p.viewMatrix } ]
 
--- textureCube : WebGL.Texture -> Mat4 -> WebGL.Renderable
+textureCube : WebGL.Texture -> See
 textureCube texture p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         iHMD = if p.cameraVR then 1.0 else 0.0

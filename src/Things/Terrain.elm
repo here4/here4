@@ -166,10 +166,12 @@ nearby placement terrain pos sees =
     in
         List.map (\(x,y) -> getXZ (ix0+x) (iz0+y)) ir
 
+terrainGrid : Int -> Placement -> Array2D NoiseSurfaceVertex -> Array2D Thing
 terrainGrid skip placement =
        placeTerrain (noiseSurface2D skip) placement
     << tileTerrain skip placement.tileSize
 
+terrainGridMaybe : Int -> Float -> Placement -> Array2D (Maybe NoiseSurfaceVertex) -> Array2D Thing
 terrainGridMaybe skip ripple placement =
        placeTerrain (rippleNoiseSurface2D skip ripple) placement
     << tileTerrain skip placement.tileSize

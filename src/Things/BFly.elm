@@ -6,14 +6,31 @@ import Math.Matrix4 exposing (..)
 import Time exposing (second)
 import WebGL exposing (..)
 
+import Thing exposing (..)
+
 type alias BoidVertex = { pos:Vec3, color:Vec3, coord:Vec3, wing:Vec3 }
 
+type alias BoidShaderInput =
+    { flapL : Mat4
+    , flapR : Mat4
+    , iGlobalTime : Float
+    , iHMD : Float
+    , iLensDistort : Float
+    , iResolution : Vec3
+    , view : Mat4
+}
+
+type alias BoidVertexShader = Shader BoidVertex BoidShaderInput
+
+bfly : Shader {} BoidShaderInput { elm_FragColor : Vec3, elm_FragCoord : Vec2 } -> Float -> Oriented (Visible {})
 bfly fragmentShader f01 = makeBFly bflyVertex fragmentShader (f01 * second * pi * 2)
 
+makeBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Oriented (Visible {})
 makeBFly vertexShader fragmentShader flapStart =
     let see = seeBFly vertexShader fragmentShader flapStart
     in { scale = vec3 1 1 1, pos = (vec3 7 0 4), orientation = vec3 0 0 1, see = see }
 
+seeBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> See
 seeBFly vertexShader fragmentShader flapStart p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime + flapStart

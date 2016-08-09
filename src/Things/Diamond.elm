@@ -6,25 +6,25 @@ import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
 
+import Thing exposing (See, ThingShaderInput)
+
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
 import Shaders.FogMountains exposing (fogMountains)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 type alias Triangle a = (a,a,a)
--- type alias Vertex = { pos:Vec3, coord:Vec3 }
 
+skyDiamond : See
 skyDiamond = diamond worldVertex sky
 
--- cloudsDiamond : Window.Size -> Time -> Mat4 -> Renderable
+cloudsDiamond : See
 cloudsDiamond = diamond worldVertex clouds
 
--- fogMountainsDiamond : Window.Size -> Time -> Mat4 -> Renderable
+fogMountainsDiamond : See
 fogMountainsDiamond = diamond worldVertex fogMountains
 
--- diamond : Shader attributes uniforms varying -> Shader {} uniforms varyings
---    -> (Int,Int) -> Time -> Mat4 -> Renderable
--- diamond vertexShader fragmentShader windowSize t view =
+diamond : Shader Vertex ThingShaderInput a -> Shader {} ThingShaderInput a -> See
 diamond vertexShader fragmentShader p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
@@ -49,9 +49,6 @@ rotY n = makeRotate (2*pi/n) (vec3 0 1 0)
 
 rotZ : Float -> Mat4
 rotZ n = makeRotate (-2*pi/n) (vec3 0 0 1)
-
--- rotBoth : Float -> Vertex -> Vertex
--- rotBoth n x = { pos = transform (rotY n) x.pos, coord = transform (rotZ n) x.coord }
 
 rotBoth : Float -> Vertex -> Vertex
 rotBoth n x = { x | pos = transform (rotY n) x.pos, coord = transform (rotZ n) x.coord }

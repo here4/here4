@@ -159,3 +159,12 @@ thingToFocus (Thing _ p _ _) = { pos = p }
 
 orientedToFocus : Oriented a -> Focus
 orientedToFocus x = { pos = x.pos }
+
+type alias ThingShaderInput =
+   { iGlobalTime : Time
+   , iHMD : Float
+   , iResolution : Vec3
+   , iLensDistort : Float
+   , view : Mat4
+   }
+
