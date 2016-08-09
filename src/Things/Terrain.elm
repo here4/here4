@@ -193,6 +193,7 @@ mkTile skip smallSide arr0 (x0, y0) = case arr0 of
     in (out, (x0, y0))
 
 -- placeTerrain : List (List ((List (List NoiseSurfaceVertex)), (Int, Int))) -> Array2D Thing
+placeTerrain : (Placement -> (Float, Float) -> v -> Oriented (Visible {})) -> Placement -> List (List (v, (Int, Int))) -> Array2D Thing
 placeTerrain toSurface2D placement terrainsCoords =
     let
         terrainSurfacesCoords = List.map (List.map (\(t,(x,z)) -> (toSurface2D placement (toFloat x * placement.xDelta, toFloat z * placement.zDelta) t, (x,z)))) terrainsCoords

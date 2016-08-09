@@ -1,14 +1,30 @@
-module Shaders.NoiseVertex exposing (NoiseVertex, noiseVertex, rippleNoiseVertex)
+module Shaders.NoiseVertex exposing (NoiseVertex, NoiseVertexInput, NoiseVertexOutput, RippleNoiseVertexInput, noiseVertex, rippleNoiseVertex)
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (Vec3)
 import Math.Vector4 exposing (Vec4)
 import Math.Matrix4 exposing (Mat4)
+import Time exposing (Time)
 import WebGL exposing (..)
 
 type alias NoiseVertex = { pos:Vec3, color:Vec4, coord:Vec3, textureScale:Float, timeScale:Float, smoothing:Float }
 
-noiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4 } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
+type alias NoiseVertexInput = -- u = { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4 }
+          { iDetail : Float
+          , iGlobalTime : Time
+          , iGlobalTimeV : Time
+          , iHMD : Float
+          , iLensDistort : Float
+          , iResolution : Vec3
+          , view : Mat4
+          }
+
+type alias NoiseVertexOutput = { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
+
+type alias RippleNoiseVertexInput u = { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4, iRipple:Float }
+
+-- noiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4 } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
+noiseVertex : Shader NoiseVertex (NoiseVertexInput) NoiseVertexOutput
 noiseVertex = [glsl|
 
 attribute vec3 pos;
@@ -64,7 +80,8 @@ void main () {
 
 |]
 
-rippleNoiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4, iRipple:Float } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
+-- rippleNoiseVertex : Shader NoiseVertex { u | iGlobalTimeV:Float, iLensDistort:Float, view:Mat4, iRipple:Float } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
+rippleNoiseVertex : Shader NoiseVertex (RippleNoiseVertexInput a) NoiseVertexOutput
 rippleNoiseVertex = [glsl|
 
 attribute vec3 pos;

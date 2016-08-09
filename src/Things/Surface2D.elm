@@ -10,6 +10,8 @@ import Math.Vector4 exposing (Vec4)
 import Util exposing (subsample)
 import WebGL exposing (..)
 
+import Thing exposing (..)
+
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
 
@@ -26,7 +28,7 @@ type alias Placement =
     , bigSide : Int
     }
 
-type alias SurfaceVertex = (Float, Vec3)
+type alias SurfaceVertex = (Float, Vec4)
 
 -- (height, color, textureScale, timeScale, smoothing)
 type alias NoiseSurfaceVertex = (Float, Vec4, Float, Float, Float)
@@ -46,10 +48,14 @@ defaultPlacement =
 toNSV : (Float, Vec4) -> NoiseSurfaceVertex
 toNSV (y,rgb) = (y, rgb, 0.0, 0.0, 0.0)
 
+surface2D : Int -> Placement -> (Float, Float)
+    -> List (List SurfaceVertex) -> Oriented (Visible {})
 surface2D skip placement xz = surface noiseVertex noiseColorFragment
     << surfaceMesh xz skip placement
     << List.map (List.map toNSV)
 
+noiseSurface2D : Int -> Placement -> (Float, Float)
+    -> List (List NoiseSurfaceVertex) -> Oriented (Visible {})
 noiseSurface2D skip placement xz = surface noiseVertex noiseColorFragment
     << surfaceMesh xz skip placement
 
@@ -70,13 +76,18 @@ seeSurface vertexShader fragmentShader mesh p =
         ]
 
 
+rippleNoiseSurface2D : Int -> Float -> Placement -> (Float, Float)
+    -> List (List (Maybe NoiseSurfaceVertex)) -> Oriented (Visible {})
 rippleNoiseSurface2D skip ripple placement xz = rippleSurface rippleNoiseVertex noiseColorFragment ripple
     << surfaceMeshMaybe xz skip placement
 
+-- rippleSurface : Shader a (NoiseVertexInput ThingShaderInput) 
 rippleSurface vertexShader fragmentShader ripple mesh =
     let see = rippleSeeSurface vertexShader fragmentShader ripple mesh
     in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
+-- rippleSeeSurface : Shader NoiseVertex (RippleNoiseVertexInput a) NoiseVertexOutput -> Shader {} (RippleNoiseVertexInput a) NoiseVertexOutput
+ --    -> Float -> Drawable a -> See
 rippleSeeSurface vertexShader fragmentShader ripple mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
