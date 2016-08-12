@@ -32,7 +32,7 @@ create details =
 
 type MyWorldMsg
     = TerrainGenerated Terrain
-    | Send Bag.Key (MyMsg Dynamic)
+    | Send Bag.Key (Dispatch CtrlMsg Dynamic)
 
 type alias WorldMsg = Dispatch CtrlMsg MyWorldMsg
 
@@ -117,7 +117,7 @@ worldUpdate msg model =
                        Nothing ->
                            ( model, Cmd.none )
                        Just t ->
-                           let (thingModel, thingCmdMsg) = Thing.update (Ex (Thing.Move dp)) t
+                           let (thingModel, thingCmdMsg) = Thing.update (Down (Thing.Move dp)) t
                            in
                                ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
                                , Cmd.map (Self << Send key) thingCmdMsg

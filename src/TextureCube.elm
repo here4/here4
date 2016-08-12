@@ -5,6 +5,7 @@ import Task exposing (Task)
 import Time exposing (Time)
 import WebGL exposing (Texture, loadTexture)
 
+import Dispatch exposing (..)
 import Thing exposing (..)
 import Things.Cube exposing (textureCube)
 
@@ -22,21 +23,21 @@ create path = createThings (init path)
     , focus = focus
     }
 
-init : String -> (TextureCube, Cmd (MyMsg Msg))
+init : String -> (TextureCube, Cmd (Dispatch CtrlMsg Msg))
 init path =
     ( []
     , loadTexture path
-        |> Task.perform (My << TextureError) (My << TextureLoaded)
+        |> Task.perform (Self << TextureError) (Self << TextureLoaded)
     )
 
-update : MyMsg Msg -> TextureCube -> (TextureCube, Cmd (MyMsg Msg))
+update : Dispatch CtrlMsg Msg -> TextureCube -> (TextureCube, Cmd (Dispatch CtrlMsg Msg))
 update msg model = case msg of
-    My (TextureError err) ->
+    Self (TextureError err) ->
         -- ( { model | message = "Error loading texture" }, Cmd.none )
         ( model, Cmd.none )
-    My (TextureLoaded texture) ->
+    Self (TextureLoaded texture) ->
         ( [ put (vec3 -2 20 -17) (textureCube texture) ] , Cmd.none )
-    Ex (Move dp) -> ( List.map (translate dp) model, Cmd.none )
+    Down (Move dp) -> ( List.map (translate dp) model, Cmd.none )
 
 animate : Time -> TextureCube -> TextureCube
 animate dt cube = cube

@@ -4,6 +4,7 @@ import Math.Vector3 exposing (add, vec3)
 import Random
 import Time exposing (Time)
 
+import Dispatch exposing (..)
 import Thing exposing (..)
 import Things.Sphere exposing (fogMountainsSphere)
 
@@ -32,12 +33,12 @@ randomDrop = Random.map2
 randomBalls : Int -> Random.Generator Balls
 randomBalls n = Random.list n randomDrop
 
-init : Int -> (Balls, Cmd (MyMsg Msg))
-init n = ([], Random.generate (My << BallsGenerated) (randomBalls n))
+init : Int -> (Balls, Cmd (Dispatch CtrlMsg Msg))
+init n = ([], Random.generate (Self << BallsGenerated) (randomBalls n))
 
-update : MyMsg Msg -> Balls -> (Balls, Cmd (MyMsg Msg))
+update : Dispatch CtrlMsg Msg -> Balls -> (Balls, Cmd (Dispatch CtrlMsg Msg))
 update msg balls = case msg of
-    My (BallsGenerated newBalls) -> (newBalls, Cmd.none)
+    Self (BallsGenerated newBalls) -> (newBalls, Cmd.none)
     _ -> (balls, Cmd.none)
 
 animate : Time -> Balls -> Balls
