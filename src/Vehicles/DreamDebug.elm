@@ -9,18 +9,18 @@ import Model
 ----------------------------------------------------------------------
 -- DreamDebug
 
-move : Model.EyeLevel -> Model.Inputs -> Model.Person -> Model.Person
-move eyeLevel inputs person = 
-    person |> fly eyeLevel inputs
+move : Model.EyeLevel -> Model.Inputs -> Model.Player -> Model.Player
+move eyeLevel inputs player = 
+    player |> fly eyeLevel inputs
            |> flyPhysics eyeLevel inputs.dt
 
 -- | Welcome a new driver to debug
-welcome : Model.Person -> Model.Person
-welcome person = person
+welcome : Model.Player -> Model.Player
+welcome player = player
 
 -- http://www.dtic.mil/dtic/tr/fulltext/u2/a152616.pdf
-fly : Model.EyeLevel -> Model.Inputs -> Model.Person -> Model.Person
-fly eyeLevel inputs person =
+fly : Model.EyeLevel -> Model.Inputs -> Model.Player -> Model.Player
+fly eyeLevel inputs player =
     let
         thrust = inputs.y
 
@@ -29,21 +29,21 @@ fly eyeLevel inputs person =
         roll  =  6 * inputs.mx * inputs.dt
 
         orpy = fromRollPitchYaw (roll, pitch, yaw)
-        orientation = person.orientation `followedBy` orpy
+        orientation = player.orientation `followedBy` orpy
         orient = rotateBodyV orientation
 
         dv = V3.scale (50 * thrust * inputs.dt) <| orient V3.k
 
-        vel = (V3.scale 0.8 dv) `add` (V3.scale 0.95 person.velocity)
+        vel = (V3.scale 0.8 dv) `add` (V3.scale 0.95 player.velocity)
         
     in
-        { person | orientation = orientation
+        { player | orientation = orientation
                  , velocity = vel
         }
 
-flyPhysics : Model.EyeLevel -> Float -> Model.Person -> Model.Person
-flyPhysics eyeLevel dt person =
-    let pos = person.pos `add` V3.scale dt person.velocity
+flyPhysics : Model.EyeLevel -> Float -> Model.Player -> Model.Player
+flyPhysics eyeLevel dt player =
+    let pos = player.pos `add` V3.scale dt player.velocity
         p = toRecord pos
         e = eyeLevel pos
 
@@ -52,5 +52,5 @@ flyPhysics eyeLevel dt person =
                      else
                          (pos, vec3 0 0 0)
     in
-        { person | pos = pos', velocity = person.velocity `add` dv }
+        { player | pos = pos', velocity = player.velocity `add` dv }
 

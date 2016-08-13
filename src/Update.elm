@@ -65,13 +65,13 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                         wm = worldAnimate inputs.dt model.worldModel
                         (wm2, wmCmdMsg, focPos) = case worldFocus model.worldModel of
                             Just focus ->
-                                let dp = inputsToMove inputs model.person
+                                let dp = inputsToMove inputs model.player1
                                     (wm2, wmCmdMsg) = worldUpdate (Down (Thing.Move dp)) wm
                                 in (wm2, wmCmdMsg, Just focus.pos)
                             _ -> (wm, Cmd.none, Nothing)
                         newModel =
                             { model | globalTime = model.globalTime + dt
-                                    , person = step terrain inputs focPos model.person
+                                    , player1 = step terrain inputs focPos model.player1
                                     , player2 = step terrain inputs2 Nothing model.player2
                                     , inputs = clearStationaryInputs inputs
                                     , worldModel = wm2
@@ -85,10 +85,10 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                    ]
                )
 
-inputsToMove : Model.Inputs -> Model.Person -> Vec3
-inputsToMove inputs person =
+inputsToMove : Model.Inputs -> Model.Player -> Vec3
+inputsToMove inputs player =
     let dp = vec3 -inputs.cx 0 inputs.cy
-    in Orientation.rotateBodyV person.orientation dp
+    in Orientation.rotateBodyV player.orientation dp
 
 timeToInputs : Time -> Model.Inputs -> Model.Inputs
 timeToInputs dt inputs0 = { inputs0 | dt = dt }
@@ -158,44 +158,44 @@ aboveTerrain eyeLevel pos =
     in
         if p.y < e then vec3 p.x e p.z else pos
 
-step : Terrain -> Model.Inputs -> Maybe Vec3 -> Model.Person -> Model.Person
-step terrain inputs focPos person0 = if inputs.reset then Model.defaultPerson else
+step : Terrain -> Model.Inputs -> Maybe Vec3 -> Model.Player -> Model.Player
+step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer else
         let 
             eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
-            move person =
-                if person.vehicle == Model.vehicleBird then
-                    DreamBird.move eyeLevel inputs person
-                else if person.vehicle == Model.vehicleBuggy then
-                    DreamBuggy.move eyeLevel inputs person
-                else if person.vehicle == Model.vehicleLookAt then
-                    LookAt.move eyeLevel inputs focPos person
+            move player =
+                if player.vehicle == Model.vehicleBird then
+                    DreamBird.move eyeLevel inputs player
+                else if player.vehicle == Model.vehicleBuggy then
+                    DreamBuggy.move eyeLevel inputs player
+                else if player.vehicle == Model.vehicleLookAt then
+                    LookAt.move eyeLevel inputs focPos player
                 else
-                    DreamDebug.move eyeLevel inputs person
-            bounds person = { person | pos = Terrain.bounds terrain person.pos }
+                    DreamDebug.move eyeLevel inputs player
+            bounds player = { player | pos = Terrain.bounds terrain player.pos }
 
-            checkCamera person = { person |
+            checkCamera player = { player |
                 cameraInside = if inputs.changeCamera then
-                                   not person.cameraInside
+                                   not player.cameraInside
                                else
-                                   person.cameraInside,
+                                   player.cameraInside,
                 cameraVR = if inputs.changeVR then
-                                   not person.cameraVR
+                                   not player.cameraVR
                                else
-                                   person.cameraVR }
+                                   player.cameraVR }
 
-            moveCamera person =
-                if person.cameraInside then
-                    -- let behind = person.pos `sub` (V3.scale 2.5 (Model.direction person)) `sub` (vec3 0 0.5 0)
-                    let inside = person.pos
-                                     `add` Orientation.rotateBodyV person.orientation (vec3 0 0 1) -- wedge
+            moveCamera player =
+                if player.cameraInside then
+                    -- let behind = player.pos `sub` (V3.scale 2.5 (Model.direction player)) `sub` (vec3 0 0.5 0)
+                    let inside = player.pos
+                                     `add` Orientation.rotateBodyV player.orientation (vec3 0 0 1) -- wedge
                                      -- Inside Jeep driver's seat
-                                     -- `add` Qn.vrotate person.orientQn (vec3 0.38 0.5 -2.3)
+                                     -- `add` Qn.vrotate player.orientQn (vec3 0.38 0.5 -2.3)
                     in
-                        { person | cameraPos = inside -- aboveTerrain eyeLevel behind
-                                 , cameraUp = Model.cameraUp person }
+                        { player | cameraPos = inside -- aboveTerrain eyeLevel behind
+                                 , cameraUp = Model.cameraUp player }
                 else
-                    let behind = person.pos `sub` (V3.scale 7 (Model.direction person))
-                        p = toRecord person.pos
+                    let behind = player.pos `sub` (V3.scale 7 (Model.direction player))
+                        p = toRecord player.pos
                         yMax0 v = let vr = V3.toRecord v in vec3 vr.x (min (-0.3) vr.y) vr.z
                         newCameraPos =
                             if p.y < Model.eyeLevel then
@@ -206,16 +206,16 @@ step terrain inputs focPos person0 = if inputs.reset then Model.defaultPerson el
                                 -- vec3 0 2 0 `add` behind
                                 vec3 0 -2 0 `add` behind
                         cameraPos = aboveTerrain eyeLevel
-                            -- (V3.scale 0.5 newCameraPos `add` V3.scale 0.5 person.cameraPos) -- smooth
+                            -- (V3.scale 0.5 newCameraPos `add` V3.scale 0.5 player.cameraPos) -- smooth
                             newCameraPos
-                        newCameraUp = Model.cameraUp person
+                        newCameraUp = Model.cameraUp player
 
-                    in  { person | cameraPos = Terrain.bounds terrain cameraPos
+                    in  { player | cameraPos = Terrain.bounds terrain cameraPos
                                  , cameraUp =
-                            -- V3.scale 0.1 newCameraUp `add` V3.scale 0.9 person.cameraUp }
+                            -- V3.scale 0.1 newCameraUp `add` V3.scale 0.9 player.cameraUp }
                                newCameraUp }
         in
-            person0
+            player0
                 |> gravity eyeLevel inputs.dt
                 |> selectVehicle inputs
                 |> move
@@ -223,31 +223,31 @@ step terrain inputs focPos person0 = if inputs.reset then Model.defaultPerson el
                 |> checkCamera
                 |> moveCamera
 
-selectVehicle : Model.Inputs -> Model.Person -> Model.Person
-selectVehicle inputs person =
+selectVehicle : Model.Inputs -> Model.Player -> Model.Player
+selectVehicle inputs player =
     let
         switch = inputs.button_X
-        newVehicle = Model.nextVehicle person.vehicle
+        newVehicle = Model.nextVehicle player.vehicle
     in
         if not switch then
-            person
+            player
         else if newVehicle == Model.vehicleBuggy then
             Debug.log "Switch to buggy!" <|
-                DreamBuggy.welcome { person | vehicle = newVehicle }
+                DreamBuggy.welcome { player | vehicle = newVehicle }
         else if newVehicle == Model.vehicleBird then
             Debug.log "Switch to flying!" <|
-                DreamBird.welcome { person | vehicle = newVehicle }
+                DreamBird.welcome { player | vehicle = newVehicle }
         else if newVehicle == Model.vehicleLookAt then
             Debug.log "Switch to LookAt!" <|
-                LookAt.welcome { person | vehicle = newVehicle }
+                LookAt.welcome { player | vehicle = newVehicle }
         -- else if newVehicle == vehicleDebug then
         else
             Debug.log "Switch to debug!" <|
-                DreamDebug.welcome { person | vehicle = newVehicle }
+                DreamDebug.welcome { player | vehicle = newVehicle }
 
-gravity : Model.EyeLevel -> Float -> Model.Person -> Model.Person
-gravity eyeLevel dt person =
-  if getY person.pos <= eyeLevel person.pos then person else
-    let v = toRecord person.velocity
+gravity : Model.EyeLevel -> Float -> Model.Player -> Model.Player
+gravity eyeLevel dt player =
+  if getY player.pos <= eyeLevel player.pos then player else
+    let v = toRecord player.velocity
     in
-        { person | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }
+        { player | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }

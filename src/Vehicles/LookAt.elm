@@ -10,28 +10,28 @@ import Model
 ----------------------------------------------------------------------
 -- LookAt
 
-welcome : Model.Person -> Model.Person
-welcome person = person
+welcome : Model.Player -> Model.Player
+welcome player = player
 
-move : Model.EyeLevel -> Model.Inputs -> Maybe Vec3 -> Model.Person -> Model.Person
-move eyeLevel inputs focPos person = case focPos of
-  Nothing -> person
+move : Model.EyeLevel -> Model.Inputs -> Maybe Vec3 -> Model.Player -> Model.Player
+move eyeLevel inputs focPos player = case focPos of
+  Nothing -> player
   Just fpos ->
     let
         -- Some point directly above a given point
         upwardsFrom p = V3.setY (V3.getY p + 1) p
 
-        p = fpos `V3.sub` person.pos
+        p = fpos `V3.sub` player.pos
 
         -- inputs
         upDown = V3.scale (3.0 * inputs.y) (V3.normalize p)
         inputYaw = inputs.mx * 30 * inputs.dt
         inputPitch = inputs.my * 30 * inputs.dt
 
-        cPos = person.pos `V3.add` upDown
+        cPos = player.pos `V3.add` upDown
 
         -- Limit how close you can get. This should be a function of the size of the thing.
-        closePos = if V3.length (fpos `V3.sub` cPos) < 3.0 then person.pos else cPos
+        closePos = if V3.length (fpos `V3.sub` cPos) < 3.0 then player.pos else cPos
 
 {-
         fromSpherical (r, theta, phi) = (r * sin theta * cos phi, r * sin theta * sin phi, r * cos theta)
@@ -60,7 +60,7 @@ move eyeLevel inputs focPos person = case focPos of
         wantPos = V3.add fpos <| Qn.vrotate pitchQ xzPos
 -}
 
-        unboundPos = V3.scale 0.3 wantPos `V3.add` V3.scale 0.7 person.pos
+        unboundPos = V3.scale 0.3 wantPos `V3.add` V3.scale 0.7 player.pos
 
         u = toRecord unboundPos
         e = eyeLevel unboundPos
@@ -84,4 +84,4 @@ move eyeLevel inputs focPos person = case focPos of
         orientation = Qn.hamilton orCam orPos
         
     in
-        { person | pos = newPos, orientation = orientation }
+        { player | pos = newPos, orientation = orientation }

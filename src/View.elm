@@ -35,14 +35,14 @@ layoutScene windowSize model world =
     let
         render = renderWorld model.globalTime world
     in
-        if model.person.cameraVR then
+        if model.player1.cameraVR then
             layoutSceneVR windowSize model render
         else if model.numPlayers == 2 then
             layoutScene2 windowSize model render
         else
             layoutScene1 windowSize model render
 
-type alias RenderWorld = Model.Eye -> Window.Size -> Model.Person -> List WebGL.Renderable
+type alias RenderWorld = Model.Eye -> Window.Size -> Model.Player -> List WebGL.Renderable
 
 layoutScene1 : Window.Size -> Model worldModel -> RenderWorld -> Html (Msg worldMsg)
 layoutScene1 windowSize model render =
@@ -63,8 +63,8 @@ layoutScene1 windowSize model render =
                     , ( "right", "0px" )
                     ]
             ]
-            (render Model.OneEye windowSize model.person)
-        , hud model.person 0 0
+            (render Model.OneEye windowSize model.player1)
+        , hud model.player1 0 0
         ]
 
 layoutScene2 : Window.Size -> Model worldModel -> RenderWorld -> Html (Msg worldMsg)
@@ -94,8 +94,8 @@ layoutScene2 windowSize model render =
                       , ( "padding", "0px" )
                       ]
               ]
-              (render Model.OneEye ws2 model.person)
-            , hud model.person 0 w2
+              (render Model.OneEye ws2 model.player1)
+            , hud model.player1 0 w2
             ]
           , div []
             [ WebGL.toHtml
@@ -136,7 +136,7 @@ layoutSceneVR windowSize model render =
                     , ( "float", "left" )
                     ]
             ]
-            (render Model.LeftEye ws2 model.person)
+            (render Model.LeftEye ws2 model.player1)
         , WebGL.toHtml
             [ width w2
             , height windowSize.height
@@ -144,7 +144,7 @@ layoutSceneVR windowSize model render =
                     , ( "float", "right" )
                     ]
             ]
-            (render Model.RightEye ws2 model.person)
+            (render Model.RightEye ws2 model.player1)
         ]
 
 mapApply : List (a -> List b) -> a -> List b
@@ -158,12 +158,12 @@ orient (Thing scale position orientation see) =
     in
         tview (M4.scale scale) << tview (M4.translate position) << tview (M4.rotate rot_angle rot_axis) <| see
 
-eyeOffset : Model.Person -> Model.Eye -> Vec3
-eyeOffset person eye =
+eyeOffset : Model.Player -> Model.Eye -> Vec3
+eyeOffset player eye =
     if eye == Model.LeftEye then
-        Orientation.rotateLabV person.orientation (vec3 (-0.04) 0 0)
+        Orientation.rotateLabV player.orientation (vec3 (-0.04) 0 0)
     else if eye == Model.RightEye then
-        Orientation.rotateLabV person.orientation (vec3 0.04 0 0)
+        Orientation.rotateLabV player.orientation (vec3 0.04 0 0)
     else
         vec3 0 0 0
 
@@ -177,22 +177,22 @@ aboveTerrain eyeLevel pos =
 
 {-| Set up 3D world
 -}
-renderWorld : Time -> Model.World -> Model.Eye -> Window.Size -> Model.Person -> List WebGL.Renderable
-renderWorld globalTime world eye windowSize person =
+renderWorld : Time -> Model.World -> Model.Eye -> Window.Size -> Model.Player -> List WebGL.Renderable
+renderWorld globalTime world eye windowSize player =
     let
         eyeLevel pos = Model.eyeLevel + Terrain.elevation world.terrain pos
-        lensDistort = if person.cameraVR then 0.85 else 0.95
+        lensDistort = if player.cameraVR then 0.85 else 0.95
 
-        p = { cameraPos = Terrain.bounds world.terrain (aboveTerrain eyeLevel person.pos)
-            , viewMatrix = perspective windowSize person eye
+        p = { cameraPos = Terrain.bounds world.terrain (aboveTerrain eyeLevel player.pos)
+            , viewMatrix = perspective windowSize player eye
             , globalTime = globalTime
             , windowSize = windowSize
             , lensDistort = lensDistort
-            , cameraVR = person.cameraVR
+            , cameraVR = player.cameraVR
             , measuredFPS = 30.0
             }
 
-        skybox = orientSkybox world.skybox { p | viewMatrix = skyboxMatrix windowSize person }
+        skybox = orientSkybox world.skybox { p | viewMatrix = skyboxMatrix windowSize player }
 
         things = world.terrain.groundMesh ++ world.terrain.waterMesh ++ world.things
         seeThings = mapApply (List.map orient things)
@@ -201,12 +201,12 @@ renderWorld globalTime world eye windowSize person =
 
 {-| Calculate the viewer's field of view
 -}
-perspective : Window.Size -> Model.Person -> Model.Eye -> Mat4
-perspective { width, height } person eye =
+perspective : Window.Size -> Model.Player -> Model.Eye -> Mat4
+perspective { width, height } player eye =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
-        (M4.makeLookAt (person.cameraPos `add` eyeOffset person eye)
-                       (person.pos `add` (scale 3 (Model.direction person)))
-                       person.cameraUp)
+        (M4.makeLookAt (player.cameraPos `add` eyeOffset player eye)
+                       (player.pos `add` (scale 3 (Model.direction player)))
+                       player.cameraUp)
 
 orientSkybox : Thing -> See
 orientSkybox (Thing scale _ orientation see) =
@@ -216,24 +216,24 @@ orientSkybox (Thing scale _ orientation see) =
     in
         tview (M4.scale scale) << tview (M4.rotate rot_angle rot_axis) <| see
 
-skyboxMatrix : Window.Size -> Model.Person -> Mat4
-skyboxMatrix { width, height } person =
+skyboxMatrix : Window.Size -> Model.Player -> Mat4
+skyboxMatrix { width, height } player =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
         (M4.makeLookAt (vec3 0 0 0)
-                       (scale 3 (Model.direction person))
-                       person.cameraUp)
+                       (scale 3 (Model.direction player))
+                       player.cameraUp)
 
-hud : Model.Person -> Int -> Int -> Html (Msg worldMsg)
-hud person left right =
+hud : Model.Player -> Int -> Int -> Html (Msg worldMsg)
+hud player left right =
     let
-        vehicleName = if person.vehicle == Model.vehicleBird then
+        vehicleName = if player.vehicle == Model.vehicleBird then
                           "Dreambird"
-                      else if person.vehicle == Model.vehicleBuggy then
+                      else if player.vehicle == Model.vehicleBuggy then
                            "Dreambuggy"
-                      else if person.vehicle == Model.vehicleLookAt then
+                      else if player.vehicle == Model.vehicleLookAt then
                            "Look at"
                       else "DreamDebug"
-        wher = if person.cameraInside then "Inside" else "Outside"
+        wher = if player.cameraInside then "Inside" else "Outside"
     in div
        [ style
            [ ( "position", "absolute" )

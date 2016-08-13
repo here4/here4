@@ -52,7 +52,7 @@ type alias World =
     , skybox : Thing
     }
 
-type alias Person =
+type alias Player =
     { pos : Vec3
     , velocity : Vec3
     , orientation : Orientation.Orientation
@@ -71,8 +71,8 @@ type alias EyeLevel = Vec3 -> Float
 eyeLevel : Float
 eyeLevel = 1.8 -- Make this a function of Vehicle
 
-defaultPerson : Person
-defaultPerson =
+defaultPlayer : Player
+defaultPlayer =
     { pos = vec3 0 30 0 
     , velocity = vec3 0 0 0
     , orientation = Orientation.initial
@@ -129,8 +129,8 @@ type alias MouseMovement = (Int, Int)
 {-| This is the application's Model data structure -}
 type alias Model worldModel =
     { numPlayers : Int
-    , person : Person
-    , player2 : Person
+    , player1 : Player
+    , player2 : Player
     , globalTime : Time
     , maybeWindowSize : Maybe Window.Size
     , keys : Keys
@@ -158,8 +158,8 @@ init : (worldModel, Cmd worldMsg) -> Args -> (Model worldModel, Cmd (Msg worldMs
 init worldInit { movement, isLocked } =
     let (worldModel, worldCmdMsg) = worldInit in
     ( { numPlayers = 1
-      , person = defaultPerson
-      , player2 = defaultPerson
+      , player1 = defaultPlayer
+      , player2 = defaultPlayer
       , globalTime = 0
       , maybeWindowSize = Nothing
       , keys = Keys False False False False False
@@ -178,13 +178,13 @@ init worldInit { movement, isLocked } =
         ]
     )
 
-orient : Person -> Vec3 -> Vec3
-orient person = Orientation.rotateBodyV person.orientation
+orient : Player -> Vec3 -> Vec3
+orient player = Orientation.rotateBodyV player.orientation
 
-direction : Person -> Vec3
-direction person = orient person V3.k
+direction : Player -> Vec3
+direction player = orient player V3.k
 
-cameraUp : Person -> Vec3
--- cameraUp person = orient person V3.j
--- cameraUp person = Qn.vrotate (Qn.negate person.orientQn) V3.j
-cameraUp person = Orientation.rotateLabV person.orientation V3.j
+cameraUp : Player -> Vec3
+-- cameraUp player = orient player V3.j
+-- cameraUp player = Qn.vrotate (Qn.negate player.orientQn) V3.j
+cameraUp player = Orientation.rotateLabV player.orientation V3.j

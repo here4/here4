@@ -9,18 +9,18 @@ import Model
 ----------------------------------------------------------------------
 -- DreamBird
 
-move : Model.EyeLevel -> Model.Inputs -> Model.Person -> Model.Person
-move eyeLevel inputs person = 
-    person |> fly eyeLevel inputs
+move : Model.EyeLevel -> Model.Inputs -> Model.Player -> Model.Player
+move eyeLevel inputs player = 
+    player |> fly eyeLevel inputs
            |> flyPhysics eyeLevel inputs.dt
 
 -- | Welcome a new driver to the DreamBird
-welcome : Model.Person -> Model.Person
-welcome person = person
+welcome : Model.Player -> Model.Player
+welcome player = player
 
 -- http://www.dtic.mil/dtic/tr/fulltext/u2/a152616.pdf
-fly : Model.EyeLevel -> Model.Inputs -> Model.Person -> Model.Person
-fly eyeLevel inputs person =
+fly : Model.EyeLevel -> Model.Inputs -> Model.Player -> Model.Player
+fly eyeLevel inputs player =
     let
         thrust = inputs.y
 
@@ -28,26 +28,26 @@ fly eyeLevel inputs person =
         pitch =  4 * inputs.my * inputs.dt
         roll  =  6 * inputs.mx * inputs.dt
 
-        -- orientQn = Qn.hamilton person.orientQn (Qn.fromEuler (roll, pitch, yaw))
+        -- orientQn = Qn.hamilton player.orientQn (Qn.fromEuler (roll, pitch, yaw))
         -- orient = Qn.vrotate orientQn
         orpy = fromRollPitchYaw (roll, pitch, yaw)
-        orientation = person.orientation `followedBy` orpy
+        orientation = player.orientation `followedBy` orpy
         orient = rotateBodyV orientation
 
         dv = V3.scale (50 * thrust * inputs.dt) <| orient V3.k
         du = V3.scale (20 * thrust * inputs.dt) <| orient V3.j
         dv' = dv `add` du
 
-        vel = (V3.scale 0.8 dv') `add` (V3.scale 0.95 person.velocity)
+        vel = (V3.scale 0.8 dv') `add` (V3.scale 0.95 player.velocity)
         
     in
-        { person | orientation = orientation
+        { player | orientation = orientation
                  , velocity = vel
         }
 
-flyPhysics : Model.EyeLevel -> Float -> Model.Person -> Model.Person
-flyPhysics eyeLevel dt person =
-    let pos = person.pos `add` V3.scale dt person.velocity
+flyPhysics : Model.EyeLevel -> Float -> Model.Player -> Model.Player
+flyPhysics eyeLevel dt player =
+    let pos = player.pos `add` V3.scale dt player.velocity
         p = toRecord pos
         e = eyeLevel pos
 
@@ -56,5 +56,5 @@ flyPhysics eyeLevel dt person =
                      else
                          (pos, vec3 0 0 0)
     in
-        { person | pos = pos', velocity = person.velocity `add` dv }
+        { player | pos = pos', velocity = player.velocity `add` dv }
 
