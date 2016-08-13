@@ -14,7 +14,7 @@ import Model
 move : Model.EyeLevel -> Model.Inputs -> Model.Player -> Model.Player
 move eyeLevel inputs player =
     player |> turn eyeLevel inputs.mx inputs.my
-           |> walk eyeLevel inputs
+           |> drive eyeLevel inputs
            |> physics eyeLevel inputs.dt
 
 -- | Welcome a new driver to the DreamBuggy
@@ -54,8 +54,8 @@ turn eyeLevel dx dy player =
     in
         { player | orientation = orientation }
 
-walk : Model.EyeLevel -> { a | x:Float, y:Float, dt:Float } -> Model.Player -> Model.Player
-walk eyeLevel inputs player =
+drive : Model.EyeLevel -> { a | x:Float, y:Float, dt:Float } -> Model.Player -> Model.Player
+drive eyeLevel inputs player =
   -- if getY player.pos > eyeLevel player.pos then player else
     let moveDir = normalize (flatten (Model.direction player))
         strafeDir = transform (makeRotate (degrees -90) j) moveDir
