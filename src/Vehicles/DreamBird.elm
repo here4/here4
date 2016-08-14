@@ -9,14 +9,14 @@ import Model
 ----------------------------------------------------------------------
 -- DreamBird
 
+-- | Welcome a new driver to the DreamBird
+welcome : Model.Player -> Model.Player
+welcome player = player
+
 move : Model.EyeLevel -> Model.Inputs -> Model.Player -> Model.Player
 move eyeLevel inputs player = 
     player |> fly eyeLevel inputs
            |> flyPhysics eyeLevel inputs.dt
-
--- | Welcome a new driver to the DreamBird
-welcome : Model.Player -> Model.Player
-welcome player = player
 
 -- http://www.dtic.mil/dtic/tr/fulltext/u2/a152616.pdf
 fly : Model.EyeLevel -> Model.Inputs -> Model.Player -> Model.Player

@@ -11,15 +11,15 @@ import Model
 ----------------------------------------------------------------------
 -- DreamBuggy
 
+-- | Welcome a new driver to the DreamBuggy
+welcome : Model.Player -> Model.Player
+welcome player = { player | orientation = clampBuggy player.orientation }
+
 move : Model.EyeLevel -> Model.Inputs -> Model.Player -> Model.Player
 move eyeLevel inputs player =
     player |> turn eyeLevel inputs.mx inputs.my
            |> drive eyeLevel inputs
            |> physics eyeLevel inputs.dt
-
--- | Welcome a new driver to the DreamBuggy
-welcome : Model.Player -> Model.Player
-welcome player = { player | orientation = clampBuggy player.orientation }
 
 clampBuggy : Orientation -> Orientation
 clampBuggy o =
