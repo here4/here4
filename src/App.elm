@@ -31,7 +31,7 @@ programWithFlags
     , terrain : model -> Maybe Terrain
     , focus : model -> Maybe Focus
     }
-  -> Program Model.Args
+  -> Program Model.Args (Model.Model model) (Model.Msg (Dispatch CtrlMsg msg))
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init

@@ -1,4 +1,4 @@
-module TerrainWorld exposing (create)
+module TerrainWorld exposing (create, WorldModel, MyWorldMsg)
 
 import Bag exposing (Bag)
 import Time exposing (Time)
@@ -19,7 +19,7 @@ import Things.Surface2D exposing (Placement, defaultPlacement)
 import Things.Terrain as Terrain
 
 create : { things : List (Things, Cmd ThingMsg) , staticThings : List Thing, skybox : Thing }
-    -> Program Args
+    -> Program Args (Model.Model WorldModel) (Model.Msg (Dispatch CtrlMsg MyWorldMsg))
 create details =
   App.programWithFlags
     { init = worldInit details

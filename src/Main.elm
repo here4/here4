@@ -3,6 +3,7 @@ module Main exposing (main)
 import Math.Vector3 exposing (vec3)
 
 import Model exposing (Args)
+import Dispatch
 import TerrainWorld
 import Thing exposing (..)
 
@@ -15,6 +16,8 @@ import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Things.Sphere exposing (skySphere, cloudsSphere)
 
 main : Program Args
+        (Model.Model TerrainWorld.WorldModel)
+        (Model.Msg (Dispatch.Dispatch CtrlMsg TerrainWorld.MyWorldMsg))
 main =
   TerrainWorld.create
     { things =
