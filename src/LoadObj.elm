@@ -202,8 +202,8 @@ sendRaw mb plush = Signal.send mb.address plush
 loadMesh infile = Signal.map mesh objMailbox.signal
 
 
-objThing : Drawable VertVTN -> Perception -> List Renderable
-objThing mesh p = [render vertexShader fragmentShader mesh { view = p.viewMatrix }]
+objThing : Mesh VertVTN -> Perception -> List Entity
+objThing mesh p = [entity vertexShader fragmentShader mesh { view = p.viewMatrix }]
 
 loadObj infile = Signal.map objThing (loadMesh infile)
 
@@ -212,14 +212,14 @@ objJeepMailbox = Signal.mailbox ""
 
 loadJeepMesh = Signal.map mesh objJeepMailbox.signal
 
-jeepThing : Drawable VertVTN -> Perception -> List Renderable
+jeepThing : Mesh VertVTN -> Perception -> List Entity
 jeepThing mesh p =
     let
         rv = p.viewMatrix
              |> M4.translate (vec3 -2 -2 0)
              |> M4.rotate (degrees -90) V3.i
     in
-        [render vertexShader fragmentShader mesh { view = rv }]
+        [entity vertexShader fragmentShader mesh { view = rv }]
 
 loadJeep infile = Signal.map jeepThing loadJeepMesh
 
@@ -235,7 +235,7 @@ main = Signal.map scene meshSig (foldp (+) 0 (fps 30))
 scene : [Triangle VertVTN] -> Float -> Element
 scene teapot t =
     webgl (400,400)
-    [ render vertexShader fragmentShader teapot { view = view (t / 1000), m_normal = normal (t / 1000) } ]
+    [ entity vertexShader fragmentShader teapot { view = view (t / 1000), m_normal = normal (t / 1000) } ]
 
 view : Float -> Mat4
 view t =

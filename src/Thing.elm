@@ -4,7 +4,7 @@ import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (Mat4)
 import Time exposing (Time)
-import WebGL exposing (Renderable)
+import WebGL exposing (Entity)
 import Window
 
 import Dispatch exposing (..)
@@ -122,7 +122,7 @@ type alias Focus = {
     pos : Vec3
 }
 
-type alias See = Perception -> List Renderable
+type alias See = Perception -> List Entity
 
 type Thing = Thing Vec3 Vec3 Vec3 See
 

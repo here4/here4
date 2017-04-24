@@ -27,15 +27,15 @@ seeWedge p =
         s = p.globalTime
         detail = p.measuredFPS / 3.0
     in
-        [ render worldVertex voronoiDistances topMesh
+        [ entity worldVertex voronoiDistances topMesh
             { iResolution=resolution, iGlobalTime=s
             , iLensDistort=p.lensDistort, view=p.viewMatrix }
-        , render noiseVertex noiseColorFragment bottomMesh
+        , entity noiseVertex noiseColorFragment bottomMesh
             { iResolution=resolution, iDetail=detail, iGlobalTime=s
             , iGlobalTimeV=s, iLensDistort=p.lensDistort, view=p.viewMatrix }
         ]
 
-topMesh : Drawable Vertex
+topMesh : Mesh Vertex
 topMesh =
     let white = vec3 1 1 1
         wHead = { pos = vec3    0 0    1,   color = white, coord = vec3    0 0 0 }
@@ -48,7 +48,7 @@ topMesh =
         Triangle <| [ (wHead, wLB, wLT), (wHead, wLT, wRT), (wHead, wRT, wRB)
                     , (wLT, wLB, wCB), (wLT, wCB, wRT), (wRT, wCB, wRB) ]
 
-bottomMesh : Drawable NoiseVertex
+bottomMesh : Mesh NoiseVertex
 bottomMesh =
     let white = vec4 0.1 0.1 0.7 1.7 
         wHead = { pos = vec3    0 0    1,   color = white, coord = vec3    0 0 0

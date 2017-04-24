@@ -40,12 +40,12 @@ seeBFly vertexShader fragmentShader flapStart p =
         flapL = makeRotate (-flap * 3*pi/8) (vec3 0 0 1)
         flapR = makeRotate (flap * 3*pi/8) (vec3 0 0 1)
     in
-        [render vertexShader fragmentShader mesh
+        [entity vertexShader fragmentShader mesh
             { iResolution=resolution, iGlobalTime=s, iHMD=iHMD
             , iLensDistort=p.lensDistort, view=p.viewMatrix, flapL=flapL, flapR=flapR }
         ]
 
-mesh : Drawable BoidVertex
+mesh : Mesh BoidVertex
 mesh =
     let white  = vec3 1 1 1
         bHead  = { pos = vec3 0 0 0.5, color = white, coord = vec3 0.5 0 0, wing = vec3 0 0 0 }
@@ -53,7 +53,7 @@ mesh =
         bLeft  = { pos = vec3 -0.7 0 -0.7, color = white, coord = vec3 0 0.5 0, wing = vec3 -1 0 0 }
         bRight = { pos = vec3 0.7 0 -0.7, color = white, coord = vec3 1 0.5 0, wing = vec3 1 0 0 }
     in
-        Triangle <| [ (bHead, bTail, bLeft), (bHead, bTail, bRight) ]
+        triangles <| [ (bHead, bTail, bLeft), (bHead, bTail, bRight) ]
 
 bflyVertex : Shader BoidVertex { u | iLensDistort:Float, view:Mat4, flapL:Mat4, flapR:Mat4 } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
 bflyVertex = [glsl|

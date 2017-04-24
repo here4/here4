@@ -30,7 +30,7 @@ diamond vertexShader fragmentShader p =
         s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0
     in
-        [ render vertexShader fragmentShader diamondMesh
+        [ entity vertexShader fragmentShader diamondMesh
             { iResolution = resolution, iGlobalTime = s, iHMD=iHMD
             , iLensDistort = p.lensDistort, view = p.viewMatrix } ]
 
@@ -59,7 +59,7 @@ seven = unfold 7 (rotBoth 8)
 eights : Vertex -> (List Vertex, List Vertex)
 eights x = let x7 = seven x in (x::x7, x7++[x])
 
-diamondMesh : Drawable Vertex
+diamondMesh : Mesh Vertex
 diamondMesh =
   let
       white = vec3 1 1 1

@@ -60,20 +60,20 @@ noiseSurface2D skip placement xz = surface noiseVertex noiseColorFragment
     << surfaceMesh xz skip placement
 
 surface : Shader NoiseVertex NoiseVertexInput b -> Shader {} NoiseVertexInput b
-    -> Drawable NoiseVertex -> Oriented (Visible {})
+    -> Mesh NoiseVertex -> Oriented (Visible {})
 surface vertexShader fragmentShader mesh =
     let see = seeSurface vertexShader fragmentShader mesh
     in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
 seeSurface : Shader NoiseVertex NoiseVertexInput b -> Shader {} NoiseVertexInput b
-    -> Drawable NoiseVertex -> See
+    -> Mesh NoiseVertex -> See
 seeSurface vertexShader fragmentShader mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0
         detail = p.measuredFPS / 3.0
     in
-        [render vertexShader fragmentShader mesh
+        [entity vertexShader fragmentShader mesh
             { iGlobalTime=s, iResolution=resolution, iHMD=iHMD, iDetail=detail
             , iGlobalTimeV=s, iLensDistort=p.lensDistort, view=p.viewMatrix
             }
@@ -86,20 +86,20 @@ rippleNoiseSurface2D skip ripple placement xz = rippleSurface rippleNoiseVertex 
     << surfaceMeshMaybe xz skip placement
 
 rippleSurface : Shader NoiseVertex RippleNoiseVertexInput b -> Shader {} RippleNoiseVertexInput b -> Float
-    -> Drawable NoiseVertex -> Oriented (Visible {})
+    -> Mesh NoiseVertex -> Oriented (Visible {})
 rippleSurface vertexShader fragmentShader ripple mesh =
     let see = rippleSeeSurface vertexShader fragmentShader ripple mesh
     in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
 
 rippleSeeSurface : Shader NoiseVertex RippleNoiseVertexInput b -> Shader {} RippleNoiseVertexInput b -> Float
-    -> Drawable NoiseVertex -> See
+    -> Mesh NoiseVertex -> See
 rippleSeeSurface vertexShader fragmentShader ripple mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0
         detail = p.measuredFPS / 3.0
     in
-        [render vertexShader fragmentShader mesh
+        [entity vertexShader fragmentShader mesh
             { iGlobalTime=s, iResolution=resolution, iHMD=iHMD, iDetail=detail
             , iGlobalTimeV=s, iLensDistort=p.lensDistort, view=p.viewMatrix, iRipple=ripple
             }
@@ -130,7 +130,7 @@ matRow (rx,rz) skip placement z =
       m 0.0 rx
 
 surfaceMesh : (Float,Float) -> Int -> Placement -> List (List NoiseSurfaceVertex)
-    -> Drawable NoiseVertex
+    -> Mesh NoiseVertex
 surfaceMesh (rx,rz) skip placement m =
     let
         zs = indexedMap (\ix _ -> placement.zOffset + placement.zDelta * toFloat ix) m
@@ -171,7 +171,7 @@ matRowMaybe (rx,rz) skip placement z =
       m 0.0 rx
 
 surfaceMeshMaybe : (Float,Float) -> Int -> Placement -> List (List (Maybe NoiseSurfaceVertex))
-    -> Drawable NoiseVertex
+    -> Mesh NoiseVertex
 surfaceMeshMaybe (rx,rz) skip placement m =
     let
         zs = indexedMap (\ix _ -> placement.zOffset + placement.zDelta * toFloat ix) m

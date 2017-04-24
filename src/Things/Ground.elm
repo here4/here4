@@ -18,13 +18,13 @@ renderGround p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
     in
-        [render worldVertex colorFragment groundMesh
+        [entity worldVertex colorFragment groundMesh
             { iResolution=resolution, iGlobalTime=s
             , iLensDistort=p.lensDistort, view=p.viewMatrix }]
 
 
 -- The mesh for the ground
-groundMesh : Drawable Vertex
+groundMesh : Mesh Vertex
 groundMesh =
   let green = hslToVec3 (degrees 110) 0.48
 

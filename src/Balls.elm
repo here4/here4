@@ -8,7 +8,7 @@ import Dispatch exposing (..)
 import Thing exposing (..)
 import Things.Sphere exposing (fogMountainsSphere)
 
-import Math.RandomVector exposing (randomVec3')
+import Math.RandomVector exposing (randomVec3)
 import Physics.Collisions exposing (collisions)
 import Physics.Drop exposing (..)
 
@@ -27,8 +27,8 @@ create n = createThings (init n)
 randomDrop : Random.Generator (Drop (Visible {}))
 randomDrop = Random.map2
     (\pos vel -> newDrop pos vel fogMountainsSphere)
-    (Random.map (add (vec3 0 30 0)) (randomVec3' 4.0))
-    (randomVec3' 8.0)
+    (Random.map (add (vec3 0 30 0)) (randomVec3 4.0))
+    (randomVec3 8.0)
 
 randomBalls : Int -> Random.Generator Balls
 randomBalls n = Random.list n randomDrop

@@ -1,4 +1,4 @@
-module Math.RandomVector exposing (randomVec3')
+module Math.RandomVector exposing (randomVec3)
 
 import Random
 
@@ -17,22 +17,22 @@ fromSpherical r theta phi =
 {- Generate a random vector with given length
    http://mathworld.wolfram.com/SpherePointPicking.html
 -}
-randomVec3' : Float -> Random.Generator Vec3
-randomVec3' r =
+randomVec3 : Float -> Random.Generator Vec3
+randomVec3 r =
     let fromUV u v =
             let theta = 2 * pi * u
                 phi = acos (2 * v - 1)
             in fromSpherical r theta phi
     in Random.map2 fromUV (Random.float 0.0 1.0) (Random.float 0.0 1.0)
 
-randomUnitVec3' : Random.Generator Vec3
-randomUnitVec3' = randomVec3' 1
+randomUnitVec3 : Random.Generator Vec3
+randomUnitVec3 = randomVec3 1
 
-randomVec3s' : Int -> Float -> Random.Generator (List Vec3)
-randomVec3s' n r = Random.list n (randomVec3' r)
+randomVec3s : Int -> Float -> Random.Generator (List Vec3)
+randomVec3s n r = Random.list n (randomVec3 r)
 
-randomVec3 : Float -> Vec3
-randomVec3 r =
+randomVec3_ : Float -> Vec3
+randomVec3_ r =
     let fromUV (u,v) =
             let theta = 2 * pi * u
                 phi = acos (2 * v - 1)
@@ -41,14 +41,14 @@ randomVec3 r =
     -- in Signal.map fromUV (list 2 (float 0 1))
     in fromUV (0.3, 0.7)
 
-randomUnitVec3 : Vec3
-randomUnitVec3 = randomVec3 1
+randomUnitVec3_ : Vec3
+randomUnitVec3_ = randomVec3_ 1
 
 {- Generate n random vectors with given length
    http://mathworld.wolfram.com/SpherePointPicking.html
 -}
-randomVec3s : Int -> Float -> List Vec3
-randomVec3s n r =
+randomVec3s_ : Int -> Float -> List Vec3
+randomVec3s_ n r =
     let fromUV (u,v) =
             let theta = 2 * pi * u
                 phi = acos (2 * v - 1)
@@ -62,5 +62,5 @@ randomVec3s n r =
     in List.map fromUV (pairs (rampList (2*n)))
 
 rampList : Int -> List Float
-rampList n = List.map (\x -> (toFloat x)/(toFloat n)) [1..n]
+rampList n = List.map (\x -> (toFloat x)/(toFloat n)) (List.range 1 n)
 

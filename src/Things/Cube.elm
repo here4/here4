@@ -17,22 +17,22 @@ import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 type alias Triple a = (a,a,a)
 
-skyCube : Perception -> List Renderable
+skyCube : Perception -> List Entity
 skyCube = cube worldVertex sky
 
-cloudsCube : Perception -> List Renderable
+cloudsCube : Perception -> List Entity
 cloudsCube = cube worldVertex clouds
 
-fireCube : Perception -> List Renderable
+fireCube : Perception -> List Entity
 fireCube = cube worldVertex fire
 
-fogMountainsCube : Perception -> List Renderable
+fogMountainsCube : Perception -> List Entity
 fogMountainsCube = cube worldVertex fogMountains
 
-plasmaCube : Perception -> List Renderable
+plasmaCube : Perception -> List Entity
 plasmaCube = cube worldVertex simplePlasma
 
-voronoiCube : Perception -> List Renderable
+voronoiCube : Perception -> List Entity
 voronoiCube = cube worldVertex voronoiDistances
 
 cube : Shader Vertex ThingShaderInput a -> Shader {} ThingShaderInput a -> See
@@ -41,7 +41,7 @@ cube vertexShader fragmentShader p =
         s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0
     in
-        [ render vertexShader fragmentShader mesh
+        [ entity vertexShader fragmentShader mesh
             { iResolution = resolution, iHMD = iHMD, iGlobalTime = s
             , iLensDistort = p.lensDistort, view = p.viewMatrix } ]
 
@@ -50,13 +50,13 @@ textureCube texture p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         iHMD = if p.cameraVR then 1.0 else 0.0
     in
-        [ render worldVertex textureFragment mesh
+        [ entity worldVertex textureFragment mesh
             { iResolution = resolution, iHMD = iHMD, iTexture = texture
             , iLensDistort = p.lensDistort, view = p.viewMatrix } ]
 
 {-| The mesh for a cube -}
-mesh : Drawable Vertex
-mesh = Triangle <| List.concatMap rotatedFace [ (0,0,0), (90,0,1), (180,0,2), (270,0,3), (0,90,0), (0,-90,0) ]
+mesh : Mesh Vertex
+mesh = triangles <| List.concatMap rotatedFace [ (0,0,0), (90,0,1), (180,0,2), (270,0,3), (0,90,0), (0,-90,0) ]
 
 -- rotatedFace : (Float,Float) -> List ({ pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 })
 rotatedFace : (Float,Float,Float) -> List (Triple Vertex)

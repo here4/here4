@@ -7,7 +7,7 @@ module App exposing (programWithFlags)
 -}
 
 import AnimationFrame
-import Html.App as Html
+import Html
 import Keyboard
 import Mouse
 import Time exposing (Time)

@@ -42,7 +42,7 @@ layoutScene windowSize model world =
         else
             layoutScene1 windowSize model render
 
-type alias RenderWorld = Model.Eye -> Window.Size -> Model.Player -> List WebGL.Renderable
+type alias RenderWorld = Model.Eye -> Window.Size -> Model.Player -> List WebGL.Entity
 
 layoutScene1 : Window.Size -> Model worldModel -> RenderWorld -> Html (Msg worldMsg)
 layoutScene1 windowSize model render =
@@ -177,7 +177,7 @@ aboveTerrain eyeLevel pos =
 
 {-| Set up 3D world
 -}
-renderWorld : Time -> Model.World -> Model.Eye -> Window.Size -> Model.Player -> List WebGL.Renderable
+renderWorld : Time -> Model.World -> Model.Eye -> Window.Size -> Model.Player -> List WebGL.Entity
 renderWorld globalTime world eye windowSize player =
     let
         eyeLevel pos = Model.eyeLevel + Terrain.elevation world.terrain pos

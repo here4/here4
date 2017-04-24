@@ -47,12 +47,12 @@ seePortal vertexShader fragmentShader p =
         resolution = vec3 (toFloat w) (toFloat h) 0
         s = p.globalTime
     in
-        [render vertexShader fragmentShader mesh
+        [entity vertexShader fragmentShader mesh
             { iResolution=resolution, iGlobalTime=s
             , iLensDistort=p.lensDistort, view=p.viewMatrix }]
 
 -- mesh : List (Triple Vertex)
-mesh : Drawable Vertex
+mesh : Mesh Vertex
 mesh = Triangle face
 {-
 mesh = concatMap rotatedFace [ (0,0), (90,0), (180,0), (270,0), (0,90), (0,-90) ]

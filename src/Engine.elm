@@ -24,7 +24,7 @@ type alias Perception = {
     measuredFPS : Float
 }
 
-type alias See = Perception -> List Renderable
+type alias See = Perception -> List Entity
 
 type alias Visible a = { a | see : See }
 

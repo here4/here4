@@ -19,10 +19,10 @@ spheres : Int -> Shader {} ThingShaderInput { elm_FragColor : Vec3, elm_FragCoor
     -> List (Oriented (Visible {}))
 spheres n fragmentShader = map (always (sphere worldVertex fragmentShader)) [0..n]
 
-skySphere : Perception -> List Renderable
+skySphere : Perception -> List Entity
 skySphere = seeSphere worldVertex sky
 
-cloudsSphere : Perception -> List Renderable
+cloudsSphere : Perception -> List Entity
 cloudsSphere = seeSphere worldVertex clouds
 
 fogMountainsSphere : Oriented (Visible {})
@@ -41,7 +41,7 @@ seeSphere vertexShader fragmentShader p =
         s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0
     in
-        [render vertexShader fragmentShader sphereMesh
+        [entity vertexShader fragmentShader sphereMesh
             { iResolution=resolution, iGlobalTime=s, iHMD=iHMD
             , iLensDistort = p.lensDistort, view = p.viewMatrix }]
 
@@ -80,7 +80,7 @@ unfoldMercator n = unfold (n-1) (rotMercator (toFloat n))
 verticesMercator : Int -> Vertex -> (List Vertex, List Vertex)
 verticesMercator n x = let xs = unfoldMercator n x in (x::xs, xs++[x])
 
-sphereMesh : Drawable Vertex
+sphereMesh : Mesh Vertex
 sphereMesh =
   let
       white = vec3 1 1 1
