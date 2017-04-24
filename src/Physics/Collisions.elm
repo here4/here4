@@ -14,7 +14,7 @@ type alias BBall a = Massive (Spherical (Moving a))
 -- TODO: merge these next two functions
 -- timeStep : TimeLeft (Moving a) -> Moving a
 timeStep : TimeLeft (BBall a) -> TimeLeft (BBall a)
-timeStep (x, timeLeft) = ({ x  | pos = x.pos `V3.add` (V3.scale timeLeft x.velocity) }, timeLeft)
+timeStep (x, timeLeft) = ({ x  | pos = V3.add x.pos (V3.scale timeLeft x.velocity) }, timeLeft)
 
 stripTimeStep : TimeLeft a -> a
 stripTimeStep (x,_) = x
@@ -33,8 +33,8 @@ updatePairs f arr0 =
         update m n arr = case g (Array.get m arr) (Array.get n arr) of
             Nothing       -> arr
             Just (vm, vn) -> Array.set m vm << Array.set n vn <| arr
-        row m arr = List.foldl (update m) arr [m+1..len-1]
-    in List.foldl row arr0 [0..len-1]
+        row m arr = List.foldl (update m) arr (List.range (m+1) (len-1))
+    in List.foldl row arr0 (List.range 0 (len-1))
 
 {- Collision between two spheres
    http://www.gamasutra.com/view/feature/131424/pool_hall_lessons_fast_accurate_.php?page=2
@@ -116,8 +116,8 @@ collide dt (a,ta) (b,tb) =
               movedB = { b | pos = V3.add b.pos collisionVectorB }
 
               -- Projection of movement onto new centerDisplacement
-              centerDisplacement' = V3.sub movedA.pos movedB.pos
-              nnn = V3.normalize centerDisplacement'
+              centerDisplacement_ = V3.sub movedA.pos movedB.pos
+              nnn = V3.normalize centerDisplacement_
               projA = V3.dot a.velocity nnn
               projB = V3.dot b.velocity nnn
 

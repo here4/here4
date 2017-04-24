@@ -136,7 +136,7 @@ surfaceMesh (rx,rz) skip placement m =
         zs = indexedMap (\ix _ -> placement.zOffset + placement.zDelta * toFloat ix) m
         rows = List.map2 (matRow (rx,rz) skip placement) (subsample skip zs) (subsample skip m)
     in
-        Triangle <| List.concat <| List.map2 mkStrip rows (drop 1 rows)
+        triangles <| List.concat <| List.map2 mkStrip rows (drop 1 rows)
 
 ----------------------------------------------------------------------
 
@@ -177,4 +177,4 @@ surfaceMeshMaybe (rx,rz) skip placement m =
         zs = indexedMap (\ix _ -> placement.zOffset + placement.zDelta * toFloat ix) m
         rows = List.map2 (matRowMaybe (rx,rz) skip placement) (subsample skip zs) (subsample skip m)
     in
-        Triangle <| List.concat <| List.map2 mkStripMaybe rows (drop 1 rows)
+        triangles <| List.concat <| List.map2 mkStripMaybe rows (drop 1 rows)

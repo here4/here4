@@ -25,25 +25,25 @@ boidOrientation b =
     in V3.normalize (vec3 v.x (v.y/10) v.z)
 
 stepBoid : Time -> Moving a -> Moving a
-stepBoid dt b = { b | pos = b.pos `V3.add` (V3.scale dt b.velocity), orientation = boidOrientation b }
+stepBoid dt b = { b | pos = V3.add b.pos ((V3.scale dt b.velocity)), orientation = boidOrientation b }
 
 rule1 : Int -> Vec3 -> Boid a -> Vec3 
 rule1 n sumPos b =
     let perceived_scale = 1.0 / (toFloat (n-1))
-        perceived_center = V3.scale perceived_scale (sumPos `V3.sub` b.pos)
-    in V3.scale (1/100) <| perceived_center `V3.sub` b.pos
+        perceived_center = V3.scale perceived_scale (V3.sub sumPos b.pos)
+    in V3.scale (1/100) <| V3.sub perceived_center b.pos
 
 rule2 : List Vec3 -> Boid a -> Vec3
 rule2 poss b =
     let f pos = let d = V3.distanceSquared pos b.pos
-                in if (d > 0 && d < 10.0) then b.pos `V3.sub` pos else vec3 0 0 0
+                in if (d > 0 && d < 10.0) then V3.sub b.pos pos else vec3 0 0 0
     in V3.scale (1/2) <| sumVec3s (List.map f poss)
 
 rule3 : Int -> Vec3 -> Boid a -> Vec3
 rule3 n sumVel b =
     let perceived_scale = 1.0 / (toFloat (n-1))
-        perceived_vel = V3.scale perceived_scale (sumVel `V3.sub` b.velocity)
-    in V3.scale (1/15) <| perceived_vel `V3.sub` b.velocity
+        perceived_vel = V3.scale perceived_scale (V3.sub sumVel b.velocity)
+    in V3.scale (1/15) <| V3.sub perceived_vel b.velocity
 
 bounds : Boid a -> Vec3
 bounds b =
@@ -67,8 +67,8 @@ moveBoids dt boids =
         r3s = List.map (rule3 nboids sumVel) boids
         box = List.map bounds boids
         applyRules b r1 r2 r3 r4 = { b |
-            velocity = boundVelocity (b.velocity `V3.add` (V3.scale dt
-                (r1 `V3.add` r2 `V3.add` r3 `V3.add` r4))) }
+            velocity = boundVelocity (V3.add b.velocity (V3.scale dt
+                (V3.add r1 (V3.add r2 (V3.add r3 r4))))) }
         bs = List.map5 applyRules boids r1s r2s r3s box
     in List.map (stepBoid dt) bs
 

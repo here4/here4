@@ -48,6 +48,6 @@ moveDrops dt balls =
     let
         gs = List.map gravity balls
         applyRules b g = { b |
-            velocity = (b.velocity `V3.add` (V3.scale dt g)) }
+            velocity = (V3.add b.velocity (V3.scale dt g)) }
         bs = List.map bounds <| List.map2 applyRules balls gs
     in List.map (\x -> { x | orientation = dropOrientation x }) <| bs

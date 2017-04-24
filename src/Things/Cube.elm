@@ -64,11 +64,11 @@ rotatedFace (angleX,angleY,coordX) =
   let
     x = makeRotate (degrees angleX) (vec3 1 0 0)
     y = makeRotate (degrees angleY) (vec3 0 1 0)
-    t = x `mul` y `mul` makeTranslate (vec3 0 0 1)
+    t = mul x (mul y (makeTranslate (vec3 0 0 1)))
     each f (a,b,c) =
       (f a, f b, f c)
   in
-    List.map (each (\x -> {x | pos = transform t x.pos, coord = vec3 coordX 0 0 `add` x.coord })) face
+    List.map (each (\x -> {x | pos = transform t x.pos, coord = add (vec3 coordX 0 0) x.coord })) face
 
 
 -- face : List ({ pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 })

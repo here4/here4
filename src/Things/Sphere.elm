@@ -13,11 +13,11 @@ import Shaders.Sky exposing (sky)
 import Shaders.FogMountains exposing (fogMountains)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
-type alias Triangle a = (a,a,a)
+-- type alias Triangle a = (a,a,a)
 
 spheres : Int -> Shader {} ThingShaderInput { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
     -> List (Oriented (Visible {}))
-spheres n fragmentShader = map (always (sphere worldVertex fragmentShader)) [0..n]
+spheres n fragmentShader = map (always (sphere worldVertex fragmentShader)) (List.range 0 n)
 
 skySphere : Perception -> List Entity
 skySphere = seeSphere worldVertex sky
@@ -52,7 +52,7 @@ unfold n f x = if n==0 then [] else
 zip3 : List a -> List b -> List c -> List (a,b,c)
 zip3 xs ys zs =
   case (xs, ys, zs) of
-    (x::xs', y::ys', z::zs') -> (x,y,z) :: zip3 xs' ys' zs'
+    (x::xs1, y::ys1, z::zs1) -> (x,y,z) :: zip3 xs1 ys1 zs1
     _ -> []
 
 rotY : Float -> Mat4
@@ -106,9 +106,9 @@ sphereMesh =
               band1L = zip3 band20 band11 band21
           in band1U ++ band1L
 
-      qs0 n = map (\x -> x/n) [0..n]
+      qs0 n = map (\x -> (toFloat x)/(toFloat n)) (List.range 0 n)
       qs = map (sin << (\x -> x*pi/2)) (qs0 30)
       nbands = concat (map2 nband qs (drop 1 qs))
       sbands = concat (map2 sband qs (drop 1 qs))
   in
-      Triangle <| nbands ++ sbands
+      triangles <| nbands ++ sbands

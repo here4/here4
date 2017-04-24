@@ -13,7 +13,7 @@ import Shaders.Sky exposing (sky)
 import Shaders.FogMountains exposing (fogMountains)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
-type alias Triangle a = (a,a,a)
+-- type alias Triangle a = (a,a,a)
 
 skyDiamond : See
 skyDiamond = diamond worldVertex sky
@@ -41,7 +41,7 @@ unfold n f x = if n==0 then [] else
 zip3 : List a -> List b -> List c -> List (a,b,c)
 zip3 xs ys zs =
   case (xs, ys, zs) of
-    (x::xs', y::ys', z::zs') -> (x,y,z) :: zip3 xs' ys' zs'
+    (x::xs1, y::ys1, z::zs1) -> (x,y,z) :: zip3 xs1 ys1 zs1
     _ -> []
 
 rotY : Float -> Mat4
@@ -87,7 +87,7 @@ diamondMesh =
 
       cutlet = { pos = vec3 0 -1.6 0, color = white, coord = vec3 0.41 (yMul*(0.87-yOffset)) 0 }
 
-      -- Triangles
+      --- Triangles
       mkTable v1 v2 = (table0, v1, v2)
       table = map2 mkTable tableVS1 tableVS0
 
@@ -105,7 +105,7 @@ diamondMesh =
       pavilionFacetL = zip3 pavilionVS0 girdleTS0 (repeat 8 cutlet)
       pavilionFacetR = zip3 girdleTS0 pavilionVS1 (repeat 8 cutlet)
       
-  in Triangle <|
+  in triangles <|
       table ++
       stars ++
       bezelL ++ bezelR ++
