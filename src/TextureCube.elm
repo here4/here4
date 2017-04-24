@@ -31,13 +31,13 @@ init path =
 
 update : Dispatch CtrlMsg Msg -> TextureCube -> (TextureCube, Cmd (Dispatch CtrlMsg Msg))
 update msg model = case msg of
-    -- Self (TextureError err) ->
-        -- ( { model | message = "Error loading texture" }, Cmd.none )
-    --     ( model, Cmd.none )
     Self (TextureLoaded textureResult) ->
-        -- TODO: display a cube
-        -- ( [ put (vec3 -2 20 -17) (textureCube texture) ] , Cmd.none )
-          ( model, Cmd.none )
+        case textureResult of
+          Ok texture ->
+            ( [ put (vec3 -2 20 -17) (textureCube texture) ] , Cmd.none )
+          Err msg ->
+            -- ( { model | message = "Error loading texture" }, Cmd.none )
+            ( model, Cmd.none )
     Down (Move dp) -> ( List.map (translate dp) model, Cmd.none )
 
 animate : Time -> TextureCube -> TextureCube
