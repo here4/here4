@@ -21,17 +21,17 @@ move eyeLevel inputs focPos player = case focPos of
         -- Some point directly above a given point
         upwardsFrom p = V3.setY (V3.getY p + 1) p
 
-        p = fpos `V3.sub` player.pos
+        p = V3.sub fpos player.pos
 
         -- inputs
         upDown = V3.scale (3.0 * inputs.y) (V3.normalize p)
         inputYaw = inputs.mx * 30 * inputs.dt
         inputPitch = inputs.my * 30 * inputs.dt
 
-        cPos = player.pos `V3.add` upDown
+        cPos = V3.add player.pos upDown
 
         -- Limit how close you can get. This should be a function of the size of the thing.
-        closePos = if V3.length (fpos `V3.sub` cPos) < 3.0 then player.pos else cPos
+        closePos = if V3.length (V3.sub fpos cPos) < 3.0 then player.pos else cPos
 
 {-
         fromSpherical (r, theta, phi) = (r * sin theta * cos phi, r * sin theta * sin phi, r * cos theta)
@@ -60,7 +60,7 @@ move eyeLevel inputs focPos player = case focPos of
         wantPos = V3.add fpos <| Qn.vrotate pitchQ xzPos
 -}
 
-        unboundPos = V3.scale 0.3 wantPos `V3.add` V3.scale 0.7 player.pos
+        unboundPos = V3.add (V3.scale 0.3 wantPos) (V3.scale 0.7 player.pos)
 
         u = toRecord unboundPos
         e = eyeLevel unboundPos
@@ -71,7 +71,7 @@ move eyeLevel inputs focPos player = case focPos of
                    unboundPos
 
         -- Find the orientation looking at fpos from newPos
-        f = V3.normalize (fpos `V3.sub` newPos)
+        f = V3.normalize (V3.sub fpos newPos)
         orPos = Qn.fromTo2 V3.k f
 
         -- Ensure the camera is in an upright plane

@@ -73,21 +73,21 @@ gamepadNothing = { id = "", axes = [], buttons = [], mapping = "" }
 
 toStandardGamepad : Gamepad.Gamepad -> Gamepad.Gamepad
 toStandardGamepad gamepad =
-    if gamepad.id `contains` "STANDARD GAMEPAD" then
+    if contains gamepad.id "STANDARD GAMEPAD" then
         gamepad
     else
-        let (axes', buttons') = case (gamepad.axes, gamepad.buttons) of
+        let (axes_, buttons_) = case (gamepad.axes, gamepad.buttons) of
             -- Performance Designed Products Rock Candy Gamepad for Xbox 360 (Vendor: 0e6f Product: 011f)
             ( [x1, y1, b1, x2, y2, b2, x3, y3]
             , [a, b, x, y, lb, rb, back, start, logo, lstick, rstick]) ->
                 let
-                    toTrigger b = let b' = (b+1.0)/2.0 in
-                        if b' > 0 then
-                            { pressed = True, value = b' }
+                    toTrigger b = let b_ = (b+1.0)/2.0 in
+                        if b_ > 0 then
+                            { pressed = True, value = b_ }
                         else
                             { pressed = False, value = 0 }
-                    b1' = toTrigger b1
-                    b2' = toTrigger b2
+                    b1_ = toTrigger b1
+                    b2_ = toTrigger b2
 
                     toPads ax =
                         if ax > 0 then
@@ -101,12 +101,12 @@ toStandardGamepad gamepad =
 
                 in
                     ( [x1, y1, x2, y2]
-                    , [ a, b, x, y, lb, rb, b1', b2', back, start
+                    , [ a, b, x, y, lb, rb, b1_, b2_, back, start
                       , lstick, rstick, padU, padD, padL, padR, logo]
                     )
 
             _ -> (gamepad.axes, gamepad.buttons)
-        in { gamepad | axes = axes', buttons = buttons' }
+        in { gamepad | axes = axes_, buttons = buttons_ }
 
 persistentGamepads : List String -> List Gamepad.Gamepad -> (List (Maybe Gamepad.Gamepad), List String)
 persistentGamepads is0 gs0 = 

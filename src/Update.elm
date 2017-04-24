@@ -57,7 +57,7 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
         Model.Animate dt ->
-            let (model', newCmdMsg) = case worldTerrain model.worldModel of
+            let (model_, newCmdMsg) = case worldTerrain model.worldModel of
                 Nothing -> (model, Cmd.none)
                 Just terrain ->
                     let inputs = timeToInputs dt model.inputs
@@ -78,7 +78,7 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                             }
                     in
                         (newModel, Cmd.map Model.WorldMessage wmCmdMsg)
-            in ( model'
+            in ( model_
                , Cmd.batch
                    [ Gamepad.gamepads Model.GamepadUpdate
                    , newCmdMsg
@@ -186,25 +186,25 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
             moveCamera player =
                 if player.cameraInside then
                     -- let behind = player.pos `sub` (V3.scale 2.5 (Model.direction player)) `sub` (vec3 0 0.5 0)
-                    let inside = player.pos
-                                     `add` Orientation.rotateBodyV player.orientation (vec3 0 0 1) -- wedge
+                    let inside = add player.pos
+                                     (Orientation.rotateBodyV player.orientation (vec3 0 0 1)) -- wedge
                                      -- Inside Jeep driver's seat
                                      -- `add` Qn.vrotate player.orientQn (vec3 0.38 0.5 -2.3)
                     in
                         { player | cameraPos = inside -- aboveTerrain eyeLevel behind
                                  , cameraUp = Model.cameraUp player }
                 else
-                    let behind = player.pos `sub` (V3.scale 7 (Model.direction player))
+                    let behind = sub player.pos (V3.scale 7 (Model.direction player))
                         p = toRecord player.pos
                         yMax0 v = let vr = V3.toRecord v in vec3 vr.x (min (-0.3) vr.y) vr.z
                         newCameraPos =
                             if p.y < Model.eyeLevel then
-                                yMax0 (vec3 0 2 0 `add` behind)
+                                yMax0 (add (vec3 0 2 0) behind)
                             else if p.y < Model.eyeLevel+1 then
                                 behind
                             else
-                                -- vec3 0 2 0 `add` behind
-                                vec3 0 -2 0 `add` behind
+                                -- add (vec3 0 2 0) behind
+                                add (vec3 0 -2 0) behind
                         cameraPos = aboveTerrain eyeLevel
                             -- (V3.scale 0.5 newCameraPos `add` V3.scale 0.5 player.cameraPos) -- smooth
                             newCameraPos

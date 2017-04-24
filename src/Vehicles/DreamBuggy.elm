@@ -24,13 +24,13 @@ move eyeLevel inputs player =
 clampBuggy : Orientation -> Orientation
 clampBuggy o =
     let (roll, pitch, yaw) = Orientation.toRollPitchYaw o
-        roll' = clamp (degrees -10) (degrees 10) (roll/2)
-        pitch' = clamp (degrees -15) (degrees 15) (pitch/2)
-    in Orientation.fromRollPitchYaw (roll', pitch', yaw)
+        roll_ = clamp (degrees -10) (degrees 10) (roll/2)
+        pitch_ = clamp (degrees -15) (degrees 15) (pitch/2)
+    in Orientation.fromRollPitchYaw (roll_, pitch_, yaw)
 
 flatten : Vec3 -> Vec3
 flatten v =
-    let r = toRecord v
+    let r = V3.toRecord v
     in  normalize (vec3 r.x 0 r.z)
 
 turn : Model.EyeLevel -> Float -> Float -> Model.Player -> Model.Player
@@ -38,9 +38,9 @@ turn eyeLevel dx dy player =
     let
         (roll0, pitch0, yaw0) = toRollPitchYaw player.orientation
         playerY = eyeLevel player.pos
-        frontTireY = eyeLevel (player.pos `add` (rotateBodyV player.orientation (vec3 0 0 1)))
-        rightTireY = eyeLevel (player.pos `add` (rotateBodyV player.orientation (vec3 1 0 0)))
-        leftTireY = eyeLevel (player.pos `add` (rotateBodyV player.orientation (vec3 -1 0 0)))
+        frontTireY = eyeLevel (add player.pos (rotateBodyV player.orientation (vec3 0 0 1)))
+        rightTireY = eyeLevel (add player.pos (rotateBodyV player.orientation (vec3 1 0 0)))
+        leftTireY = eyeLevel (add player.pos (rotateBodyV player.orientation (vec3 -1 0 0)))
         tirePitch = 0 -- atan (-(frontTireY - playerY)/0.01)
         tireRoll  = atan ((rightTireY - leftTireY)/0.1)
         (yaw, pitch, roll) =
@@ -78,7 +78,7 @@ drive eyeLevel inputs player =
                    else if e < 0.15 then 15
                    else 20
     in
-        { player | velocity = adjustVelocity maxSpeed friction (move `add` strafe) inputs.dt player.velocity }
+        { player | velocity = adjustVelocity maxSpeed friction (add move strafe) inputs.dt player.velocity }
 
 adjustVelocity : Float -> Float -> Vec3 -> Float -> Vec3 -> Vec3
 adjustVelocity maxSpeed friction dv dt v =
@@ -86,16 +86,16 @@ adjustVelocity maxSpeed friction dv dt v =
 
 physics : Model.EyeLevel -> Float -> Model.Player -> Model.Player
 physics eyeLevel dt player =
-    let pos = player.pos `add` V3.scale dt player.velocity
-        p = toRecord pos
+    let pos = add player.pos (V3.scale dt player.velocity)
+        p = V3.toRecord pos
         e = eyeLevel pos
         vy0 = getY player.velocity
 
-        (pos', dv) = if p.y < e then
+        (pos_, dv) = if p.y < e then
                          let vy = if ((e < (0.8*80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10*dt) then
                              clamp 0 10 (V3.length player.velocity * (e-p.y)*dt*5) else 0
                          in (vec3 p.x e p.z, vec3 0 vy 0)
                      else
                          (pos, vec3 0 0 0)
     in
-        { player | pos = pos', velocity = player.velocity `add` dv }
+        { player | pos = pos_, velocity = add player.velocity dv }

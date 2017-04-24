@@ -172,7 +172,8 @@ init worldInit { movement, isLocked } =
       , worldModel = worldModel
       }
     , Cmd.batch
-        [ Window.size |> Task.perform (always Resize (0, 0)) Resize
+        -- [ Window.size |> Task.perform (always Resize (0, 0)) Resize
+        [ Window.size |> Task.perform Resize
         , gamepads GamepadUpdate
         , Cmd.map WorldMessage worldCmdMsg
         ]

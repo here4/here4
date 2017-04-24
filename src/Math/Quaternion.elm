@@ -175,8 +175,9 @@ fromTo v1 v2 =
 fromTo2 : Vec3 -> Vec3 -> Quaternion
 fromTo2 u v =
     let norm_u_norm_v = sqrt (V3.dot u u * V3.dot v v)
+        real_part0 = norm_u_norm_v + V3.dot u v
         (real_part, w) =
-            if real_part < 1e-6 * norm_u_norm_v then
+            if real_part0 < 1e-6 * norm_u_norm_v then
                 let w =
                     if abs (V3.getX u) > abs (V3.getZ u) then
                         vec3 -(V3.getY u) (V3.getX u) 0
@@ -184,7 +185,7 @@ fromTo2 u v =
                         vec3 0 -(V3.getZ u) (V3.getY u)
                 in (0,  w)
             else
-                (norm_u_norm_v + V3.dot u v, V3.cross u v)
+                (real_part0, V3.cross u v)
 
     in normalize <| fromSV (real_part, w)
                 

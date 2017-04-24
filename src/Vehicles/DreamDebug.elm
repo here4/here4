@@ -29,12 +29,12 @@ fly eyeLevel inputs player =
         roll  =  6 * inputs.mx * inputs.dt
 
         orpy = fromRollPitchYaw (roll, pitch, yaw)
-        orientation = player.orientation `followedBy` orpy
+        orientation = followedBy player.orientation orpy
         orient = rotateBodyV orientation
 
         dv = V3.scale (50 * thrust * inputs.dt) <| orient V3.k
 
-        vel = (V3.scale 0.8 dv) `add` (V3.scale 0.95 player.velocity)
+        vel = add (V3.scale 0.8 dv) (V3.scale 0.95 player.velocity)
         
     in
         { player | orientation = orientation
@@ -43,14 +43,14 @@ fly eyeLevel inputs player =
 
 flyPhysics : Model.EyeLevel -> Float -> Model.Player -> Model.Player
 flyPhysics eyeLevel dt player =
-    let pos = player.pos `add` V3.scale dt player.velocity
+    let pos = add player.pos (V3.scale dt player.velocity)
         p = toRecord pos
         e = eyeLevel pos
 
-        (pos', dv) = if p.y < e then
+        (pos_, dv) = if p.y < e then
                          (vec3 p.x e p.z, vec3 0 0 0)
                      else
                          (pos, vec3 0 0 0)
     in
-        { player | pos = pos', velocity = player.velocity `add` dv }
+        { player | pos = pos_, velocity = add player.velocity dv }
 
