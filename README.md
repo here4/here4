@@ -23,7 +23,7 @@ run the following sequence of commands:
 git clone https://github.com/kfish/dreambuggy.git
 cd dreambuggy
 elm-package install
-elm-make src/Main.elm --output build/Main.js
+elm-make dreambuggy/Main.elm --output build/Main.js
 elm-reactor
 ```
 
