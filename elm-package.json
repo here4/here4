@@ -4,6 +4,7 @@
     "repository": "https://github.com/kfish/dreambuggy.git",
     "license": "BSD3",
     "source-directories": [
+        "quaternion",
         "src"
     ],
     "exposed-modules": [],
