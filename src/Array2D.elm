@@ -1,7 +1,7 @@
 module Array2D exposing (..)
 
 import Array
-import Util exposing (splitEvery)
+import List.Extra exposing (splitAt)
 
 type Array2D a = Array2D Int (Array.Array a)
 
@@ -22,3 +22,9 @@ setXY x y val (Array2D s arr) = Array2D s (Array.set (x + y*s) val arr)
 
 map : (a -> b) -> Array2D a -> Array2D b
 map f (Array2D s arr) = Array2D s (Array.map f arr)
+
+splitEvery : Int -> List a -> List (List a)
+splitEvery size xs = case xs of
+    [] -> []
+    _  -> let (p,q) = splitAt size xs in p :: splitEvery size q
+

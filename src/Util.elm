@@ -1,17 +1,10 @@
 module Util exposing (..)
 
-import List.Extra exposing (splitAt)
-
 import Color exposing (hsl, toRgb)
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 
 ---------------------------------------------------------------------
-
-splitEvery : Int -> List a -> List (List a)
-splitEvery size xs = case xs of
-    [] -> []
-    _  -> let (p,q) = splitAt size xs in p :: splitEvery size q
 
 subsample : Int -> List a -> List a
 subsample n list = case list of
