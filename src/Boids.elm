@@ -5,7 +5,6 @@ import Random
 import Time exposing (Time)
 
 import Behavior.Boids exposing (..)
-import Dispatch exposing (..)
 import Math.RandomVector exposing (randomVec3)
 import Thing exposing (..)
 import Things.BFly exposing (bfly)
@@ -17,7 +16,7 @@ type alias Boids = List (Boid (Visible {}))
 type Msg = BoidsGenerated Boids
 
 create : Int -> (Things, Cmd ThingMsg)
-create n = createThings (init n)
+create n = createThingsNoChildren (init n)
     { update = update
     , animate = animate
     , things = things
@@ -37,13 +36,12 @@ randomBoid = Random.map3
 randomBoids : Int -> Random.Generator Boids
 randomBoids n = Random.list n randomBoid
 
-init : Int -> (Boids, Cmd (Dispatch CtrlMsg Msg))
-init n = ([], Random.generate (Self << BoidsGenerated) (randomBoids n))
+init : Int -> (Boids, Cmd Msg)
+init n = ([], Random.generate BoidsGenerated (randomBoids n))
 
-update : Dispatch CtrlMsg Msg -> Boids -> (Boids, Cmd (Dispatch CtrlMsg Msg))
+update : Msg -> Boids -> (Boids, Cmd Msg)
 update msg model = case msg of
-    Self (BoidsGenerated newBoids) -> (newBoids, Cmd.none)
-    _ -> (model, Cmd.none)
+   BoidsGenerated newBoids -> (newBoids, Cmd.none)
 
 animate : Time -> Boids -> Boids
 animate dt boids = moveBoids dt boids

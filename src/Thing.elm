@@ -73,6 +73,17 @@ createThings (model, msg) methods =
     , Cmd.map msgPack msg
     ) 
 
+createThingsNoChildren : (model, Cmd msg) -> Animated model msg -> (Things, Cmd ThingMsg)
+createThingsNoChildren (model, msg) methods =
+    createThings (model, Cmd.map Self msg) { methods | update = updateSelf methods.update }
+
+-- | Update helper for things with no children
+updateSelf : (msg -> model -> (model, Cmd msg))
+    -> Dispatch CtrlMsg msg -> model -> (model, Cmd (Dispatch CtrlMsg msg))
+updateSelf f msg model = case msg of
+    Self selfMsg -> let (newModel, newMsg) = f selfMsg model in (newModel, Cmd.map Self newMsg)
+    _            -> (model, Cmd.none)
+
 {-
 ----------------------------------------------------------------------
 -- Debugging: noop Things
