@@ -4,7 +4,6 @@ import Math.Vector3 exposing (add, vec3)
 import Random
 import Time exposing (Time)
 
-import Dispatch exposing (..)
 import Thing exposing (..)
 import Things.Sphere exposing (fogMountainsSphere)
 
@@ -17,7 +16,7 @@ type alias Balls = List (Drop (Visible {}))
 type Msg = BallsGenerated Balls
 
 create : Int -> (Things, Cmd ThingMsg)
-create n = createThings (init n)
+create n = createThingsNoChildren (init n)
     { update = update
     , animate = animate
     , things = things
@@ -33,13 +32,12 @@ randomDrop = Random.map2
 randomBalls : Int -> Random.Generator Balls
 randomBalls n = Random.list n randomDrop
 
-init : Int -> (Balls, Cmd (Dispatch CtrlMsg Msg))
-init n = ([], Random.generate (Self << BallsGenerated) (randomBalls n))
+init : Int -> (Balls, Cmd Msg)
+init n = ([], Random.generate BallsGenerated (randomBalls n))
 
-update : Dispatch CtrlMsg Msg -> Balls -> (Balls, Cmd (Dispatch CtrlMsg Msg))
+update : Msg -> Balls -> (Balls, Cmd Msg)
 update msg balls = case msg of
-    Self (BallsGenerated newBalls) -> (newBalls, Cmd.none)
-    _ -> (balls, Cmd.none)
+    BallsGenerated newBalls -> (newBalls, Cmd.none)
 
 animate : Time -> Balls -> Balls
 animate dt balls = collisions dt (moveDrops dt balls)
