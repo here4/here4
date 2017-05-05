@@ -150,13 +150,13 @@ layoutSceneVR windowSize model render =
 mapApply : List (a -> List b) -> a -> List b
 mapApply fs x = List.concat <| List.map (\f -> f x) fs
 
-orient : Thing -> See
-orient (Thing scale position orientation see) =
+orient : Thing -> Appearance
+orient (Thing scale position orientation appear) =
     let z_axis = vec3 0 0 1
         rot_angle = 0 - acos (dot orientation z_axis)
         rot_axis = normalize (cross orientation z_axis)
     in
-        tview (M4.scale scale) << tview (M4.translate position) << tview (M4.rotate rot_angle rot_axis) <| see
+        tview (M4.scale scale) << tview (M4.translate position) << tview (M4.rotate rot_angle rot_axis) <| appear
 
 eyeOffset : Model.Player -> Model.Eye -> Vec3
 eyeOffset player eye =
@@ -195,9 +195,9 @@ renderWorld globalTime world eye windowSize player =
         skybox = orientSkybox world.skybox { p | viewMatrix = skyboxMatrix windowSize player }
 
         things = world.terrain.groundMesh ++ world.terrain.waterMesh ++ world.things
-        seeThings = mapApply (List.map orient things)
+        appearThings = mapApply (List.map orient things)
     in
-        skybox ++ seeThings p
+        skybox ++ appearThings p
 
 {-| Calculate the viewer's field of view
 -}
@@ -208,13 +208,13 @@ perspective { width, height } player eye =
                        (add player.pos (scale 3 (Model.direction player)))
                        player.cameraUp)
 
-orientSkybox : Thing -> See
-orientSkybox (Thing scale _ orientation see) =
+orientSkybox : Thing -> Appearance
+orientSkybox (Thing scale _ orientation appear) =
     let z_axis = vec3 0 0 1
         rot_angle = 0 - acos (dot orientation z_axis)
         rot_axis = normalize (cross orientation z_axis)
     in
-        tview (M4.scale scale) << tview (M4.rotate rot_angle rot_axis) <| see
+        tview (M4.scale scale) << tview (M4.rotate rot_angle rot_axis) <| appear
 
 skyboxMatrix : Window.Size -> Model.Player -> Mat4
 skyboxMatrix { width, height } player =

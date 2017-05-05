@@ -53,14 +53,14 @@ randomDrop = Random.map2
     (randomVec3' 8.0)
 
 drive : Model.Person -> Thing -> Thing
-drive person (Thing pos orientation see) =
+drive person (Thing pos orientation appear) =
     let
         -- Move so the object does not obscure the camera
         -- pos = person.pos `sub` (scale 1.1 (Model.direction person)) `sub` vec3 0 (Model.eyeLevel - 1.0) 0
         pos = person.pos -- `sub` (scale 1.1 (Model.direction person)) `sub` vec3 0 (Model.eyeLevel - 1.0) 0
         orient = Orientation.rotateLabV person.orientation V3.k
     in
-        Thing pos orient see
+        Thing pos orient appear
 
 demoThings : Array2D.Array2D Float -> List (Signal Model.Person) -> Signal (List Thing)
 demoThings terrain0 persons =

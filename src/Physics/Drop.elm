@@ -18,7 +18,7 @@ newDrop pos vel thing0 =
     , scale = thing0.scale
     , pos = pos
     , orientation = thing0.orientation
-    , see = thing0.see
+    , appear = thing0.appear
     }
 
 -- TODO: add spin?

@@ -7,12 +7,7 @@ import WebGL exposing (..)
 import Util exposing (hslToVec3)
 
 import Shaders.ColorFragment exposing (colorFragment)
--- import Shaders.ColorVertex exposing (ColorVertex, colorVertex)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
--- import Engine exposing (..)
-
--- ground : Signal Thing
--- ground = Signal.constant <| Thing (vec3 0 0 0) (vec3 1 0 1) seeGround
 
 renderGround p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0

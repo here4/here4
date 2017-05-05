@@ -62,12 +62,12 @@ noiseSurface2D skip placement xz = surface noiseVertex noiseColorFragment
 surface : Shader NoiseVertex NoiseVertexInput b -> Shader {} NoiseVertexInput b
     -> Mesh NoiseVertex -> Oriented (Visible {})
 surface vertexShader fragmentShader mesh =
-    let see = seeSurface vertexShader fragmentShader mesh
-    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
+    let appear = appearSurface vertexShader fragmentShader mesh
+    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appear }
 
-seeSurface : Shader NoiseVertex NoiseVertexInput b -> Shader {} NoiseVertexInput b
-    -> Mesh NoiseVertex -> See
-seeSurface vertexShader fragmentShader mesh p =
+appearSurface : Shader NoiseVertex NoiseVertexInput b -> Shader {} NoiseVertexInput b
+    -> Mesh NoiseVertex -> Appearance
+appearSurface vertexShader fragmentShader mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0
@@ -88,12 +88,12 @@ rippleNoiseSurface2D skip ripple placement xz = rippleSurface rippleNoiseVertex 
 rippleSurface : Shader NoiseVertex RippleNoiseVertexInput b -> Shader {} RippleNoiseVertexInput b -> Float
     -> Mesh NoiseVertex -> Oriented (Visible {})
 rippleSurface vertexShader fragmentShader ripple mesh =
-    let see = rippleSeeSurface vertexShader fragmentShader ripple mesh
-    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
+    let appear = rippleAppearSurface vertexShader fragmentShader ripple mesh
+    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appear }
 
-rippleSeeSurface : Shader NoiseVertex RippleNoiseVertexInput b -> Shader {} RippleNoiseVertexInput b -> Float
-    -> Mesh NoiseVertex -> See
-rippleSeeSurface vertexShader fragmentShader ripple mesh p =
+rippleAppearSurface : Shader NoiseVertex RippleNoiseVertexInput b -> Shader {} RippleNoiseVertexInput b -> Float
+    -> Mesh NoiseVertex -> Appearance
+rippleAppearSurface vertexShader fragmentShader ripple mesh p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0

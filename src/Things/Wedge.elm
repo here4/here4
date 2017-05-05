@@ -19,9 +19,9 @@ import Model
 import Engine exposing (..)
 
 -- wedge : Oriented (Visible {})
-wedge = Signal.constant <| { pos = vec3 0 0 0, orientation = vec3 1 0 1, see = seeWedge }
+wedge = Signal.constant <| { pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appearWedge }
 
-seeWedge p =
+appearWedge p =
     let (w,h) = p.resolution
         resolution = vec3 (toFloat w) (toFloat h) 0
         s = p.globalTime

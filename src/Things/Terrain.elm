@@ -141,23 +141,23 @@ ripplePaint how ripple placement terrain =
 visibleTerrain : Placement -> Array2D Float -> Array2D Thing -> List Thing
 visibleTerrain placement terrain arr =
     let
-        sees = Array2D.map (\(Thing _ pos _ see) -> (tview (M4.translate pos) see)) arr
+        appears = Array2D.map (\(Thing _ pos _ appear) -> (tview (M4.translate pos) appear)) arr
     in
         List.map extractThing
-            [{ scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = seeTerrain placement terrain sees }]
+            [{ scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appearTerrain placement terrain appears }]
 
-seeTerrain : Placement -> Array2D Float -> Array2D See -> See
-seeTerrain placement terrain sees p =
+appearTerrain : Placement -> Array2D Float -> Array2D Appearance -> Appearance
+appearTerrain placement terrain appears p =
        List.concat
-    <| List.map (\see -> see p)
-    <| nearby placement terrain p.cameraPos sees
+    <| List.map (\appear -> appear p)
+    <| nearby placement terrain p.cameraPos appears
 
-nearby : Placement -> Array2D Float -> Vec3 -> Array2D See -> List See
-nearby placement terrain pos sees =
+nearby : Placement -> Array2D Float -> Vec3 -> Array2D Appearance -> List Appearance
+nearby placement terrain pos appears =
     let
         ix0 = floor ((getX pos - placement.xOffset) / (placement.xDelta * toFloat placement.tileSize))
         iz0 = floor ((getZ pos - placement.zOffset) / (placement.zDelta * toFloat placement.tileSize))
-        getXZ x z = Array2D.getXY z x (\_ -> []) sees
+        getXZ x z = Array2D.getXY z x (\_ -> []) appears
 
         -- The visible radius of tiles depends on the height of the camera
         r = max 12 (floor ((getY pos - approxElevation placement terrain pos) / 10))

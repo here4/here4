@@ -16,7 +16,7 @@ newBoid m r pos vel thing0 =
     , scale = thing0.scale
     , pos = pos
     , orientation = thing0.orientation
-    , see = thing0.see
+    , appear = thing0.appear
     }
 
 boidOrientation : Moving a -> Vec3

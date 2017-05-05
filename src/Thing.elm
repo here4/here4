@@ -133,11 +133,11 @@ type alias Focus = {
     pos : Vec3
 }
 
-type alias See = Perception -> List Entity
+type alias Appearance = Perception -> List Entity
 
-type Thing = Thing Vec3 Vec3 Vec3 See
+type Thing = Thing Vec3 Vec3 Vec3 Appearance
 
-type alias Visible a = { a | see : See }
+type alias Visible a = { a | appear : Appearance }
 
 type alias Oriented a = { a | scale : Vec3, pos : Vec3, orientation : Vec3 }
 type alias Moving a = Oriented { a | velocity : Vec3 }
@@ -145,13 +145,13 @@ type alias Massive a = { a | mass : Float }
 type alias Spherical a = { a | radius : Float }
 
 extractThing : Oriented (Visible a) -> Thing
-extractThing x = Thing x.scale x.pos x.orientation x.see
+extractThing x = Thing x.scale x.pos x.orientation x.appear
 
-tview : (Mat4 -> Mat4) -> See -> See
-tview f see p = see { p | viewMatrix = f p.viewMatrix }
+tview : (Mat4 -> Mat4) -> Appearance -> Appearance
+tview f appear p = appear { p | viewMatrix = f p.viewMatrix }
 
-put : Vec3 -> See -> Thing
-put pos see = Thing (vec3 1 1 1) pos (vec3 1 0 0) see
+put : Vec3 -> Appearance -> Thing
+put pos appear = Thing (vec3 1 1 1) pos (vec3 1 0 0) appear
 
 place : Vec3 -> Thing -> Thing
 place t (Thing scale _ o s) = Thing scale t o s

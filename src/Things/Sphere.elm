@@ -20,23 +20,23 @@ spheres : Int -> Shader {} ThingShaderInput { elm_FragColor : Vec3, elm_FragCoor
 spheres n fragmentShader = map (always (sphere worldVertex fragmentShader)) (List.range 0 n)
 
 skySphere : Perception -> List Entity
-skySphere = seeSphere worldVertex sky
+skySphere = appearSphere worldVertex sky
 
 cloudsSphere : Perception -> List Entity
-cloudsSphere = seeSphere worldVertex clouds
+cloudsSphere = appearSphere worldVertex clouds
 
 fogMountainsSphere : Oriented (Visible {})
 fogMountainsSphere = sphere worldVertex fogMountains
 
 sphere : Shader Vertex ThingShaderInput a -> Shader {} ThingShaderInput a -> Oriented (Visible {})
 sphere vertexShader fragmentShader =
-    let see = seeSphere vertexShader fragmentShader
-    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, see = see }
+    let appear = appearSphere vertexShader fragmentShader
+    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appear }
 
 type alias ShadertoyUniforms a = { a | iResolution : Vec3, iGlobalTime : Float, view : (Int,Int) }
 
-seeSphere : Shader Vertex ThingShaderInput a -> Shader {} ThingShaderInput a -> See
-seeSphere vertexShader fragmentShader p =
+appearSphere : Shader Vertex ThingShaderInput a -> Shader {} ThingShaderInput a -> Appearance
+appearSphere vertexShader fragmentShader p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
         iHMD = if p.cameraVR then 1.0 else 0.0

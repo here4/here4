@@ -27,11 +27,11 @@ bfly fragmentShader f01 = makeBFly bflyVertex fragmentShader (f01 * second * pi 
 
 makeBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Oriented (Visible {})
 makeBFly vertexShader fragmentShader flapStart =
-    let see = seeBFly vertexShader fragmentShader flapStart
-    in { scale = vec3 1 1 1, pos = (vec3 7 0 4), orientation = vec3 0 0 1, see = see }
+    let appear = appearBFly vertexShader fragmentShader flapStart
+    in { scale = vec3 1 1 1, pos = (vec3 7 0 4), orientation = vec3 0 0 1, appear = appear }
 
-seeBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> See
-seeBFly vertexShader fragmentShader flapStart p =
+appearBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Appearance
+appearBFly vertexShader fragmentShader flapStart p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime + flapStart
         iHMD = if p.cameraVR then 1.0 else 0.0

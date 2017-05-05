@@ -37,12 +37,12 @@ plasmaPortal = Signal.constant <| portal worldVertex simplePlasma
 voronoiPortal = Signal.constant <| portal worldVertex voronoiDistances
 
 portal vertexShader fragmentShader =
-    let see = seePortal vertexShader fragmentShader
-    in { pos = (vec3 0 0 0), orientation = vec3 1 0 1, see = see }
+    let appear = appearPortal vertexShader fragmentShader
+    in { pos = (vec3 0 0 0), orientation = vec3 1 0 1, appear = appear }
 
 -- portal : Shader attributes uniforms varying -> Shader {} uniforms varyings
 --    -> Perception -> Entity
-seePortal vertexShader fragmentShader p =
+appearPortal vertexShader fragmentShader p =
     let (w,h) = p.resolution
         resolution = vec3 (toFloat w) (toFloat h) 0
         s = p.globalTime
