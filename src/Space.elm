@@ -1,4 +1,4 @@
-module App exposing (programWithFlags)
+module Space exposing (programWithFlags)
 
 {-| This module drives a virtuul wurld
 

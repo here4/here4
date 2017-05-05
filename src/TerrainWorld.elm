@@ -3,7 +3,7 @@ module TerrainWorld exposing (create, WorldModel, MyWorldMsg)
 import Bag exposing (Bag)
 import Time exposing (Time)
 
-import App
+import Space
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
@@ -17,7 +17,7 @@ import Things.Terrain as Terrain exposing (Terrain)
 create : { things : List (Things, Cmd ThingMsg) , staticThings : List Body, skybox : Body }
     -> Program Args (Model.Model WorldModel) (Model.Msg (CtrlMsg MyWorldMsg))
 create details =
-  App.programWithFlags
+  Space.programWithFlags
     { init = worldInit details
     , view = worldView
     , update = worldUpdate

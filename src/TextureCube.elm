@@ -8,7 +8,7 @@ import WebGL.Texture as Texture exposing (Texture, Error)
 import Body exposing (Body, translate, put)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
-import Thing exposing (..)
+import Thing exposing (Things, createThings, ThingMsg, Focus, thingToFocus)
 import Things.Cube exposing (textureCube)
 
 type alias TextureCube = List Body
