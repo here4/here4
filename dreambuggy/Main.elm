@@ -6,7 +6,7 @@ import Model exposing (Args)
 
 import Body exposing (resize, put)
 import Dispatch
-import Thing exposing (CtrlMsg)
+import Control
 
 import TerrainWorld
 import Boids
@@ -19,7 +19,7 @@ import Things.Sphere exposing (skySphere, cloudsSphere)
 
 main : Program Args
         (Model.Model TerrainWorld.WorldModel)
-        (Model.Msg (Dispatch.Dispatch CtrlMsg TerrainWorld.MyWorldMsg))
+        (Model.Msg (Dispatch.Dispatch Control.Msg TerrainWorld.MyWorldMsg))
 main =
   TerrainWorld.create
     { things =

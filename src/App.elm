@@ -15,23 +15,24 @@ import Window
 
 import Ports
 
+import Control
 import Dispatch exposing (..)
 import Model
 import Update
 import View
 
-import Thing exposing (CtrlMsg, Focus, Things)
+import Thing exposing (Focus, Things)
 import Things.Terrain exposing (Terrain)
 
 programWithFlags
-  : { init : ( model, Cmd (Dispatch CtrlMsg msg) )
-    , update : Dispatch CtrlMsg msg -> model -> ( model, Cmd (Dispatch CtrlMsg msg) )
+  : { init : ( model, Cmd (Dispatch Control.Msg msg) )
+    , update : Dispatch Control.Msg msg -> model -> ( model, Cmd (Dispatch Control.Msg msg) )
     , view : model -> Maybe Model.World
     , animate : Time -> model -> model 
     , terrain : model -> Maybe Terrain
     , focus : model -> Maybe Focus
     }
-  -> Program Model.Args (Model.Model model) (Model.Msg (Dispatch CtrlMsg msg))
+  -> Program Model.Args (Model.Model model) (Model.Msg (Dispatch Control.Msg msg))
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init

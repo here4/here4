@@ -8,6 +8,7 @@ import WebGL exposing (Entity)
 
 import Appearance exposing (..)
 import Body exposing (..)
+import Control exposing (..)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 
@@ -20,22 +21,19 @@ type alias Animated model msg =
 
 type alias ThingModel = Dynamic
 
-type CtrlMsg
-    = Move Vec3
-
-type alias ThingMsg = Dispatch CtrlMsg Dynamic
+type alias ThingMsg = Dispatch Control.Msg Dynamic
 
 type alias Things =
     { methods : Animated ThingModel ThingMsg
     , model : ThingModel
     }
 
-msgUnpack : Dispatch CtrlMsg Dynamic -> Dispatch CtrlMsg a
+msgUnpack : Dispatch Control.Msg Dynamic -> Dispatch Control.Msg a
 msgUnpack msg = case msg of
     Self m -> Self (Dynamic.unpack m)
     Down c -> Down c
 
-msgPack : Dispatch CtrlMsg a -> Dispatch CtrlMsg Dynamic
+msgPack : Dispatch Control.Msg a -> Dispatch Control.Msg Dynamic
 msgPack msg = case msg of
     Self m -> Self (Dynamic.pack m)
     Down c -> Down c
@@ -43,7 +41,7 @@ msgPack msg = case msg of
 packInit : (model, Cmd msg) -> (ThingModel, Cmd ThingMsg)
 packInit (x, cmd) = (Dynamic.pack x, Cmd.map (Self << Dynamic.pack) cmd)
 
-packUpdate : (Dispatch CtrlMsg msg -> model -> (model, Cmd (Dispatch CtrlMsg msg))) -> ThingMsg -> ThingModel -> (ThingModel, Cmd ThingMsg)
+packUpdate : (Dispatch Control.Msg msg -> model -> (model, Cmd (Dispatch Control.Msg msg))) -> ThingMsg -> ThingModel -> (ThingModel, Cmd ThingMsg)
 packUpdate f msg dyn =
     let (newModel, newCmdMsg) = f (msgUnpack msg) (Dynamic.unpack dyn)
     in (Dynamic.pack newModel, Cmd.map msgPack newCmdMsg)
@@ -58,7 +56,7 @@ packFocus : (a -> Maybe Focus) -> ThingModel -> Maybe Focus
 packFocus f dyn = f (Dynamic.unpack dyn)
 
 
-packThingMethods : Animated model (Dispatch CtrlMsg msg) -> Animated ThingModel ThingMsg
+packThingMethods : Animated model (Dispatch Control.Msg msg) -> Animated ThingModel ThingMsg
 packThingMethods { update, animate, bodies, focus } =
     { update = packUpdate update
     , animate = packAnimate animate
@@ -66,7 +64,7 @@ packThingMethods { update, animate, bodies, focus } =
     , focus = packFocus focus
     }
 
-createThings : (model, Cmd (Dispatch CtrlMsg msg)) -> Animated model (Dispatch CtrlMsg msg) -> (Things, Cmd ThingMsg)
+createThings : (model, Cmd (Dispatch Control.Msg msg)) -> Animated model (Dispatch Control.Msg msg) -> (Things, Cmd ThingMsg)
 createThings (model, msg) methods =
     ( { methods = packThingMethods methods
       , model = Dynamic.pack model
@@ -80,7 +78,7 @@ createThingsNoChildren (model, msg) methods =
 
 -- | Update helper for things with no children
 updateSelf : (msg -> model -> (model, Cmd msg))
-    -> Dispatch CtrlMsg msg -> model -> (model, Cmd (Dispatch CtrlMsg msg))
+    -> Dispatch Control.Msg msg -> model -> (model, Cmd (Dispatch Control.Msg msg))
 updateSelf f msg model = case msg of
     Self selfMsg -> let (newModel, newMsg) = f selfMsg model in (newModel, Cmd.map Self newMsg)
     _            -> (model, Cmd.none)

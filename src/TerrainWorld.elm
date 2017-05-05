@@ -4,6 +4,7 @@ import Bag exposing (Bag)
 import Time exposing (Time)
 
 import App
+import Control
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Model exposing (Args)
@@ -20,7 +21,7 @@ import Things.Surface2D exposing (Placement, defaultPlacement)
 import Things.Terrain as Terrain
 
 create : { things : List (Things, Cmd ThingMsg) , staticThings : List Body, skybox : Body }
-    -> Program Args (Model.Model WorldModel) (Model.Msg (Dispatch CtrlMsg MyWorldMsg))
+    -> Program Args (Model.Model WorldModel) (Model.Msg (Dispatch Control.Msg MyWorldMsg))
 create details =
   App.programWithFlags
     { init = worldInit details
@@ -33,9 +34,9 @@ create details =
 
 type MyWorldMsg
     = TerrainGenerated Terrain
-    | Send Bag.Key (Dispatch CtrlMsg Dynamic)
+    | Send Bag.Key (Dispatch Control.Msg Dynamic)
 
-type alias WorldMsg = Dispatch CtrlMsg MyWorldMsg
+type alias WorldMsg = Dispatch Control.Msg MyWorldMsg
 
 type alias WorldModel =
     { maybeTerrain : Maybe Terrain
@@ -109,7 +110,7 @@ worldUpdate msg model =
         Self (TerrainGenerated terrain) ->
             ( { model | maybeTerrain = Just terrain }, Cmd.none )
 
-        Down (Move dp) ->
+        Down (Control.Move dp) ->
            case model.focusKey of
                Nothing ->
                    ( model, Cmd.none )
@@ -118,7 +119,7 @@ worldUpdate msg model =
                        Nothing ->
                            ( model, Cmd.none )
                        Just t ->
-                           let (thingModel, thingCmdMsg) = Thing.update (Down (Thing.Move dp)) t
+                           let (thingModel, thingCmdMsg) = Thing.update (Down (Control.Move dp)) t
                            in
                                ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
                                , Cmd.map (Self << Send key) thingCmdMsg
