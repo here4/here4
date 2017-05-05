@@ -9,7 +9,7 @@ import Dispatch exposing (..)
 import Thing exposing (..)
 import Things.Cube exposing (textureCube)
 
-type alias TextureCube = List Thing
+type alias TextureCube = List Body
 
 type Msg
     = TextureLoaded (Result Error Texture)
@@ -43,7 +43,7 @@ update msg model = case msg of
 animate : Time -> TextureCube -> TextureCube
 animate dt cube = cube
 
-things : TextureCube -> List Thing
+things : TextureCube -> List Body
 things = identity
 
 focus : TextureCube -> Maybe Focus

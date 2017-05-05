@@ -18,7 +18,7 @@ import Things.Terrain exposing (Terrain)
 import Things.Surface2D exposing (Placement, defaultPlacement)
 import Things.Terrain as Terrain
 
-create : { things : List (Things, Cmd ThingMsg) , staticThings : List Thing, skybox : Thing }
+create : { things : List (Things, Cmd ThingMsg) , staticThings : List Body, skybox : Body }
     -> Program Args (Model.Model WorldModel) (Model.Msg (Dispatch CtrlMsg MyWorldMsg))
 create details =
   App.programWithFlags
@@ -38,8 +38,8 @@ type alias WorldMsg = Dispatch CtrlMsg MyWorldMsg
 
 type alias WorldModel =
     { maybeTerrain : Maybe Terrain
-    , skybox : Thing
-    , staticThings : List Thing
+    , skybox : Body
+    , staticThings : List Body
     , thingsBag : Bag Things
     , focusKey : Maybe Bag.Key
     }
@@ -61,7 +61,7 @@ worldThings ts =
     in
         (bag, Cmd.batch unbatched)
 
-worldInit : { things : List (Things, Cmd ThingMsg) , staticThings : List Thing, skybox : Thing }
+worldInit : { things : List (Things, Cmd ThingMsg) , staticThings : List Body, skybox : Body }
     -> (WorldModel, Cmd WorldMsg)
 worldInit details =
     let (bag, thingCmds) = worldThings details.things

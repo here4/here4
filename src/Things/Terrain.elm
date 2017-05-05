@@ -24,8 +24,8 @@ import Things.Surface2D exposing (..)
 type alias Terrain =
     { placement : Placement
     , elevations : Array2D Float
-    , groundMesh : List Thing
-    , waterMesh : List Thing
+    , groundMesh : List Body
+    , waterMesh : List Body
     }
 
 type Tag = TTag (Array2D Float)
@@ -128,22 +128,22 @@ approxElevation placement terrain pos =
             
 ----------------------------------------------------------------------
 
-paint : (Float -> NoiseSurfaceVertex) -> Placement -> Array2D Float -> List Thing
+paint : (Float -> NoiseSurfaceVertex) -> Placement -> Array2D Float -> List Body
 paint how placement terrain =
     let paintedTerrain = Array2D.map how terrain
     in visibleTerrain placement terrain (terrainGrid 1 placement paintedTerrain)
 
-ripplePaint : (Float -> Maybe NoiseSurfaceVertex) -> Float -> Placement -> Array2D Float -> List Thing
+ripplePaint : (Float -> Maybe NoiseSurfaceVertex) -> Float -> Placement -> Array2D Float -> List Body
 ripplePaint how ripple placement terrain =
     let paintedTerrain = Array2D.map how terrain
     in visibleTerrain placement terrain (terrainGridMaybe 1 ripple placement paintedTerrain)
 
-visibleTerrain : Placement -> Array2D Float -> Array2D Thing -> List Thing
+visibleTerrain : Placement -> Array2D Float -> Array2D Body -> List Body
 visibleTerrain placement terrain arr =
     let
-        appears = Array2D.map (\(Thing _ pos _ appear) -> (tview (M4.translate pos) appear)) arr
+        appears = Array2D.map (\(BCtr _ pos _ appear) -> (tview (M4.translate pos) appear)) arr
     in
-        List.map extractThing
+        List.map extractBody
             [{ scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appearTerrain placement terrain appears }]
 
 appearTerrain : Placement -> Array2D Float -> Array2D Appearance -> Appearance
@@ -166,12 +166,12 @@ nearby placement terrain pos appears =
     in
         List.map (\(x,y) -> getXZ (ix0+x) (iz0+y)) ir
 
-terrainGrid : Int -> Placement -> Array2D NoiseSurfaceVertex -> Array2D Thing
+terrainGrid : Int -> Placement -> Array2D NoiseSurfaceVertex -> Array2D Body
 terrainGrid skip placement =
        placeTerrain (noiseSurface2D skip) placement
     << tileTerrain skip placement.tileSize
 
-terrainGridMaybe : Int -> Float -> Placement -> Array2D (Maybe NoiseSurfaceVertex) -> Array2D Thing
+terrainGridMaybe : Int -> Float -> Placement -> Array2D (Maybe NoiseSurfaceVertex) -> Array2D Body
 terrainGridMaybe skip ripple placement =
        placeTerrain (rippleNoiseSurface2D skip ripple) placement
     << tileTerrain skip placement.tileSize
@@ -192,14 +192,14 @@ mkTile skip smallSide arr0 (x0, y0) = case arr0 of
         out = List.reverse <| List.foldl (::) [] rows
     in (out, (x0, y0))
 
--- placeTerrain : List (List ((List (List NoiseSurfaceVertex)), (Int, Int))) -> Array2D Thing
-placeTerrain : (Placement -> (Float, Float) -> v -> Oriented (Visible {})) -> Placement -> List (List (v, (Int, Int))) -> Array2D Thing
+-- placeTerrain : List (List ((List (List NoiseSurfaceVertex)), (Int, Int))) -> Array2D Body
+placeTerrain : (Placement -> (Float, Float) -> v -> Oriented (Visible {})) -> Placement -> List (List (v, (Int, Int))) -> Array2D Body
 placeTerrain toSurface2D placement terrainsCoords =
     let
         terrainSurfacesCoords = List.map (List.map (\(t,(x,z)) -> (toSurface2D placement (toFloat x * placement.xDelta, toFloat z * placement.zDelta) t, (x,z)))) terrainsCoords
         terrainz = Array2D.fromLists terrainSurfacesCoords
     in
-        Array2D.map (\(s,(x,z)) -> extractThing { s | scale = vec3 1 1 1
+        Array2D.map (\(s,(x,z)) -> extractBody { s | scale = vec3 1 1 1
                                                     , pos = vec3 (toFloat x * placement.xDelta) 0 (toFloat z * placement.zDelta)
                                                 }
                     ) terrainz

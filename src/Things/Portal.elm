@@ -21,19 +21,14 @@ import Keyboard exposing (isDown)
 
 type alias Triple a = (a,a,a)
 
--- cloudsPortal : Signal Thing
 cloudsPortal = Signal.constant <| portal worldVertex clouds
 
--- firePortal : Signal Thing
 firePortal = Signal.constant <| portal worldVertex fire
 
--- fogMountainsPortal : Signal Thing
 fogMountainsPortal = Signal.constant <| portal worldVertex fogMountains
 
--- plasmaPortal : Signal Thing
 plasmaPortal = Signal.constant <| portal worldVertex simplePlasma
 
--- voronoiPortal : Signal Thing
 voronoiPortal = Signal.constant <| portal worldVertex voronoiDistances
 
 portal vertexShader fragmentShader =

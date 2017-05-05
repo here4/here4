@@ -12,7 +12,7 @@ import Dynamic exposing (Dynamic)
 
 type alias Animated model msg =
     { update : msg -> model -> (model, Cmd msg)
-    , things : model -> List Thing
+    , things : model -> List Body
     , animate : Time -> model -> model
     , focus : model -> Maybe Focus
     }
@@ -50,7 +50,7 @@ packUpdate f msg dyn =
 packAnimate : (Time -> model -> model) -> Time -> ThingModel -> ThingModel
 packAnimate f dt dyn = Dynamic.pack (f dt (Dynamic.unpack dyn))
 
-packThings : (a -> List Thing) -> ThingModel -> List Thing
+packThings : (a -> List Body) -> ThingModel -> List Body
 packThings f dyn = f (Dynamic.unpack dyn)
 
 packFocus : (a -> Maybe Focus) -> ThingModel -> Maybe Focus
@@ -112,7 +112,7 @@ animate dt { methods, model } =
     let newModel = methods.animate dt model
     in { methods = methods, model = newModel }
 
-things : Things -> List Thing
+things : Things -> List Body
 things { methods, model } = methods.things model
 
 focus : Things -> Maybe Focus
@@ -135,7 +135,7 @@ type alias Focus = {
 
 type alias Appearance = Perception -> List Entity
 
-type Thing = Thing Vec3 Vec3 Vec3 Appearance
+type Body = BCtr Vec3 Vec3 Vec3 Appearance
 
 type alias Visible a = { a | appear : Appearance }
 
@@ -144,31 +144,31 @@ type alias Moving a = Oriented { a | velocity : Vec3 }
 type alias Massive a = { a | mass : Float }
 type alias Spherical a = { a | radius : Float }
 
-extractThing : Oriented (Visible a) -> Thing
-extractThing x = Thing x.scale x.pos x.orientation x.appear
+extractBody : Oriented (Visible a) -> Body
+extractBody x = BCtr x.scale x.pos x.orientation x.appear
 
 tview : (Mat4 -> Mat4) -> Appearance -> Appearance
 tview f appear p = appear { p | viewMatrix = f p.viewMatrix }
 
-put : Vec3 -> Appearance -> Thing
-put pos appear = Thing (vec3 1 1 1) pos (vec3 1 0 0) appear
+put : Vec3 -> Appearance -> Body
+put pos appear = BCtr (vec3 1 1 1) pos (vec3 1 0 0) appear
 
-place : Vec3 -> Thing -> Thing
-place t (Thing scale _ o s) = Thing scale t o s
+place : Vec3 -> Body -> Body
+place t (BCtr scale _ o s) = BCtr scale t o s
 
-translate : Vec3 -> Thing -> Thing
-translate t (Thing scale p o s) = Thing scale (V3.add t p) o s
+translate : Vec3 -> Body -> Body
+translate t (BCtr scale p o s) = BCtr scale (V3.add t p) o s
 
-resize : Float -> Thing -> Thing
-resize scale (Thing scale0 p o s) = Thing (V3.scale scale scale0) p o s
+resize : Float -> Body -> Body
+resize scale (BCtr scale0 p o s) = BCtr (V3.scale scale scale0) p o s
 
-thingToFocus : Thing -> Focus
-thingToFocus (Thing _ p _ _) = { pos = p }
+thingToFocus : Body -> Focus
+thingToFocus (BCtr _ p _ _) = { pos = p }
 
 orientedToFocus : Oriented a -> Focus
 orientedToFocus x = { pos = x.pos }
 
-type alias ThingShaderInput =
+type alias BodyShaderInput =
    { iGlobalTime : Time
    , iHMD : Float
    , iResolution : Vec3

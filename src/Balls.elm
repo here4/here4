@@ -42,8 +42,8 @@ update msg balls = case msg of
 animate : Time -> Balls -> Balls
 animate dt balls = collisions dt (moveDrops dt balls)
 
-things : Balls -> List Thing
-things = List.map extractThing
+things : Balls -> List Body
+things = List.map extractBody
 
 focus : Balls -> Maybe Focus
 focus balls = Maybe.map orientedToFocus (List.head balls)
