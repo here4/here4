@@ -6,6 +6,7 @@ import Time exposing (Time)
 
 import Behavior.Boids exposing (..)
 import Math.RandomVector exposing (randomVec3)
+import Body exposing (..)
 import Thing exposing (..)
 import Things.BFly exposing (bfly)
 

@@ -4,6 +4,7 @@ import Math.Vector3 exposing (add, vec3)
 import Random
 import Time exposing (Time)
 
+import Body exposing (Body, Visible)
 import Thing exposing (..)
 import Things.Sphere exposing (fogMountainsSphere)
 

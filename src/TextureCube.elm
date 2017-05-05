@@ -5,6 +5,7 @@ import Task exposing (Task)
 import Time exposing (Time)
 import WebGL.Texture as Texture exposing (Texture, Error)
 
+import Body exposing (Body)
 import Dispatch exposing (..)
 import Thing exposing (..)
 import Things.Cube exposing (textureCube)

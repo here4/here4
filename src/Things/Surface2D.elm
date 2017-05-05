@@ -11,7 +11,7 @@ import Util exposing (subsample)
 import WebGL exposing (..)
 
 import Appearance exposing (..)
-import Thing exposing (..)
+import Body exposing (Oriented, Visible)
 
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)

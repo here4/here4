@@ -5,7 +5,7 @@ import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Time exposing (Time)
 
-import Thing exposing (..)
+import Body exposing (Massive, Spherical, Moving)
 
 type alias TimeLeft a = (a, Float)
 

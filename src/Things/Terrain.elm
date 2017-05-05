@@ -17,6 +17,7 @@ import Util exposing (..)
 
 import Math.Procedural exposing (..)
 import Appearance exposing (..)
+import Body exposing (Body, Oriented, Visible)
 import Thing exposing (..)
 import Things.Surface2D exposing (..)
 
@@ -142,7 +143,7 @@ ripplePaint how ripple placement terrain =
 visibleTerrain : Placement -> Array2D Float -> Array2D Body -> List Body
 visibleTerrain placement terrain arr =
     let
-        appears = Array2D.map (\(BCtr _ pos _ appear) -> (tview (M4.translate pos) appear)) arr
+        appears = Array2D.map (\(Body.BCtr _ pos _ appear) -> (tview (M4.translate pos) appear)) arr
     in
         List.map extractBody
             [{ scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appearTerrain placement terrain appears }]

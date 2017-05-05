@@ -7,7 +7,7 @@ import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
 
 import Appearance exposing (..)
-import Thing exposing (..)
+import Body exposing (Oriented, Visible)
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)

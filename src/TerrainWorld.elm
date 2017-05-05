@@ -8,6 +8,7 @@ import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Model exposing (Args)
 
+import Body exposing (Body)
 import Thing exposing (..)
 import Things.Surface2D exposing (defaultPlacement)
 import Things.Terrain exposing (Terrain)

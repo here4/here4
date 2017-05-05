@@ -7,7 +7,7 @@ import Task exposing (Task)
 import Window
 
 import Orientation
-import Thing exposing (..)
+import Body exposing (Body)
 import Things.Terrain exposing (Terrain)
 
 import Gamepad exposing (Gamepad, gamepads)

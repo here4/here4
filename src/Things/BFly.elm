@@ -7,7 +7,7 @@ import Time exposing (second)
 import WebGL exposing (..)
 
 import Appearance exposing (..)
-import Thing exposing (Oriented, Visible)
+import Body exposing (Oriented, Visible)
 
 type alias BoidVertex = { pos:Vec3, color:Vec3, coord:Vec3, wing:Vec3 }
 

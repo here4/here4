@@ -14,6 +14,7 @@ import WebGL
 import Window
 
 import Appearance exposing (Appearance)
+import Body exposing (Body)
 import Model exposing (Model, Msg)
 import Orientation
 import Thing exposing (..)
@@ -152,7 +153,7 @@ mapApply : List (a -> List b) -> a -> List b
 mapApply fs x = List.concat <| List.map (\f -> f x) fs
 
 orient : Body -> Appearance
-orient (BCtr scale position orientation appear) =
+orient (Body.BCtr scale position orientation appear) =
     let z_axis = vec3 0 0 1
         rot_angle = 0 - acos (dot orientation z_axis)
         rot_axis = normalize (cross orientation z_axis)
@@ -210,7 +211,7 @@ perspective { width, height } player eye =
                        player.cameraUp)
 
 orientSkybox : Body -> Appearance
-orientSkybox (BCtr scale _ orientation appear) =
+orientSkybox (Body.BCtr scale _ orientation appear) =
     let z_axis = vec3 0 0 1
         rot_angle = 0 - acos (dot orientation z_axis)
         rot_axis = normalize (cross orientation z_axis)

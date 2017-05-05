@@ -7,6 +7,7 @@ import Time exposing (Time)
 import WebGL exposing (Entity)
 
 import Appearance exposing (..)
+import Body exposing (..)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 
@@ -122,15 +123,6 @@ focus { methods, model } = methods.focus model
 type alias Focus = {
     pos : Vec3
 }
-
-type Body = BCtr Vec3 Vec3 Vec3 Appearance
-
-type alias Visible a = { a | appear : Appearance }
-
-type alias Oriented a = { a | scale : Vec3, pos : Vec3, orientation : Vec3 }
-type alias Moving a = Oriented { a | velocity : Vec3 }
-type alias Massive a = { a | mass : Float }
-type alias Spherical a = { a | radius : Float }
 
 extractBody : Oriented (Visible a) -> Body
 extractBody x = BCtr x.scale x.pos x.orientation x.appear
