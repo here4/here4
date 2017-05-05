@@ -20,7 +20,7 @@ create : Int -> (Things, Cmd ThingMsg)
 create n = createThingsNoChildren (init n)
     { update = update
     , animate = animate
-    , things = things
+    , bodies = bodies
     , focus = focus
     }
 
@@ -43,8 +43,8 @@ update msg balls = case msg of
 animate : Time -> Balls -> Balls
 animate dt balls = collisions dt (moveDrops dt balls)
 
-things : Balls -> List Body
-things = List.map extractBody
+bodies : Balls -> List Body
+bodies = List.map extractBody
 
 focus : Balls -> Maybe Focus
 focus balls = Maybe.map orientedToFocus (List.head balls)

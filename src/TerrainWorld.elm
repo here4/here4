@@ -88,7 +88,7 @@ worldView model =
 makeWorld : Terrain -> WorldModel -> Model.World
 makeWorld terrain model =
     let
-        myThings = List.concatMap Thing.things (Bag.items model.thingsBag)
+        myThings = List.concatMap bodies (Bag.items model.thingsBag)
         worldThings = myThings ++ model.staticThings
     in
         { things = worldThings, terrain = terrain, skybox = model.skybox }

@@ -20,7 +20,7 @@ create : Int -> (Things, Cmd ThingMsg)
 create n = createThingsNoChildren (init n)
     { update = update
     , animate = animate
-    , things = things
+    , bodies = bodies
     , focus = focus
     }
 
@@ -47,8 +47,8 @@ update msg model = case msg of
 animate : Time -> Boids -> Boids
 animate dt boids = moveBoids dt boids
 
-things : Boids -> List Body
-things = List.map extractBody
+bodies : Boids -> List Body
+bodies = List.map extractBody
 
 focus : Boids -> Maybe Focus
 focus boids = Maybe.map orientedToFocus (List.head boids)

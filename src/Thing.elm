@@ -13,7 +13,7 @@ import Dynamic exposing (Dynamic)
 
 type alias Animated model msg =
     { update : msg -> model -> (model, Cmd msg)
-    , things : model -> List Body
+    , bodies : model -> List Body
     , animate : Time -> model -> model
     , focus : model -> Maybe Focus
     }
@@ -59,10 +59,10 @@ packFocus f dyn = f (Dynamic.unpack dyn)
 
 
 packThingMethods : Animated model (Dispatch CtrlMsg msg) -> Animated ThingModel ThingMsg
-packThingMethods { update, animate, things, focus } =
+packThingMethods { update, animate, bodies, focus } =
     { update = packUpdate update
     , animate = packAnimate animate
-    , things = packThings things
+    , bodies = packThings bodies
     , focus = packFocus focus
     }
 
@@ -113,8 +113,8 @@ animate dt { methods, model } =
     let newModel = methods.animate dt model
     in { methods = methods, model = newModel }
 
-things : Things -> List Body
-things { methods, model } = methods.things model
+bodies : Things -> List Body
+bodies { methods, model } = methods.bodies model
 
 focus : Things -> Maybe Focus
 focus { methods, model } = methods.focus model

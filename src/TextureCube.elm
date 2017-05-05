@@ -19,7 +19,7 @@ create : String -> (Things, Cmd ThingMsg)
 create path = createThings (init path)
     { update = update
     , animate = animate
-    , things = things
+    , bodies = bodies
     , focus = focus
     }
 
@@ -44,8 +44,8 @@ update msg model = case msg of
 animate : Time -> TextureCube -> TextureCube
 animate dt cube = cube
 
-things : TextureCube -> List Body
-things = identity
+bodies : TextureCube -> List Body
+bodies = identity
 
 focus : TextureCube -> Maybe Focus
 focus cube = Maybe.map thingToFocus (List.head cube)
