@@ -17,7 +17,7 @@ import Util exposing (..)
 
 import Math.Procedural exposing (..)
 import Appearance exposing (..)
-import Body exposing (Body, Oriented, Visible)
+import Body exposing (Body, Oriented, Visible, toBody)
 import Thing exposing (..)
 import Things.Surface2D exposing (..)
 
@@ -145,7 +145,7 @@ visibleTerrain placement terrain arr =
     let
         appears = Array2D.map (\(Body.BCtr _ pos _ appear) -> (tview (M4.translate pos) appear)) arr
     in
-        List.map extractBody
+        List.map toBody
             [{ scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appearTerrain placement terrain appears }]
 
 appearTerrain : Placement -> Array2D Float -> Array2D Appearance -> Appearance
@@ -201,7 +201,7 @@ placeTerrain toSurface2D placement terrainsCoords =
         terrainSurfacesCoords = List.map (List.map (\(t,(x,z)) -> (toSurface2D placement (toFloat x * placement.xDelta, toFloat z * placement.zDelta) t, (x,z)))) terrainsCoords
         terrainz = Array2D.fromLists terrainSurfacesCoords
     in
-        Array2D.map (\(s,(x,z)) -> extractBody { s | scale = vec3 1 1 1
+        Array2D.map (\(s,(x,z)) -> toBody { s | scale = vec3 1 1 1
                                                     , pos = vec3 (toFloat x * placement.xDelta) 0 (toFloat z * placement.zDelta)
                                                 }
                     ) terrainz

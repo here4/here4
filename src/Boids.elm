@@ -48,7 +48,7 @@ animate : Time -> Boids -> Boids
 animate dt boids = moveBoids dt boids
 
 bodies : Boids -> List Body
-bodies = List.map extractBody
+bodies = List.map toBody
 
 focus : Boids -> Maybe Focus
 focus boids = Maybe.map orientedToFocus (List.head boids)

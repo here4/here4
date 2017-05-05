@@ -4,7 +4,7 @@ import Math.Vector3 exposing (add, vec3)
 import Random
 import Time exposing (Time)
 
-import Body exposing (Body, Visible)
+import Body exposing (Body, Visible, toBody)
 import Thing exposing (..)
 import Things.Sphere exposing (fogMountainsSphere)
 
@@ -44,7 +44,7 @@ animate : Time -> Balls -> Balls
 animate dt balls = collisions dt (moveDrops dt balls)
 
 bodies : Balls -> List Body
-bodies = List.map extractBody
+bodies = List.map toBody
 
 focus : Balls -> Maybe Focus
 focus balls = Maybe.map orientedToFocus (List.head balls)

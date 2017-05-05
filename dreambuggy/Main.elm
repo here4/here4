@@ -3,10 +3,12 @@ module Main exposing (main)
 import Math.Vector3 exposing (vec3)
 
 import Model exposing (Args)
-import Dispatch
-import TerrainWorld
-import Thing exposing (..)
 
+import Body exposing (resize, put)
+import Dispatch
+import Thing exposing (CtrlMsg)
+
+import TerrainWorld
 import Boids
 import Balls
 import TextureCube

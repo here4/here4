@@ -124,28 +124,12 @@ type alias Focus = {
     pos : Vec3
 }
 
-extractBody : Oriented (Visible a) -> Body
-extractBody x = BCtr x.scale x.pos x.orientation x.appear
-
-tview : (Mat4 -> Mat4) -> Appearance -> Appearance
-tview f appear p = appear { p | viewMatrix = f p.viewMatrix }
-
-put : Vec3 -> Appearance -> Body
-put pos appear = BCtr (vec3 1 1 1) pos (vec3 1 0 0) appear
-
-place : Vec3 -> Body -> Body
-place t (BCtr scale _ o s) = BCtr scale t o s
-
-translate : Vec3 -> Body -> Body
-translate t (BCtr scale p o s) = BCtr scale (V3.add t p) o s
-
-resize : Float -> Body -> Body
-resize scale (BCtr scale0 p o s) = BCtr (V3.scale scale scale0) p o s
-
 thingToFocus : Body -> Focus
 thingToFocus (BCtr _ p _ _) = { pos = p }
 
 orientedToFocus : Oriented a -> Focus
 orientedToFocus x = { pos = x.pos }
 
+tview : (Mat4 -> Mat4) -> Appearance -> Appearance
+tview f appear p = appear { p | viewMatrix = f p.viewMatrix }
 
