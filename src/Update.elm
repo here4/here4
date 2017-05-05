@@ -6,14 +6,13 @@ import Time exposing (Time)
 
 import Dispatch exposing (..)
 import Model exposing (Model, Msg)
-import Model
 import Orientation
 import Ports
 
 import Gamepad
 import GamepadInputs
 
-import Control
+import Control exposing (CtrlMsg)
 import Thing exposing (Focus)
 import Things.Terrain as Terrain
 import Things.Terrain exposing (Terrain)
@@ -24,12 +23,12 @@ import Vehicles.DreamDebug as DreamDebug
 
 {-| Take a Msg and a Model and return an updated Model
 -}
-update : (Dispatch Control.Msg worldMsg -> worldModel -> (worldModel, Cmd (Dispatch Control.Msg worldMsg)))
+update : (CtrlMsg worldMsg -> worldModel -> (worldModel, Cmd (CtrlMsg worldMsg)))
     -> (worldModel -> Maybe Focus)
     -> (worldModel -> Maybe Terrain)
     -> (Time -> worldModel -> worldModel)
-    -> Model.Msg (Dispatch Control.Msg worldMsg) -> Model worldModel
-    -> (Model worldModel, Cmd (Msg (Dispatch Control.Msg worldMsg)))
+    -> Model.Msg (CtrlMsg worldMsg) -> Model worldModel
+    -> (Model worldModel, Cmd (Msg (CtrlMsg worldMsg)))
 update worldUpdate worldFocus worldTerrain worldAnimate msg model =
     case msg of
         Model.WorldMessage worldMsg ->

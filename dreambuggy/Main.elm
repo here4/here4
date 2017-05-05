@@ -5,8 +5,7 @@ import Math.Vector3 exposing (vec3)
 import Model exposing (Args)
 
 import Body exposing (resize, put)
-import Dispatch
-import Control
+import Control exposing (CtrlMsg)
 
 import TerrainWorld
 import Boids
@@ -19,7 +18,7 @@ import Things.Sphere exposing (skySphere, cloudsSphere)
 
 main : Program Args
         (Model.Model TerrainWorld.WorldModel)
-        (Model.Msg (Dispatch.Dispatch Control.Msg TerrainWorld.MyWorldMsg))
+        (Model.Msg (CtrlMsg TerrainWorld.MyWorldMsg))
 main =
   TerrainWorld.create
     { things =
