@@ -12,13 +12,7 @@ import Model exposing (Args)
 import Body exposing (Body)
 import Thing exposing (..)
 import Things.Surface2D exposing (defaultPlacement)
-import Things.Terrain exposing (Terrain)
-import Things.Terrain as Terrain
-
-
-import Things.Terrain exposing (Terrain)
-import Things.Surface2D exposing (Placement, defaultPlacement)
-import Things.Terrain as Terrain
+import Things.Terrain as Terrain exposing (Terrain)
 
 create : { things : List (Things, Cmd ThingMsg) , staticThings : List Body, skybox : Body }
     -> Program Args (Model.Model WorldModel) (Model.Msg (CtrlMsg MyWorldMsg))
