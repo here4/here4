@@ -3,7 +3,7 @@ module Things.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, 
 import List exposing (map2, repeat)
 
 import Math.Vector3 exposing (..)
-import Math.Matrix4 exposing (..)
+import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
 
 import Appearance exposing (..)
@@ -51,7 +51,10 @@ rotZ : Float -> Mat4
 rotZ n = makeRotate (-2*pi/n) (vec3 0 0 1)
 
 rotBoth : Float -> Vertex -> Vertex
-rotBoth n x = { x | pos = transform (rotY n) x.pos, coord = transform (rotZ n) x.coord }
+rotBoth n x =
+    { x | pos   = M4.transform (rotY n) x.pos,
+          coord = M4.transform (rotZ n) x.coord
+    }
 
 seven : Vertex -> List Vertex
 seven = unfold 7 (rotBoth 8)

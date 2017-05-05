@@ -130,6 +130,3 @@ thingToFocus (BCtr _ p _ _) = { pos = p }
 orientedToFocus : Oriented a -> Focus
 orientedToFocus x = { pos = x.pos }
 
-tview : (Mat4 -> Mat4) -> Appearance -> Appearance
-tview f appear p = appear { p | viewMatrix = f p.viewMatrix }
-

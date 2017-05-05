@@ -3,7 +3,7 @@ module Things.Sphere exposing (spheres, skySphere, cloudsSphere, fogMountainsSph
 import List exposing (drop, concat, map, map2)
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
-import Math.Matrix4 exposing (..)
+import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
 
 import Appearance exposing (..)
@@ -63,11 +63,16 @@ rotZ : Float -> Mat4
 rotZ n = makeRotate (-2*pi/n) (vec3 0 0 1)
 
 rotBoth : Float -> Vertex -> Vertex
-rotBoth n x = { x | pos = transform (rotY n) x.pos, coord = transform (rotZ n) x.coord }
+rotBoth n x =
+    { x | pos   = M4.transform (rotY n) x.pos,
+          coord = M4.transform (rotZ n) x.coord
+    }
 
 rotMercator : Float -> Vertex -> Vertex
-rotMercator n v = { v | pos = transform (rotY n) v.pos,
-    coord = vec3 (getX v.coord + (1.0/n)) (getY v.coord) 0 }
+rotMercator n v =
+    { v | pos = M4.transform (rotY n) v.pos,
+          coord = vec3 (getX v.coord + (1.0/n)) (getY v.coord) 0
+        }
 
 seven : Vertex -> List Vertex
 seven = unfold 7 (rotMercator 8)

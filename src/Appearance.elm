@@ -25,3 +25,8 @@ type alias ShaderPerception =
    , iLensDistort : Float
    , view : Mat4
    }
+
+-- | Transform the viewMatrix of an Appearance
+transform : (Mat4 -> Mat4) -> Appearance -> Appearance
+transform f appear p = appear { p | viewMatrix = f p.viewMatrix }
+

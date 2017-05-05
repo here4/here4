@@ -143,7 +143,11 @@ ripplePaint how ripple placement terrain =
 visibleTerrain : Placement -> Array2D Float -> Array2D Body -> List Body
 visibleTerrain placement terrain arr =
     let
-        appears = Array2D.map (\(Body.BCtr _ pos _ appear) -> (tview (M4.translate pos) appear)) arr
+        appears = Array2D.map
+                    (\(Body.BCtr _ pos _ appear) ->
+                      (Appearance.transform (M4.translate pos)
+                                            appear))
+                    arr
     in
         List.map toBody
             [{ scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appearTerrain placement terrain appears }]

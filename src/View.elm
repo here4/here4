@@ -158,7 +158,10 @@ orient (Body.BCtr scale position orientation appear) =
         rot_angle = 0 - acos (dot orientation z_axis)
         rot_axis = normalize (cross orientation z_axis)
     in
-        tview (M4.scale scale) << tview (M4.translate position) << tview (M4.rotate rot_angle rot_axis) <| appear
+        appear
+          |> Appearance.transform (M4.rotate rot_angle rot_axis)
+          >> Appearance.transform (M4.translate position)
+          >> Appearance.transform (M4.scale scale)
 
 eyeOffset : Model.Player -> Model.Eye -> Vec3
 eyeOffset player eye =
@@ -216,7 +219,10 @@ orientSkybox (Body.BCtr scale _ orientation appear) =
         rot_angle = 0 - acos (dot orientation z_axis)
         rot_axis = normalize (cross orientation z_axis)
     in
-        tview (M4.scale scale) << tview (M4.rotate rot_angle rot_axis) <| appear
+        appear
+          |> Appearance.transform (M4.rotate rot_angle rot_axis)
+          >> Appearance.transform (M4.scale scale)
+
 
 skyboxMatrix : Window.Size -> Model.Player -> Mat4
 skyboxMatrix { width, height } player =

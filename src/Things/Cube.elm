@@ -1,7 +1,7 @@
 module Things.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, cube)
 
 import Math.Vector3 exposing (..)
-import Math.Matrix4 exposing (..)
+import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
 
 import Appearance exposing (..)
@@ -68,7 +68,7 @@ rotatedFace (angleX,angleY,coordX) =
     each f (a,b,c) =
       (f a, f b, f c)
   in
-    List.map (each (\x -> {x | pos = transform t x.pos, coord = add (vec3 coordX 0 0) x.coord })) face
+    List.map (each (\x -> {x | pos = M4.transform t x.pos, coord = add (vec3 coordX 0 0) x.coord })) face
 
 
 -- face : List ({ pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 }, { pos:Vec3, coord:Vec3 })
