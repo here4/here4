@@ -10,6 +10,7 @@ import Math.Vector4 exposing (Vec4)
 import Util exposing (subsample)
 import WebGL exposing (..)
 
+import Appearance exposing (..)
 import Thing exposing (..)
 
 import Shaders.ColorFragment exposing (..)

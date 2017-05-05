@@ -13,6 +13,7 @@ import Time exposing (Time)
 import WebGL
 import Window
 
+import Appearance exposing (Appearance)
 import Model exposing (Model, Msg)
 import Orientation
 import Thing exposing (..)

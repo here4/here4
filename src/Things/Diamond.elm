@@ -6,7 +6,7 @@ import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
 
-import Thing exposing (Appearance, BodyShaderInput)
+import Appearance exposing (..)
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
@@ -24,7 +24,7 @@ cloudsDiamond = diamond worldVertex clouds
 fogMountainsDiamond : Appearance
 fogMountainsDiamond = diamond worldVertex fogMountains
 
-diamond : Shader Vertex BodyShaderInput a -> Shader {} BodyShaderInput a -> Appearance
+diamond : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 diamond vertexShader fragmentShader p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime

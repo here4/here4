@@ -16,6 +16,7 @@ import Math.Vector3 exposing (..)
 import Util exposing (..)
 
 import Math.Procedural exposing (..)
+import Appearance exposing (..)
 import Thing exposing (..)
 import Things.Surface2D exposing (..)
 

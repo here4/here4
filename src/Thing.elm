@@ -5,8 +5,8 @@ import Math.Vector3 as V3
 import Math.Matrix4 exposing (Mat4)
 import Time exposing (Time)
 import WebGL exposing (Entity)
-import Window
 
+import Appearance exposing (..)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 
@@ -118,22 +118,10 @@ things { methods, model } = methods.things model
 focus : Things -> Maybe Focus
 focus { methods, model } = methods.focus model
 
-type alias Perception = {
-    cameraPos  : Vec3,
-    windowSize : Window.Size,
-    globalTime : Time,
-    viewMatrix : Mat4,
-    lensDistort : Float,
-    cameraVR   : Bool,
-    measuredFPS : Float
-}
-
 -- TODO: focus on a plane/surface/controls
 type alias Focus = {
     pos : Vec3
 }
-
-type alias Appearance = Perception -> List Entity
 
 type Body = BCtr Vec3 Vec3 Vec3 Appearance
 
@@ -168,11 +156,4 @@ thingToFocus (BCtr _ p _ _) = { pos = p }
 orientedToFocus : Oriented a -> Focus
 orientedToFocus x = { pos = x.pos }
 
-type alias BodyShaderInput =
-   { iGlobalTime : Time
-   , iHMD : Float
-   , iResolution : Vec3
-   , iLensDistort : Float
-   , view : Mat4
-   }
 

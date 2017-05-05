@@ -6,6 +6,7 @@ import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
 
+import Appearance exposing (..)
 import Thing exposing (..)
 
 import Shaders.Clouds exposing (clouds)
@@ -15,7 +16,7 @@ import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 -- type alias Triangle a = (a,a,a)
 
-spheres : Int -> Shader {} BodyShaderInput { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+spheres : Int -> Shader {} ShaderPerception { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
     -> List (Oriented (Visible {}))
 spheres n fragmentShader = map (always (sphere worldVertex fragmentShader)) (List.range 0 n)
 
@@ -28,14 +29,14 @@ cloudsSphere = appearSphere worldVertex clouds
 fogMountainsSphere : Oriented (Visible {})
 fogMountainsSphere = sphere worldVertex fogMountains
 
-sphere : Shader Vertex BodyShaderInput a -> Shader {} BodyShaderInput a -> Oriented (Visible {})
+sphere : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Oriented (Visible {})
 sphere vertexShader fragmentShader =
     let appear = appearSphere vertexShader fragmentShader
     in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appear }
 
 type alias ShadertoyUniforms a = { a | iResolution : Vec3, iGlobalTime : Float, view : (Int,Int) }
 
-appearSphere : Shader Vertex BodyShaderInput a -> Shader {} BodyShaderInput a -> Appearance
+appearSphere : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 appearSphere vertexShader fragmentShader p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
         s = p.globalTime
