@@ -34,8 +34,6 @@ sphere vertexShader fragmentShader =
     let appear = appearSphere vertexShader fragmentShader
     in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appear }
 
-type alias ShadertoyUniforms a = { a | iResolution : Vec3, iGlobalTime : Float, view : (Int,Int) }
-
 appearSphere : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 appearSphere vertexShader fragmentShader p =
     let resolution = vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
