@@ -4,12 +4,12 @@ import Math.Vector3 exposing (add, vec3)
 import Random
 import Time exposing (Time)
 
-import Behavior.Boids exposing (..)
-import Math.RandomVector exposing (randomVec3)
-import Body exposing (..)
 import App exposing (..)
-import Things.BFly exposing (bfly)
+import Body exposing (..)
+import Math.RandomVector exposing (randomVec3)
 
+import Behavior.Boids exposing (..)
+import Body.BFly exposing (bfly)
 import Shaders.VoronoiDistances exposing (voronoiDistances)
 
 type alias Boids = List (Boid (Visible {}))

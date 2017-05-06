@@ -1,4 +1,4 @@
-module Things.BFly exposing (bfly)
+module Body.BFly exposing (bfly)
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)

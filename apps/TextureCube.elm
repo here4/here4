@@ -5,11 +5,12 @@ import Task exposing (Task)
 import Time exposing (Time)
 import WebGL.Texture as Texture exposing (Texture, Error)
 
+import App exposing (App, AppMsg, Focus, appToFocus)
 import Body exposing (Body, translate, put)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
-import App exposing (App, AppMsg, Focus, appToFocus)
-import Things.Cube exposing (textureCube)
+
+import Body.Cube exposing (textureCube)
 
 type alias TextureCube = List Body
 

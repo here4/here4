@@ -1,4 +1,4 @@
-module Things.Portal (cloudsPortal, firePortal, fogMountainsPortal, plasmaPortal, voronoiPortal, portal) where
+module Body.Portal (cloudsPortal, firePortal, fogMountainsPortal, plasmaPortal, voronoiPortal, portal) where
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)

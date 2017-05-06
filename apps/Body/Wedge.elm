@@ -1,4 +1,4 @@
-module Things.Wedge (wedge) where
+module Body.Wedge (wedge) where
 
 import List exposing (concatMap, map)
 import Time exposing (Time)

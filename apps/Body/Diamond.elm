@@ -1,4 +1,4 @@
-module Things.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, diamond)
+module Body.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, diamond)
 
 import List exposing (map2, repeat)
 

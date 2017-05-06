@@ -4,13 +4,13 @@ import Math.Vector3 exposing (Vec3, add, vec3)
 import Random
 import Time exposing (Time)
 
-import Body exposing (..)
 import App exposing (..)
-import Things.Sphere exposing (fogMountainsSphere)
-
+import Body exposing (..)
 import Math.RandomVector exposing (randomVec3)
 import Physics.Collisions exposing (collisions)
 import Physics.Gravity exposing (gravity)
+
+import Body.Sphere exposing (fogMountainsSphere)
 
 type alias BBall a = Massive (Spherical (Moving a))
 type alias Balls = List (BBall (Visible {}))

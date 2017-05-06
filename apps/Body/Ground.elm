@@ -1,4 +1,4 @@
-module Things.Ground exposing (renderGround)
+module Body.Ground exposing (renderGround)
 
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)

@@ -12,9 +12,9 @@ import Boids
 import Balls
 import TextureCube
 
-import Things.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
-import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
-import Things.Sphere exposing (skySphere, cloudsSphere)
+import Body.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
+import Body.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
+import Body.Sphere exposing (skySphere, cloudsSphere)
 
 main : Program Args
         (Model.Model TerrainWorld.WorldModel)

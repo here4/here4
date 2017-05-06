@@ -1,4 +1,4 @@
-module Things.Sphere exposing (spheres, skySphere, cloudsSphere, fogMountainsSphere, sphere)
+module Body.Sphere exposing (spheres, skySphere, cloudsSphere, fogMountainsSphere, sphere)
 
 import List exposing (drop, concat, map, map2)
 import Math.Vector2 exposing (Vec2)
