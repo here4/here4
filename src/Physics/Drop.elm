@@ -6,11 +6,9 @@ import Time exposing (Time)
 
 import Body exposing (..)
 
-import Physics.Collisions exposing (..)
+type alias BBall a = Massive (Spherical (Moving a))
 
-type alias Drop a = Massive (Spherical (Moving a))
-
-newDrop : Vec3 -> Vec3 -> Visible (Oriented {}) -> Drop (Visible {})
+newDrop : Vec3 -> Vec3 -> Visible (Oriented {}) -> BBall (Visible {})
 newDrop pos vel thing0 =
     { radius = 1.0
     , mass = 1.0

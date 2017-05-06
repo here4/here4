@@ -12,7 +12,7 @@ import Math.RandomVector exposing (randomVec3)
 import Physics.Collisions exposing (collisions)
 import Physics.Drop exposing (..)
 
-type alias Balls = List (Drop (Visible {}))
+type alias Balls = List (BBall (Visible {}))
 
 type Msg = BallsGenerated Balls
 
@@ -24,7 +24,7 @@ create n = App.createUncontrolled (init n)
     , focus = focus
     }
 
-randomDrop : Random.Generator (Drop (Visible {}))
+randomDrop : Random.Generator (BBall (Visible {}))
 randomDrop = Random.map2
     (\pos vel -> newDrop pos vel fogMountainsSphere)
     (Random.map (add (vec3 0 30 0)) (randomVec3 4.0))
