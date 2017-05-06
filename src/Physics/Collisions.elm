@@ -1,4 +1,4 @@
-module Physics.Collisions exposing (..)
+module Physics.Collisions exposing (collisions)
 
 import Array
 import Math.Vector3 as V3

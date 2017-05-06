@@ -1,17 +1,18 @@
 module Balls exposing (create)
 
-import Math.Vector3 exposing (add, vec3)
+import Math.Vector3 exposing (Vec3, add, vec3)
 import Random
 import Time exposing (Time)
 
-import Body exposing (Body, Visible, toBody)
+import Body exposing (..)
 import App exposing (..)
 import Things.Sphere exposing (fogMountainsSphere)
 
 import Math.RandomVector exposing (randomVec3)
 import Physics.Collisions exposing (collisions)
-import Physics.Drop exposing (..)
+import Physics.Gravity exposing (gravity)
 
+type alias BBall a = Massive (Spherical (Moving a))
 type alias Balls = List (BBall (Visible {}))
 
 type Msg = BallsGenerated Balls
@@ -22,6 +23,17 @@ create n = App.createUncontrolled (init n)
     , animate = animate
     , bodies = bodies
     , focus = focus
+    }
+
+newDrop : Vec3 -> Vec3 -> Oriented (Visible {}) -> BBall (Visible {})
+newDrop pos vel thing0 =
+    { radius = 1.0
+    , mass = 1.0
+    , velocity = vel
+    , scale = thing0.scale
+    , pos = pos
+    , orientation = thing0.orientation
+    , appear = thing0.appear
     }
 
 randomDrop : Random.Generator (BBall (Visible {}))
@@ -41,7 +53,7 @@ update msg balls = case msg of
     BallsGenerated newBalls -> (newBalls, Cmd.none)
 
 animate : Time -> Balls -> Balls
-animate dt balls = collisions dt (moveDrops dt balls)
+animate dt balls = collisions dt (gravity dt balls)
 
 bodies : Balls -> List Body
 bodies = List.map toBody
