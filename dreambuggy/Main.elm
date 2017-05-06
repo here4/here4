@@ -18,7 +18,7 @@ import Things.Sphere exposing (skySphere, cloudsSphere)
 
 main : Program Args
         (Model.Model TerrainWorld.WorldModel)
-        (Model.Msg (CtrlMsg TerrainWorld.MyWorldMsg))
+        (Model.Msg TerrainWorld.WorldMsg)
 main =
   TerrainWorld.create
     { things =

@@ -1,4 +1,4 @@
-module TerrainWorld exposing (create, WorldModel, MyWorldMsg)
+module TerrainWorld exposing (create, WorldModel, WorldMsg)
 
 import Bag exposing (Bag)
 import Time exposing (Time)
@@ -15,7 +15,7 @@ import Things.Surface2D exposing (defaultPlacement)
 import Things.Terrain as Terrain exposing (Terrain)
 
 create : { things : List (App, Cmd AppMsg) , staticBodies : List Body, skybox : Body }
-    -> Program Args (Model.Model WorldModel) (Model.Msg (CtrlMsg MyWorldMsg))
+    -> Program Args (Model.Model WorldModel) (Model.Msg WorldMsg)
 create details =
   Space.programWithFlags
     { init = worldInit details
@@ -26,11 +26,11 @@ create details =
     , terrain = worldTerrain
     }
 
-type MyWorldMsg
+type TerrainWorldMsg
     = TerrainGenerated Terrain
     | Send Bag.Key (CtrlMsg Dynamic)
 
-type alias WorldMsg = CtrlMsg MyWorldMsg
+type alias WorldMsg = CtrlMsg TerrainWorldMsg
 
 type alias WorldModel =
     { maybeTerrain : Maybe Terrain
