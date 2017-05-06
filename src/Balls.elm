@@ -17,7 +17,7 @@ type alias Balls = List (Drop (Visible {}))
 type Msg = BallsGenerated Balls
 
 create : Int -> (App, Cmd AppMsg)
-create n = createAppNoChildren (init n)
+create n = App.createUncontrolled (init n)
     { update = update
     , animate = animate
     , bodies = bodies

@@ -17,7 +17,7 @@ type alias Boids = List (Boid (Visible {}))
 type Msg = BoidsGenerated Boids
 
 create : Int -> (App, Cmd AppMsg)
-create n = createAppNoChildren (init n)
+create n = App.createUncontrolled (init n)
     { update = update
     , animate = animate
     , bodies = bodies

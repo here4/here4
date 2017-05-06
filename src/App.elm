@@ -64,17 +64,19 @@ packThingMethods { update, animate, bodies, focus } =
     , focus = packFocus focus
     }
 
-createApp : (model, Cmd (CtrlMsg msg)) -> Animated model (CtrlMsg msg) -> (App, Cmd AppMsg)
-createApp (model, msg) methods =
+-- | Create an app
+create : (model, Cmd (CtrlMsg msg)) -> Animated model (CtrlMsg msg) -> (App, Cmd AppMsg)
+create (model, msg) methods =
     ( { methods = packThingMethods methods
       , model = Dynamic.pack model
       }
     , Cmd.map msgPack msg
     ) 
 
-createAppNoChildren : (model, Cmd msg) -> Animated model msg -> (App, Cmd AppMsg)
-createAppNoChildren (model, msg) methods =
-    createApp (model, Cmd.map Self msg) { methods | update = updateSelf methods.update }
+-- | Create an app that ignores control messages
+createUncontrolled : (model, Cmd msg) -> Animated model msg -> (App, Cmd AppMsg)
+createUncontrolled (model, msg) methods =
+    create (model, Cmd.map Self msg) { methods | update = updateSelf methods.update }
 
 -- | Update helper for apps with no children
 updateSelf : (msg -> model -> (model, Cmd msg))

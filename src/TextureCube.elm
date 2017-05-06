@@ -8,7 +8,7 @@ import WebGL.Texture as Texture exposing (Texture, Error)
 import Body exposing (Body, translate, put)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
-import App exposing (App, createApp, AppMsg, Focus, appToFocus)
+import App exposing (App, AppMsg, Focus, appToFocus)
 import Things.Cube exposing (textureCube)
 
 type alias TextureCube = List Body
@@ -17,7 +17,7 @@ type Msg
     = TextureLoaded (Result Error Texture)
 
 create : String -> (App, Cmd AppMsg)
-create path = createApp (init path)
+create path = App.create (init path)
     { update = update
     , animate = animate
     , bodies = bodies
