@@ -13,7 +13,7 @@ import Gamepad
 import GamepadInputs
 
 import Control exposing (CtrlMsg)
-import Thing exposing (Focus)
+import App exposing (Focus)
 import Things.Terrain as Terrain
 import Things.Terrain exposing (Terrain)
 import Vehicles.DreamBird as DreamBird

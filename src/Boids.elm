@@ -7,7 +7,7 @@ import Time exposing (Time)
 import Behavior.Boids exposing (..)
 import Math.RandomVector exposing (randomVec3)
 import Body exposing (..)
-import Thing exposing (..)
+import App exposing (..)
 import Things.BFly exposing (bfly)
 
 import Shaders.VoronoiDistances exposing (voronoiDistances)
@@ -16,8 +16,8 @@ type alias Boids = List (Boid (Visible {}))
 
 type Msg = BoidsGenerated Boids
 
-create : Int -> (Things, Cmd ThingMsg)
-create n = createThingsNoChildren (init n)
+create : Int -> (App, Cmd AppMsg)
+create n = createAppNoChildren (init n)
     { update = update
     , animate = animate
     , bodies = bodies

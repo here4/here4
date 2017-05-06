@@ -5,7 +5,7 @@ import Random
 import Time exposing (Time)
 
 import Body exposing (Body, Visible, toBody)
-import Thing exposing (..)
+import App exposing (..)
 import Things.Sphere exposing (fogMountainsSphere)
 
 import Math.RandomVector exposing (randomVec3)
@@ -16,8 +16,8 @@ type alias Balls = List (Drop (Visible {}))
 
 type Msg = BallsGenerated Balls
 
-create : Int -> (Things, Cmd ThingMsg)
-create n = createThingsNoChildren (init n)
+create : Int -> (App, Cmd AppMsg)
+create n = createAppNoChildren (init n)
     { update = update
     , animate = animate
     , bodies = bodies

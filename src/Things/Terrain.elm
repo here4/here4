@@ -18,7 +18,7 @@ import Util exposing (..)
 import Math.Procedural exposing (..)
 import Appearance exposing (..)
 import Body exposing (Body, Oriented, Visible, toBody)
-import Thing exposing (..)
+-- import Thing exposing (..)
 import Things.Surface2D exposing (..)
 
 ----------------------------------------------------------------------

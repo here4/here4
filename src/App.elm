@@ -1,4 +1,4 @@
-module Thing exposing (..)
+module App exposing (..)
 
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
@@ -19,13 +19,13 @@ type alias Animated model msg =
     , focus : model -> Maybe Focus
     }
 
-type alias ThingModel = Dynamic
+type alias AppModel = Dynamic
 
-type alias ThingMsg = CtrlMsg Dynamic
+type alias AppMsg = CtrlMsg Dynamic
 
-type alias Things =
-    { methods : Animated ThingModel ThingMsg
-    , model : ThingModel
+type alias App =
+    { methods : Animated AppModel AppMsg
+    , model : AppModel
     }
 
 msgUnpack : CtrlMsg Dynamic -> CtrlMsg a
@@ -38,45 +38,45 @@ msgPack msg = case msg of
     Self m -> Self (Dynamic.pack m)
     Down c -> Down c
 
-packInit : (model, Cmd msg) -> (ThingModel, Cmd ThingMsg)
+packInit : (model, Cmd msg) -> (AppModel, Cmd AppMsg)
 packInit (x, cmd) = (Dynamic.pack x, Cmd.map (Self << Dynamic.pack) cmd)
 
-packUpdate : (CtrlMsg msg -> model -> (model, Cmd (CtrlMsg msg))) -> ThingMsg -> ThingModel -> (ThingModel, Cmd ThingMsg)
+packUpdate : (CtrlMsg msg -> model -> (model, Cmd (CtrlMsg msg))) -> AppMsg -> AppModel -> (AppModel, Cmd AppMsg)
 packUpdate f msg dyn =
     let (newModel, newCmdMsg) = f (msgUnpack msg) (Dynamic.unpack dyn)
     in (Dynamic.pack newModel, Cmd.map msgPack newCmdMsg)
 
-packAnimate : (Time -> model -> model) -> Time -> ThingModel -> ThingModel
+packAnimate : (Time -> model -> model) -> Time -> AppModel -> AppModel
 packAnimate f dt dyn = Dynamic.pack (f dt (Dynamic.unpack dyn))
 
-packThings : (a -> List Body) -> ThingModel -> List Body
-packThings f dyn = f (Dynamic.unpack dyn)
+packApp : (a -> List Body) -> AppModel -> List Body
+packApp f dyn = f (Dynamic.unpack dyn)
 
-packFocus : (a -> Maybe Focus) -> ThingModel -> Maybe Focus
+packFocus : (a -> Maybe Focus) -> AppModel -> Maybe Focus
 packFocus f dyn = f (Dynamic.unpack dyn)
 
 
-packThingMethods : Animated model (CtrlMsg msg) -> Animated ThingModel ThingMsg
+packThingMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
 packThingMethods { update, animate, bodies, focus } =
     { update = packUpdate update
     , animate = packAnimate animate
-    , bodies = packThings bodies
+    , bodies = packApp bodies
     , focus = packFocus focus
     }
 
-createThings : (model, Cmd (CtrlMsg msg)) -> Animated model (CtrlMsg msg) -> (Things, Cmd ThingMsg)
-createThings (model, msg) methods =
+createApp : (model, Cmd (CtrlMsg msg)) -> Animated model (CtrlMsg msg) -> (App, Cmd AppMsg)
+createApp (model, msg) methods =
     ( { methods = packThingMethods methods
       , model = Dynamic.pack model
       }
     , Cmd.map msgPack msg
     ) 
 
-createThingsNoChildren : (model, Cmd msg) -> Animated model msg -> (Things, Cmd ThingMsg)
-createThingsNoChildren (model, msg) methods =
-    createThings (model, Cmd.map Self msg) { methods | update = updateSelf methods.update }
+createAppNoChildren : (model, Cmd msg) -> Animated model msg -> (App, Cmd AppMsg)
+createAppNoChildren (model, msg) methods =
+    createApp (model, Cmd.map Self msg) { methods | update = updateSelf methods.update }
 
--- | Update helper for things with no children
+-- | Update helper for apps with no children
 updateSelf : (msg -> model -> (model, Cmd msg))
     -> CtrlMsg msg -> model -> (model, Cmd (CtrlMsg msg))
 updateSelf f msg model = case msg of
@@ -85,36 +85,36 @@ updateSelf f msg model = case msg of
 
 {-
 ----------------------------------------------------------------------
--- Debugging: noop Things
+-- Debugging: noop App
 
 update0 _ m = (m, Cmd.none)
 animate0 dt t = t
-things0 _ = []
-methods0 = { update = update0, animate = animate0, things = things0 }
+bodies0 _ = []
+methods0 = { update = update0, animate = animate0, bodies = bodies0 }
 
-createThings0 : (model, Cmd msg) -> Things
-createThings0 (model, msg) =
+createApp0 : (model, Cmd msg) -> App
+createApp0 (model, msg) =
     { methods = methods0
     , model = Dynamic.pack model
     }
 ----------------------------------------------------------------------
 -}
 
-update : ThingMsg -> Things -> (Things, Cmd ThingMsg)
+update : AppMsg -> App -> (App, Cmd AppMsg)
 update msg { methods, model } =
     let (newModel, newCmdMsg) = methods.update msg model
     in ({ methods = methods, model = newModel }, newCmdMsg)
 
--- animate : Time -> Things -> (Things, Cmd ThingMsg)
-animate : Time -> Things -> Things
+-- animate : Time -> App -> (App, Cmd AppMsg)
+animate : Time -> App -> App
 animate dt { methods, model } =
     let newModel = methods.animate dt model
     in { methods = methods, model = newModel }
 
-bodies : Things -> List Body
+bodies : App -> List Body
 bodies { methods, model } = methods.bodies model
 
-focus : Things -> Maybe Focus
+focus : App -> Maybe Focus
 focus { methods, model } = methods.focus model
 
 -- TODO: focus on a plane/surface/controls
@@ -122,8 +122,8 @@ type alias Focus = {
     pos : Vec3
 }
 
-thingToFocus : Body -> Focus
-thingToFocus (BCtr _ p _ _) = { pos = p }
+appToFocus : Body -> Focus
+appToFocus (BCtr _ p _ _) = { pos = p }
 
 orientedToFocus : Oriented a -> Focus
 orientedToFocus x = { pos = x.pos }

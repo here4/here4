@@ -13,11 +13,11 @@ import Time exposing (Time)
 import WebGL
 import Window
 
+import App exposing (..)
 import Appearance exposing (Appearance)
 import Body exposing (Body)
 import Model exposing (Model, Msg)
 import Orientation
-import Thing exposing (..)
 import Things.Terrain exposing (Terrain)
 import Things.Terrain as Terrain
 

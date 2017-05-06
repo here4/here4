@@ -21,7 +21,7 @@ import Model
 import Update
 import View
 
-import Thing exposing (Focus, Things)
+import App exposing (Focus)
 import Things.Terrain exposing (Terrain)
 
 programWithFlags

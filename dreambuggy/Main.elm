@@ -26,7 +26,7 @@ main =
         , Boids.create 100
         , Balls.create 30
         ]
-    , staticThings =
+    , staticBodies =
         [ put (vec3 0 1.5 0) fogMountainsDiamond
         , put (vec3 5 1.5 1) cloudsDiamond
         , put (vec3 3 10 5) cloudsSphere

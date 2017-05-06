@@ -10,11 +10,11 @@ import Dynamic exposing (Dynamic)
 import Model exposing (Args)
 
 import Body exposing (Body)
-import Thing exposing (..)
+import App exposing (..)
 import Things.Surface2D exposing (defaultPlacement)
 import Things.Terrain as Terrain exposing (Terrain)
 
-create : { things : List (Things, Cmd ThingMsg) , staticThings : List Body, skybox : Body }
+create : { things : List (App, Cmd AppMsg) , staticBodies : List Body, skybox : Body }
     -> Program Args (Model.Model WorldModel) (Model.Msg (CtrlMsg MyWorldMsg))
 create details =
   Space.programWithFlags
@@ -35,8 +35,8 @@ type alias WorldMsg = CtrlMsg MyWorldMsg
 type alias WorldModel =
     { maybeTerrain : Maybe Terrain
     , skybox : Body
-    , staticThings : List Body
-    , thingsBag : Bag Things
+    , staticBodies : List Body
+    , apps : Bag App
     , focusKey : Maybe Bag.Key
     }
 
@@ -44,28 +44,28 @@ worldTerrain : WorldModel -> Maybe Terrain
 worldTerrain model = model.maybeTerrain
 
 worldFocus : WorldModel -> Maybe Focus
-worldFocus model = case Bag.items model.thingsBag of
-    (someitem :: _) -> Thing.focus someitem
+worldFocus model = case Bag.items model.apps of
+    (someitem :: _) -> App.focus someitem
     _ -> Nothing
 
-worldThings : List (Things, Cmd ThingMsg) -> (Bag Things, Cmd WorldMsg)
-worldThings ts =
-    let f (newThings, newCmdMsg) (oldBag, oldCmdMsgs) =
-            let (key, newBag) = Bag.insert newThings oldBag
+worldApps : List (App, Cmd AppMsg) -> (Bag App, Cmd WorldMsg)
+worldApps ts =
+    let f (newApps, newCmdMsg) (oldBag, oldCmdMsgs) =
+            let (key, newBag) = Bag.insert newApps oldBag
             in (newBag, oldCmdMsgs ++ [Cmd.map (Self << Send key) newCmdMsg])
         (bag, unbatched) = List.foldl f (Bag.empty, []) ts
     in
         (bag, Cmd.batch unbatched)
 
-worldInit : { things : List (Things, Cmd ThingMsg) , staticThings : List Body, skybox : Body }
+worldInit : { things : List (App, Cmd AppMsg) , staticBodies : List Body, skybox : Body }
     -> (WorldModel, Cmd WorldMsg)
 worldInit details =
-    let (bag, thingCmds) = worldThings details.things
+    let (bag, thingCmds) = worldApps details.things
     in
         ( { maybeTerrain = Nothing
           , skybox = details.skybox
-          , staticThings = details.staticThings
-          , thingsBag = bag
+          , staticBodies = details.staticBodies
+          , apps = bag
           , focusKey = List.head (Bag.keys bag)
           }
         , Cmd.batch
@@ -83,22 +83,22 @@ worldView model =
 makeWorld : Terrain -> WorldModel -> Model.World
 makeWorld terrain model =
     let
-        myThings = List.concatMap bodies (Bag.items model.thingsBag)
-        worldThings = myThings ++ model.staticThings
+        myBodies = List.concatMap bodies (Bag.items model.apps)
+        worldBodies = myBodies ++ model.staticBodies
     in
-        { things = worldThings, terrain = terrain, skybox = model.skybox }
+        { things = worldBodies, terrain = terrain, skybox = model.skybox }
 
 worldUpdate : WorldMsg -> WorldModel -> (WorldModel, Cmd WorldMsg)
 worldUpdate msg model =
     case msg of
         Self (Send key thingMsg) ->
-           case Bag.get key model.thingsBag of
+           case Bag.get key model.apps of
                Nothing ->
                    ( model, Cmd.none )
                Just t ->
-                   let (thingModel, thingCmdMsg) = Thing.update thingMsg t
+                   let (thingModel, thingCmdMsg) = App.update thingMsg t
                    in
-                       ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
+                       ( { model | apps = Bag.replace key thingModel model.apps }
                        , Cmd.map (Self << Send key) thingCmdMsg
                        )
         Self (TerrainGenerated terrain) ->
@@ -109,17 +109,17 @@ worldUpdate msg model =
                Nothing ->
                    ( model, Cmd.none )
                Just key ->
-                   case Bag.get key model.thingsBag of
+                   case Bag.get key model.apps of
                        Nothing ->
                            ( model, Cmd.none )
                        Just t ->
-                           let (thingModel, thingCmdMsg) = Thing.update (Down (Control.Move dp)) t
+                           let (thingModel, thingCmdMsg) = App.update (Down (Control.Move dp)) t
                            in
-                               ( { model | thingsBag = Bag.replace key thingModel model.thingsBag }
+                               ( { model | apps = Bag.replace key thingModel model.apps }
                                , Cmd.map (Self << Send key) thingCmdMsg
                                )
 
 worldAnimate : Time -> WorldModel -> WorldModel
 worldAnimate dt model =
-    { model | thingsBag = Bag.map (Thing.animate dt) model.thingsBag }
+    { model | apps = Bag.map (App.animate dt) model.apps }
 
