@@ -5,6 +5,7 @@
     "license": "BSD3",
     "source-directories": [
         "dreambuggy",
+        "engine",
         "quaternion",
         "src"
     ],
