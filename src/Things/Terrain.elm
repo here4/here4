@@ -30,8 +30,6 @@ type alias Terrain =
     , waterMesh : List Body
     }
 
-type Tag = TTag (Array2D Float)
-
 generate : (Terrain -> msg) -> Placement -> Cmd msg
 generate tagger placement =
     let elGen = randTerrain2D (placement.bigSide+1)
