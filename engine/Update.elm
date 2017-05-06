@@ -14,8 +14,7 @@ import GamepadInputs
 
 import Control exposing (CtrlMsg)
 import App exposing (Focus)
-import Things.Terrain as Terrain
-import Things.Terrain exposing (Terrain)
+import Ground exposing (Terrain, bounds, elevation)
 import Vehicles.DreamBird as DreamBird
 import Vehicles.DreamBuggy as DreamBuggy
 import Vehicles.LookAt as LookAt
@@ -161,7 +160,7 @@ aboveTerrain eyeLevel pos =
 step : Terrain -> Model.Inputs -> Maybe Vec3 -> Model.Player -> Model.Player
 step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer else
         let 
-            eyeLevel pos = Model.eyeLevel + Terrain.elevation terrain pos
+            eyeLevel pos = Model.eyeLevel + elevation terrain pos
             move player =
                 if player.vehicle == Model.vehicleBird then
                     DreamBird.move eyeLevel inputs player
@@ -171,7 +170,7 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
                     LookAt.move eyeLevel inputs focPos player
                 else
                     DreamDebug.move eyeLevel inputs player
-            bounds player = { player | pos = Terrain.bounds terrain player.pos }
+            keepWithinbounds player = { player | pos = bounds terrain player.pos }
 
             checkCamera player = { player |
                 cameraInside = if inputs.changeCamera then
@@ -210,7 +209,7 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
                             newCameraPos
                         newCameraUp = Model.cameraUp player
 
-                    in  { player | cameraPos = Terrain.bounds terrain cameraPos
+                    in  { player | cameraPos = bounds terrain cameraPos
                                  , cameraUp =
                             -- V3.scale 0.1 newCameraUp `add` V3.scale 0.9 player.cameraUp }
                                newCameraUp }
@@ -219,7 +218,7 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
                 |> gravity eyeLevel inputs.dt
                 |> selectVehicle inputs
                 |> move
-                |> bounds
+                |> keepWithinbounds
                 |> checkCamera
                 |> moveCamera
 

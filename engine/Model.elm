@@ -8,7 +8,7 @@ import Window
 
 import Orientation
 import Body exposing (Body)
-import Things.Terrain exposing (Terrain)
+import Ground exposing (Terrain)
 
 import Gamepad exposing (Gamepad, gamepads)
 

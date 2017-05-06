@@ -16,10 +16,9 @@ import Window
 import App exposing (..)
 import Appearance exposing (Appearance)
 import Body exposing (Body)
+import Ground exposing (Terrain, bounds, elevation)
 import Model exposing (Model, Msg)
 import Orientation
-import Things.Terrain exposing (Terrain)
-import Things.Terrain as Terrain
 
 {-| Generate a View from a Model
 -}
@@ -185,10 +184,10 @@ aboveTerrain eyeLevel pos =
 renderWorld : Time -> Model.World -> Model.Eye -> Window.Size -> Model.Player -> List WebGL.Entity
 renderWorld globalTime world eye windowSize player =
     let
-        eyeLevel pos = Model.eyeLevel + Terrain.elevation world.terrain pos
+        eyeLevel pos = Model.eyeLevel + elevation world.terrain pos
         lensDistort = if player.cameraVR then 0.85 else 0.95
 
-        p = { cameraPos = Terrain.bounds world.terrain (aboveTerrain eyeLevel player.pos)
+        p = { cameraPos = bounds world.terrain (aboveTerrain eyeLevel player.pos)
             , viewMatrix = perspective windowSize player eye
             , globalTime = globalTime
             , windowSize = windowSize

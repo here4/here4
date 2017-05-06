@@ -22,7 +22,7 @@ import Update
 import View
 
 import App exposing (Focus)
-import Things.Terrain exposing (Terrain)
+import Ground exposing (Terrain)
 
 programWithFlags
   : { init : ( model, Cmd (CtrlMsg msg) )

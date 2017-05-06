@@ -1,7 +1,6 @@
 module Things.Surface2D exposing
     ( SurfaceVertex, surface2D
     , NoiseSurfaceVertex, noiseSurface2D, rippleNoiseSurface2D
-    , Placement, defaultPlacement
     )
 
 import List exposing (..)
@@ -12,39 +11,17 @@ import WebGL exposing (..)
 
 import Appearance exposing (..)
 import Body exposing (Oriented, Visible)
+import Placement exposing (..)
 
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
 
 -- import Model
 
-type alias Placement =
-    { xOffset : Float
-    , xDelta  : Float
-    , yOffset : Float
-    , yMult   : Float
-    , zOffset : Float
-    , zDelta  : Float
-    , tileSize : Int -- Length of side of a square tile
-    , bigSide : Int
-    }
-
 type alias SurfaceVertex = (Float, Vec4)
 
 -- (height, color, textureScale, timeScale, smoothing)
 type alias NoiseSurfaceVertex = (Float, Vec4, Float, Float, Float)
-
-defaultPlacement : Placement
-defaultPlacement =
-    { xOffset = -256
-    , xDelta  = 2
-    , yOffset = 0
-    , yMult   = 30
-    , zOffset = -256
-    , zDelta  = 2
-    , tileSize = 8
-    , bigSide = 512
-    }
 
 toNSV : (Float, Vec4) -> NoiseSurfaceVertex
 toNSV (y,rgb) = (y, rgb, 0.0, 0.0, 0.0)

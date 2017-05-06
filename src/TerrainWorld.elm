@@ -11,8 +11,9 @@ import Model exposing (Args)
 
 import Body exposing (Body)
 import App exposing (..)
-import Things.Surface2D exposing (defaultPlacement)
-import Things.Terrain as Terrain exposing (Terrain)
+import Ground exposing (Terrain)
+import Placement exposing (defaultPlacement)
+import Things.Terrain as Terrain
 
 create : { things : List (App, Cmd AppMsg) , staticBodies : List Body, skybox : Body }
     -> Program Args (Model.Model WorldModel) (Model.Msg WorldMsg)
