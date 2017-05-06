@@ -12,7 +12,7 @@ import Boids
 import Balls
 import TextureCube
 
-import Things.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, voronoiCube)
+import Things.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
 import Things.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Things.Sphere exposing (skySphere, cloudsSphere)
 
