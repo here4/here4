@@ -27,13 +27,12 @@ main =
         , Boids.create 100
         , Balls.create 30
         , Statue.create (vec3 3 10 5) cloudsSphere
+        , Statue.create (vec3 0 1.5 0) fogMountainsDiamond
+        , Statue.create (vec3 5 1.5 1) cloudsDiamond
+        , Statue.create (vec3 10 0 10) voronoiCube
+        , Statue.create (vec3 -10 0 -10) skyCube -- fireCube
+        , Statue.create (vec3 10 1.5 -10) fogMountainsCube
         ]
-    , staticBodies =
-        [ put (vec3 0 1.5 0) fogMountainsDiamond
-        , put (vec3 5 1.5 1) cloudsDiamond
-        , put (vec3 10 0 10) voronoiCube
-        , put (vec3 -10 0 -10) skyCube -- fireCube
-        , put (vec3 10 1.5 -10) fogMountainsCube
-        ]
+    , staticBodies = []
     , skybox = resize 80 <| put (vec3 0 1 1) skySphere
     }
