@@ -22,21 +22,21 @@ import Update
 import View
 
 import App exposing (Focus)
-import Ground exposing (Terrain)
+import Ground exposing (Ground)
 
 programWithFlags
   : { init : ( model, Cmd (CtrlMsg msg) )
     , update : CtrlMsg msg -> model -> ( model, Cmd (CtrlMsg msg) )
     , view : model -> Maybe Model.World
     , animate : Time -> model -> model 
-    , terrain : model -> Maybe Terrain
+    , ground : model -> Maybe Ground
     , focus : model -> Maybe Focus
     }
   -> Program Model.Args (Model.Model model) (Model.Msg (CtrlMsg msg))
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.focus world.terrain world.animate
+        , update = Update.update world.update world.focus world.ground world.animate
         , subscriptions = subscriptions
         , view = View.view world.view
         }

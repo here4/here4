@@ -14,7 +14,7 @@ import GamepadInputs
 
 import Control exposing (CtrlMsg)
 import App exposing (Focus)
-import Ground exposing (Terrain, bounds, elevation)
+import Ground exposing (Ground, bounds, elevation)
 import Vehicles.DreamBird as DreamBird
 import Vehicles.DreamBuggy as DreamBuggy
 import Vehicles.LookAt as LookAt
@@ -24,7 +24,7 @@ import Vehicles.DreamDebug as DreamDebug
 -}
 update : (CtrlMsg worldMsg -> worldModel -> (worldModel, Cmd (CtrlMsg worldMsg)))
     -> (worldModel -> Maybe Focus)
-    -> (worldModel -> Maybe Terrain)
+    -> (worldModel -> Maybe Ground)
     -> (Time -> worldModel -> worldModel)
     -> Model.Msg (CtrlMsg worldMsg) -> Model worldModel
     -> (Model worldModel, Cmd (Msg (CtrlMsg worldMsg)))
@@ -149,15 +149,15 @@ updateGamepads gps0 model =
         }
       _ -> model
 
-aboveTerrain : Model.EyeLevel -> Vec3 -> Vec3
-aboveTerrain eyeLevel pos =
+aboveGround : Model.EyeLevel -> Vec3 -> Vec3
+aboveGround eyeLevel pos =
     let
         p = toRecord pos
         e = eyeLevel pos
     in
         if p.y < e then vec3 p.x e p.z else pos
 
-step : Terrain -> Model.Inputs -> Maybe Vec3 -> Model.Player -> Model.Player
+step : Ground -> Model.Inputs -> Maybe Vec3 -> Model.Player -> Model.Player
 step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer else
         let 
             eyeLevel pos = Model.eyeLevel + elevation terrain pos
@@ -190,7 +190,7 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
                                      -- Inside Jeep driver's seat
                                      -- `add` Qn.vrotate player.orientQn (vec3 0.38 0.5 -2.3)
                     in
-                        { player | cameraPos = inside -- aboveTerrain eyeLevel behind
+                        { player | cameraPos = inside -- aboveGround eyeLevel behind
                                  , cameraUp = Model.cameraUp player }
                 else
                     let behind = sub player.pos (V3.scale 7 (Model.direction player))
@@ -204,7 +204,7 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
                             else
                                 -- add (vec3 0 2 0) behind
                                 add (vec3 0 -2 0) behind
-                        cameraPos = aboveTerrain eyeLevel
+                        cameraPos = aboveGround eyeLevel
                             -- (V3.scale 0.5 newCameraPos `add` V3.scale 0.5 player.cameraPos) -- smooth
                             newCameraPos
                         newCameraUp = Model.cameraUp player

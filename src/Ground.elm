@@ -1,5 +1,5 @@
 module Ground exposing
-    ( Terrain
+    ( Ground
     , bounds, elevation, approxElevation
     )
 
@@ -9,17 +9,16 @@ import Array2D exposing (Array2D)
 import Body exposing (Body, Oriented, Visible, toBody)
 import Placement exposing (Placement)
 
-type alias Terrain =
+type alias Ground =
     { placement : Placement
     , elevations : Array2D Float
-    , groundMesh : List Body
-    , waterMesh : List Body
+    , bodies : List Body
     }
 
 ----------------------------------------------------------------------
 
 -- bounds : Placement -> Vec3 -> Vec3
-bounds : Terrain -> Vec3 -> Vec3
+bounds : Ground -> Vec3 -> Vec3
 bounds { placement } pos =
     let bound x low high = if (x < low) then low else (if x > high then high else x)
         (x,y,z) = V3.toTuple pos
@@ -32,7 +31,7 @@ bounds { placement } pos =
 -- Elevation of terrain at a given coordinate
 -- Linearly interpolated on the mesh triangle
 -- elevation : Placement -> Array2D Float -> Vec3 -> Float
-elevation : Terrain -> Vec3 -> Float
+elevation : Ground -> Vec3 -> Float
 elevation { placement, elevations } pos =
     let
         ix0 = (getX pos + 256) / 2

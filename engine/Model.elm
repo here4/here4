@@ -8,7 +8,7 @@ import Window
 
 import Orientation
 import Body exposing (Body)
-import Ground exposing (Terrain)
+import Ground exposing (Ground)
 
 import Gamepad exposing (Gamepad, gamepads)
 
@@ -48,7 +48,7 @@ nextVehicle v = (v+1) % (vehicleDebug+1)
 
 type alias World =
     { things : List Body
-    , terrain : Terrain
+    , ground : Ground
     , skybox : Body
     }
 

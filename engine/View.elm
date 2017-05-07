@@ -16,7 +16,7 @@ import Window
 import App exposing (..)
 import Appearance exposing (Appearance)
 import Body exposing (Body)
-import Ground exposing (Terrain, bounds, elevation)
+import Ground exposing (Ground, bounds, elevation)
 import Model exposing (Model, Msg)
 import Orientation
 
@@ -171,8 +171,8 @@ eyeOffset player eye =
     else
         vec3 0 0 0
 
-aboveTerrain : Model.EyeLevel -> Vec3 -> Vec3
-aboveTerrain eyeLevel pos =
+aboveGround : Model.EyeLevel -> Vec3 -> Vec3
+aboveGround eyeLevel pos =
     let
         p = toRecord pos
         e = eyeLevel pos
@@ -184,10 +184,10 @@ aboveTerrain eyeLevel pos =
 renderWorld : Time -> Model.World -> Model.Eye -> Window.Size -> Model.Player -> List WebGL.Entity
 renderWorld globalTime world eye windowSize player =
     let
-        eyeLevel pos = Model.eyeLevel + elevation world.terrain pos
+        eyeLevel pos = Model.eyeLevel + elevation world.ground pos
         lensDistort = if player.cameraVR then 0.85 else 0.95
 
-        p = { cameraPos = bounds world.terrain (aboveTerrain eyeLevel player.pos)
+        p = { cameraPos = bounds world.ground (aboveGround eyeLevel player.pos)
             , viewMatrix = perspective windowSize player eye
             , globalTime = globalTime
             , windowSize = windowSize
@@ -198,7 +198,7 @@ renderWorld globalTime world eye windowSize player =
 
         skybox = orientSkybox world.skybox { p | viewMatrix = skyboxMatrix windowSize player }
 
-        bodies = world.terrain.groundMesh ++ world.terrain.waterMesh ++ world.things
+        bodies = world.ground.bodies ++ world.things
         appears = mapApply (List.map orient bodies)
     in
         skybox ++ appears p

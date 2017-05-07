@@ -11,7 +11,7 @@ import Model exposing (Args)
 
 import Body exposing (Body)
 import App exposing (..)
-import Ground exposing (Terrain)
+import Ground exposing (Ground)
 import Placement exposing (defaultPlacement)
 import Things.Terrain as Terrain
 
@@ -24,25 +24,25 @@ create details =
     , update = worldUpdate
     , focus = worldFocus
     , animate = worldAnimate
-    , terrain = worldTerrain
+    , ground = worldGround
     }
 
 type TerrainWorldMsg
-    = TerrainGenerated Terrain
+    = TerrainGenerated Ground
     | Send Bag.Key (CtrlMsg Dynamic)
 
 type alias WorldMsg = CtrlMsg TerrainWorldMsg
 
 type alias WorldModel =
-    { maybeTerrain : Maybe Terrain
+    { maybeGround : Maybe Ground
     , skybox : Body
     , staticBodies : List Body
     , apps : Bag App
     , focusKey : Maybe Bag.Key
     }
 
-worldTerrain : WorldModel -> Maybe Terrain
-worldTerrain model = model.maybeTerrain
+worldGround : WorldModel -> Maybe Ground
+worldGround model = model.maybeGround
 
 worldFocus : WorldModel -> Maybe Focus
 worldFocus model = case Bag.items model.apps of
@@ -63,7 +63,7 @@ worldInit : { things : List (App, Cmd AppMsg) , staticBodies : List Body, skybox
 worldInit details =
     let (bag, thingCmds) = worldApps details.things
     in
-        ( { maybeTerrain = Nothing
+        ( { maybeGround = Nothing
           , skybox = details.skybox
           , staticBodies = details.staticBodies
           , apps = bag
@@ -77,17 +77,17 @@ worldInit details =
 
 worldView : WorldModel -> Maybe Model.World
 worldView model =
-    case model.maybeTerrain of
-        Nothing      -> Nothing
-        Just terrain -> Just (makeWorld terrain model)
+    case model.maybeGround of
+        Nothing     -> Nothing
+        Just ground -> Just (makeWorld ground model)
 
-makeWorld : Terrain -> WorldModel -> Model.World
-makeWorld terrain model =
+makeWorld : Ground -> WorldModel -> Model.World
+makeWorld ground model =
     let
         myBodies = List.concatMap bodies (Bag.items model.apps)
         worldBodies = myBodies ++ model.staticBodies
     in
-        { things = worldBodies, terrain = terrain, skybox = model.skybox }
+        { things = worldBodies, ground = ground, skybox = model.skybox }
 
 worldUpdate : WorldMsg -> WorldModel -> (WorldModel, Cmd WorldMsg)
 worldUpdate msg model =
@@ -103,7 +103,7 @@ worldUpdate msg model =
                        , Cmd.map (Self << Send key) thingCmdMsg
                        )
         Self (TerrainGenerated terrain) ->
-            ( { model | maybeTerrain = Just terrain }, Cmd.none )
+            ( { model | maybeGround = Just terrain }, Cmd.none )
 
         Down (Control.Move dp) ->
            case model.focusKey of

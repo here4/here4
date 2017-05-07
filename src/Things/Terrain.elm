@@ -17,20 +17,20 @@ import Util exposing (..)
 import Math.Procedural exposing (..)
 import Appearance exposing (..)
 import Body exposing (Body, Oriented, Visible, toBody)
-import Ground exposing (Terrain, approxElevation)
+import Ground exposing (Ground, approxElevation)
 import Placement exposing (Placement)
 import Things.Surface2D exposing (..)
 
 ----------------------------------------------------------------------
 
-generate : (Terrain -> msg) -> Placement -> Cmd msg
+generate : (Ground -> msg) -> Placement -> Cmd msg
 generate tagger placement =
     let elGen = randTerrain2D (placement.bigSide+1)
         makeTerrain elevations =
             { placement = placement
             , elevations = elevations
-            , groundMesh = paint mountains placement elevations
-            , waterMesh = ripplePaint sea 0.3 placement elevations
+            , bodies = paint mountains placement elevations ++
+                       ripplePaint sea 0.3 placement elevations
             }
     in Random.generate tagger (Random.map makeTerrain elGen)
 
