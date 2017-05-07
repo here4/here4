@@ -87,15 +87,15 @@ worldUpdate msg model =
         Control.W (TerrainGenerated terrain) ->
             ( { model | maybeGround = Just terrain }, Cmd.none )
 
-        Control.Send key thingMsg ->
+        Control.Send key appMsg ->
            case Bag.get key model.apps of
                Nothing ->
                    ( model, Cmd.none )
                Just t ->
-                   let (thingModel, thingCmdMsg) = App.update thingMsg t
+                   let (appModel, appCmdMsg) = App.update appMsg t
                    in
-                       ( { model | apps = Bag.replace key thingModel model.apps }
-                       , Cmd.map (Control.Send key) thingCmdMsg
+                       ( { model | apps = Bag.replace key appModel model.apps }
+                       , Cmd.map (Control.Send key) appCmdMsg
                        )
         Control.Ctrl (Control.Move dp) ->
            case model.focusKey of
@@ -106,10 +106,10 @@ worldUpdate msg model =
                        Nothing ->
                            ( model, Cmd.none )
                        Just t ->
-                           let (thingModel, thingCmdMsg) = App.update (Down (Control.Move dp)) t
+                           let (appModel, appCmdMsg) = App.update (Down (Control.Move dp)) t
                            in
-                               ( { model | apps = Bag.replace key thingModel model.apps }
-                               , Cmd.map (Control.Send key) thingCmdMsg
+                               ( { model | apps = Bag.replace key appModel model.apps }
+                               , Cmd.map (Control.Send key) appCmdMsg
                                )
 
 worldAnimate : Time -> WorldModel -> WorldModel
