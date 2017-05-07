@@ -7,6 +7,7 @@ import Model exposing (Args)
 import TerrainWorld
 import Boids
 import Balls
+import Control exposing (WorldMsg)
 import Sky
 import Statue
 import TextureCube
@@ -17,7 +18,7 @@ import Body.Sphere exposing (skySphere, cloudsSphere)
 
 main : Program Args
         (Model.Model TerrainWorld.WorldModel)
-        (Model.Msg TerrainWorld.WorldMsg)
+        (Model.Msg (WorldMsg TerrainWorld.TerrainWorldMsg))
 main =
   TerrainWorld.create
     { apps =

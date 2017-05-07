@@ -15,7 +15,7 @@ import Window
 
 import Ports
 
-import Control exposing (CtrlMsg)
+import Control exposing (WorldMsg)
 import Dispatch exposing (..)
 import Model
 import Update
@@ -25,14 +25,14 @@ import App exposing (Focus)
 import Ground exposing (Ground)
 
 programWithFlags
-  : { init : ( model, Cmd (CtrlMsg msg) )
-    , update : CtrlMsg msg -> model -> ( model, Cmd (CtrlMsg msg) )
+  : { init : ( model, Cmd (WorldMsg msg) )
+    , update : WorldMsg msg -> model -> ( model, Cmd (WorldMsg msg) )
     , view : model -> Maybe Model.World
     , animate : Time -> model -> model 
     , ground : model -> Maybe Ground
     , focus : model -> Maybe Focus
     }
-  -> Program Model.Args (Model.Model model) (Model.Msg (CtrlMsg msg))
+  -> Program Model.Args (Model.Model model) (Model.Msg (WorldMsg msg))
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init

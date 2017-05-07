@@ -12,7 +12,7 @@ import Ports
 import Gamepad
 import GamepadInputs
 
-import Control exposing (CtrlMsg)
+import Control exposing (WorldMsg)
 import App exposing (Focus)
 import Ground exposing (Ground, bounds, elevation)
 import Vehicles.DreamBird as DreamBird
@@ -22,12 +22,12 @@ import Vehicles.DreamDebug as DreamDebug
 
 {-| Take a Msg and a Model and return an updated Model
 -}
-update : (CtrlMsg worldMsg -> worldModel -> (worldModel, Cmd (CtrlMsg worldMsg)))
+update : (WorldMsg worldMsg -> worldModel -> (worldModel, Cmd (WorldMsg worldMsg)))
     -> (worldModel -> Maybe Focus)
     -> (worldModel -> Maybe Ground)
     -> (Time -> worldModel -> worldModel)
-    -> Model.Msg (CtrlMsg worldMsg) -> Model worldModel
-    -> (Model worldModel, Cmd (Msg (CtrlMsg worldMsg)))
+    -> Model.Msg (WorldMsg worldMsg) -> Model worldModel
+    -> (Model worldModel, Cmd (Msg (WorldMsg worldMsg)))
 update worldUpdate worldFocus worldTerrain worldAnimate msg model =
     case msg of
         Model.WorldMessage worldMsg ->
@@ -65,7 +65,7 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                         (wm2, wmCmdMsg, focPos) = case worldFocus model.worldModel of
                             Just focus ->
                                 let dp = inputsToMove inputs model.player1
-                                    (wm2, wmCmdMsg) = worldUpdate (Down (Control.Move dp)) wm
+                                    (wm2, wmCmdMsg) = worldUpdate (Control.Ctrl (Control.Move dp)) wm
                                 in (wm2, wmCmdMsg, Just focus.pos)
                             _ -> (wm, Cmd.none, Nothing)
                         newModel =
