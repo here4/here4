@@ -23,8 +23,8 @@ import Things.Surface2D exposing (..)
 
 ----------------------------------------------------------------------
 
-generate : (Ground -> msg) -> Placement -> Cmd msg
-generate tagger placement =
+generate : Placement -> (Ground -> msg) -> Cmd msg
+generate placement tagger =
     let elGen = randTerrain2D (placement.bigSide+1)
         makeTerrain elevations =
             { placement = placement

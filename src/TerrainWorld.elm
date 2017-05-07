@@ -63,7 +63,7 @@ worldInit details =
           , focusKey = List.head (Bag.keys appsBag)
           }
         , Cmd.batch
-            [ Terrain.generate (Hub << TerrainGenerated) defaultPlacement
+            [ Terrain.generate defaultPlacement (Hub << TerrainGenerated)
             , appCmds
             ]
         )
