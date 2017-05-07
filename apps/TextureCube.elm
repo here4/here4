@@ -42,7 +42,7 @@ update msg model = case msg of
           Err msg ->
             -- ( { model | message = "Error loading texture" }, Cmd.none )
             ( model, Cmd.none )
-    Down (Control.Move dp) -> ( List.map (translate dp) model, Cmd.none )
+    Ctrl (Control.Move dp) -> ( List.map (translate dp) model, Cmd.none )
 
 animate : Time -> TextureCube -> TextureCube
 animate dt cube = cube

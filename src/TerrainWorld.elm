@@ -106,7 +106,7 @@ worldUpdate msg model =
                        Nothing ->
                            ( model, Cmd.none )
                        Just t ->
-                           let (appModel, appCmdMsg) = App.update (Down (Control.Move dp)) t
+                           let (appModel, appCmdMsg) = App.update (Ctrl (Control.Move dp)) t
                            in
                                ( { model | apps = Bag.replace key appModel model.apps }
                                , Cmd.map (Send key) appCmdMsg

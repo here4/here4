@@ -31,12 +31,12 @@ type alias App =
 msgUnpack : CtrlMsg Dynamic -> CtrlMsg a
 msgUnpack msg = case msg of
     Self m -> Self (Dynamic.unpack m)
-    Down c -> Down c
+    Ctrl c -> Ctrl c
 
 msgPack : CtrlMsg a -> CtrlMsg Dynamic
 msgPack msg = case msg of
     Self m -> Self (Dynamic.pack m)
-    Down c -> Down c
+    Ctrl c -> Ctrl c
 
 packInit : (model, Cmd msg) -> (AppModel, Cmd AppMsg)
 packInit (x, cmd) = (Dynamic.pack x, Cmd.map (Self << Dynamic.pack) cmd)

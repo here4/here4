@@ -1,8 +1,8 @@
 module Dispatch exposing (..)
 
-type Dispatch downMsg selfMsg
-    = Down downMsg
-    | Self selfMsg
+type Dispatch ctrlMsg nodeMsg
+    = Self nodeMsg
+    | Ctrl ctrlMsg
 
 type DispatchHub key ctrlMsg nodeMsg hubMsg
     = Hub hubMsg

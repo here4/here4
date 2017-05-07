@@ -28,7 +28,7 @@ init pos appear = ( put pos appear, Cmd.none )
 update : CtrlMsg Msg -> Model -> (Model, Cmd (CtrlMsg Msg))
 update msg model = case msg of
     Self _                 -> ( model, Cmd.none)
-    Down (Control.Move dp) -> ( translate dp model, Cmd.none )
+    Ctrl (Control.Move dp) -> ( translate dp model, Cmd.none )
 
 animate : Time -> Model -> Model
 animate dt body = body
