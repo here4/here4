@@ -33,6 +33,5 @@ main =
         , Statue.create (vec3 -10 0 -10) skyCube -- fireCube
         , Statue.create (vec3 10 1.5 -10) fogMountainsCube
         ]
-    , staticBodies = []
     , skybox = resize 80 <| put (vec3 0 1 1) skySphere
     }
