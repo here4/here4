@@ -22,7 +22,7 @@ main : Program Args
         (Model.Msg TerrainWorld.WorldMsg)
 main =
   TerrainWorld.create
-    { things =
+    { apps =
         [ TextureCube.create "resources/woodCrate.jpg"
         , Boids.create 100
         , Balls.create 30

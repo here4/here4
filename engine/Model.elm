@@ -47,7 +47,7 @@ nextVehicle : WhichVehicle -> WhichVehicle
 nextVehicle v = (v+1) % (vehicleDebug+1) 
 
 type alias World =
-    { things : List Body
+    { bodies : List Body
     , ground : Ground
     , skybox : Body
     }

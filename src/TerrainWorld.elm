@@ -15,7 +15,7 @@ import Ground exposing (Ground)
 import Placement exposing (defaultPlacement)
 import Things.Terrain as Terrain
 
-create : { things : List (App, Cmd AppMsg) , skybox : Body }
+create : { apps : List (App, Cmd AppMsg) , skybox : Body }
     -> Program Args (Model.Model WorldModel) (Model.Msg WorldMsg)
 create details =
   Space.programWithFlags
@@ -53,19 +53,19 @@ worldApps ts =
     let f (newApps, newCmdMsg) (oldBag, oldCmdMsgs) =
             let (key, newBag) = Bag.insert newApps oldBag
             in (newBag, oldCmdMsgs ++ [Cmd.map (Self << Send key) newCmdMsg])
-        (bag, unbatched) = List.foldl f (Bag.empty, []) ts
+        (appsBag, unbatched) = List.foldl f (Bag.empty, []) ts
     in
-        (bag, Cmd.batch unbatched)
+        (appsBag, Cmd.batch unbatched)
 
-worldInit : { things : List (App, Cmd AppMsg) , skybox : Body }
+worldInit : { apps : List (App, Cmd AppMsg) , skybox : Body }
     -> (WorldModel, Cmd WorldMsg)
 worldInit details =
-    let (bag, thingCmds) = worldApps details.things
+    let (appsBag, thingCmds) = worldApps details.apps
     in
         ( { maybeGround = Nothing
           , skybox = details.skybox
-          , apps = bag
-          , focusKey = List.head (Bag.keys bag)
+          , apps = appsBag
+          , focusKey = List.head (Bag.keys appsBag)
           }
         , Cmd.batch
             [ Terrain.generate (Self << TerrainGenerated) defaultPlacement
@@ -84,7 +84,7 @@ makeWorld ground model =
     let
         worldBodies = List.concatMap bodies (Bag.items model.apps)
     in
-        { things = worldBodies, ground = ground, skybox = model.skybox }
+        { bodies = worldBodies, ground = ground, skybox = model.skybox }
 
 worldUpdate : WorldMsg -> WorldModel -> (WorldModel, Cmd WorldMsg)
 worldUpdate msg model =

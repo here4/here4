@@ -198,7 +198,7 @@ renderWorld globalTime world eye windowSize player =
 
         skybox = orientSkybox world.skybox { p | viewMatrix = skyboxMatrix windowSize player }
 
-        bodies = world.ground.bodies ++ world.things
+        bodies = world.ground.bodies ++ world.bodies
         appears = mapApply (List.map orient bodies)
     in
         skybox ++ appears p
