@@ -56,8 +56,8 @@ packFocus : (a -> Maybe Focus) -> AppModel -> Maybe Focus
 packFocus f dyn = f (Dynamic.unpack dyn)
 
 
-packThingMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
-packThingMethods { update, animate, bodies, focus } =
+packMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
+packMethods { update, animate, bodies, focus } =
     { update = packUpdate update
     , animate = packAnimate animate
     , bodies = packApp bodies
@@ -67,7 +67,7 @@ packThingMethods { update, animate, bodies, focus } =
 -- | Create an app
 create : (model, Cmd (CtrlMsg msg)) -> Animated model (CtrlMsg msg) -> (App, Cmd AppMsg)
 create (model, msg) methods =
-    ( { methods = packThingMethods methods
+    ( { methods = packMethods methods
       , model = Dynamic.pack model
       }
     , Cmd.map msgPack msg

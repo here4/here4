@@ -4,9 +4,6 @@ import Math.Vector3 exposing (vec3)
 
 import Model exposing (Args)
 
-import Body exposing (resize, put)
-import Control exposing (CtrlMsg)
-
 import TerrainWorld
 import Boids
 import Balls
