@@ -10,6 +10,7 @@ import Control exposing (CtrlMsg)
 import TerrainWorld
 import Boids
 import Balls
+import Statue
 import TextureCube
 
 import Body.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
@@ -25,11 +26,11 @@ main =
         [ TextureCube.create "resources/woodCrate.jpg"
         , Boids.create 100
         , Balls.create 30
+        , Statue.create (vec3 3 10 5) cloudsSphere
         ]
     , staticBodies =
         [ put (vec3 0 1.5 0) fogMountainsDiamond
         , put (vec3 5 1.5 1) cloudsDiamond
-        , put (vec3 3 10 5) cloudsSphere
         , put (vec3 10 0 10) voronoiCube
         , put (vec3 -10 0 -10) skyCube -- fireCube
         , put (vec3 10 1.5 -10) fogMountainsCube
