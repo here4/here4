@@ -5,7 +5,9 @@ import Math.Vector3 as V3
 
 import Appearance exposing (Appearance)
 
-type Body = BCtr Vec3 Vec3 Vec3 Appearance
+type Body = BCtr Anchor Vec3 Vec3 Vec3 Appearance
+
+type Anchor = AnchorGround | AnchorSky | AnchorHUD
 
 type alias Visible a = { a | appear : Appearance }
 
@@ -17,20 +19,22 @@ type alias Spherical a = { a | radius : Float }
 
 -- | Use anything Oriented and Visible as a Body
 toBody : Oriented (Visible a) -> Body
-toBody x = BCtr x.scale x.pos x.orientation x.appear
+toBody x = BCtr AnchorGround x.scale x.pos x.orientation x.appear
 
 -- | Reposition a Body
 reposition : Vec3 -> Body -> Body
-reposition t (BCtr scale _ o s) = BCtr scale t o s
+reposition t (BCtr anchor scale _ o s) = BCtr anchor scale t o s
 
 -- | Resize a Body
 resize : Float -> Body -> Body
-resize scale (BCtr scale0 p o s) = BCtr (V3.scale scale scale0) p o s
+resize scale (BCtr anchor scale0 p o s) = BCtr anchor (V3.scale scale scale0) p o s
 
 -- | Translate a Body
 translate : Vec3 -> Body -> Body
-translate t (BCtr scale p o s) = BCtr scale (V3.add t p) o s
+translate t (BCtr anchor scale p o s) = BCtr anchor scale (V3.add t p) o s
 
 put : Vec3 -> Appearance -> Body
-put pos appear = BCtr (vec3 1 1 1) pos (vec3 1 0 0) appear
+put pos appear = BCtr AnchorGround (vec3 1 1 1) pos (vec3 1 0 0) appear
 
+anchorSky : Body -> Body
+anchorSky (BCtr _ scale p o s) = BCtr AnchorSky scale p o s

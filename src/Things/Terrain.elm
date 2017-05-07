@@ -79,7 +79,7 @@ visibleTerrain : Placement -> Array2D Float -> Array2D Body -> List Body
 visibleTerrain placement terrain arr =
     let
         appears = Array2D.map
-                    (\(Body.BCtr _ pos _ appear) ->
+                    (\(Body.BCtr _ _ pos _ appear) ->
                       (Appearance.transform (M4.translate pos)
                                             appear))
                     arr

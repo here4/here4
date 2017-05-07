@@ -14,7 +14,7 @@ import WebGL
 import Window
 
 import App exposing (..)
-import Appearance exposing (Appearance)
+import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
 import Ground exposing (Ground, bounds, elevation)
 import Model exposing (Model, Msg)
@@ -151,16 +151,29 @@ layoutSceneVR windowSize model render =
 mapApply : List (a -> List b) -> a -> List b
 mapApply fs x = List.concat <| List.map (\f -> f x) fs
 
-orient : Body -> Appearance
-orient (Body.BCtr scale position orientation appear) =
+orient : Mat4 -> Perception -> Body -> List WebGL.Entity
+orient skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
     let z_axis = vec3 0 0 1
         rot_angle = 0 - acos (dot orientation z_axis)
         rot_axis = normalize (cross orientation z_axis)
-    in
-        appear
-          |> Appearance.transform (M4.rotate rot_angle rot_axis)
-          >> Appearance.transform (M4.translate position)
-          >> Appearance.transform (M4.scale scale)
+        appear = case anchor of
+            Body.AnchorGround ->
+                appear0
+                  |> Appearance.transform (M4.rotate rot_angle rot_axis)
+                  >> Appearance.transform (M4.translate position)
+                  >> Appearance.transform (M4.scale scale)
+            Body.AnchorSky ->
+                appear0
+                  |> Appearance.transform (M4.rotate rot_angle rot_axis)
+                  >> Appearance.transform (M4.scale scale)
+            Body.AnchorHUD ->
+                appear0
+                  |> Appearance.transform (M4.scale scale)
+        skyPerception = { p | viewMatrix = skyMatrix }
+    in case anchor of
+            Body.AnchorGround -> appear p
+            Body.AnchorSky -> appear skyPerception
+            Body.AnchorHUD -> appear skyPerception
 
 eyeOffset : Model.Player -> Model.Eye -> Vec3
 eyeOffset player eye =
@@ -197,13 +210,15 @@ renderWorld globalTime world eye windowSize player =
             }
 
         bodies = world.ground.bodies ++ world.bodies
-        appears = mapApply (List.map orient bodies)
+        skyMatrix = skyboxMatrix windowSize player
+        -- appears = mapApply (List.map (orient skyMatrix p) bodies)
+        appears = List.concat <| List.map (orient skyMatrix p) bodies
 
-        skyPerspective = { p | viewMatrix = skyboxMatrix windowSize player }
-        skyAppears = mapApply (List.map orientSkybox world.sky)
+        -- skyPerception = { p | viewMatrix = skyboxMatrix windowSize player }
+        -- skyAppears = mapApply (List.map orientSkybox world.sky)
 
     in
-        skyAppears skyPerspective ++ appears p
+        appears
 
 {-| Calculate the viewer's field of view
 -}
@@ -214,6 +229,7 @@ perspective { width, height } player eye =
                        (add player.pos (scale 3 (Model.direction player)))
                        player.cameraUp)
 
+{-
 orientSkybox : Body -> Appearance
 orientSkybox (Body.BCtr scale _ orientation appear) =
     let z_axis = vec3 0 0 1
@@ -223,6 +239,7 @@ orientSkybox (Body.BCtr scale _ orientation appear) =
         appear
           |> Appearance.transform (M4.rotate rot_angle rot_axis)
           >> Appearance.transform (M4.scale scale)
+-}
 
 
 skyboxMatrix : Window.Size -> Model.Player -> Mat4

@@ -125,7 +125,7 @@ type alias Focus = {
 }
 
 appToFocus : Body -> Focus
-appToFocus (BCtr _ p _ _) = { pos = p }
+appToFocus (BCtr _ _ p _ _) = { pos = p }
 
 orientedToFocus : Oriented a -> Focus
 orientedToFocus x = { pos = x.pos }
