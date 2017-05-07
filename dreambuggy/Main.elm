@@ -21,7 +21,7 @@ main : Program Args
 main =
   TerrainWorld.create
     { apps =
-        [ Sky.create (vec3 0 1 1) skySphere
+        [ Sky.create skySphere
         , TextureCube.create "resources/woodCrate.jpg"
         , Boids.create 100
         , Balls.create 30
