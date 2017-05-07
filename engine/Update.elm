@@ -65,7 +65,7 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                         (wm2, wmCmdMsg, focPos) = case worldFocus model.worldModel of
                             Just focus ->
                                 let dp = inputsToMove inputs model.player1
-                                    (wm2, wmCmdMsg) = worldUpdate (Control.Ctrl (Control.Move dp)) wm
+                                    (wm2, wmCmdMsg) = worldUpdate (Forward (Control.Move dp)) wm
                                 in (wm2, wmCmdMsg, Just focus.pos)
                             _ -> (wm, Cmd.none, Nothing)
                         newModel =

@@ -48,7 +48,7 @@ worldApps : List (App, Cmd AppMsg) -> (Bag App, Cmd (WorldMsg a))
 worldApps ts =
     let f (newApps, newCmdMsg) (oldBag, oldCmdMsgs) =
             let (key, newBag) = Bag.insert newApps oldBag
-            in (newBag, oldCmdMsgs ++ [Cmd.map (Control.Send key) newCmdMsg])
+            in (newBag, oldCmdMsgs ++ [Cmd.map (Send key) newCmdMsg])
         (appsBag, unbatched) = List.foldl f (Bag.empty, []) ts
     in
         (appsBag, Cmd.batch unbatched)
@@ -63,7 +63,7 @@ worldInit details =
           , focusKey = List.head (Bag.keys appsBag)
           }
         , Cmd.batch
-            [ Terrain.generate (Control.W << TerrainGenerated) defaultPlacement
+            [ Terrain.generate (Hub << TerrainGenerated) defaultPlacement
             , appCmds
             ]
         )
@@ -84,10 +84,10 @@ makeWorld ground model =
 worldUpdate : WorldMsg TerrainWorldMsg -> WorldModel -> (WorldModel, Cmd (WorldMsg TerrainWorldMsg))
 worldUpdate msg model =
     case msg of
-        Control.W (TerrainGenerated terrain) ->
+        Hub (TerrainGenerated terrain) ->
             ( { model | maybeGround = Just terrain }, Cmd.none )
 
-        Control.Send key appMsg ->
+        Send key appMsg ->
            case Bag.get key model.apps of
                Nothing ->
                    ( model, Cmd.none )
@@ -95,9 +95,9 @@ worldUpdate msg model =
                    let (appModel, appCmdMsg) = App.update appMsg t
                    in
                        ( { model | apps = Bag.replace key appModel model.apps }
-                       , Cmd.map (Control.Send key) appCmdMsg
+                       , Cmd.map (Send key) appCmdMsg
                        )
-        Control.Ctrl (Control.Move dp) ->
+        Forward (Control.Move dp) ->
            case model.focusKey of
                Nothing ->
                    ( model, Cmd.none )
@@ -109,7 +109,7 @@ worldUpdate msg model =
                            let (appModel, appCmdMsg) = App.update (Down (Control.Move dp)) t
                            in
                                ( { model | apps = Bag.replace key appModel model.apps }
-                               , Cmd.map (Control.Send key) appCmdMsg
+                               , Cmd.map (Send key) appCmdMsg
                                )
 
 worldAnimate : Time -> WorldModel -> WorldModel
