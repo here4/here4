@@ -32,7 +32,4 @@ main =
         , Statue.create (vec3 -10 0 -10) skyCube -- fireCube
         , Statue.create (vec3 10 1.5 -10) fogMountainsCube
         ]
-    , sky =
-        [
-        ]
     }
