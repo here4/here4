@@ -48,8 +48,8 @@ nextVehicle v = (v+1) % (vehicleDebug+1)
 
 type alias World =
     { bodies : List Body
+    , sky    : List Body
     , ground : Ground
-    , skybox : Body
     }
 
 type alias Player =

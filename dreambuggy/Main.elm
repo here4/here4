@@ -10,6 +10,7 @@ import Control exposing (CtrlMsg)
 import TerrainWorld
 import Boids
 import Balls
+import Sky
 import Statue
 import TextureCube
 
@@ -33,5 +34,7 @@ main =
         , Statue.create (vec3 -10 0 -10) skyCube -- fireCube
         , Statue.create (vec3 10 1.5 -10) fogMountainsCube
         ]
-    , skybox = resize 80 <| put (vec3 0 1 1) skySphere
+    , sky =
+        [ Sky.create (vec3 0 1 1) skySphere
+        ]
     }

@@ -196,12 +196,14 @@ renderWorld globalTime world eye windowSize player =
             , measuredFPS = 30.0
             }
 
-        skybox = orientSkybox world.skybox { p | viewMatrix = skyboxMatrix windowSize player }
-
         bodies = world.ground.bodies ++ world.bodies
         appears = mapApply (List.map orient bodies)
+
+        skyPerspective = { p | viewMatrix = skyboxMatrix windowSize player }
+        skyAppears = mapApply (List.map orientSkybox world.sky)
+
     in
-        skybox ++ appears p
+        skyAppears skyPerspective ++ appears p
 
 {-| Calculate the viewer's field of view
 -}
