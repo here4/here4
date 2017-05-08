@@ -10,28 +10,28 @@ import Model
 ----------------------------------------------------------------------
 -- LookAt
 
-welcome : Model.Player -> Model.Player
-welcome player = player
+welcome : Model.Motion -> Model.Motion
+welcome motion = motion
 
-move : Model.EyeLevel -> Model.Inputs -> Maybe Vec3 -> Model.Player -> Model.Player
-move eyeLevel inputs focPos player = case focPos of
-  Nothing -> player
+move : Model.EyeLevel -> Model.Inputs -> Maybe Vec3 -> Model.Motion -> Model.Motion
+move eyeLevel inputs focPos motion = case focPos of
+  Nothing -> motion
   Just fpos ->
     let
         -- Some point directly above a given point
         upwardsFrom p = V3.setY (V3.getY p + 1) p
 
-        p = V3.sub fpos player.pos
+        p = V3.sub fpos motion.position
 
         -- inputs
         upDown = V3.scale (3.0 * inputs.y) (V3.normalize p)
         inputYaw = inputs.mx * 30 * inputs.dt
         inputPitch = inputs.my * 30 * inputs.dt
 
-        cPos = V3.add player.pos upDown
+        cPos = V3.add motion.position upDown
 
         -- Limit how close you can get. This should be a function of the size of the thing.
-        closePos = if V3.length (V3.sub fpos cPos) < 3.0 then player.pos else cPos
+        closePos = if V3.length (V3.sub fpos cPos) < 3.0 then motion.position else cPos
 
 {-
         fromSpherical (r, theta, phi) = (r * sin theta * cos phi, r * sin theta * sin phi, r * cos theta)
@@ -60,7 +60,7 @@ move eyeLevel inputs focPos player = case focPos of
         wantPos = V3.add fpos <| Qn.vrotate pitchQ xzPos
 -}
 
-        unboundPos = V3.add (V3.scale 0.3 wantPos) (V3.scale 0.7 player.pos)
+        unboundPos = V3.add (V3.scale 0.3 wantPos) (V3.scale 0.7 motion.position)
 
         u = toRecord unboundPos
         e = eyeLevel unboundPos
@@ -84,4 +84,4 @@ move eyeLevel inputs focPos player = case focPos of
         orientation = Qn.hamilton orCam orPos
         
     in
-        { player | pos = newPos, orientation = orientation }
+        { motion | position = newPos, orientation = orientation }

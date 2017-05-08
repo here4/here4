@@ -16,5 +16,3 @@ type Msg
 
 type EffectMsg
     = UpdateGround Ground
-
-

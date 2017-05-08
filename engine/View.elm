@@ -174,12 +174,12 @@ orient skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
             Body.AnchorSky -> appear skyPerception
             Body.AnchorHUD -> appear skyPerception
 
-eyeOffset : Model.Player -> Model.Eye -> Vec3
-eyeOffset player eye =
+eyeOffset : Model.Motion -> Model.Eye -> Vec3
+eyeOffset motion eye =
     if eye == Model.LeftEye then
-        Orientation.rotateLabV player.orientation (vec3 (-0.04) 0 0)
+        Orientation.rotateLabV motion.orientation (vec3 (-0.04) 0 0)
     else if eye == Model.RightEye then
-        Orientation.rotateLabV player.orientation (vec3 0.04 0 0)
+        Orientation.rotateLabV motion.orientation (vec3 0.04 0 0)
     else
         vec3 0 0 0
 
@@ -199,7 +199,7 @@ renderWorld globalTime world eye windowSize player =
         eyeLevel pos = Model.eyeLevel + world.ground.elevation pos
         lensDistort = if player.cameraVR then 0.85 else 0.95
 
-        p = { cameraPos = world.ground.bounds (aboveGround eyeLevel player.pos)
+        p = { cameraPos = world.ground.bounds (aboveGround eyeLevel player.motion.position)
             , viewMatrix = perspective windowSize player eye
             , globalTime = globalTime
             , windowSize = windowSize
@@ -218,15 +218,15 @@ renderWorld globalTime world eye windowSize player =
 perspective : Window.Size -> Model.Player -> Model.Eye -> Mat4
 perspective { width, height } player eye =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
-        (M4.makeLookAt (add player.cameraPos (eyeOffset player eye))
-                       (add player.pos (scale 3 (Model.direction player)))
+        (M4.makeLookAt (add player.cameraPos (eyeOffset player.motion eye))
+                       (add player.motion.position (scale 3 (Model.direction player.motion)))
                        player.cameraUp)
 
 skyboxMatrix : Window.Size -> Model.Player -> Mat4
 skyboxMatrix { width, height } player =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
         (M4.makeLookAt (vec3 0 0 0)
-                       (scale 3 (Model.direction player))
+                       (scale 3 (Model.direction player.motion))
                        player.cameraUp)
 
 hud : Model.Player -> Int -> Int -> Html (Msg worldMsg)

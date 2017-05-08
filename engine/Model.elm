@@ -6,7 +6,7 @@ import Time exposing (..)
 import Task exposing (Task)
 import Window
 
-import Orientation
+import Orientation exposing (Orientation)
 import Bag
 import Body exposing (Body)
 import Ground exposing (Ground)
@@ -52,10 +52,14 @@ type alias World =
     , ground : Ground
     }
 
-type alias Player =
-    { pos : Vec3
+type alias Motion =
+    { position : Vec3
     , velocity : Vec3
-    , orientation : Orientation.Orientation
+    , orientation : Orientation
+    }
+
+type alias Player =
+    { motion : Motion
     , vehicle : WhichVehicle
     , cameraVR : Bool
     , cameraInside : Bool
@@ -71,11 +75,16 @@ type alias EyeLevel = Vec3 -> Float
 eyeLevel : Float
 eyeLevel = 1.8 -- Make this a function of Vehicle
 
-defaultPlayer : Player
-defaultPlayer =
-    { pos = vec3 0 30 0 
+defaultMotion : Motion
+defaultMotion =
+    { position = vec3 0 30 0
     , velocity = vec3 0 0 0
     , orientation = Orientation.initial
+    }
+
+defaultPlayer : Player
+defaultPlayer =
+    { motion = defaultMotion
     , vehicle = vehicleBuggy
     , cameraVR = False
     , cameraInside = True
@@ -179,13 +188,13 @@ init worldInit { movement, isLocked } =
         ]
     )
 
-orient : Player -> Vec3 -> Vec3
-orient player = Orientation.rotateBodyV player.orientation
+orient : Motion -> Vec3 -> Vec3
+orient motion = Orientation.rotateBodyV motion.orientation
 
-direction : Player -> Vec3
-direction player = orient player V3.k
+direction : Motion -> Vec3
+direction motion = orient motion V3.k
 
 cameraUp : Player -> Vec3
 -- cameraUp player = orient player V3.j
 -- cameraUp player = Qn.vrotate (Qn.negate player.orientQn) V3.j
-cameraUp player = Orientation.rotateLabV player.orientation V3.j
+cameraUp player = Orientation.rotateLabV player.motion.orientation V3.j
