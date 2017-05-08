@@ -1,4 +1,4 @@
-module Things.Terrain exposing
+module Body.Terrain exposing
     ( generate
     , paint, ripplePaint
     , mountains, sea
@@ -20,7 +20,7 @@ import Body exposing (Body, Oriented, Visible, toBody)
 import Ground exposing (Ground)
 import Placement exposing (Placement, defaultPlacement)
 import Tiles exposing ( createTileGround)
-import Things.Surface2D exposing (..)
+import Body.Surface2D exposing (..)
 
 ----------------------------------------------------------------------
 

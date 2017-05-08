@@ -1,4 +1,4 @@
-module Things.Surface2D exposing
+module Body.Surface2D exposing
     ( SurfaceVertex, surface2D
     , NoiseSurfaceVertex, noiseSurface2D, rippleNoiseSurface2D
     )

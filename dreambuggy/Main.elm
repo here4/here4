@@ -12,7 +12,7 @@ import Statue
 import TextureCube
 
 import StaticGround
-import Things.Terrain as Terrain
+import Body.Terrain as Terrain
 
 import Body.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
 import Body.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
