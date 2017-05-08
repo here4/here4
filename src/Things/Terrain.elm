@@ -17,8 +17,9 @@ import Util exposing (..)
 import Math.Procedural exposing (..)
 import Appearance exposing (..)
 import Body exposing (Body, Oriented, Visible, toBody)
-import Ground exposing (Ground, createTileGround)
+import Ground exposing (Ground)
 import Placement exposing (Placement, defaultPlacement)
+import Tiles exposing ( createTileGround)
 import Things.Surface2D exposing (..)
 
 ----------------------------------------------------------------------
