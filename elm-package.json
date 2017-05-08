@@ -6,10 +6,10 @@
     "source-directories": [
         "dreambuggy",
         "engine",
-        "apps",
         "terrain",
-        "quaternion",
-        "src"
+        "apps",
+        "vehicles",
+        "quaternion"
     ],
     "exposed-modules": [],
     "native-modules": true,
