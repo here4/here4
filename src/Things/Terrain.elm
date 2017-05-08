@@ -17,7 +17,7 @@ import Util exposing (..)
 import Math.Procedural exposing (..)
 import Appearance exposing (..)
 import Body exposing (Body, Oriented, Visible, toBody)
-import Ground exposing (Ground)
+import Ground exposing (Ground, createTileGround)
 import Placement exposing (Placement, defaultPlacement)
 import Things.Surface2D exposing (..)
 
@@ -35,7 +35,7 @@ generateWithPlacement placement tagger =
             , bodies = paint mountains placement elevations ++
                        ripplePaint sea 0.3 placement elevations
             }
-    in Random.generate tagger (Random.map makeTerrain elGen)
+    in Random.generate tagger (Random.map (createTileGround << makeTerrain) elGen)
 
 ----------------------------------------------------------------------
 

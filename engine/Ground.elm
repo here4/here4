@@ -1,6 +1,6 @@
 module Ground exposing
     ( Ground
-    , bounds, elevation
+    , Tiles, createTileGround
     )
 
 import Math.Vector3 as V3 exposing (Vec3, vec3, getX, getZ)
@@ -10,16 +10,29 @@ import Body exposing (Body, Oriented, Visible, toBody)
 import Placement exposing (Placement)
 
 type alias Ground =
-    { placement : Placement
-    , elevations : Array2D Float
+    { bounds : Vec3 -> Vec3
+    , elevation : Vec3 -> Float
     , bodies : List Body
     }
 
 ----------------------------------------------------------------------
 
--- bounds : Placement -> Vec3 -> Vec3
-bounds : Ground -> Vec3 -> Vec3
-bounds { placement } pos =
+type alias Tiles =
+    { placement : Placement
+    , elevations : Array2D Float
+    , bodies : List Body
+    }
+
+createTileGround : Tiles -> Ground
+createTileGround tiles =
+    { bounds = tileBounds tiles
+    , elevation = tileElevation tiles
+    , bodies = tiles.bodies
+    }
+
+
+tileBounds : Tiles -> Vec3 -> Vec3
+tileBounds { placement } pos =
     let bound x low high = if (x < low) then low else (if x > high then high else x)
         (x,y,z) = V3.toTuple pos
     -- in vec3 (bound x -246 1782) (bound y 0 1000) (bound z -246 1782)
@@ -30,9 +43,8 @@ bounds { placement } pos =
 
 -- Elevation of terrain at a given coordinate
 -- Linearly interpolated on the mesh triangle
--- elevation : Placement -> Array2D Float -> Vec3 -> Float
-elevation : Ground -> Vec3 -> Float
-elevation { placement, elevations } pos =
+tileElevation : Tiles -> Vec3 -> Float
+tileElevation { placement, elevations } pos =
     let
         ix0 = (getX pos + 256) / 2
         ix  = floor ix0

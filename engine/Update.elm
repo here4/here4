@@ -14,7 +14,7 @@ import GamepadInputs
 
 import Control exposing (WorldMsg)
 import App exposing (Focus)
-import Ground exposing (Ground, bounds, elevation)
+import Ground exposing (Ground)
 import Vehicles.DreamBird as DreamBird
 import Vehicles.DreamBuggy as DreamBuggy
 import Vehicles.LookAt as LookAt
@@ -160,7 +160,7 @@ aboveGround eyeLevel pos =
 step : Ground -> Model.Inputs -> Maybe Vec3 -> Model.Player -> Model.Player
 step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer else
         let 
-            eyeLevel pos = Model.eyeLevel + elevation terrain pos
+            eyeLevel pos = Model.eyeLevel + terrain.elevation pos
             move player =
                 if player.vehicle == Model.vehicleBird then
                     DreamBird.move eyeLevel inputs player
@@ -170,7 +170,7 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
                     LookAt.move eyeLevel inputs focPos player
                 else
                     DreamDebug.move eyeLevel inputs player
-            keepWithinbounds player = { player | pos = bounds terrain player.pos }
+            keepWithinbounds player = { player | pos = terrain.bounds player.pos }
 
             checkCamera player = { player |
                 cameraInside = if inputs.changeCamera then
@@ -209,7 +209,7 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
                             newCameraPos
                         newCameraUp = Model.cameraUp player
 
-                    in  { player | cameraPos = bounds terrain cameraPos
+                    in  { player | cameraPos = terrain.bounds cameraPos
                                  , cameraUp =
                             -- V3.scale 0.1 newCameraUp `add` V3.scale 0.9 player.cameraUp }
                                newCameraUp }
