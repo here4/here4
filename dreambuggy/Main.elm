@@ -4,7 +4,7 @@ import Math.Vector3 exposing (vec3)
 
 import Model exposing (Args)
 
-import TerrainWorld exposing (TerrainModel, TerrainMsg)
+import NewWorld
 import Boids
 import Balls
 import Sky
@@ -19,10 +19,10 @@ import Body.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Body.Sphere exposing (skySphere, cloudsSphere)
 
 main : Program Args
-        (Model.Model TerrainModel)
-        (Model.Msg TerrainMsg)
+        (Model.Model NewWorld.Model)
+        (Model.Msg NewWorld.Msg)
 main =
-  TerrainWorld.create -- Terrain.generate
+  NewWorld.create
     { apps =
         [ Terrain.create TerrainG.generate
         , Sky.create skySphere
