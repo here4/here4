@@ -15,24 +15,24 @@ import Ground exposing (Ground)
 
 type alias WorldModel a =
     { worldModel : a
+    , maybeGround : Maybe Ground
     , apps : Bag App
     , focusKey : Maybe Bag.Key
     }
 
 create :
        (model, Cmd msg)
-    -> (model -> Maybe Ground)
     -> (msg -> model -> (model, Cmd msg))
     -> { apps : List (App, Cmd AppMsg) }
     -> Program Args (Model.Model (WorldModel model)) (Model.Msg (WorldMsg msg))
-create hubInit hubGround hubUpdate details =
+create hubInit hubUpdate details =
   Space.programWithFlags
     { init = worldInit hubInit details
-    , view = worldView hubGround
+    , view = worldView
     , update = worldUpdate hubUpdate
     , focus = worldFocus
     , animate = worldAnimate
-    , ground = worldGround hubGround
+    , ground = worldGround
     }
 
 worldApps : List (App, Cmd AppMsg) -> (Bag App, Cmd (WorldMsg a))
@@ -52,6 +52,7 @@ worldInit hubInit details =
         (appsBag, appCmds) = worldApps details.apps
     in
         ( { worldModel = hubModel
+          , maybeGround = Nothing
           , apps = appsBag
           , focusKey = List.head (Bag.keys appsBag)
           }
@@ -61,9 +62,9 @@ worldInit hubInit details =
             ]
         )
 
-worldView : (model -> Maybe Ground) -> WorldModel model -> Maybe Model.World
-worldView hubGround model =
-    case hubGround model.worldModel of
+worldView : WorldModel model -> Maybe Model.World
+worldView model =
+    case model.maybeGround of
         Nothing     -> Nothing
         Just ground -> Just (makeWorld ground model)
 
@@ -82,15 +83,21 @@ worldUpdate hubUpdate msg model =
             let (hubModel, hubCmd) = hubUpdate hubMsg model.worldModel
             in ( { model | worldModel = hubModel }, Cmd.map Hub hubCmd)
 
+        HubEff (Control.UpdateGround ground) ->
+            ( { model | maybeGround = Just ground }, Cmd.none)
+
         Send key appMsg ->
            case Bag.get key model.apps of
                Nothing ->
                    ( model, Cmd.none )
                Just t ->
                    let (appModel, appCmdMsg) = App.update appMsg t
+                       foo x = case x of
+                                 Effect e -> HubEff e
+                                 m        -> Send key m
                    in
                        ( { model | apps = Bag.replace key appModel model.apps }
-                       , Cmd.map (Send key) appCmdMsg
+                       , Cmd.map foo appCmdMsg
                        )
         Forward (Control.Move dp) ->
            case model.focusKey of
@@ -116,6 +123,6 @@ worldFocus model = case Bag.items model.apps of
     (someitem :: _) -> App.focus someitem
     _ -> Nothing
 
-worldGround : (model -> Maybe Ground) -> WorldModel model -> Maybe Ground
-worldGround hubGround model = hubGround model.worldModel
+worldGround : WorldModel model -> Maybe Ground
+worldGround model = model.maybeGround
 

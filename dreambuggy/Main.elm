@@ -11,7 +11,8 @@ import Sky
 import Statue
 import TextureCube
 
-import Things.Terrain as Terrain
+import Terrain
+import Things.Terrain as TerrainG
 
 import Body.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
 import Body.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
@@ -21,9 +22,10 @@ main : Program Args
         (Model.Model TerrainModel)
         (Model.Msg TerrainMsg)
 main =
-  TerrainWorld.create Terrain.generate
+  TerrainWorld.create -- Terrain.generate
     { apps =
-        [ Sky.create skySphere
+        [ Terrain.create TerrainG.generate
+        , Sky.create skySphere
         , TextureCube.create "resources/woodCrate.jpg"
         , Boids.create 100
         , Balls.create 30
