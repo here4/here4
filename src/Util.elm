@@ -2,7 +2,6 @@ module Util exposing (..)
 
 import Color exposing (hsl, toRgb)
 import Math.Vector3 exposing (Vec3, vec3)
-import Math.Vector3 as V3
 
 ---------------------------------------------------------------------
 
@@ -42,8 +41,4 @@ hslToVec3 : Float -> Float -> Float -> Vec3
 hslToVec3 hue saturation lightness =
     let c = toRgb (hsl hue saturation lightness)
     in  vec3 (toFloat c.red / 255) (toFloat c.green / 255) (toFloat c.blue / 255)
-
--- | Clamp a vector to be no longer than len
-v3_clamp : Float -> Vec3 -> Vec3
-v3_clamp len v = if V3.length v <= len then v else V3.scale len (V3.normalize v)
 

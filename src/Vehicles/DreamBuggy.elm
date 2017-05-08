@@ -4,7 +4,6 @@ import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (..)
 import Orientation exposing (..)
-import Util exposing (v3_clamp)
 
 import Model
 
@@ -99,3 +98,7 @@ physics eyeLevel dt player =
                          (pos, vec3 0 0 0)
     in
         { player | pos = pos_, velocity = add player.velocity dv }
+
+-- | Clamp a vector to be no longer than len
+v3_clamp : Float -> Vec3 -> Vec3
+v3_clamp len v = if V3.length v <= len then v else V3.scale len (V3.normalize v)
