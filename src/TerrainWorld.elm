@@ -38,11 +38,6 @@ type alias TerrainModel = WorldModel TerrainWorldModel
 worldGround : TerrainModel -> Maybe Ground
 worldGround model = model.worldModel
 
-worldFocus : WorldModel a -> Maybe Focus
-worldFocus model = case Bag.items model.apps of
-    (someitem :: _) -> App.focus someitem
-    _ -> Nothing
-
 terrainInit : ((Ground -> TerrainWorldMsg) -> Cmd TerrainWorldMsg)
     -> (TerrainWorldModel, Cmd TerrainWorldMsg)
 terrainInit makeGround = (Nothing, makeGround TerrainGenerated)
@@ -136,4 +131,9 @@ worldUpdate hubUpdate msg model =
 worldAnimate : Time -> WorldModel a -> WorldModel a
 worldAnimate dt model =
     { model | apps = Bag.map (App.animate dt) model.apps }
+
+worldFocus : WorldModel a -> Maybe Focus
+worldFocus model = case Bag.items model.apps of
+    (someitem :: _) -> App.focus someitem
+    _ -> Nothing
 
