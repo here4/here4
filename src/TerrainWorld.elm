@@ -15,14 +15,14 @@ import Ground exposing (Ground)
 
 type alias TerrainMsg = WorldMsg TerrainWorldMsg
 
-create : ((Ground -> TerrainMsg) -> Cmd (TerrainMsg))
+create : ((Ground -> TerrainWorldMsg) -> Cmd (TerrainWorldMsg))
     -> { apps : List (App, Cmd AppMsg) }
     -> Program Args (Model.Model TerrainModel) (Model.Msg TerrainMsg)
 create makeGround details =
   Space.programWithFlags
-    { init = worldInit makeGround details
+    { init = worldInit (terrainInit makeGround) details
     , view = worldView
-    , update = worldUpdate
+    , update = worldUpdate terrainUpdate
     , focus = worldFocus
     , animate = worldAnimate
     , ground = worldGround
@@ -31,21 +31,48 @@ create makeGround details =
 type TerrainWorldMsg
     = TerrainGenerated Ground
 
-type alias WorldModel a =
-    { maybeGround : a
-    , apps : Bag App
-    , focusKey : Maybe Bag.Key
-    }
+type alias TerrainWorldModel = Maybe Ground
 
-type alias TerrainModel = WorldModel (Maybe Ground)
+type alias TerrainModel = WorldModel TerrainWorldModel
 
 worldGround : TerrainModel -> Maybe Ground
-worldGround model = model.maybeGround
+worldGround model = model.worldModel
 
 worldFocus : WorldModel a -> Maybe Focus
 worldFocus model = case Bag.items model.apps of
     (someitem :: _) -> App.focus someitem
     _ -> Nothing
+
+terrainInit : ((Ground -> TerrainWorldMsg) -> Cmd TerrainWorldMsg)
+    -> (TerrainWorldModel, Cmd TerrainWorldMsg)
+terrainInit makeGround = (Nothing, makeGround TerrainGenerated)
+
+worldView : TerrainModel -> Maybe Model.World
+worldView model =
+    case model.worldModel of
+        Nothing     -> Nothing
+        Just ground -> Just (makeWorld ground model)
+
+makeWorld : Ground -> WorldModel a -> Model.World
+makeWorld ground model =
+    let
+        worldBodies = List.concatMap bodies (Bag.items model.apps)
+    in
+        { bodies = worldBodies, ground = ground }
+
+terrainUpdate : TerrainWorldMsg -> TerrainWorldModel -> (TerrainWorldModel, Cmd TerrainWorldMsg)
+terrainUpdate msg model =
+    case msg of
+        TerrainGenerated terrain ->
+            ( Just terrain, Cmd.none )
+
+----------------------------------------------------------------------
+
+type alias WorldModel a =
+    { worldModel : a
+    , apps : Bag App
+    , focusKey : Maybe Bag.Key
+    }
 
 worldApps : List (App, Cmd AppMsg) -> (Bag App, Cmd (WorldMsg a))
 worldApps appsList =
@@ -56,40 +83,30 @@ worldApps appsList =
     in
         (appsBag, Cmd.batch unbatched)
 
-worldInit : ((Ground -> TerrainMsg) -> Cmd TerrainMsg)
+worldInit : (model, Cmd msg)
     -> { apps : List (App, Cmd AppMsg) }
-    -> (TerrainModel, Cmd TerrainMsg)
-worldInit makeGround details =
-    let (appsBag, appCmds) = worldApps details.apps
+    -> (WorldModel model, Cmd (WorldMsg msg))
+worldInit hubInit details =
+    let (hubModel, hubCmd) = hubInit
+        (appsBag, appCmds) = worldApps details.apps
     in
-        ( { maybeGround = Nothing
+        ( { worldModel = hubModel
           , apps = appsBag
           , focusKey = List.head (Bag.keys appsBag)
           }
         , Cmd.batch
-            [ makeGround (Hub << TerrainGenerated)
+            [ Cmd.map Hub hubCmd
             , appCmds
             ]
         )
 
-worldView : TerrainModel -> Maybe Model.World
-worldView model =
-    case model.maybeGround of
-        Nothing     -> Nothing
-        Just ground -> Just (makeWorld ground model)
-
-makeWorld : Ground -> TerrainModel -> Model.World
-makeWorld ground model =
-    let
-        worldBodies = List.concatMap bodies (Bag.items model.apps)
-    in
-        { bodies = worldBodies, ground = ground }
-
-worldUpdate : TerrainMsg -> TerrainModel -> (TerrainModel, Cmd TerrainMsg)
-worldUpdate msg model =
+worldUpdate : (msg -> model -> (model, Cmd msg))
+    -> WorldMsg msg -> WorldModel model -> (WorldModel model, Cmd (WorldMsg msg))
+worldUpdate hubUpdate msg model =
     case msg of
-        Hub (TerrainGenerated terrain) ->
-            ( { model | maybeGround = Just terrain }, Cmd.none )
+        Hub hubMsg ->
+            let (hubModel, hubCmd) = hubUpdate hubMsg model.worldModel
+            in ( { model | worldModel = hubModel }, Cmd.map Hub hubCmd)
 
         Send key appMsg ->
            case Bag.get key model.apps of
