@@ -6,10 +6,15 @@ import Bag exposing (Bag)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 
-type alias CtrlMsg a = Dispatch Msg a
+import Ground exposing (Ground)
+
+type alias CtrlMsg a  = Dispatch EffectMsg Msg a
+type alias WorldMsg a = DispatchHub Bag.Key EffectMsg Msg Dynamic a
 
 type Msg
     = Move Vec3
 
-type alias WorldMsg a = DispatchHub Bag.Key Msg Dynamic a
+type EffectMsg
+    = UpdateGround Ground
+
 
