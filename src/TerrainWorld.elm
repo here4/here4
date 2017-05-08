@@ -19,14 +19,7 @@ create : ((Ground -> TerrainWorldMsg) -> Cmd (TerrainWorldMsg))
     -> { apps : List (App, Cmd AppMsg) }
     -> Program Args (Model.Model TerrainModel) (Model.Msg TerrainMsg)
 create makeGround details =
-  Space.programWithFlags
-    { init = worldInit (terrainInit makeGround) details
-    , view = worldView
-    , update = worldUpdate terrainUpdate
-    , focus = worldFocus
-    , animate = worldAnimate
-    , ground = worldGround
-    }
+    worldCreate (terrainInit makeGround) terrainGround terrainUpdate details
 
 type TerrainWorldMsg
     = TerrainGenerated Ground
@@ -35,25 +28,12 @@ type alias TerrainWorldModel = Maybe Ground
 
 type alias TerrainModel = WorldModel TerrainWorldModel
 
-worldGround : TerrainModel -> Maybe Ground
-worldGround model = model.worldModel
+terrainGround : TerrainWorldModel -> Maybe Ground
+terrainGround = identity
 
 terrainInit : ((Ground -> TerrainWorldMsg) -> Cmd TerrainWorldMsg)
     -> (TerrainWorldModel, Cmd TerrainWorldMsg)
 terrainInit makeGround = (Nothing, makeGround TerrainGenerated)
-
-worldView : TerrainModel -> Maybe Model.World
-worldView model =
-    case model.worldModel of
-        Nothing     -> Nothing
-        Just ground -> Just (makeWorld ground model)
-
-makeWorld : Ground -> WorldModel a -> Model.World
-makeWorld ground model =
-    let
-        worldBodies = List.concatMap bodies (Bag.items model.apps)
-    in
-        { bodies = worldBodies, ground = ground }
 
 terrainUpdate : TerrainWorldMsg -> TerrainWorldModel -> (TerrainWorldModel, Cmd TerrainWorldMsg)
 terrainUpdate msg model =
@@ -67,6 +47,22 @@ type alias WorldModel a =
     { worldModel : a
     , apps : Bag App
     , focusKey : Maybe Bag.Key
+    }
+
+worldCreate :
+       (model, Cmd msg)
+    -> (model -> Maybe Ground)
+    -> (msg -> model -> (model, Cmd msg))
+    -> { apps : List (App, Cmd AppMsg) }
+    -> Program Args (Model.Model (WorldModel model)) (Model.Msg (WorldMsg msg))
+worldCreate hubInit hubGround hubUpdate details =
+  Space.programWithFlags
+    { init = worldInit hubInit details
+    , view = worldView hubGround
+    , update = worldUpdate hubUpdate
+    , focus = worldFocus
+    , animate = worldAnimate
+    , ground = worldGround hubGround
     }
 
 worldApps : List (App, Cmd AppMsg) -> (Bag App, Cmd (WorldMsg a))
@@ -94,6 +90,19 @@ worldInit hubInit details =
             , appCmds
             ]
         )
+
+worldView : (model -> Maybe Ground) -> WorldModel model -> Maybe Model.World
+worldView hubGround model =
+    case hubGround model.worldModel of
+        Nothing     -> Nothing
+        Just ground -> Just (makeWorld ground model)
+
+makeWorld : Ground -> WorldModel a -> Model.World
+makeWorld ground model =
+    let
+        worldBodies = List.concatMap bodies (Bag.items model.apps)
+    in
+        { bodies = worldBodies, ground = ground }
 
 worldUpdate : (msg -> model -> (model, Cmd msg))
     -> WorldMsg msg -> WorldModel model -> (WorldModel model, Cmd (WorldMsg msg))
@@ -136,4 +145,7 @@ worldFocus : WorldModel a -> Maybe Focus
 worldFocus model = case Bag.items model.apps of
     (someitem :: _) -> App.focus someitem
     _ -> Nothing
+
+worldGround : (model -> Maybe Ground) -> WorldModel model -> Maybe Ground
+worldGround hubGround model = hubGround model.worldModel
 
