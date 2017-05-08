@@ -1,12 +1,10 @@
 module Terrain exposing (create)
 
-import Math.Vector3 exposing (vec3)
 import Task exposing (Task)
 import Time exposing (Time)
-import WebGL.Texture as Texture exposing (Texture, Error)
 
-import App exposing (App, AppMsg, Focus, appToFocus)
-import Body exposing (Body, translate, put)
+import App exposing (App, AppMsg, Focus)
+import Body exposing (Body)
 import Control exposing (..)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
