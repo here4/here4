@@ -99,28 +99,24 @@ worldUpdate hubUpdate msg model =
                        ( { model | apps = Bag.replace key appModel model.apps }
                        , Cmd.map foo appCmdMsg
                        )
-        Forward fwdMsg ->
-           case model.focusKey of
+        Forward key fwdMsg ->
+           case Bag.get key model.apps of
                Nothing ->
                    ( model, Cmd.none )
-               Just key ->
-                   case Bag.get key model.apps of
-                       Nothing ->
-                           ( model, Cmd.none )
-                       Just t ->
-                           let (appModel, appCmdMsg) = App.update (Ctrl fwdMsg) t
-                           in
-                               ( { model | apps = Bag.replace key appModel model.apps }
-                               , Cmd.map (Send key) appCmdMsg
-                               )
+               Just t ->
+                   let (appModel, appCmdMsg) = App.update (Ctrl fwdMsg) t
+                   in
+                       ( { model | apps = Bag.replace key appModel model.apps }
+                       , Cmd.map (Send key) appCmdMsg
+                       )
 
 worldAnimate : Time -> WorldModel a -> WorldModel a
 worldAnimate dt model =
     { model | apps = Bag.map (App.animate dt) model.apps }
 
-worldFocus : WorldModel a -> Maybe Focus
+worldFocus : WorldModel a -> Maybe (Bag.Key, Focus)
 worldFocus model = case Bag.items model.apps of
-    (someitem :: _) -> App.focus someitem
+    (someitem :: _) -> Maybe.map (\i -> (0, i)) (App.focus someitem)
     _ -> Nothing
 
 worldGround : WorldModel model -> Maybe Ground

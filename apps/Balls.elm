@@ -59,4 +59,4 @@ bodies : Balls -> List Body
 bodies = List.map toBody
 
 focus : Balls -> Maybe Focus
-focus balls = Maybe.map orientedToFocus (List.head balls)
+focus balls = Nothing

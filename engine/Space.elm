@@ -15,6 +15,7 @@ import Window
 
 import Ports
 
+import Bag
 import Control exposing (WorldMsg)
 import Dispatch exposing (..)
 import Model
@@ -30,7 +31,7 @@ programWithFlags
     , view : model -> Maybe Model.World
     , animate : Time -> model -> model 
     , ground : model -> Maybe Ground
-    , focus : model -> Maybe Focus
+    , focus : model -> Maybe (Bag.Key, Focus)
     }
   -> Program Model.Args (Model.Model model) (Model.Msg (WorldMsg msg))
 programWithFlags world =

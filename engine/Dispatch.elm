@@ -8,5 +8,5 @@ type Dispatch effectMsg ctrlMsg nodeMsg
 type DispatchHub key effectMsg ctrlMsg nodeMsg hubMsg
     = Hub hubMsg
     | Send key (Dispatch effectMsg ctrlMsg nodeMsg)
-    | Forward ctrlMsg
+    | Forward key ctrlMsg
     | HubEff effectMsg

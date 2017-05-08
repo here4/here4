@@ -4,6 +4,7 @@ import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Time exposing (Time)
 
+import Bag
 import Dispatch exposing (..)
 import Model exposing (Model, Msg)
 import Orientation
@@ -23,7 +24,7 @@ import Vehicles.DreamDebug as DreamDebug
 {-| Take a Msg and a Model and return an updated Model
 -}
 update : (WorldMsg worldMsg -> worldModel -> (worldModel, Cmd (WorldMsg worldMsg)))
-    -> (worldModel -> Maybe Focus)
+    -> (worldModel -> Maybe (Bag.Key, Focus))
     -> (worldModel -> Maybe Ground)
     -> (Time -> worldModel -> worldModel)
     -> Model.Msg (WorldMsg worldMsg) -> Model worldModel
@@ -63,9 +64,9 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                         inputs2 = timeToInputs dt model.inputs2
                         wm = worldAnimate inputs.dt model.worldModel
                         (wm2, wmCmdMsg, focPos) = case worldFocus model.worldModel of
-                            Just focus ->
+                            Just (key, focus) ->
                                 let dp = inputsToMove inputs model.player1
-                                    (wm2, wmCmdMsg) = worldUpdate (Forward (Control.Move dp)) wm
+                                    (wm2, wmCmdMsg) = worldUpdate (Forward key (Control.Move dp)) wm
                                 in (wm2, wmCmdMsg, Just focus.pos)
                             _ -> (wm, Cmd.none, Nothing)
                         newModel =
