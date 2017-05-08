@@ -17,7 +17,7 @@ import Util exposing (..)
 import Math.Procedural exposing (..)
 import Appearance exposing (..)
 import Body exposing (Body, Oriented, Visible, toBody)
-import Ground exposing (Ground, approxElevation)
+import Ground exposing (Ground)
 import Placement exposing (Placement, defaultPlacement)
 import Things.Surface2D exposing (..)
 
@@ -109,6 +109,19 @@ nearby placement terrain pos appears =
         ir = iradius r
     in
         List.map (\(x,y) -> getXZ (ix0+x) (iz0+y)) ir
+
+-- A faster version of elevation that doesn't attempt to interpolate between
+-- the four surrounding points. Useful for rough calculations like deciding
+-- how many nearby terrain tiles to display based on how close to the ground
+-- the camera is.
+approxElevation : Placement -> Array2D Float -> Vec3 -> Float
+approxElevation placement terrain pos =
+    let
+        ix0 = floor <| (getX pos + 256) / 2
+        iz0 = floor <| (getZ pos + 256) / 2
+        getXZ x z = (Array2D.getXY x z 0 terrain) * placement.yMult
+    in
+        getXZ ix0 iz0
 
 terrainGrid : Int -> Placement -> Array2D NoiseSurfaceVertex -> Array2D Body
 terrainGrid skip placement =

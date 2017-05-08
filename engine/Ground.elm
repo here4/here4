@@ -1,6 +1,6 @@
 module Ground exposing
     ( Ground
-    , bounds, elevation, approxElevation
+    , bounds, elevation
     )
 
 import Math.Vector3 as V3 exposing (Vec3, vec3, getX, getZ)
@@ -58,16 +58,4 @@ elevation { placement, elevations } pos =
         else
             mix i01 i11 ixf + mix i10 i11 izf
 
--- A faster version of elevation that doesn't attempt to interpolate between
--- the four surrounding points. Useful for rough calculations like deciding
--- how many nearby terrain tiles to display based on how close to the ground
--- the camera is.
-approxElevation : Placement -> Array2D Float -> Vec3 -> Float
-approxElevation placement terrain pos =
-    let
-        ix0 = floor <| (getX pos + 256) / 2
-        iz0 = floor <| (getZ pos + 256) / 2
-        getXZ x z = (Array2D.getXY x z 0 terrain) * placement.yMult
-    in
-        getXZ ix0 iz0
             
