@@ -1,4 +1,4 @@
-module Terrain exposing (create)
+module StaticGround exposing (create)
 
 import Task exposing (Task)
 import Time exposing (Time)
@@ -12,7 +12,7 @@ import Ground exposing (Ground)
 type alias Model = List Body
 
 type Msg
-    = TerrainGenerated (Ground, List Body)
+    = GroundGenerated (Ground, List Body)
 
 create : (((Ground, List Body) -> Msg) -> Cmd Msg)
     -> (App, Cmd AppMsg)
@@ -27,13 +27,13 @@ init : (((Ground, List Body) -> Msg) -> Cmd Msg)
     -> (Model, Cmd (CtrlMsg Msg))
 init makeGround =
     ( []
-    , Cmd.map Self (makeGround TerrainGenerated)
+    , Cmd.map Self (makeGround GroundGenerated)
     )
 
 update : CtrlMsg Msg -> Model
     -> (Model, Cmd (CtrlMsg Msg))
 update msg model = case msg of
-    Self (TerrainGenerated (ground, bodies)) ->
+    Self (GroundGenerated (ground, bodies)) ->
             ( bodies
             , Task.succeed ground
                 |> Task.perform (Effect << UpdateGround)
