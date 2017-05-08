@@ -4,10 +4,9 @@ import Math.Vector3 exposing (vec3)
 
 import Model exposing (Args)
 
-import TerrainWorld
+import TerrainWorld exposing (TerrainModel, TerrainMsg)
 import Boids
 import Balls
-import Control exposing (WorldMsg)
 import Sky
 import Statue
 import TextureCube
@@ -20,8 +19,8 @@ import Body.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Body.Sphere exposing (skySphere, cloudsSphere)
 
 main : Program Args
-        (Model.Model TerrainWorld.WorldModel)
-        (Model.Msg (WorldMsg TerrainWorld.TerrainWorldMsg))
+        (Model.Model TerrainModel)
+        (Model.Msg TerrainMsg)
 main =
   TerrainWorld.create (Terrain.generate defaultPlacement)
     { apps =

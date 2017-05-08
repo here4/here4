@@ -1,4 +1,4 @@
-module TerrainWorld exposing (create, WorldModel, TerrainWorldMsg)
+module TerrainWorld exposing (create, TerrainModel, TerrainMsg)
 
 import Bag exposing (Bag)
 import Time exposing (Time)
@@ -13,9 +13,11 @@ import Body exposing (Body)
 import App exposing (..)
 import Ground exposing (Ground)
 
-create : ((Ground -> WorldMsg TerrainWorldMsg) -> Cmd (WorldMsg TerrainWorldMsg))
+type alias TerrainMsg = WorldMsg TerrainWorldMsg
+
+create : ((Ground -> TerrainMsg) -> Cmd (TerrainMsg))
     -> { apps : List (App, Cmd AppMsg) }
-    -> Program Args (Model.Model WorldModel) (Model.Msg (WorldMsg TerrainWorldMsg))
+    -> Program Args (Model.Model TerrainModel) (Model.Msg TerrainMsg)
 create makeGround details =
   Space.programWithFlags
     { init = worldInit makeGround details
@@ -29,16 +31,18 @@ create makeGround details =
 type TerrainWorldMsg
     = TerrainGenerated Ground
 
-type alias WorldModel =
-    { maybeGround : Maybe Ground
+type alias WorldModel a =
+    { maybeGround : a
     , apps : Bag App
     , focusKey : Maybe Bag.Key
     }
 
-worldGround : WorldModel -> Maybe Ground
+type alias TerrainModel = WorldModel (Maybe Ground)
+
+worldGround : TerrainModel -> Maybe Ground
 worldGround model = model.maybeGround
 
-worldFocus : WorldModel -> Maybe Focus
+worldFocus : WorldModel a -> Maybe Focus
 worldFocus model = case Bag.items model.apps of
     (someitem :: _) -> App.focus someitem
     _ -> Nothing
@@ -52,9 +56,9 @@ worldApps appsList =
     in
         (appsBag, Cmd.batch unbatched)
 
-worldInit : ((Ground -> WorldMsg TerrainWorldMsg) -> Cmd (WorldMsg TerrainWorldMsg))
+worldInit : ((Ground -> TerrainMsg) -> Cmd TerrainMsg)
     -> { apps : List (App, Cmd AppMsg) }
-    -> (WorldModel, Cmd (WorldMsg TerrainWorldMsg))
+    -> (TerrainModel, Cmd TerrainMsg)
 worldInit makeGround details =
     let (appsBag, appCmds) = worldApps details.apps
     in
@@ -68,20 +72,20 @@ worldInit makeGround details =
             ]
         )
 
-worldView : WorldModel -> Maybe Model.World
+worldView : TerrainModel -> Maybe Model.World
 worldView model =
     case model.maybeGround of
         Nothing     -> Nothing
         Just ground -> Just (makeWorld ground model)
 
-makeWorld : Ground -> WorldModel -> Model.World
+makeWorld : Ground -> TerrainModel -> Model.World
 makeWorld ground model =
     let
         worldBodies = List.concatMap bodies (Bag.items model.apps)
     in
         { bodies = worldBodies, ground = ground }
 
-worldUpdate : WorldMsg TerrainWorldMsg -> WorldModel -> (WorldModel, Cmd (WorldMsg TerrainWorldMsg))
+worldUpdate : TerrainMsg -> TerrainModel -> (TerrainModel, Cmd TerrainMsg)
 worldUpdate msg model =
     case msg of
         Hub (TerrainGenerated terrain) ->
@@ -112,7 +116,7 @@ worldUpdate msg model =
                                , Cmd.map (Send key) appCmdMsg
                                )
 
-worldAnimate : Time -> WorldModel -> WorldModel
+worldAnimate : Time -> WorldModel a -> WorldModel a
 worldAnimate dt model =
     { model | apps = Bag.map (App.animate dt) model.apps }
 
