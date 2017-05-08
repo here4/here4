@@ -13,13 +13,6 @@ import Ground exposing (Ground)
 
 import Gamepad exposing (Gamepad, gamepads)
 
-{-| Every half a second there's an event coming through;
-these are all the valid actions we could receive.
-# Move - the user is trying to jump using the space key, move using the
-arrow keys, or the window is being resized.
-# TextureLoaded - a texture has been loaded across the wire
--}
-
 type Msg worldMsg
     = KeyChange (Keys -> Keys)
     | MouseMove MouseMovement
