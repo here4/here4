@@ -31,7 +31,7 @@ programWithFlags
     , view : model -> Maybe Model.World
     , animate : Time -> model -> model 
     , ground : model -> Maybe Ground
-    , focus : model -> Maybe (Bag.Key, Focus)
+    , focus : Bag.Key -> model -> Maybe Focus
     }
   -> Program Model.Args (Model.Model model) (Model.Msg (WorldMsg msg))
 programWithFlags world =

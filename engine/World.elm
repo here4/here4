@@ -114,10 +114,10 @@ worldAnimate : Time -> WorldModel a -> WorldModel a
 worldAnimate dt model =
     { model | apps = Bag.map (App.animate dt) model.apps }
 
-worldFocus : WorldModel a -> Maybe (Bag.Key, Focus)
-worldFocus model = case Bag.items model.apps of
-    (someitem :: _) -> Maybe.map (\i -> (0, i)) (App.focus someitem)
-    _ -> Nothing
+worldFocus : Bag.Key -> WorldModel a -> Maybe Focus
+worldFocus key model = case Bag.get key model.apps of
+    Just app -> App.focus app
+    _        -> Nothing
 
 worldGround : WorldModel model -> Maybe Ground
 worldGround model = model.maybeGround
