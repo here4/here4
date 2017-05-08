@@ -12,6 +12,9 @@ import Sky
 import Statue
 import TextureCube
 
+import Placement exposing (defaultPlacement)
+import Things.Terrain as Terrain
+
 import Body.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
 import Body.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Body.Sphere exposing (skySphere, cloudsSphere)
@@ -20,7 +23,7 @@ main : Program Args
         (Model.Model TerrainWorld.WorldModel)
         (Model.Msg (WorldMsg TerrainWorld.TerrainWorldMsg))
 main =
-  TerrainWorld.create
+  TerrainWorld.create (Terrain.generate defaultPlacement)
     { apps =
         [ Sky.create skySphere
         , TextureCube.create "resources/woodCrate.jpg"

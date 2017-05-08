@@ -12,14 +12,13 @@ import Model exposing (Args)
 import Body exposing (Body)
 import App exposing (..)
 import Ground exposing (Ground)
-import Placement exposing (defaultPlacement)
-import Things.Terrain as Terrain
 
-create : { apps : List (App, Cmd AppMsg) }
+create : ((Ground -> WorldMsg TerrainWorldMsg) -> Cmd (WorldMsg TerrainWorldMsg))
+    -> { apps : List (App, Cmd AppMsg) }
     -> Program Args (Model.Model WorldModel) (Model.Msg (WorldMsg TerrainWorldMsg))
-create details =
+create makeGround details =
   Space.programWithFlags
-    { init = worldInit details
+    { init = worldInit makeGround details
     , view = worldView
     , update = worldUpdate
     , focus = worldFocus
@@ -53,9 +52,10 @@ worldApps ts =
     in
         (appsBag, Cmd.batch unbatched)
 
-worldInit : { apps : List (App, Cmd AppMsg) }
+worldInit : ((Ground -> WorldMsg TerrainWorldMsg) -> Cmd (WorldMsg TerrainWorldMsg))
+    -> { apps : List (App, Cmd AppMsg) }
     -> (WorldModel, Cmd (WorldMsg TerrainWorldMsg))
-worldInit details =
+worldInit makeGround details =
     let (appsBag, appCmds) = worldApps details.apps
     in
         ( { maybeGround = Nothing
@@ -63,7 +63,7 @@ worldInit details =
           , focusKey = List.head (Bag.keys appsBag)
           }
         , Cmd.batch
-            [ Terrain.generate defaultPlacement (Hub << TerrainGenerated)
+            [ makeGround (Hub << TerrainGenerated)
             , appCmds
             ]
         )
