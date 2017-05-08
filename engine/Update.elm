@@ -63,12 +63,14 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                     let inputs = timeToInputs dt model.inputs
                         inputs2 = timeToInputs dt model.inputs2
                         wm = worldAnimate inputs.dt model.worldModel
-                        (wm2, wmCmdMsg, focPos) = case worldFocus 0 model.worldModel of
-                            Just focus ->
-                                let dp = inputsToMove inputs model.player1
-                                    (wm2, wmCmdMsg) = worldUpdate (Forward 0 (Control.Move dp)) wm
-                                in (wm2, wmCmdMsg, Just focus.pos)
-                            _ -> (wm, Cmd.none, Nothing)
+                        (wm2, wmCmdMsg, focPos) = let key = model.player1.focusKey in
+                            case worldFocus key model.worldModel of
+                                Just focus ->
+                                    let dp = inputsToMove inputs model.player1
+                                        (wm2, wmCmdMsg) =
+                                            worldUpdate (Forward key (Control.Move dp)) wm
+                                    in (wm2, wmCmdMsg, Just focus.pos)
+                                _ -> (wm, Cmd.none, Nothing)
                         newModel =
                             { model | globalTime = model.globalTime + dt
                                     , player1 = step terrain inputs focPos model.player1

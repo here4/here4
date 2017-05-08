@@ -7,6 +7,7 @@ import Task exposing (Task)
 import Window
 
 import Orientation
+import Bag
 import Body exposing (Body)
 import Ground exposing (Ground)
 
@@ -60,7 +61,7 @@ type alias Player =
     , cameraInside : Bool
     , cameraPos : Vec3
     , cameraUp : Vec3
-    , focusMove : Maybe Vec3
+    , focusKey : Bag.Key
     }
 
 type Eye = OneEye | LeftEye | RightEye
@@ -80,7 +81,7 @@ defaultPlayer =
     , cameraInside = True
     , cameraPos = vec3 0 eyeLevel 0
     , cameraUp = V3.j
-    , focusMove = Nothing
+    , focusKey = 0
     }
 
 type alias Keys =
