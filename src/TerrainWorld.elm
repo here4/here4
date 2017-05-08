@@ -44,11 +44,11 @@ worldFocus model = case Bag.items model.apps of
     _ -> Nothing
 
 worldApps : List (App, Cmd AppMsg) -> (Bag App, Cmd (WorldMsg a))
-worldApps ts =
+worldApps appsList =
     let f (newApps, newCmdMsg) (oldBag, oldCmdMsgs) =
             let (key, newBag) = Bag.insert newApps oldBag
             in (newBag, oldCmdMsgs ++ [Cmd.map (Send key) newCmdMsg])
-        (appsBag, unbatched) = List.foldl f (Bag.empty, []) ts
+        (appsBag, unbatched) = List.foldl f (Bag.empty, []) appsList
     in
         (appsBag, Cmd.batch unbatched)
 
