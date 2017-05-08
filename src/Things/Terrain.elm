@@ -18,13 +18,16 @@ import Math.Procedural exposing (..)
 import Appearance exposing (..)
 import Body exposing (Body, Oriented, Visible, toBody)
 import Ground exposing (Ground, approxElevation)
-import Placement exposing (Placement)
+import Placement exposing (Placement, defaultPlacement)
 import Things.Surface2D exposing (..)
 
 ----------------------------------------------------------------------
 
-generate : Placement -> (Ground -> msg) -> Cmd msg
-generate placement tagger =
+generate : (Ground -> msg) -> Cmd msg
+generate tagger = generateWithPlacement defaultPlacement tagger
+
+generateWithPlacement : Placement -> (Ground -> msg) -> Cmd msg
+generateWithPlacement placement tagger =
     let elGen = randTerrain2D (placement.bigSide+1)
         makeTerrain elevations =
             { placement = placement
