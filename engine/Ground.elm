@@ -9,5 +9,4 @@ import Body exposing (Body)
 type alias Ground =
     { bounds : Vec3 -> Vec3
     , elevation : Vec3 -> Float
-    , bodies : List Body
     }

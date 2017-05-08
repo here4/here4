@@ -15,12 +15,13 @@ type alias Tiles =
     , bodies : List Body
     }
 
-createTileGround : Tiles -> Ground
+createTileGround : Tiles -> (Ground, List Body)
 createTileGround tiles =
-    { bounds = tileBounds tiles
-    , elevation = tileElevation tiles
-    , bodies = tiles.bodies
-    }
+    ({ bounds = tileBounds tiles
+     , elevation = tileElevation tiles
+     }
+    , tiles.bodies
+    )
 
 
 tileBounds : Tiles -> Vec3 -> Vec3

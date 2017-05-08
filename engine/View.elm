@@ -16,7 +16,6 @@ import Window
 import App exposing (..)
 import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
-import Ground exposing (Ground)
 import Model exposing (Model, Msg)
 import Orientation
 
@@ -209,10 +208,8 @@ renderWorld globalTime world eye windowSize player =
             , measuredFPS = 30.0
             }
 
-        bodies = world.ground.bodies ++ world.bodies
         skyMatrix = skyboxMatrix windowSize player
-        -- appears = mapApply (List.map (orient skyMatrix p) bodies)
-        appears = List.concat <| List.map (orient skyMatrix p) bodies
+        appears = List.concat <| List.map (orient skyMatrix p) world.bodies
     in
         appears
 

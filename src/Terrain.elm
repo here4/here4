@@ -14,9 +14,9 @@ import Ground exposing (Ground)
 type alias Model = List Body
 
 type Msg
-    = TerrainGenerated Ground
+    = TerrainGenerated (Ground, List Body)
 
-create : ((Ground -> Msg) -> Cmd Msg)
+create : (((Ground, List Body) -> Msg) -> Cmd Msg)
     -> (App, Cmd AppMsg)
 create makeGround = App.create (init makeGround)
     { update = update
@@ -25,7 +25,7 @@ create makeGround = App.create (init makeGround)
     , focus = focus
     }
 
-init : ((Ground -> Msg) -> Cmd Msg)
+init : (((Ground, List Body) -> Msg) -> Cmd Msg)
     -> (Model, Cmd (CtrlMsg Msg))
 init makeGround =
     ( []
@@ -35,9 +35,9 @@ init makeGround =
 update : CtrlMsg Msg -> Model
     -> (Model, Cmd (CtrlMsg Msg))
 update msg model = case msg of
-    Self (TerrainGenerated terrain) ->
-            ( terrain.bodies
-            , Task.succeed terrain
+    Self (TerrainGenerated (ground, bodies)) ->
+            ( bodies
+            , Task.succeed ground
                 |> Task.perform (Effect << UpdateGround)
             )
     _ -> (model, Cmd.none)
