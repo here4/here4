@@ -99,7 +99,7 @@ worldUpdate hubUpdate msg model =
                        ( { model | apps = Bag.replace key appModel model.apps }
                        , Cmd.map foo appCmdMsg
                        )
-        Forward (Control.Move dp) ->
+        Forward fwdMsg ->
            case model.focusKey of
                Nothing ->
                    ( model, Cmd.none )
@@ -108,7 +108,7 @@ worldUpdate hubUpdate msg model =
                        Nothing ->
                            ( model, Cmd.none )
                        Just t ->
-                           let (appModel, appCmdMsg) = App.update (Ctrl (Control.Move dp)) t
+                           let (appModel, appCmdMsg) = App.update (Ctrl fwdMsg) t
                            in
                                ( { model | apps = Bag.replace key appModel model.apps }
                                , Cmd.map (Send key) appCmdMsg
