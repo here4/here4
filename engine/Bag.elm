@@ -1,4 +1,4 @@
-module Bag exposing (Bag, Key, empty, insert, replace, get, keys, items, map)
+module Bag exposing (Bag, Key, size, empty, insert, replace, get, keys, items, map)
 
 import Dict exposing (Dict)
 

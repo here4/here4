@@ -31,6 +31,7 @@ programWithFlags
     , update : WorldMsg msg -> model -> ( model, Cmd (WorldMsg msg) )
     , view : model -> Maybe Model.World
     , animate : Time -> model -> model 
+    , keyLimit : model -> Int
     , ground : model -> Maybe Ground
     , camera : Maybe Bag.Key -> model -> Maybe Camera
     , focus : Bag.Key -> model -> Maybe Focus
@@ -39,7 +40,7 @@ programWithFlags
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.ground world.animate world.camera world.focus
+        , update = Update.update world.update world.keyLimit world.ground world.animate world.camera world.focus
         , subscriptions = subscriptions
         , view = View.view world.view
         }

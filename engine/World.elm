@@ -30,6 +30,7 @@ create hubInit hubUpdate details =
     { init = worldInit hubInit details
     , view = worldView
     , update = worldUpdate hubUpdate
+    , keyLimit = worldKeyLimit
     , animate = worldAnimate
     , camera = worldCamera
     , focus = worldFocus
@@ -110,6 +111,9 @@ worldUpdate hubUpdate msg model =
                        ( { model | apps = Bag.replace key appModel model.apps }
                        , Cmd.map (Send key) appCmdMsg
                        )
+
+worldKeyLimit : WorldModel a -> Int
+worldKeyLimit model = Bag.size model.apps
 
 worldAnimate : Time -> WorldModel a -> WorldModel a
 worldAnimate dt model =
