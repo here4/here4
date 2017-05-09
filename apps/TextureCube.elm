@@ -17,9 +17,10 @@ type alias TextureCube = List Body
 type Msg
     = TextureLoaded (Result Error Texture)
 
-create : String -> (App, Cmd AppMsg)
-create path = App.create (init path)
-    { update = update
+create : String -> String -> (App, Cmd AppMsg)
+create label path = App.create (init path)
+    { label = always label
+    , update = update
     , animate = animate
     , bodies = bodies
     , camera = camera

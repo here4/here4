@@ -13,7 +13,8 @@ import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 
 type alias Animated model msg =
-    { update : msg -> model -> (model, Cmd msg)
+    { label : model -> String
+    , update : msg -> model -> (model, Cmd msg)
     , bodies : model -> List Body
     , animate : Time -> model -> model
     , camera : model -> Maybe Camera
@@ -44,6 +45,9 @@ msgPack msg = case msg of
 packInit : (model, Cmd msg) -> (AppModel, Cmd AppMsg)
 packInit (x, cmd) = (Dynamic.pack x, Cmd.map (Self << Dynamic.pack) cmd)
 
+packLabel : (model -> String) -> AppModel -> String
+packLabel f dyn = f (Dynamic.unpack dyn)
+
 packUpdate : (CtrlMsg msg -> model -> (model, Cmd (CtrlMsg msg))) -> AppMsg -> AppModel -> (AppModel, Cmd AppMsg)
 packUpdate f msg dyn =
     let (newModel, newCmdMsg) = f (msgUnpack msg) (Dynamic.unpack dyn)
@@ -63,8 +67,9 @@ packFocus f dyn = f (Dynamic.unpack dyn)
 
 
 packMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
-packMethods { update, animate, bodies, camera, focus } =
-    { update = packUpdate update
+packMethods { label, update, animate, bodies, camera, focus } =
+    { label = packLabel label
+    , update = packUpdate update
     , animate = packAnimate animate
     , bodies = packBodies bodies
     , camera = packCamera camera
@@ -108,6 +113,9 @@ createApp0 (model, msg) =
     }
 ----------------------------------------------------------------------
 -}
+
+label : App -> String
+label { methods, model } = methods.label model
 
 update : AppMsg -> App -> (App, Cmd AppMsg)
 update msg { methods, model } =

@@ -18,7 +18,8 @@ type Msg = BoidsGenerated Boids
 
 create : Int -> (App, Cmd AppMsg)
 create n = App.createUncontrolled (init n)
-    { update = update
+    { label = always "Boids"
+    , update = update
     , animate = animate
     , bodies = bodies
     , camera = camera

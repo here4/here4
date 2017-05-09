@@ -19,7 +19,8 @@ type Msg = BallsGenerated Balls
 
 create : Int -> (App, Cmd AppMsg)
 create n = App.createUncontrolled (init n)
-    { update = update
+    { label = always "Balls"
+    , update = update
     , animate = animate
     , bodies = bodies
     , camera = camera

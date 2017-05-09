@@ -17,7 +17,8 @@ type Msg
 create : (((Ground, List Body) -> Msg) -> Cmd Msg)
     -> (App, Cmd AppMsg)
 create makeGround = App.create (init makeGround)
-    { update = update
+    { label = always "Ground"
+    , update = update
     , animate = animate
     , bodies = bodies
     , camera = always Nothing

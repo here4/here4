@@ -26,14 +26,14 @@ main =
     { apps =
         [ StaticGround.create Terrain.generate
         , Sky.create skySphere
-        , TextureCube.create "resources/woodCrate.jpg"
+        , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
         , Boids.create 100
         , Balls.create 30
-        , Statue.create (vec3 3 10 5) cloudsSphere
-        , Statue.create (vec3 0 1.5 0) fogMountainsDiamond
-        , Statue.create (vec3 5 1.5 1) cloudsDiamond
-        , Statue.create (vec3 10 0 10) voronoiCube
-        , Statue.create (vec3 -10 0 -10) skyCube -- fireCube
-        , Statue.create (vec3 10 1.5 -10) fogMountainsCube
+        , Statue.create "Clouds Sphere" (vec3 3 10 5) cloudsSphere
+        , Statue.create "Landscape Diamond" (vec3 0 1.5 0) fogMountainsDiamond
+        , Statue.create "Sky Diamond" (vec3 5 1.5 1) cloudsDiamond
+        , Statue.create "Voronoi Cube" (vec3 10 0 10) voronoiCube
+        , Statue.create "Sky Cube" (vec3 -10 0 -10) skyCube -- fireCube
+        , Statue.create "Landscape Cube" (vec3 10 1.5 -10) fogMountainsCube
         ]
     }

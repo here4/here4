@@ -14,9 +14,10 @@ type alias Model = Body
 
 type alias Msg = ()
 
-create : Vec3 -> Appearance -> (App, Cmd AppMsg)
-create pos appear = App.create (init pos appear)
-    { update = update
+create : String -> Vec3 -> Appearance -> (App, Cmd AppMsg)
+create label pos appear = App.create (init pos appear)
+    { label = always label
+    , update = update
     , animate = animate
     , bodies = bodies
     , camera = camera
