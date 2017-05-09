@@ -73,7 +73,10 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                         wm = worldAnimate inputs.dt model.worldModel
 
                         -- Camera
+                        label1 = worldLabel (model.player1.rideKey) model.worldModel
                         camera1 = worldCamera (model.player1.rideKey) model.worldModel
+
+                        label2 = worldLabel (model.player2.rideKey) model.worldModel
                         camera2 = worldCamera (model.player2.rideKey) model.worldModel
 
                         -- Focus
@@ -88,8 +91,8 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
 
                         newModel =
                             { model | globalTime = model.globalTime + dt
-                                    , player1 = step terrain keyLimit inputs camera1 focPos model.player1
-                                    , player2 = step terrain keyLimit inputs2 camera2 Nothing model.player2
+                                    , player1 = step terrain keyLimit inputs label1 camera1 focPos model.player1
+                                    , player2 = step terrain keyLimit inputs2 label2 camera2 Nothing model.player2
                                     , inputs = clearStationaryInputs inputs
                                     , worldModel = wm2
                             }
@@ -175,8 +178,8 @@ aboveGround eyeLevel pos =
     in
         if p.y < e then vec3 p.x e p.z else pos
 
-step : Ground -> Int -> Model.Inputs -> Maybe Camera -> Maybe Vec3 -> Model.Player -> Model.Player
-step terrain keyLimit inputs camera focPos player0 = if inputs.reset then Model.defaultPlayer else
+step : Ground -> Int -> Model.Inputs -> String -> Maybe Camera -> Maybe Vec3 -> Model.Player -> Model.Player
+step terrain keyLimit inputs label camera focPos player0 = if inputs.reset then Model.defaultPlayer else
         let 
             eyeLevel pos = Model.eyeLevel + terrain.elevation pos
 
@@ -192,6 +195,8 @@ step terrain keyLimit inputs camera focPos player0 = if inputs.reset then Model.
                 Just v  -> mapMotion (v.move focPos eyeLevel inputs) player
                 Nothing -> player
 -}
+
+            relabel player = { player | rideLabel = label }
 
             keepWithinbounds motion = { motion | position = terrain.bounds motion.position }
 
@@ -240,6 +245,7 @@ step terrain keyLimit inputs camera focPos player0 = if inputs.reset then Model.
             player0
                 |> mapMotion (gravity eyeLevel inputs.dt)
                 |> selectVehicle keyLimit inputs
+                |> relabel
                 |> move
                 |> mapMotion keepWithinbounds
                 |> checkCamera
