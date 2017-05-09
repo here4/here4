@@ -30,9 +30,9 @@ create hubInit hubUpdate details =
     { init = worldInit hubInit details
     , view = worldView
     , update = worldUpdate hubUpdate
-    , focus = worldFocus
     , animate = worldAnimate
     , camera = worldCamera
+    , focus = worldFocus
     , ground = worldGround
     }
 

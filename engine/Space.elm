@@ -39,7 +39,7 @@ programWithFlags
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.focus world.ground world.animate world.camera
+        , update = Update.update world.update world.ground world.animate world.camera world.focus
         , subscriptions = subscriptions
         , view = View.view world.view
         }
