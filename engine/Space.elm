@@ -23,6 +23,7 @@ import Update
 import View
 
 import App exposing (Focus)
+import Body exposing (Camera)
 import Ground exposing (Ground)
 
 programWithFlags
@@ -31,13 +32,14 @@ programWithFlags
     , view : model -> Maybe Model.World
     , animate : Time -> model -> model 
     , ground : model -> Maybe Ground
+    , camera : Maybe Bag.Key -> model -> Maybe Camera
     , focus : Bag.Key -> model -> Maybe Focus
     }
   -> Program Model.Args (Model.Model model) (Model.Msg (WorldMsg msg))
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.focus world.ground world.animate
+        , update = Update.update world.update world.focus world.ground world.animate world.camera
         , subscriptions = subscriptions
         , view = View.view world.view
         }

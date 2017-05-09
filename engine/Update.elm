@@ -8,12 +8,14 @@ import Bag
 import Dispatch exposing (..)
 import Model exposing (Model, Msg)
 import Orientation
+import Math.Quaternion as Qn -- Don't expose this here
 import Ports
 
 import Gamepad
 import GamepadInputs
 
 import Control exposing (WorldMsg)
+import Body exposing (Camera)
 import App exposing (Focus)
 import Ground exposing (Ground)
 import Vehicles.DreamBird as DreamBird
@@ -27,9 +29,10 @@ update : (WorldMsg worldMsg -> worldModel -> (worldModel, Cmd (WorldMsg worldMsg
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> (worldModel -> Maybe Ground)
     -> (Time -> worldModel -> worldModel)
+    -> (Maybe Bag.Key -> worldModel -> Maybe Camera)
     -> Model.Msg (WorldMsg worldMsg) -> Model worldModel
     -> (Model worldModel, Cmd (Msg (WorldMsg worldMsg)))
-update worldUpdate worldFocus worldTerrain worldAnimate msg model =
+update worldUpdate worldFocus worldTerrain worldAnimate worldCamera msg model =
     case msg of
         Model.WorldMessage worldMsg ->
             let (worldModel, worldCmdMsg) = worldUpdate worldMsg model.worldModel in
@@ -62,7 +65,15 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                 Just terrain ->
                     let inputs = timeToInputs dt model.inputs
                         inputs2 = timeToInputs dt model.inputs2
+
+                        -- Animate
                         wm = worldAnimate inputs.dt model.worldModel
+
+                        -- Camera
+                        camera1 = worldCamera (model.player1.rideKey) model.worldModel
+                        camera2 = worldCamera (model.player2.rideKey) model.worldModel
+
+                        -- Focus
                         (wm2, wmCmdMsg, focPos) = let key = model.player1.focusKey in
                             case worldFocus key model.worldModel of
                                 Just focus ->
@@ -71,10 +82,11 @@ update worldUpdate worldFocus worldTerrain worldAnimate msg model =
                                             worldUpdate (Forward key (Control.Move dp)) wm
                                     in (wm2, wmCmdMsg, Just focus.pos)
                                 _ -> (wm, Cmd.none, Nothing)
+
                         newModel =
                             { model | globalTime = model.globalTime + dt
-                                    , player1 = step terrain inputs focPos model.player1
-                                    , player2 = step terrain inputs2 Nothing model.player2
+                                    , player1 = step terrain inputs camera1 focPos model.player1
+                                    , player2 = step terrain inputs2 camera2 Nothing model.player2
                                     , inputs = clearStationaryInputs inputs
                                     , worldModel = wm2
                             }
@@ -160,23 +172,24 @@ aboveGround eyeLevel pos =
     in
         if p.y < e then vec3 p.x e p.z else pos
 
-step : Ground -> Model.Inputs -> Maybe Vec3 -> Model.Player -> Model.Player
-step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer else
+step : Ground -> Model.Inputs -> Maybe Camera -> Maybe Vec3 -> Model.Player -> Model.Player
+step terrain inputs camera focPos player0 = if inputs.reset then Model.defaultPlayer else
         let 
             eyeLevel pos = Model.eyeLevel + terrain.elevation pos
+
+            move player = case camera of
+                Just c  -> { player | motion = { position = c.position,
+                                                 velocity = player.motion.velocity,
+                                                 orientation = Qn.fromVec3 c.orientation
+                                               }
+                           }
+                Nothing -> player
+{-
             move player = case player.vehicle of
                 Just v  -> mapMotion (v.move focPos eyeLevel inputs) player
                 Nothing -> player
-{-
-                if player.vehicle == Model.vehicleBird then
-                    mapMotion (DreamBird.move eyeLevel inputs) player
-                else if player.vehicle == Model.vehicleBuggy then
-                    mapMotion (DreamBuggy.move eyeLevel inputs) player
-                else if player.vehicle == Model.vehicleLookAt then
-                    mapMotion (LookAt.move eyeLevel inputs focPos) player
-                else
-                    mapMotion (DreamDebug.move eyeLevel inputs) player
 -}
+
             keepWithinbounds motion = { motion | position = terrain.bounds motion.position }
 
             checkCamera player = { player |
@@ -231,7 +244,12 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
 
 selectVehicle : Model.Inputs -> Model.Player -> Model.Player
 selectVehicle inputs player =
-    player
+    if not inputs.button_X then
+        player
+    else
+        case player.rideKey of
+            Just n -> { player | rideKey = Just (n+1) }
+            Nothing -> { player | rideKey = Just 0 }
 {-
     let
         switch = inputs.button_X

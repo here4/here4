@@ -9,7 +9,7 @@ import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Model exposing (Args)
 
-import Body exposing (Body)
+import Body exposing (Body, Camera)
 import App exposing (..)
 import Ground exposing (Ground)
 
@@ -17,7 +17,7 @@ type alias WorldModel a =
     { worldModel : a
     , maybeGround : Maybe Ground
     , apps : Bag App
-    , focusKey : Maybe Bag.Key
+    -- , focusKey : Maybe Bag.Key
     }
 
 create :
@@ -32,6 +32,7 @@ create hubInit hubUpdate details =
     , update = worldUpdate hubUpdate
     , focus = worldFocus
     , animate = worldAnimate
+    , camera = worldCamera
     , ground = worldGround
     }
 
@@ -54,7 +55,7 @@ worldInit hubInit details =
         ( { worldModel = hubModel
           , maybeGround = Nothing
           , apps = appsBag
-          , focusKey = List.head (Bag.keys appsBag)
+          -- , focusKey = List.head (Bag.keys appsBag)
           }
         , Cmd.batch
             [ Cmd.map Hub hubCmd
@@ -113,6 +114,13 @@ worldUpdate hubUpdate msg model =
 worldAnimate : Time -> WorldModel a -> WorldModel a
 worldAnimate dt model =
     { model | apps = Bag.map (App.animate dt) model.apps }
+
+worldCamera : Maybe Bag.Key -> WorldModel a -> Maybe Camera
+worldCamera mkey model = case mkey of
+    Just key -> case Bag.get key model.apps of
+                    Just app -> App.camera app
+                    Nothing  -> Nothing
+    Nothing -> Nothing
 
 worldFocus : Bag.Key -> WorldModel a -> Maybe Focus
 worldFocus key model = case Bag.get key model.apps of

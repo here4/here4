@@ -6,7 +6,7 @@ import Time exposing (Time)
 
 import App exposing (App, AppMsg, Focus, appToFocus)
 import Appearance exposing (Appearance)
-import Body exposing (Body, anchorSky, put, resize, translate)
+import Body exposing (..)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 
@@ -19,7 +19,8 @@ create appear = App.create (init appear)
     { update = update
     , animate = animate
     , bodies = bodies
-    , focus = focus
+    , camera = always Nothing
+    , focus = always Nothing
     }
 
 init : Appearance -> (Model, Cmd (CtrlMsg Msg))
@@ -35,7 +36,3 @@ animate dt body = body
 
 bodies : Model -> List Body
 bodies body = [body]
-
-focus : Model -> Maybe Focus
-focus body = Just (appToFocus body)
-    

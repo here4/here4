@@ -20,7 +20,8 @@ create makeGround = App.create (init makeGround)
     { update = update
     , animate = animate
     , bodies = bodies
-    , focus = focus
+    , camera = always Nothing
+    , focus = always Nothing
     }
 
 init : (((Ground, List Body) -> Msg) -> Cmd Msg)
@@ -45,7 +46,3 @@ animate dt model = model
 
 bodies : Model -> List Body
 bodies = identity
-
-focus : Model -> Maybe Focus
-focus model = Nothing
-    

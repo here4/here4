@@ -4,6 +4,7 @@ import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 
 import Appearance exposing (Appearance)
+import Orientation exposing (Orientation)
 
 type Body = BCtr Anchor Vec3 Vec3 Vec3 Appearance
 
@@ -15,6 +16,12 @@ type alias Oriented a = { a | scale : Vec3, pos : Vec3, orientation : Vec3 }
 type alias Moving a = Oriented { a | velocity : Vec3 }
 type alias Massive a = { a | mass : Float }
 type alias Spherical a = { a | radius : Float }
+
+-- TODO: define cameraAdd etc.
+type alias Camera =
+    { position : Vec3
+    , orientation : Vec3
+    }
 
 
 -- | Use anything Oriented and Visible as a Body
@@ -38,3 +45,6 @@ put pos appear = BCtr AnchorGround (vec3 1 1 1) pos (vec3 1 0 0) appear
 
 anchorSky : Body -> Body
 anchorSky (BCtr _ scale p o s) = BCtr AnchorSky scale p o s
+
+bodyCamera : Body -> Camera
+bodyCamera (BCtr _ _ p o _) = { position = p, orientation = o }

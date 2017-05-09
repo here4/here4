@@ -21,6 +21,7 @@ create n = App.createUncontrolled (init n)
     { update = update
     , animate = animate
     , bodies = bodies
+    , camera = camera
     , focus = focus
     }
 
@@ -49,6 +50,9 @@ animate dt boids = moveBoids dt boids
 
 bodies : Boids -> List Body
 bodies = List.map toBody
+
+camera : Boids -> Maybe Camera
+camera boids = Maybe.map (bodyCamera << toBody) (List.head boids)
 
 focus : Boids -> Maybe Focus
 focus boids = Maybe.map orientedToFocus (List.head boids)

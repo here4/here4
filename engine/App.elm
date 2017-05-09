@@ -1,4 +1,4 @@
-module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, focus, update, appToFocus, orientedToFocus)
+module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, camera, focus, update, appToFocus, orientedToFocus)
 
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
@@ -16,6 +16,7 @@ type alias Animated model msg =
     { update : msg -> model -> (model, Cmd msg)
     , bodies : model -> List Body
     , animate : Time -> model -> model
+    , camera : model -> Maybe Camera
     , focus : model -> Maybe Focus
     }
 
@@ -51,18 +52,22 @@ packUpdate f msg dyn =
 packAnimate : (Time -> model -> model) -> Time -> AppModel -> AppModel
 packAnimate f dt dyn = Dynamic.pack (f dt (Dynamic.unpack dyn))
 
-packApp : (a -> List Body) -> AppModel -> List Body
-packApp f dyn = f (Dynamic.unpack dyn)
+packBodies : (a -> List Body) -> AppModel -> List Body
+packBodies f dyn = f (Dynamic.unpack dyn)
+
+packCamera : (a -> Maybe Camera) -> AppModel -> Maybe Camera
+packCamera f dyn = f (Dynamic.unpack dyn)
 
 packFocus : (a -> Maybe Focus) -> AppModel -> Maybe Focus
 packFocus f dyn = f (Dynamic.unpack dyn)
 
 
 packMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
-packMethods { update, animate, bodies, focus } =
+packMethods { update, animate, bodies, camera, focus } =
     { update = packUpdate update
     , animate = packAnimate animate
-    , bodies = packApp bodies
+    , bodies = packBodies bodies
+    , camera = packCamera camera
     , focus = packFocus focus
     }
 
@@ -117,6 +122,9 @@ animate dt { methods, model } =
 
 bodies : App -> List Body
 bodies { methods, model } = methods.bodies model
+
+camera : App -> Maybe Camera
+camera { methods, model } = methods.camera model
 
 focus : App -> Maybe Focus
 focus { methods, model } = methods.focus model

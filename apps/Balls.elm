@@ -22,6 +22,7 @@ create n = App.createUncontrolled (init n)
     { update = update
     , animate = animate
     , bodies = bodies
+    , camera = camera
     , focus = focus
     }
 
@@ -57,6 +58,9 @@ animate dt balls = collisions dt (gravity dt balls)
 
 bodies : Balls -> List Body
 bodies = List.map toBody
+
+camera : Balls -> Maybe Camera
+camera balls = Maybe.map (bodyCamera << toBody) (List.head balls)
 
 focus : Balls -> Maybe Focus
 focus balls = Nothing

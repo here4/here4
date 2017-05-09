@@ -55,12 +55,13 @@ type alias Motion =
 
 type alias Player =
     { motion : Motion
-    , vehicle : Maybe Vehicle
+    , rideKey : Maybe Bag.Key
+    , focusKey : Bag.Key
     , cameraVR : Bool
     , cameraInside : Bool
     , cameraPos : Vec3
     , cameraUp : Vec3
-    , focusKey : Bag.Key
+    -- , cameraOrientation : Orientation -- relative to ride
     }
 
 type alias Vehicle =
@@ -85,12 +86,13 @@ defaultMotion =
 defaultPlayer : Player
 defaultPlayer =
     { motion = defaultMotion
-    , vehicle = Nothing
+    , rideKey = Nothing
+    , focusKey = 0
     , cameraVR = False
     , cameraInside = True
     , cameraPos = vec3 0 eyeLevel 0
     , cameraUp = V3.j
-    , focusKey = 0
+    -- cameraOrientation = V3.j
     }
 
 type alias Keys =

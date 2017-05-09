@@ -6,6 +6,9 @@ type alias Key = Int
 
 type Bag v = Bag Int (Dict Key v)
 
+size : Bag v -> Int
+size (Bag n _) = n
+
 empty : Bag v
 empty = Bag 0 (Dict.empty)
 

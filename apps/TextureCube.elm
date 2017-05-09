@@ -6,7 +6,7 @@ import Time exposing (Time)
 import WebGL.Texture as Texture exposing (Texture, Error)
 
 import App exposing (App, AppMsg, Focus, appToFocus)
-import Body exposing (Body, translate, put)
+import Body exposing (..)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 
@@ -22,6 +22,7 @@ create path = App.create (init path)
     { update = update
     , animate = animate
     , bodies = bodies
+    , camera = camera
     , focus = focus
     }
 
@@ -50,6 +51,9 @@ animate dt cube = cube
 
 bodies : TextureCube -> List Body
 bodies = identity
+
+camera : TextureCube -> Maybe Camera
+camera cube = Maybe.map bodyCamera (List.head cube)
 
 focus : TextureCube -> Maybe Focus
 focus cube = Maybe.map appToFocus (List.head cube)
