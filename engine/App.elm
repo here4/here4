@@ -1,4 +1,4 @@
-module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, camera, focus, update, appToFocus, orientedToFocus)
+module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, label, camera, focus, update, appToFocus, orientedToFocus)
 
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3

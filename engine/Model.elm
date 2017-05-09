@@ -56,6 +56,7 @@ type alias Motion =
 type alias Player =
     { motion : Motion
     , rideKey : Maybe Bag.Key
+    , rideLabel : String
     , focusKey : Bag.Key
     , cameraVR : Bool
     , cameraInside : Bool
@@ -87,6 +88,7 @@ defaultPlayer : Player
 defaultPlayer =
     { motion = defaultMotion
     , rideKey = Nothing
+    , rideLabel = ""
     , focusKey = 0
     , cameraVR = False
     , cameraInside = True

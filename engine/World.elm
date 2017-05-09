@@ -119,6 +119,13 @@ worldAnimate : Time -> WorldModel a -> WorldModel a
 worldAnimate dt model =
     { model | apps = Bag.map (App.animate dt) model.apps }
 
+worldLabel : Maybe Bag.Key -> WorldModel a -> String
+worldLabel mkey model = let none = "<>" in case mkey of
+    Just key -> case Bag.get key model.apps of
+                    Just app -> App.label app
+                    Nothing  -> none
+    Nothing -> none
+
 worldCamera : Maybe Bag.Key -> WorldModel a -> Maybe Camera
 worldCamera mkey model = case mkey of
     Just key -> case Bag.get key model.apps of

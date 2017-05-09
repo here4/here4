@@ -232,16 +232,6 @@ skyboxMatrix { width, height } player =
 hud : Model.Player -> Int -> Int -> Html (Msg worldMsg)
 hud player left right =
     let
-        vehicleName = "Dreambuggy"
-{-
-        vehicleName = if player.vehicle == Model.vehicleBird then
-                          "Dreambird"
-                      else if player.vehicle == Model.vehicleBuggy then
-                           "Dreambuggy"
-                      else if player.vehicle == Model.vehicleLookAt then
-                           "Look at"
-                      else "DreamDebug"
--}
         wher = if player.cameraInside then "Inside" else "Outside"
     in div
        [ style
@@ -262,7 +252,7 @@ hud player left right =
        ]
        [
            span []
-           [ Html.text vehicleName
+           [ Html.text player.rideLabel
            , Html.text " "
            , FontAwesome.diamond white 20
            , Html.text " "
