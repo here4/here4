@@ -1,4 +1,4 @@
-module Vehicles.LookAt exposing (move, welcome)
+module Vehicles.LookAt exposing (lookAt)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
@@ -10,11 +10,17 @@ import Model
 ----------------------------------------------------------------------
 -- LookAt
 
+lookAt : Model.Vehicle
+lookAt =
+    { init = welcome
+    , move = move
+    }
+
 welcome : Model.Motion -> Model.Motion
 welcome motion = motion
 
-move : Model.EyeLevel -> Model.Inputs -> Maybe Vec3 -> Model.Motion -> Model.Motion
-move eyeLevel inputs focPos motion = case focPos of
+move : Maybe Vec3 -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+move focPos eyeLevel inputs motion = case focPos of
   Nothing -> motion
   Just fpos ->
     let

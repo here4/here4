@@ -23,6 +23,7 @@ type Msg worldMsg
     | Resize Window.Size
     | WorldMessage worldMsg
 
+{-
 type alias WhichVehicle = Int
 
 vehicleBuggy : Int
@@ -39,6 +40,7 @@ vehicleDebug = 3
 
 nextVehicle : WhichVehicle -> WhichVehicle
 nextVehicle v = (v+1) % (vehicleDebug+1) 
+-}
 
 type alias World =
     { bodies : List Body
@@ -53,12 +55,17 @@ type alias Motion =
 
 type alias Player =
     { motion : Motion
-    , vehicle : WhichVehicle
+    , vehicle : Maybe Vehicle
     , cameraVR : Bool
     , cameraInside : Bool
     , cameraPos : Vec3
     , cameraUp : Vec3
     , focusKey : Bag.Key
+    }
+
+type alias Vehicle =
+    { init : Motion -> Motion
+    , move : Maybe Vec3 -> EyeLevel -> Inputs -> Motion -> Motion
     }
 
 type Eye = OneEye | LeftEye | RightEye
@@ -78,7 +85,7 @@ defaultMotion =
 defaultPlayer : Player
 defaultPlayer =
     { motion = defaultMotion
-    , vehicle = vehicleBuggy
+    , vehicle = Nothing
     , cameraVR = False
     , cameraInside = True
     , cameraPos = vec3 0 eyeLevel 0

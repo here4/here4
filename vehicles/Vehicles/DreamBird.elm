@@ -1,4 +1,4 @@
-module Vehicles.DreamBird exposing (move, welcome)
+module Vehicles.DreamBird exposing (dreamBird)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
@@ -9,12 +9,18 @@ import Model
 ----------------------------------------------------------------------
 -- DreamBird
 
+dreamBird : Model.Vehicle
+dreamBird =
+    { init = welcome
+    , move = move
+    }
+
 -- | Welcome a new driver to the DreamBird
 welcome : Model.Motion -> Model.Motion
 welcome motion = motion
 
-move : Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
-move eyeLevel inputs motion =
+move : Maybe Vec3 -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+move _ eyeLevel inputs motion =
     motion |> fly eyeLevel inputs
            |> flyPhysics eyeLevel inputs.dt
 

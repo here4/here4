@@ -1,4 +1,4 @@
-module Vehicles.DreamDebug exposing (move, welcome)
+module Vehicles.DreamDebug exposing (dreamDebug)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
@@ -9,12 +9,18 @@ import Model
 ----------------------------------------------------------------------
 -- DreamDebug
 
+dreamDebug : Model.Vehicle
+dreamDebug =
+    { init = welcome
+    , move = move
+    }
+
 -- | Welcome a new driver to debug
 welcome : Model.Motion -> Model.Motion
 welcome motion = motion
 
-move : Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
-move eyeLevel inputs motion =
+move : Maybe Vec3 -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+move _ eyeLevel inputs motion =
     motion |> fly eyeLevel inputs
            |> flyPhysics eyeLevel inputs.dt
 

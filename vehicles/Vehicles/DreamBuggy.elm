@@ -1,4 +1,4 @@
-module Vehicles.DreamBuggy exposing (move, welcome)
+module Vehicles.DreamBuggy exposing (dreamBuggy)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
@@ -10,12 +10,18 @@ import Model
 ----------------------------------------------------------------------
 -- DreamBuggy
 
+dreamBuggy : Model.Vehicle
+dreamBuggy =
+    { init = welcome
+    , move = move
+    }
+
 -- | Welcome a new driver to the DreamBuggy
 welcome : Model.Motion -> Model.Motion
 welcome motion = { motion | orientation = clampBuggy motion.orientation }
 
-move : Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
-move eyeLevel inputs motion =
+move : Maybe Vec3 -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+move _ eyeLevel inputs motion =
     motion |> turn eyeLevel inputs.mx inputs.my
            |> drive eyeLevel inputs
            |> physics eyeLevel inputs.dt

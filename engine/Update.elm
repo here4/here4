@@ -164,7 +164,10 @@ step : Ground -> Model.Inputs -> Maybe Vec3 -> Model.Player -> Model.Player
 step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer else
         let 
             eyeLevel pos = Model.eyeLevel + terrain.elevation pos
-            move player =
+            move player = case player.vehicle of
+                Just v  -> mapMotion (v.move focPos eyeLevel inputs) player
+                Nothing -> player
+{-
                 if player.vehicle == Model.vehicleBird then
                     mapMotion (DreamBird.move eyeLevel inputs) player
                 else if player.vehicle == Model.vehicleBuggy then
@@ -173,6 +176,7 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
                     mapMotion (LookAt.move eyeLevel inputs focPos) player
                 else
                     mapMotion (DreamDebug.move eyeLevel inputs) player
+-}
             keepWithinbounds motion = { motion | position = terrain.bounds motion.position }
 
             checkCamera player = { player |
@@ -227,6 +231,8 @@ step terrain inputs focPos player0 = if inputs.reset then Model.defaultPlayer el
 
 selectVehicle : Model.Inputs -> Model.Player -> Model.Player
 selectVehicle inputs player =
+    player
+{-
     let
         switch = inputs.button_X
         newVehicle = Model.nextVehicle player.vehicle
@@ -246,6 +252,7 @@ selectVehicle inputs player =
         else
             Debug.log "Switch to debug!" <|
                 mapMotion DreamDebug.welcome { player | vehicle = newVehicle }
+-}
 
 mapMotion : (Model.Motion -> Model.Motion) -> Model.Player -> Model.Player
 mapMotion f player = { player | motion = f player.motion }
