@@ -29,6 +29,7 @@ import Ground exposing (Ground)
 programWithFlags
   : { init : ( model, Cmd (WorldMsg msg) )
     , update : WorldMsg msg -> model -> ( model, Cmd (WorldMsg msg) )
+    , label : Maybe Bag.Key -> model -> String
     , view : model -> Maybe Model.World
     , animate : Time -> model -> model 
     , keyLimit : model -> Int
@@ -40,7 +41,7 @@ programWithFlags
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.keyLimit world.ground world.animate world.camera world.focus
+        , update = Update.update world.update world.label world.keyLimit world.ground world.animate world.camera world.focus
         , subscriptions = subscriptions
         , view = View.view world.view
         }

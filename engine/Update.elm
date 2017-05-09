@@ -26,6 +26,7 @@ import Vehicles.DreamDebug as DreamDebug
 {-| Take a Msg and a Model and return an updated Model
 -}
 update : (WorldMsg worldMsg -> worldModel -> (worldModel, Cmd (WorldMsg worldMsg)))
+    -> (Maybe Bag.Key -> worldModel -> String)
     -> (worldModel -> Int)
     -> (worldModel -> Maybe Ground)
     -> (Time -> worldModel -> worldModel)
@@ -33,7 +34,7 @@ update : (WorldMsg worldMsg -> worldModel -> (worldModel, Cmd (WorldMsg worldMsg
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg) -> Model worldModel
     -> (Model worldModel, Cmd (Msg (WorldMsg worldMsg)))
-update worldUpdate worldKeyLimit worldTerrain worldAnimate worldCamera worldFocus msg model =
+update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamera worldFocus msg model =
     case msg of
         Model.WorldMessage worldMsg ->
             let (worldModel, worldCmdMsg) = worldUpdate worldMsg model.worldModel in
