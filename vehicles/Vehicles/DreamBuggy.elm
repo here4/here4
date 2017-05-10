@@ -91,7 +91,7 @@ adjustVelocity maxSpeed friction dv dt v =
 
 physics : Model.EyeLevel -> Float -> Model.Motion -> Model.Motion
 physics eyeLevel dt motion =
-    let pos = add motion.position (V3.scale dt motion.velocity)
+    let pos = add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
         p = V3.toRecord pos
         e = eyeLevel pos
         vy0 = getY motion.velocity
