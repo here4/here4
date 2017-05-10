@@ -14,7 +14,7 @@ type Anchor = AnchorGround | AnchorSky | AnchorHUD
 
 type alias Visible a = { a | appear : Appearance }
 
-type alias Oriented a = { a | scale : Vec3, pos : Vec3, orientation : Vec3 }
+type alias Oriented a = { a | scale : Vec3, pos : Vec3, orientation : Orientation }
 type alias Moving a = Oriented { a | velocity : Vec3 }
 type alias Massive a = { a | mass : Float }
 type alias Spherical a = { a | radius : Float }
@@ -29,7 +29,8 @@ type alias Camera =
 -- | Use anything Oriented and Visible as a Body
 toBody : Oriented (Visible a) -> Body
 -- toBody x = BCtr AnchorGround x.scale x.pos (Qn.fromVec3 x.orientation) x.appear
-toBody x = BCtr AnchorGround x.scale x.pos Orientation.initial x.appear
+-- toBody x = BCtr AnchorGround x.scale x.pos Orientation.initial x.appear
+toBody x = BCtr AnchorGround x.scale x.pos x.orientation x.appear
 
 -- | Reposition a Body
 reposition : Vec3 -> Body -> Body

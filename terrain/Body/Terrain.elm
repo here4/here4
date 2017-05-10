@@ -18,6 +18,7 @@ import Math.Procedural exposing (..)
 import Appearance exposing (..)
 import Body exposing (Body, Oriented, Visible, toBody)
 import Ground exposing (Ground)
+import Orientation
 import Placement exposing (Placement, defaultPlacement)
 import Tiles exposing ( createTileGround)
 import Body.Surface2D exposing (..)
@@ -89,7 +90,7 @@ visibleTerrain placement terrain arr =
                     arr
     in
         List.map toBody
-            [{ scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appearTerrain placement terrain appears }]
+            [{ scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = Orientation.initial, appear = appearTerrain placement terrain appears }]
 
 appearTerrain : Placement -> Array2D Float -> Array2D Appearance -> Appearance
 appearTerrain placement terrain appears p =

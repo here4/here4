@@ -8,6 +8,7 @@ import WebGL exposing (..)
 
 import Appearance exposing (..)
 import Body exposing (Oriented, Visible)
+import Orientation
 
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
@@ -32,7 +33,7 @@ fogMountainsSphere = sphere worldVertex fogMountains
 sphere : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Oriented (Visible {})
 sphere vertexShader fragmentShader =
     let appear = appearSphere vertexShader fragmentShader
-    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appear }
+    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = Orientation.initial, appear = appear }
 
 appearSphere : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 appearSphere vertexShader fragmentShader p =

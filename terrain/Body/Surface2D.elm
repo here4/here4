@@ -11,6 +11,7 @@ import WebGL exposing (..)
 
 import Appearance exposing (..)
 import Body exposing (Oriented, Visible)
+import Orientation
 import Placement exposing (..)
 
 import Shaders.ColorFragment exposing (..)
@@ -41,7 +42,7 @@ surface : Shader NoiseVertex NoiseVertexInput b -> Shader {} NoiseVertexInput b
     -> Mesh NoiseVertex -> Oriented (Visible {})
 surface vertexShader fragmentShader mesh =
     let appear = appearSurface vertexShader fragmentShader mesh
-    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appear }
+    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = Orientation.initial, appear = appear }
 
 appearSurface : Shader NoiseVertex NoiseVertexInput b -> Shader {} NoiseVertexInput b
     -> Mesh NoiseVertex -> Appearance
@@ -67,7 +68,7 @@ rippleSurface : Shader NoiseVertex RippleNoiseVertexInput b -> Shader {} RippleN
     -> Mesh NoiseVertex -> Oriented (Visible {})
 rippleSurface vertexShader fragmentShader ripple mesh =
     let appear = rippleAppearSurface vertexShader fragmentShader ripple mesh
-    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appear }
+    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = Orientation.initial, appear = appear }
 
 rippleAppearSurface : Shader NoiseVertex RippleNoiseVertexInput b -> Shader {} RippleNoiseVertexInput b -> Float
     -> Mesh NoiseVertex -> Appearance

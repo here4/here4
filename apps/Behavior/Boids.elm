@@ -1,5 +1,6 @@
 module Behavior.Boids exposing (..)
 
+import Math.Quaternion as Qn
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Time exposing (Time)
@@ -19,10 +20,12 @@ newBoid m r pos vel thing0 =
     , appear = thing0.appear
     }
 
-boidOrientation : Moving a -> Vec3
-boidOrientation b =
+boidOrientation : Moving a -> Qn.Quaternion
+boidOrientation b = Qn.fromVec3 b.velocity
+{-
     let v = V3.toRecord b.velocity
     in V3.normalize (vec3 v.x (v.y/10) v.z)
+-}
 
 stepBoid : Time -> Moving a -> Moving a
 stepBoid dt b = { b | pos = V3.add b.pos ((V3.scale dt b.velocity)), orientation = boidOrientation b }

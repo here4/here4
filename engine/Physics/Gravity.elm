@@ -1,5 +1,6 @@
 module Physics.Gravity exposing (gravity)
 
+import Math.Quaternion as Qn
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Time exposing (Time)
@@ -9,10 +10,12 @@ import Body exposing (..)
 type alias BBall a = Massive (Spherical (Moving a))
 
 -- TODO: add spin?
-dropOrientation : Moving a -> Vec3
-dropOrientation d =
+dropOrientation : Moving a -> Qn.Quaternion
+dropOrientation d = Qn.fromVec3 d.velocity
+{-
     let v = V3.toRecord d.velocity
     in V3.normalize (vec3 v.x 0 v.z)
+-}
 
 bounds : BBall a -> BBall a
 bounds b =

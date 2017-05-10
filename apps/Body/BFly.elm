@@ -8,6 +8,7 @@ import WebGL exposing (..)
 
 import Appearance exposing (..)
 import Body exposing (Oriented, Visible)
+import Orientation
 
 type alias BoidVertex = { pos:Vec3, color:Vec3, coord:Vec3, wing:Vec3 }
 
@@ -29,7 +30,7 @@ bfly fragmentShader f01 = makeBFly bflyVertex fragmentShader (f01 * second * pi 
 makeBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Oriented (Visible {})
 makeBFly vertexShader fragmentShader flapStart =
     let appear = appearBFly vertexShader fragmentShader flapStart
-    in { scale = vec3 1 1 1, pos = (vec3 7 0 4), orientation = vec3 0 0 1, appear = appear }
+    in { scale = vec3 1 1 1, pos = (vec3 7 0 4), orientation = Orientation.initial, appear = appear }
 
 appearBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Appearance
 appearBFly vertexShader fragmentShader flapStart p =
