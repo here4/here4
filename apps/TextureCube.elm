@@ -78,9 +78,9 @@ focus model = Maybe.map (appToFocus << first) model
 drive : Inputs -> Model -> Model
 drive inputs model = case model of
     Just (BCtr anchor scale p o appear, vel) ->
-        let motion0 = { position = p, orientation = Qn.fromVec3 o, velocity = vel }
+        let motion0 = { position = p, orientation = o, velocity = vel }
             motion = dreamBuggy.move Nothing (always 1.0) inputs motion0
         in
-            Just ( BCtr anchor scale motion.position (rotateLabV motion.orientation (vec3 0 0 1)) appear
+            Just ( BCtr anchor scale motion.position motion.orientation appear
                  , motion.velocity)
     Nothing -> Nothing

@@ -256,11 +256,11 @@ toMat4 q =
         (phi, tau, psi) = toEuler q
     in
         -- M4.makeRotate (phi+pi) V3.k
+{-
         M4.makeRotate (phi) V3.k
         |> M4.rotate tau V3.i
         |> M4.rotate psi V3.j
-{-
+-}
         M4.makeRotate psi V3.j
         |> M4.rotate tau V3.i
         |> M4.rotate phi V3.k
--}

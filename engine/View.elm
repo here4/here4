@@ -13,6 +13,8 @@ import Time exposing (Time)
 import WebGL
 import Window
 
+import Math.Quaternion as Qn
+
 import App exposing (..)
 import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
@@ -153,17 +155,20 @@ mapApply fs x = List.concat <| List.map (\f -> f x) fs
 orient : Mat4 -> Perception -> Body -> List WebGL.Entity
 orient skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
     let z_axis = vec3 0 0 1
-        rot_angle = 0 - acos (dot orientation z_axis)
-        rot_axis = normalize (cross orientation z_axis)
+        -- rot_angle = 0 - acos (dot orientation z_axis)
+        -- rot_axis = normalize (cross orientation z_axis)
+        rot_mat = Qn.toMat4 orientation
         appear = case anchor of
             Body.AnchorGround ->
                 appear0
-                  |> Appearance.transform (M4.rotate rot_angle rot_axis)
+                  -- |> Appearance.transform (M4.rotate rot_angle rot_axis)
+                  |> Appearance.transform (M4.mul rot_mat)
                   >> Appearance.transform (M4.translate position)
                   >> Appearance.transform (M4.scale scale)
             Body.AnchorSky ->
                 appear0
-                  |> Appearance.transform (M4.rotate rot_angle rot_axis)
+                  -- |> Appearance.transform (M4.rotate rot_angle rot_axis)
+                  |> Appearance.transform (M4.mul rot_mat)
                   >> Appearance.transform (M4.scale scale)
             Body.AnchorHUD ->
                 appear0
