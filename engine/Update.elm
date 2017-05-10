@@ -65,39 +65,45 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
             let (model_, newCmdMsg) = case worldTerrain model.worldModel of
                 Nothing -> (model, Cmd.none)
                 Just terrain ->
-                    let inputs = timeToInputs dt model.inputs
+                    let inputs1 = timeToInputs dt model.inputs
                         inputs2 = timeToInputs dt model.inputs2
                         keyLimit = worldKeyLimit model.worldModel
 
                         -- Animate
-                        wm = worldAnimate inputs.dt model.worldModel
+                        wm = worldAnimate inputs1.dt model.worldModel
 
                         -- Camera
                         label1 = worldLabel (model.player1.rideKey) model.worldModel
                         camera1 = worldCamera (model.player1.rideKey) model.worldModel
+                        (wm1, wm1Msg) = case model.player1.rideKey of
+                            Just key -> worldUpdate (Forward key (Control.Drive inputs1)) wm
+                            Nothing  -> (wm, Cmd.none)
 
                         label2 = worldLabel (model.player2.rideKey) model.worldModel
                         camera2 = worldCamera (model.player2.rideKey) model.worldModel
+                        (wm2, wm2Msg) = case model.player2.rideKey of
+                            Just key -> worldUpdate (Forward key (Control.Drive inputs2)) wm1
+                            Nothing  -> (wm1, Cmd.none)
 
                         -- Focus
-                        (wm2, wmCmdMsg, focPos) = let key = model.player1.focusKey in
+                        (wmF, wmFMsg, focPos) = let key = model.player1.focusKey in
                             case worldFocus key model.worldModel of
                                 Just focus ->
-                                    let dp = inputsToMove inputs model.player1
-                                        (wm2, wmCmdMsg) =
-                                            worldUpdate (Forward key (Control.Move dp)) wm
-                                    in (wm2, wmCmdMsg, Just focus.pos)
-                                _ -> (wm, Cmd.none, Nothing)
+                                    let dp = inputsToMove inputs1 model.player1
+                                        (wmF, wmFMsg) =
+                                            worldUpdate (Forward key (Control.Move dp)) wm2
+                                    in (wmF, wmFMsg, Just focus.pos)
+                                _ -> (wm2, Cmd.none, Nothing)
 
                         newModel =
                             { model | globalTime = model.globalTime + dt
-                                    , player1 = step terrain keyLimit inputs label1 camera1 focPos model.player1
+                                    , player1 = step terrain keyLimit inputs1 label1 camera1 focPos model.player1
                                     , player2 = step terrain keyLimit inputs2 label2 camera2 Nothing model.player2
-                                    , inputs = clearStationaryInputs inputs
-                                    , worldModel = wm2
+                                    , inputs = clearStationaryInputs inputs1
+                                    , worldModel = wmF
                             }
-                    in
-                        (newModel, Cmd.map Model.WorldMessage wmCmdMsg)
+                    in -- Cmd.batch ]wm1Msg, wm2Msg, wmFMsg]
+                        (newModel, Cmd.map Model.WorldMessage wmFMsg)
             in ( model_
                , Cmd.batch
                    [ Gamepad.gamepads Model.GamepadUpdate
