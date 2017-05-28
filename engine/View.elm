@@ -13,7 +13,7 @@ import Time exposing (Time)
 import WebGL
 import Window
 
-import Math.Quaternion as Qn
+import Quaternion as Qn
 
 import App exposing (..)
 import Appearance exposing (Appearance, Perception)

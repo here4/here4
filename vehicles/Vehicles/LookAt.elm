@@ -3,7 +3,7 @@ module Vehicles.LookAt exposing (lookAt)
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 
-import Math.Quaternion as Qn
+import Quaternion as Qn
 
 import Model
 
@@ -56,8 +56,8 @@ move focPos eyeLevel inputs motion = case focPos of
         wantPos = V3.add fpos <| V3.fromTuple (nx, ny, nz)
 -}
 
-        yaw = Qn.normalize <| Qn.fromAngleAxis inputYaw V3.j
-        xzPos = Qn.vrotate yaw <| V3.sub closePos fpos
+        yaw = Qn.fromAngleAxis inputYaw V3.j
+        xzPos = Qn.rotate yaw <| V3.sub closePos fpos
         wantPos = V3.add fpos xzPos
 
 {-
@@ -78,16 +78,16 @@ move focPos eyeLevel inputs motion = case focPos of
 
         -- Find the orientation looking at fpos from newPos
         f = V3.normalize (V3.sub fpos newPos)
-        orPos = Qn.fromTo2 V3.k f
+        orPos = Qn.fromTo V3.k f
 
         -- Ensure the camera is in an upright plane
         -- camAxis = V3.cross f (V3.setY (V3.getY f + 1) f)
         camAxis = V3.cross f (upwardsFrom f)
         camQ = Qn.fromAngleAxis (pi/2) camAxis
-        cam = V3.normalize <| Qn.vrotate camQ f
+        cam = Qn.rotate camQ f
 
-        orCam = Qn.fromTo (Qn.vrotate orPos V3.j) cam
-        orientation = Qn.hamilton orCam orPos
+        orCam = Qn.fromTo (Qn.rotate orPos V3.j) cam
+        orientation = Qn.multiply orCam orPos
         
     in
         { motion | position = newPos, orientation = orientation }

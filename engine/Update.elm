@@ -8,7 +8,7 @@ import Bag
 import Dispatch exposing (..)
 import Model exposing (Model, Msg)
 import Orientation
-import Math.Quaternion as Qn -- Don't expose this here
+import Quaternion as Qn -- Don't expose this here
 import Ports
 
 import Gamepad

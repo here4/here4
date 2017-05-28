@@ -6,7 +6,7 @@ import Math.Vector3 as V3
 import Appearance exposing (Appearance)
 import Orientation exposing (Orientation)
 
-import Math.Quaternion as Qn
+import Quaternion as Qn
 
 type Body = BCtr Anchor Vec3 Vec3 Orientation Appearance
 

@@ -1,6 +1,6 @@
 module Physics.Gravity exposing (gravity)
 
-import Math.Quaternion as Qn
+import Quaternion as Qn
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Time exposing (Time)
