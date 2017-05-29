@@ -152,8 +152,8 @@ layoutSceneVR windowSize model render =
 mapApply : List (a -> List b) -> a -> List b
 mapApply fs x = List.concat <| List.map (\f -> f x) fs
 
-orient : Mat4 -> Perception -> Body -> List WebGL.Entity
-orient skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
+bodyAppear : Mat4 -> Perception -> Body -> List WebGL.Entity
+bodyAppear skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
     let z_axis = vec3 0 0 1
         -- rot_angle = 0 - acos (dot orientation z_axis)
         -- rot_axis = normalize (cross orientation z_axis)
@@ -216,7 +216,7 @@ renderWorld globalTime world eye windowSize player =
             }
 
         skyMatrix = skyboxMatrix windowSize player
-        appears = List.concat <| List.map (orient skyMatrix p) world.bodies
+        appears = List.concat <| List.map (bodyAppear skyMatrix p) world.bodies
     in
         appears
 
