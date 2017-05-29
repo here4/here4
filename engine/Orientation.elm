@@ -9,6 +9,21 @@ type alias Orientation = Qn.Quaternion
 initial : Orientation
 initial = Qn.unit
 
+-- quaternion (flight dynamics) to world
+qToW : V3.Vec3 -> V3.Vec3
+qToW v =
+     let (x, y, z) = V3.toTuple v
+     in V3.vec3 y z (-x)
+
+-- world to quaternion (flight dynamics)
+wToQ : V3.Vec3 -> V3.Vec3
+wToQ v =
+     let (x, y, z) = V3.toTuple v
+     in V3.vec3 (-z) x y
+
+fromVec3 : V3.Vec3 -> Orientation
+fromVec3 = wToQ >> Qn.fromVec3
+
 fromRollPitchYaw : (Float, Float, Float) -> Orientation
 fromRollPitchYaw (roll, pitch, yaw) = Qn.fromYawPitchRoll (yaw, pitch, roll)
 
@@ -19,8 +34,9 @@ followedBy : Orientation -> Orientation -> Orientation
 followedBy = Qn.multiply
 
 rotateBodyV : Orientation -> Vec3 -> Vec3
-rotateBodyV = Qn.rotate
+rotateBodyV o = wToQ >> Qn.rotate o >> qToW
 
 rotateLabV : Orientation -> Vec3 -> Vec3
-rotateLabV o = Qn.rotate (Qn.negate o)
+rotateLabV o = wToQ >> Qn.rotate (Qn.conjugate o) >> qToW
+
 

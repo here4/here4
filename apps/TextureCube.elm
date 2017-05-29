@@ -6,7 +6,6 @@ import Time exposing (Time)
 import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
 
-import Quaternion as Qn
 import Orientation exposing (rotateLabV)
 
 import App exposing (App, AppMsg, Focus, appToFocus)

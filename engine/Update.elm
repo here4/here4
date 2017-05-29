@@ -7,8 +7,8 @@ import Time exposing (Time)
 import Bag
 import Dispatch exposing (..)
 import Model exposing (Model, Msg)
-import Orientation
-import Quaternion as Qn -- Don't expose this here
+import Orientation exposing (fromVec3)
+-- import Quaternion as Qn -- Don't expose this here
 import Ports
 
 import Gamepad
@@ -192,7 +192,7 @@ step terrain keyLimit inputs label camera focPos player0 = if inputs.reset then 
             move player = case camera of
                 Just c  -> { player | motion = { position = c.position,
                                                  velocity = player.motion.velocity,
-                                                 orientation = Qn.fromVec3 c.orientation
+                                                 orientation = fromVec3 c.orientation
                                                }
                            }
                 Nothing -> player
@@ -220,7 +220,7 @@ step terrain keyLimit inputs label camera focPos player0 = if inputs.reset then 
                 if player.cameraInside then
                     -- let behind = player.pos `sub` (V3.scale 2.5 (Model.direction player.motion)) `sub` (vec3 0 0.5 0)
                     let inside = add player.motion.position
-                                     (Orientation.rotateBodyV player.motion.orientation (vec3 0 0 1)) -- wedge
+                                     (Orientation.rotateBodyV player.motion.orientation (vec3 0 0 3)) -- wedge
                                      -- Inside Jeep driver's seat
                                      -- `add` Qn.vrotate player.orientQn (vec3 0.38 0.5 -2.3)
                     in
