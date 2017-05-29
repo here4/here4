@@ -226,7 +226,7 @@ perspective : Window.Size -> Model.Player -> Model.Eye -> Mat4
 perspective { width, height } player eye =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
         (M4.makeLookAt (add player.cameraPos (eyeOffset player.motion eye))
-                       (add player.motion.position (scale 3 (Model.direction player.motion)))
+                       (add player.cameraPos (scale 3 (Model.direction player.motion)))
                        player.cameraUp)
 
 skyboxMatrix : Window.Size -> Model.Player -> Mat4
