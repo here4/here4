@@ -6,8 +6,6 @@ import Time exposing (Time)
 import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
 
-import Orientation exposing (rotateLabV)
-
 import App exposing (App, AppMsg, Focus, appToFocus)
 import Body exposing (..)
 import Control exposing (CtrlMsg)

@@ -182,9 +182,11 @@ orient skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
 eyeOffset : Model.Motion -> Model.Eye -> Vec3
 eyeOffset motion eye =
     if eye == Model.LeftEye then
-        Orientation.rotateLabV motion.orientation (vec3 (-0.04) 0 0)
+        -- Orientation.rotateLabV motion.orientation (vec3 (-0.04) 0 0)
+        Orientation.rotateBodyV motion.orientation (vec3 (-0.04) 0 0)
     else if eye == Model.RightEye then
-        Orientation.rotateLabV motion.orientation (vec3 0.04 0 0)
+        -- Orientation.rotateLabV motion.orientation (vec3 0.04 0 0)
+        Orientation.rotateBodyV motion.orientation (vec3 0.04 0 0)
     else
         vec3 0 0 0
 
