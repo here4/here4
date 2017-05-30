@@ -204,7 +204,7 @@ renderWorld globalTime world eye windowSize player =
         eyeLevel pos = Model.eyeLevel + world.ground.elevation pos
         lensDistort = if player.cameraVR then 0.85 else 0.95
 
-        p = { cameraPos = world.ground.bounds (aboveGround eyeLevel player.motion.position)
+        p = { cameraPos = player.cameraPos
             , viewMatrix = perspective windowSize player eye
             , globalTime = globalTime
             , windowSize = windowSize
