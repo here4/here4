@@ -1,5 +1,6 @@
 module Orientation exposing (..)
 
+import Math.Matrix4 as M4
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Quaternion as Qn
@@ -38,5 +39,14 @@ rotateBodyV o = wToQ >> Qn.rotate o >> qToW
 
 rotateLabV : Orientation -> Vec3 -> Vec3
 rotateLabV o = wToQ >> Qn.rotate (Qn.conjugate o) >> qToW
+
+toMat4 : Orientation -> M4.Mat4
+toMat4 =
+    let
+        -- fromFlightDynamics = M4.makeBasis (V3.negate V3.k) V3.i (V3.negate V3.j)
+        -- fromFlightDynamics = M4.makeBasis V3.j (V3.negate V3.k) (V3.negate V3.i)
+        fromFlightDynamics = M4.identity
+    in
+        Qn.toMat4 >> M4.mul fromFlightDynamics
 
 

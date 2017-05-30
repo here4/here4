@@ -13,8 +13,6 @@ import Time exposing (Time)
 import WebGL
 import Window
 
-import Quaternion as Qn
-
 import App exposing (..)
 import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
@@ -157,7 +155,7 @@ bodyAppear skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
     let z_axis = vec3 0 0 1
         -- rot_angle = 0 - acos (dot orientation z_axis)
         -- rot_axis = normalize (cross orientation z_axis)
-        rot_mat = Qn.toMat4 orientation
+        rot_mat = Orientation.toMat4 orientation
         appear = case anchor of
             Body.AnchorGround ->
                 appear0
