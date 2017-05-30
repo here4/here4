@@ -196,7 +196,7 @@ orient : Motion -> Vec3 -> Vec3
 orient motion = Orientation.rotateBodyV motion.orientation
 
 direction : Motion -> Vec3
-direction motion = orient motion V3.k
+direction motion = Orientation.rotateBodyV motion.orientation V3.k
 
 cameraUp : Player -> Vec3
 -- cameraUp player = orient player V3.j
