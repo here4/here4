@@ -126,6 +126,8 @@ keysToInputs keys inputs0 =
         { inputs0 | x = minusPlus keys.left keys.right
                   , y = minusPlus keys.down keys.up
                   , button_X = keys.space
+                  , changeCamera = keys.kI
+                  , mx = minusPlus keys.kComma keys.kPeriod
         }
 
 mouseToInputs : Model.MouseMovement -> Model.Inputs -> Model.Inputs

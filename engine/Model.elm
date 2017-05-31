@@ -103,6 +103,9 @@ type alias Keys =
     , up : Bool
     , down : Bool
     , space : Bool
+    , kI : Bool
+    , kComma : Bool
+    , kPeriod : Bool
     }
 
 type alias Inputs =
@@ -175,7 +178,7 @@ init worldInit { movement, isLocked } =
       , player2 = defaultPlayer
       , globalTime = 0
       , maybeWindowSize = Nothing
-      , keys = Keys False False False False False
+      , keys = Keys False False False False False False False False
       , gamepadIds = []
       , inputs = noInput
       , inputs2 = noInput

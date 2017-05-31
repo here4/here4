@@ -47,7 +47,6 @@ programWithFlags world =
         }
 
 {- Subscribe to keychange events.
-Ignore anything that isn't an escape, space or WASD keys.
 -}
 keyChange : Bool -> Keyboard.KeyCode -> Model.Msg worldMsg
 keyChange on keyCode =
@@ -60,6 +59,9 @@ keyChange on keyCode =
             68 -> \k -> { k | right = on }
             87 -> \k -> { k | up    = on }
             83 -> \k -> { k | down  = on }
+            188 -> \k -> { k | kComma = on }
+            190 -> \k -> { k | kPeriod = on }
+            73 -> \k -> { k | kI = on }
             _  -> Basics.identity
         ) |> Model.KeyChange
 
