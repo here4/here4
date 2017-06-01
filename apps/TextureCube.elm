@@ -71,7 +71,7 @@ camera model = Maybe.map (bodyCamera << first) model
 
 focus : Model -> Maybe Focus
 focus model = Maybe.map (appToFocus << first) model
-    
+
 drive : Inputs -> Model -> Model
 drive inputs model = case model of
     Just (BCtr anchor scale p o appear, vel) ->

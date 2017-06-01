@@ -147,9 +147,6 @@ layoutSceneVR windowSize model render =
             (render Model.RightEye ws2 model.player1)
         ]
 
-mapApply : List (a -> List b) -> a -> List b
-mapApply fs x = List.concat <| List.map (\f -> f x) fs
-
 bodyAppear : Mat4 -> Perception -> Body -> List WebGL.Entity
 bodyAppear skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
     let z_axis = vec3 0 0 1
@@ -159,15 +156,17 @@ bodyAppear skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
         appear = case anchor of
             Body.AnchorGround ->
                 appear0
-                  -- |> Appearance.transform (M4.rotate rot_angle rot_axis)
-                  |> Appearance.transform (M4.mul rot_mat)
-                  >> Appearance.transform (M4.translate position)
+                  -- -- |> Appearance.transform (M4.rotate rot_angle rot_axis)
+                  -- |> Appearance.transform (M4.mul rot_mat)
+                  -- >> Appearance.transform (M4.translate position)
+                  |> Appearance.transform (M4.translate position)
                   >> Appearance.transform (M4.scale scale)
             Body.AnchorSky ->
                 appear0
-                  -- |> Appearance.transform (M4.rotate rot_angle rot_axis)
-                  |> Appearance.transform (M4.mul rot_mat)
-                  >> Appearance.transform (M4.scale scale)
+                  -- -- |> Appearance.transform (M4.rotate rot_angle rot_axis)
+                  -- |> Appearance.transform (M4.mul rot_mat)
+                  -- >> Appearance.transform (M4.scale scale)
+                  |> Appearance.transform (M4.scale scale)
             Body.AnchorHUD ->
                 appear0
                   |> Appearance.transform (M4.scale scale)

@@ -26,8 +26,6 @@ type alias Camera =
 
 -- | Use anything Oriented and Visible as a Body
 toBody : Oriented (Visible a) -> Body
--- toBody x = BCtr AnchorGround x.scale x.pos (Qn.fromVec3 x.orientation) x.appear
--- toBody x = BCtr AnchorGround x.scale x.pos Orientation.initial x.appear
 toBody x = BCtr AnchorGround x.scale x.pos x.orientation x.appear
 
 -- | Reposition a Body

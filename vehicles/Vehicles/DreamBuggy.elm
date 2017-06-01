@@ -27,11 +27,13 @@ move _ eyeLevel inputs motion =
            |> physics eyeLevel inputs.dt
 
 clampBuggy : Orientation -> Orientation
-clampBuggy o =
+clampBuggy o = o
+{-
     let (roll, pitch, yaw) = Orientation.toRollPitchYaw o
         roll_ = clamp (degrees -10) (degrees 10) (roll/2)
         pitch_ = clamp (degrees -15) (degrees 15) (pitch/2)
     in Orientation.fromRollPitchYaw (roll_, pitch_, yaw)
+-}
 
 flatten : Vec3 -> Vec3
 flatten v =
@@ -50,9 +52,9 @@ turn eyeLevel dx dy motion =
         tireRoll  = atan ((rightTireY - leftTireY)/0.1)
         (yaw, pitch, roll) =
             if getY motion.position > (eyeLevel motion.position) + 5 then
-                (yaw0-(dx * 5), pitch0*0.9 + dy*0.1, 0)
+                (yaw0+(dx * 5), pitch0*0.9 + dy*0.1, 0)
             else
-                (yaw0-dx, pitch0*0.95 + (tirePitch+dy)*0.05, roll0*0.95 + (tireRoll*0.05))
+                (yaw0+dx, pitch0*0.95 + (tirePitch+dy)*0.05, roll0*0.95 + (tireRoll*0.05))
                 -- (yaw0-dx, pitch0*0.05 + tirePitch*0.95, tireRoll)
 
         orientation = clampBuggy (fromRollPitchYaw (roll, pitch, yaw))

@@ -48,6 +48,7 @@ toMat4 =
         flipY = M4.makeBasis V3.i (V3.negate V3.j) V3.k
         -- fromFlightDynamics = M4.identity
     in
-        Qn.toMat4 >> M4.mul flipY
+        -- Qn.toMat4 >> M4.mul flipY
+        Qn.toMat4
 
 
