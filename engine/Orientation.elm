@@ -40,6 +40,11 @@ rotateBodyV o = wToQ >> Qn.rotate o >> qToW
 rotateLabV : Orientation -> Vec3 -> Vec3
 rotateLabV o = wToQ >> Qn.rotate (Qn.conjugate o) >> qToW
 
+rotateM4 : Orientation -> M4.Mat4 -> M4.Mat4
+rotateM4 o =
+    let angle = Qn.getAngle o
+    in if angle == 0 then identity else M4.rotate -angle (Qn.getAxis o |> qToW)
+
 toMat4 : Orientation -> M4.Mat4
 toMat4 =
     let
