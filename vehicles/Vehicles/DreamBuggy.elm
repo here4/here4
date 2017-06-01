@@ -50,9 +50,9 @@ turn eyeLevel dx dy motion =
         tirePitch = 0 -- atan (-(frontTireY - motionY)/0.01)
         tireRoll  = atan ((rightTireY - leftTireY)/0.1)
         (yaw, pitch, roll) =
-            if getY motion.position > (eyeLevel motion.position) + 5 then
-                (dx * 5, dy*0.1, 0)
-            else
+            -- if getY motion.position > (eyeLevel motion.position) + 5 then -- spin if in the air
+            --     (dx * 5, dy*0.1, 0)
+            -- else
                 (dx, (tirePitch+dy)*0.05, tireRoll*0.05)
 
         orientation = clampBuggy (followedBy motion.orientation (fromRollPitchYaw (roll, pitch, yaw)))
