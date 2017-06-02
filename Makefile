@@ -5,7 +5,10 @@ PROJECT=dreambuggy
 REMOTE=${GHUSER}-${PROJECT}
 
 SOURCE=dreambuggy/Main.elm
-TARGET=build/Main.js
+SCRIPT=dreambuggy.js
+TARGET=build/${SCRIPT}
+DEPLOY=scripts/${SCRIPT}
+
 
 BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 
@@ -18,13 +21,13 @@ update:
 
 build:
 	elm-make ${SOURCE} --output ${TARGET}
-
-rebuild: clean build
+	mkdir -p scripts
+	cp ${TARGET} ${DEPLOY}
 
 publish: build
-	git add -f build/Main.js
-	git commit -m 'Update Main.js'
-	git push --force kfish-${PROJECT} HEAD:gh-pages
+	git add -f ${TARGET}
+	git commit -m "Update ${TARGET}"
+	git push --force ${REMOTE} HEAD:gh-pages
 	git reset --hard HEAD^
 
 pull:
@@ -35,6 +38,7 @@ push:
 	git push ${REMOTE} ${BRANCH}
 
 clean:
+	rm -rf build
 	rm -rf elm-stuff/build-artifacts
 
 realclean:
