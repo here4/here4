@@ -202,7 +202,4 @@ direction : Motion -> Vec3
 direction motion = Orientation.rotateBodyV motion.orientation V3.k
 
 cameraUp : Player -> Vec3
--- cameraUp player = orient player V3.j
--- cameraUp player = Qn.vrotate (Qn.negate player.orientQn) V3.j
--- cameraUp player = Orientation.rotateLabV player.motion.orientation V3.j
-cameraUp player = Orientation.rotateBodyV player.motion.orientation V3.j
+cameraUp player = Orientation.rotateBodyV player.motion.orientation (V3.negate V3.j)
