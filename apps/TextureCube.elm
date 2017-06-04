@@ -63,7 +63,7 @@ update msg model = case msg of
         Nothing   -> (Nothing, Cmd.none)
 
     Ctrl (Control.Drive ground inputs) ->
-        (drive ground inputs model, Cmd.none)
+        (Maybe.map (DreamBuggy.drive ground inputs) model, Cmd.none)
 
     Effect _ ->
         (model, Cmd.none)
@@ -81,17 +81,3 @@ camera model = Maybe.map bodyCamera model
 
 focus : Model -> Maybe Focus
 focus model = Maybe.map appToFocus model
-
-drive : Ground -> Inputs -> Model -> Model
-drive ground inputs model = case model of
-    Just body ->
-        let eyeLevel pos = 1.8 + ground.elevation pos
-            motion0 = { position = body.position, orientation = body.orientation, velocity = body.velocity }
-            motion = DreamBuggy.move ground eyeLevel inputs motion0
-        in
-            Just ( { body | position = motion.position
-                          , orientation = motion.orientation
-                          , velocity = motion.velocity
-                   }
-                 )
-    Nothing -> Nothing

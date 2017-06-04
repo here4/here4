@@ -1,4 +1,4 @@
-module Vehicles.DreamBuggy exposing (move)
+module Vehicles.DreamBuggy exposing (drive)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
@@ -16,10 +16,21 @@ import Ground exposing (Ground)
 welcome : Model.Motion -> Model.Motion
 welcome motion = { motion | orientation = clampBuggy motion.orientation }
 
+drive : Ground -> Model.Inputs -> Moving (HasBody a) -> Moving (HasBody a)
+drive ground inputs body =
+    let eyeLevel pos = 1.8 + ground.elevation pos
+        motion0 = { position = body.position, orientation = body.orientation, velocity = body.velocity }
+        motion = move ground eyeLevel inputs motion0
+    in
+        { body | position = motion.position
+               , orientation = motion.orientation
+               , velocity = motion.velocity
+        }
+
 move : Ground -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
 move terrain eyeLevel inputs motion =
     motion |> turn eyeLevel inputs.mx inputs.my
-           |> drive eyeLevel inputs
+           |> goForward eyeLevel inputs
            |> gravity eyeLevel inputs.dt
            |> physics eyeLevel inputs.dt
            |> keepWithinbounds terrain
@@ -58,8 +69,8 @@ turn eyeLevel dx dy motion =
     in
         { motion | orientation = orientation }
 
-drive : Model.EyeLevel -> { a | x:Float, y:Float, dt:Float } -> Model.Motion -> Model.Motion
-drive eyeLevel inputs motion =
+goForward : Model.EyeLevel -> { a | x:Float, y:Float, dt:Float } -> Model.Motion -> Model.Motion
+goForward eyeLevel inputs motion =
   -- if getY motion.position > eyeLevel motion.position then motion else
     let moveDir = normalize (flatten (Model.direction motion))
         strafeDir = transform (makeRotate (degrees -90) j) moveDir
