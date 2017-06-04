@@ -10,6 +10,7 @@ import App exposing (App, AppMsg, Focus, appToFocus)
 import Body exposing (..)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
+import Ground exposing (Ground)
 import Model exposing (Inputs)
 
 import Body.Cube exposing (textureCube)
@@ -52,8 +53,8 @@ update msg model = case msg of
         Just (body, vel) -> (Just (translate dp body, vel), Cmd.none)
         Nothing          -> (Nothing, Cmd.none)
 
-    Ctrl (Control.Drive inputs) ->
-        (drive inputs model, Cmd.none)
+    Ctrl (Control.Drive ground inputs) ->
+        (drive ground inputs model, Cmd.none)
 
     Effect _ ->
         (model, Cmd.none)
@@ -72,11 +73,12 @@ camera model = Maybe.map (bodyCamera << first) model
 focus : Model -> Maybe Focus
 focus model = Maybe.map (appToFocus << first) model
 
-drive : Inputs -> Model -> Model
-drive inputs model = case model of
+drive : Ground -> Inputs -> Model -> Model
+drive ground inputs model = case model of
     Just (BCtr anchor scale p o appear, vel) ->
-        let motion0 = { position = p, orientation = o, velocity = vel }
-            motion = dreamBuggy.move Nothing (always 1.0) inputs motion0
+        let eyeLevel pos = 1.8 + ground.elevation pos
+            motion0 = { position = p, orientation = o, velocity = vel }
+            motion = dreamBuggy.move Nothing eyeLevel inputs motion0
         in
             Just ( BCtr anchor scale motion.position motion.orientation appear
                  , motion.velocity)

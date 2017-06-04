@@ -14,7 +14,7 @@ type alias WorldMsg a = DispatchHub Bag.Key EffectMsg Msg Dynamic a
 
 type Msg
     = Move Vec3
-    | Drive Inputs
+    | Drive Ground Inputs
 
 type EffectMsg
     = UpdateGround Ground

@@ -76,13 +76,13 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                         label1 = worldLabel (model.player1.rideKey) model.worldModel
                         camera1 = worldCamera (model.player1.rideKey) model.worldModel
                         (wm1, wm1Msg) = case model.player1.rideKey of
-                            Just key -> worldUpdate (Forward key (Control.Drive inputs1)) wm
+                            Just key -> worldUpdate (Forward key (Control.Drive terrain inputs1)) wm
                             Nothing  -> (wm, Cmd.none)
 
                         label2 = worldLabel (model.player2.rideKey) model.worldModel
                         camera2 = worldCamera (model.player2.rideKey) model.worldModel
                         (wm2, wm2Msg) = case model.player2.rideKey of
-                            Just key -> worldUpdate (Forward key (Control.Drive inputs2)) wm1
+                            Just key -> worldUpdate (Forward key (Control.Drive terrain inputs2)) wm1
                             Nothing  -> (wm1, Cmd.none)
 
                         -- Focus
