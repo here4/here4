@@ -19,6 +19,7 @@ type alias Body =
     }
 -}
 
+type alias Anchored a = { a | anchor : Anchor }
 
 type alias Visible a = { a | appear : Appearance }
 
@@ -27,7 +28,8 @@ type alias Moving a = Oriented { a | velocity : Vec3 }
 type alias Massive a = { a | mass : Float }
 type alias Spherical a = { a | radius : Float }
 
-type alias Body = Oriented (Visible { anchor : Anchor })
+type alias HasBody a = Oriented (Visible (Anchored a))
+type alias Body = HasBody {}
 
 -- TODO: define cameraAdd etc.
 type alias Camera =
@@ -55,7 +57,7 @@ resize : Float -> Body -> Body
 resize scale body = { body | scale = V3.scale scale body.scale }
 
 -- | Translate a Body
-translate : Vec3 -> Body -> Body
+translate : Vec3 -> Oriented a -> Oriented a
 translate t body = { body | position = V3.add t body.position }
 
 put : Vec3 -> Appearance -> Body
@@ -70,7 +72,7 @@ put position appear =
 anchorSky : Body -> Body
 anchorSky body = { body | anchor = AnchorSky }
 
-bodyCamera : Body -> Camera
+bodyCamera : Oriented a -> Camera
 bodyCamera body = 
     { position = body.position
     , orientation = Orientation.rotateBodyV body.orientation V3.k

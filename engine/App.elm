@@ -142,7 +142,7 @@ type alias Focus = {
     position : Vec3
 }
 
-appToFocus : Body -> Focus
+appToFocus : Oriented a -> Focus
 appToFocus body = { position = body.position }
 
 orientedToFocus : Oriented a -> Focus

@@ -5,6 +5,7 @@ import Math.Vector3 as V3
 import Math.Matrix4 exposing (..)
 import Orientation exposing (..)
 
+import Body exposing (..)
 import Model
 import Ground exposing (Ground)
 
