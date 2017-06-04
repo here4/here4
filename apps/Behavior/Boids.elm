@@ -6,6 +6,7 @@ import Math.Vector3 exposing (Vec3, vec3)
 import Time exposing (Time)
 
 import Body exposing (..)
+import Ground exposing (Ground)
 
 type alias Boid a = Massive (Spherical (Moving a))
 
@@ -22,13 +23,12 @@ newBoid m r pos vel thing0 =
 
 boidOrientation : Moving a -> Orientation
 boidOrientation b = fromVec3 b.velocity
-{-
-    let v = V3.toRecord b.velocity
-    in V3.normalize (vec3 v.x (v.y/10) v.z)
--}
 
-stepBoid : Time -> Moving a -> Moving a
-stepBoid dt b = { b | position = V3.add b.position ((V3.scale dt b.velocity)), orientation = boidOrientation b }
+stepBoid : Ground -> Time -> Moving a -> Moving a
+stepBoid ground dt b =
+    { b | position = ground.bounds (V3.add b.position ((V3.scale dt b.velocity)))
+        , orientation = boidOrientation b
+    }
 
 rule1 : Int -> Vec3 -> Boid a -> Vec3 
 rule1 n sumPos b =
@@ -48,17 +48,20 @@ rule3 n sumVel b =
         perceived_vel = V3.scale perceived_scale (V3.sub sumVel b.velocity)
     in V3.scale (1/15) <| V3.sub perceived_vel b.velocity
 
-bounds : Boid a -> Vec3
-bounds b =
+bounds : Ground -> Boid a -> Vec3
+bounds ground b =
     let bound x low high = if (x < low) then 1 else (if x > high then -1 else 0)
         (x,y,z) = V3.toTuple b.position
-    in vec3 (bound x -200 200) (bound y 0 100) (bound z -200 200)
+        elevation = ground.elevation b.position
+    in vec3 (bound x -200 200)
+            (bound y (elevation+10) (elevation+100))
+            (bound z -200 200)
 
 boundVelocity : Vec3 -> Vec3
 boundVelocity v = let l = V3.length v in if (l<1) then (V3.scale (1/l) v) else v
 
-moveBoids : Time -> List (Boid a) -> List (Boid a)
-moveBoids dt boids =
+moveBoids : Ground -> Time -> List (Boid a) -> List (Boid a)
+moveBoids ground dt boids =
     let
         nboids = List.length boids
         positions = List.map .position boids
@@ -68,12 +71,12 @@ moveBoids dt boids =
         r1s = List.map (rule1 nboids sumPos) boids
         r2s = List.map (rule2 positions) boids
         r3s = List.map (rule3 nboids sumVel) boids
-        box = List.map bounds boids
+        box = List.map (bounds ground) boids
         applyRules b r1 r2 r3 r4 = { b |
             velocity = boundVelocity (V3.add b.velocity (V3.scale dt
                 (V3.add r1 (V3.add r2 (V3.add r3 r4))))) }
         bs = List.map5 applyRules boids r1s r2s r3s box
-    in List.map (stepBoid dt) bs
+    in List.map (stepBoid ground dt) bs
 
 {-
 boidsTCont : TCont (List (Boid a))

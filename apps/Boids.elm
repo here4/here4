@@ -48,7 +48,7 @@ update msg model = case msg of
    BoidsGenerated newBoids -> (newBoids, Cmd.none)
 
 animate : Ground -> Time -> Boids -> Boids
-animate ground dt boids = moveBoids dt boids
+animate ground dt boids = moveBoids ground dt boids
 
 bodies : Boids -> List Body
 bodies = List.map toBody
