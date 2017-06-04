@@ -63,7 +63,7 @@ update msg model = case msg of
         Nothing   -> (Nothing, Cmd.none)
 
     Ctrl (Control.Drive ground inputs) ->
-        (Maybe.map (DreamBuggy.drive ground inputs) model, Cmd.none)
+        (Maybe.map (DreamBuggy.drive ground 8.0 inputs) model, Cmd.none)
 
     Effect _ ->
         (model, Cmd.none)

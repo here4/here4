@@ -29,11 +29,11 @@ main =
         , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
         , Boids.create 100
         , Balls.create 30
-        , Statue.create Bird "Clouds Sphere" (vec3 3 10 5) cloudsSphere
-        , Statue.create Buggy "Landscape Diamond" (vec3 0 1.5 0) fogMountainsDiamond
-        , Statue.create Bird "Sky Diamond" (vec3 5 1.5 1) cloudsDiamond
-        , Statue.create Buggy "Voronoi Cube" (vec3 10 0 10) voronoiCube
-        , Statue.create Bird "Sky Cube" (vec3 -10 0 -10) skyCube -- fireCube
-        , Statue.create Buggy "Landscape Cube" (vec3 10 1.5 -10) fogMountainsCube
+        , Statue.create Bird 3.0 "Clouds Sphere" (vec3 3 10 5) cloudsSphere
+        , Statue.create Buggy 2.0 "Landscape Diamond" (vec3 0 1.5 0) fogMountainsDiamond
+        , Statue.create Bird 4.0 "Sky Diamond" (vec3 5 1.5 1) cloudsDiamond
+        , Statue.create Buggy 7.0 "Voronoi Cube" (vec3 10 0 10) voronoiCube
+        , Statue.create Bird 3.0 "Sky Cube" (vec3 -10 0 -10) skyCube -- fireCube
+        , Statue.create Buggy 4.0 "Landscape Cube" (vec3 10 1.5 -10) fogMountainsCube
         ]
     }

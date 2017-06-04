@@ -17,12 +17,15 @@ import Vehicles.DreamBird as DreamBird
 
 type VehicleType = Buggy | Bird
 
-type alias Model = Moving Body
+type alias Model = 
+    { body : Moving Body
+    , speed : Float
+    }
 
 type alias Msg = ()
 
-create : VehicleType -> String -> Vec3 -> Appearance -> (App, Cmd AppMsg)
-create vtype label pos appear = App.create (init pos appear)
+create : VehicleType -> Float -> String -> Vec3 -> Appearance -> (App, Cmd AppMsg)
+create vtype speed label pos appear = App.create (init pos speed appear)
     { label = always label
     , update = update vtype
     , animate = animate
@@ -31,40 +34,42 @@ create vtype label pos appear = App.create (init pos appear)
     , focus = focus
     }
 
-init : Vec3 -> Appearance -> (Model, Cmd (CtrlMsg Msg))
-init pos appear =
-    ( { anchor = AnchorGround
-      , scale = vec3 1 1 1
-      , position = pos
-      , orientation = Orientation.initial
-      , appear = appear
-      , velocity = vec3 0 0 0
+init : Vec3 -> Float -> Appearance -> (Model, Cmd (CtrlMsg Msg))
+init pos speed appear =
+    ( { body = { anchor = AnchorGround
+               , scale = vec3 1 1 1
+               , position = pos
+               , orientation = Orientation.initial
+               , appear = appear
+               , velocity = vec3 0 0 0
+               }
+      , speed = speed
       }
     , Cmd.none )
 
 update : VehicleType -> CtrlMsg Msg -> Model -> (Model, Cmd (CtrlMsg Msg))
 update vtype msg model = case msg of
     Ctrl (Control.Move dp) ->
-        ( translate dp model, Cmd.none )
+        ( { model | body = translate dp model.body } , Cmd.none )
 
     Ctrl (Control.Drive ground inputs) ->
         case vtype of
-            Buggy -> ( DreamBuggy.drive ground inputs model, Cmd.none )
-            Bird -> ( DreamBird.drive ground inputs model, Cmd.none )
+            Buggy -> ( { model | body = DreamBuggy.drive ground model.speed inputs model.body }, Cmd.none )
+            Bird -> ( { model | body = DreamBird.drive ground inputs model.body }, Cmd.none )
 
     _ ->
         ( model, Cmd.none )
 
 
 animate : Ground -> Time -> Model -> Model
-animate ground dt body = body
+animate ground dt model = model
 
 bodies : Model -> List Body
-bodies body = [toBody body]
+bodies model = [toBody model.body]
 
 camera : Model -> Maybe Camera
-camera model = Just (bodyCamera model)
+camera model = Just (bodyCamera model.body)
 
 focus : Model -> Maybe Focus
-focus body = Just (appToFocus body)
+focus model = Just (appToFocus model.body)
     
