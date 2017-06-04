@@ -222,7 +222,7 @@ step terrain keyLimit inputs label camera focPos player0 = if inputs.reset then 
                         { player | cameraPos = inside -- aboveGround eyeLevel behind
                                  , cameraUp = Model.cameraUp player }
                 else
-                    let behind = sub player.motion.position (V3.scale 7 (Model.direction player.motion))
+                    let behind = sub player.motion.position (V3.scale 20 (Model.direction player.motion))
                         p = toRecord player.motion.position
                         yMax0 v = let vr = V3.toRecord v in vec3 vr.x (min (-0.3) vr.y) vr.z
                         newCameraPos =
