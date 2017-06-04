@@ -116,9 +116,9 @@ worldUpdate hubUpdate msg model =
 worldKeyLimit : WorldModel a -> Int
 worldKeyLimit model = Bag.size model.apps
 
-worldAnimate : Time -> WorldModel a -> WorldModel a
-worldAnimate dt model =
-    { model | apps = Bag.map (App.animate dt) model.apps }
+worldAnimate : Ground -> Time -> WorldModel a -> WorldModel a
+worldAnimate ground dt model =
+    { model | apps = Bag.map (App.animate ground dt) model.apps }
 
 worldLabel : Maybe Bag.Key -> WorldModel a -> String
 worldLabel mkey model = let none = "<>" in case mkey of

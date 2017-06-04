@@ -29,7 +29,7 @@ update : (WorldMsg worldMsg -> worldModel -> (worldModel, Cmd (WorldMsg worldMsg
     -> (Maybe Bag.Key -> worldModel -> String)
     -> (worldModel -> Int)
     -> (worldModel -> Maybe Ground)
-    -> (Time -> worldModel -> worldModel)
+    -> (Ground -> Time -> worldModel -> worldModel)
     -> (Maybe Bag.Key -> worldModel -> Maybe Camera)
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg) -> Model worldModel
@@ -70,7 +70,7 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                         keyLimit = worldKeyLimit model.worldModel
 
                         -- Animate
-                        wm = worldAnimate inputs1.dt model.worldModel
+                        wm = worldAnimate terrain inputs1.dt model.worldModel
 
                         -- Camera
                         label1 = worldLabel (model.player1.rideKey) model.worldModel

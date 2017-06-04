@@ -42,8 +42,8 @@ update msg model = case msg of
             )
     _ -> (model, Cmd.none)
 
-animate : Time -> Model -> Model
-animate dt model = model
+animate : Ground -> Time -> Model -> Model
+animate ground dt model = model
 
 bodies : Model -> List Body
 bodies = identity

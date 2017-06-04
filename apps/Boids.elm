@@ -6,6 +6,7 @@ import Time exposing (Time)
 
 import App exposing (..)
 import Body exposing (..)
+import Ground exposing (Ground)
 import Math.RandomVector exposing (randomVec3)
 
 import Behavior.Boids exposing (..)
@@ -46,8 +47,8 @@ update : Msg -> Boids -> (Boids, Cmd Msg)
 update msg model = case msg of
    BoidsGenerated newBoids -> (newBoids, Cmd.none)
 
-animate : Time -> Boids -> Boids
-animate dt boids = moveBoids dt boids
+animate : Ground -> Time -> Boids -> Boids
+animate ground dt boids = moveBoids dt boids
 
 bodies : Boids -> List Body
 bodies = List.map toBody

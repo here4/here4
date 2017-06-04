@@ -31,7 +31,7 @@ programWithFlags
     , update : WorldMsg msg -> model -> ( model, Cmd (WorldMsg msg) )
     , label : Maybe Bag.Key -> model -> String
     , view : model -> Maybe Model.World
-    , animate : Time -> model -> model 
+    , animate : Ground -> Time -> model -> model
     , keyLimit : model -> Int
     , ground : model -> Maybe Ground
     , camera : Maybe Bag.Key -> model -> Maybe Camera

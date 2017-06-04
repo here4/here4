@@ -9,6 +9,7 @@ import Appearance exposing (Appearance)
 import Body exposing (..)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
+import Ground exposing (Ground)
 
 type alias Model = Body
 
@@ -32,8 +33,8 @@ update msg model = case msg of
     Ctrl (Control.Move dp) -> ( translate dp model, Cmd.none )
     _                      -> ( model, Cmd.none)
 
-animate : Time -> Model -> Model
-animate dt body = body
+animate : Ground -> Time -> Model -> Model
+animate ground dt body = body
 
 bodies : Model -> List Body
 bodies body = [body]

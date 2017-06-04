@@ -6,6 +6,7 @@ import Time exposing (Time)
 
 import App exposing (..)
 import Body exposing (..)
+import Ground exposing (Ground)
 import Math.RandomVector exposing (randomVec3)
 import Physics.Collisions exposing (collisions)
 import Physics.Gravity exposing (gravity)
@@ -54,8 +55,8 @@ update : Msg -> Balls -> (Balls, Cmd Msg)
 update msg balls = case msg of
     BallsGenerated newBalls -> (newBalls, Cmd.none)
 
-animate : Time -> Balls -> Balls
-animate dt balls = collisions dt (gravity dt balls)
+animate : Ground -> Time -> Balls -> Balls
+animate ground dt balls = collisions dt (gravity ground dt balls)
 
 bodies : Balls -> List Body
 bodies = List.map toBody

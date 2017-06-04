@@ -11,12 +11,13 @@ import Body exposing (..)
 import Control exposing (..)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
+import Ground exposing (Ground)
 
 type alias Animated model msg =
     { label : model -> String
     , update : msg -> model -> (model, Cmd msg)
     , bodies : model -> List Body
-    , animate : Time -> model -> model
+    , animate : Ground -> Time -> model -> model
     , camera : model -> Maybe Camera
     , focus : model -> Maybe Focus
     }
@@ -53,8 +54,8 @@ packUpdate f msg dyn =
     let (newModel, newCmdMsg) = f (msgUnpack msg) (Dynamic.unpack dyn)
     in (Dynamic.pack newModel, Cmd.map msgPack newCmdMsg)
 
-packAnimate : (Time -> model -> model) -> Time -> AppModel -> AppModel
-packAnimate f dt dyn = Dynamic.pack (f dt (Dynamic.unpack dyn))
+packAnimate : (Ground -> Time -> model -> model) -> Ground -> Time -> AppModel -> AppModel
+packAnimate f ground dt dyn = Dynamic.pack (f ground dt (Dynamic.unpack dyn))
 
 packBodies : (a -> List Body) -> AppModel -> List Body
 packBodies f dyn = f (Dynamic.unpack dyn)
@@ -122,10 +123,10 @@ update msg { methods, model } =
     let (newModel, newCmdMsg) = methods.update msg model
     in ({ methods = methods, model = newModel }, newCmdMsg)
 
--- animate : Time -> App -> (App, Cmd AppMsg)
-animate : Time -> App -> App
-animate dt { methods, model } =
-    let newModel = methods.animate dt model
+-- animate : Ground -> Time -> App -> (App, Cmd AppMsg)
+animate : Ground -> Time -> App -> App
+animate ground dt { methods, model } =
+    let newModel = methods.animate ground dt model
     in { methods = methods, model = newModel }
 
 bodies : App -> List Body

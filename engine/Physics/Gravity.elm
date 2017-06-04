@@ -1,24 +1,21 @@
 module Physics.Gravity exposing (gravity)
 
-import Orientation exposing (Orientation, fromVec3)
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Time exposing (Time)
 
 import Body exposing (..)
+import Ground exposing (Ground)
+import Orientation exposing (Orientation, fromVec3)
 
 type alias BBall a = Massive (Spherical (Moving a))
 
 -- TODO: add spin?
 dropOrientation : Moving a -> Orientation
 dropOrientation d = fromVec3 d.velocity
-{-
-    let v = V3.toRecord d.velocity
-    in V3.normalize (vec3 v.x 0 v.z)
--}
 
-bounds : BBall a -> BBall a
-bounds b =
+bounds : Ground -> BBall a -> BBall a
+bounds ground b =
     let bound vs s low high = let dampVs = -vs * 0.99 in
             if vs < 0 && s < low then
                 dampVs
@@ -33,11 +30,11 @@ bounds b =
 gForce : a -> Vec3
 gForce _ = vec3 0 -9.8 0
 
-gravity : Time -> List (BBall a) -> List (BBall a)
-gravity dt balls =
+gravity : Ground -> Time -> List (BBall a) -> List (BBall a)
+gravity ground dt balls =
     let
         gs = List.map gForce balls
         applyRules b g = { b |
             velocity = (V3.add b.velocity (V3.scale dt g)) }
-        bs = List.map bounds <| List.map2 applyRules balls gs
+        bs = List.map (bounds ground) <| List.map2 applyRules balls gs
     in List.map (\x -> { x | orientation = dropOrientation x }) <| bs
