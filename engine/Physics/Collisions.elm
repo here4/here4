@@ -14,7 +14,7 @@ type alias BBall a = Massive (Spherical (Moving a))
 -- TODO: merge these next two functions
 -- timeStep : TimeLeft (Moving a) -> Moving a
 timeStep : TimeLeft (BBall a) -> TimeLeft (BBall a)
-timeStep (x, timeLeft) = ({ x  | pos = V3.add x.pos (V3.scale timeLeft x.velocity) }, timeLeft)
+timeStep (x, timeLeft) = ({ x  | position = V3.add x.position (V3.scale timeLeft x.velocity) }, timeLeft)
 
 stripTimeStep : TimeLeft a -> a
 stripTimeStep (x,_) = x
@@ -47,7 +47,7 @@ collide dt (a,ta) (b,tb) =
         sumRadii = a.radius + b.radius
 
         -- Vector C from center of A to center of B
-        centerDisplacement = V3.sub b.pos a.pos
+        centerDisplacement = V3.sub b.position a.position
         centerDistance = V3.length centerDisplacement
 
         -- Distance between the closest surface points of the two spheres
@@ -111,12 +111,12 @@ collide dt (a,ta) (b,tb) =
               timeLeft = (1.0 - collisionDelta) * dt
 
               -- movedA = { a | pos = V3.add a.pos collisionVectorA, timeLeft = timeLeft }
-              movedA = { a | pos = V3.add a.pos collisionVectorA }
+              movedA = { a | position = V3.add a.position collisionVectorA }
               -- movedB = { b | pos = V3.add b.pos collisionVectorB, timeLeft = timeLeft }
-              movedB = { b | pos = V3.add b.pos collisionVectorB }
+              movedB = { b | position = V3.add b.position collisionVectorB }
 
               -- Projection of movement onto new centerDisplacement
-              centerDisplacement_ = V3.sub movedA.pos movedB.pos
+              centerDisplacement_ = V3.sub movedA.position movedB.position
               nnn = V3.normalize centerDisplacement_
               projA = V3.dot a.velocity nnn
               projB = V3.dot b.velocity nnn

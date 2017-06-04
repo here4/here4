@@ -88,7 +88,7 @@ visibleTerrain placement terrain arr =
                     arr
     in
         List.map toBody
-            [{ scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = Orientation.initial, appear = appearTerrain placement terrain appears }]
+            [{ scale = vec3 1 1 1, position = vec3 0 0 0, orientation = Orientation.initial, appear = appearTerrain placement terrain appears }]
 
 appearTerrain : Placement -> Array2D Float -> Array2D Appearance -> Appearance
 appearTerrain placement terrain appears p =
@@ -157,6 +157,6 @@ placeTerrain toSurface2D placement terrainsCoords =
         terrainz = Array2D.fromLists terrainSurfacesCoords
     in
         Array2D.map (\(s,(x,z)) -> toBody { s | scale = vec3 1 1 1
-                                                    , pos = vec3 (toFloat x * placement.xDelta) 0 (toFloat z * placement.zDelta)
+                                              , position = vec3 (toFloat x * placement.xDelta) 0 (toFloat z * placement.zDelta)
                                                 }
                     ) terrainz

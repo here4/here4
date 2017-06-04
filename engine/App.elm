@@ -139,12 +139,12 @@ focus { methods, model } = methods.focus model
 
 -- TODO: focus on a plane/surface/controls
 type alias Focus = {
-    pos : Vec3
+    position : Vec3
 }
 
 appToFocus : Body -> Focus
-appToFocus body = { pos = body.position }
+appToFocus body = { position = body.position }
 
 orientedToFocus : Oriented a -> Focus
-orientedToFocus x = { pos = x.pos }
+orientedToFocus x = { position = x.position }
 

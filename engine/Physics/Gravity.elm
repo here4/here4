@@ -26,7 +26,7 @@ bounds b =
                 dampVs
             else
                 vs
-        (x,y,z) = V3.toTuple b.pos
+        (x,y,z) = V3.toTuple b.position
         (vx,vy,vz) = V3.toTuple b.velocity
     in { b | velocity = vec3 (bound vx x -100 100) (bound vy y (b.radius) 100) (bound vz z -50 50) }
 

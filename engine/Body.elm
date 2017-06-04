@@ -9,6 +9,7 @@ import Orientation exposing (Orientation)
 
 type Anchor = AnchorGround | AnchorSky | AnchorHUD
 
+{-
 type alias Body =
     { anchor : Anchor
     , scale : Vec3
@@ -16,13 +17,17 @@ type alias Body =
     , orientation : Orientation
     , appear : Appearance
     }
+-}
+
 
 type alias Visible a = { a | appear : Appearance }
 
-type alias Oriented a = { a | scale : Vec3, pos : Vec3, orientation : Orientation }
+type alias Oriented a = { a | scale : Vec3, position : Vec3, orientation : Orientation }
 type alias Moving a = Oriented { a | velocity : Vec3 }
 type alias Massive a = { a | mass : Float }
 type alias Spherical a = { a | radius : Float }
+
+type alias Body = Oriented (Visible { anchor : Anchor })
 
 -- TODO: define cameraAdd etc.
 type alias Camera =
@@ -36,7 +41,7 @@ toBody : Oriented (Visible a) -> Body
 toBody x =
     { anchor = AnchorGround
     , scale = x.scale
-    , position = x.pos
+    , position = x.position
     , orientation = x.orientation
     , appear = x.appear
     }
@@ -54,10 +59,10 @@ translate : Vec3 -> Body -> Body
 translate t body = { body | position = V3.add t body.position }
 
 put : Vec3 -> Appearance -> Body
-put pos appear =
+put position appear =
     { anchor = AnchorGround
     , scale = vec3 1 1 1
-    , position = pos
+    , position = position
     , orientation = Orientation.initial
     , appear = appear
     }

@@ -33,7 +33,7 @@ fogMountainsSphere = sphere worldVertex fogMountains
 sphere : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Oriented (Visible {})
 sphere vertexShader fragmentShader =
     let appear = appearSphere vertexShader fragmentShader
-    in { scale = vec3 1 1 1, pos = vec3 0 0 0, orientation = Orientation.initial, appear = appear }
+    in { scale = vec3 1 1 1, position = vec3 0 0 0, orientation = Orientation.initial, appear = appear }
 
 appearSphere : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 appearSphere vertexShader fragmentShader p =

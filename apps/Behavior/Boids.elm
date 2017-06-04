@@ -15,7 +15,7 @@ newBoid m r pos vel thing0 =
     , mass = m
     , velocity = vel
     , scale = thing0.scale
-    , pos = pos
+    , position = pos
     , orientation = thing0.orientation
     , appear = thing0.appear
     }
@@ -28,18 +28,18 @@ boidOrientation b = fromVec3 b.velocity
 -}
 
 stepBoid : Time -> Moving a -> Moving a
-stepBoid dt b = { b | pos = V3.add b.pos ((V3.scale dt b.velocity)), orientation = boidOrientation b }
+stepBoid dt b = { b | position = V3.add b.position ((V3.scale dt b.velocity)), orientation = boidOrientation b }
 
 rule1 : Int -> Vec3 -> Boid a -> Vec3 
 rule1 n sumPos b =
     let perceived_scale = 1.0 / (toFloat (n-1))
-        perceived_center = V3.scale perceived_scale (V3.sub sumPos b.pos)
-    in V3.scale (1/100) <| V3.sub perceived_center b.pos
+        perceived_center = V3.scale perceived_scale (V3.sub sumPos b.position)
+    in V3.scale (1/100) <| V3.sub perceived_center b.position
 
 rule2 : List Vec3 -> Boid a -> Vec3
 rule2 poss b =
-    let f pos = let d = V3.distanceSquared pos b.pos
-                in if (d > 0 && d < 10.0) then V3.sub b.pos pos else vec3 0 0 0
+    let f pos = let d = V3.distanceSquared pos b.position
+                in if (d > 0 && d < 10.0) then V3.sub b.position pos else vec3 0 0 0
     in V3.scale (1/2) <| sumVec3s (List.map f poss)
 
 rule3 : Int -> Vec3 -> Boid a -> Vec3
@@ -51,7 +51,7 @@ rule3 n sumVel b =
 bounds : Boid a -> Vec3
 bounds b =
     let bound x low high = if (x < low) then 1 else (if x > high then -1 else 0)
-        (x,y,z) = V3.toTuple b.pos
+        (x,y,z) = V3.toTuple b.position
     in vec3 (bound x -200 200) (bound y 0 100) (bound z -200 200)
 
 boundVelocity : Vec3 -> Vec3
@@ -61,7 +61,7 @@ moveBoids : Time -> List (Boid a) -> List (Boid a)
 moveBoids dt boids =
     let
         nboids = List.length boids
-        positions = List.map .pos boids
+        positions = List.map .position boids
         velocities = List.map .velocity boids
         sumPos = sumVec3s positions
         sumVel = sumVec3s velocities

@@ -92,7 +92,7 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                                     let dp = inputsToMove inputs1 model.player1
                                         (wmF, wmFMsg) =
                                             worldUpdate (Forward key (Control.Move dp)) wm2
-                                    in (wmF, wmFMsg, Just focus.pos)
+                                    in (wmF, wmFMsg, Just focus.position)
                                 _ -> (wm2, Cmd.none, Nothing)
 
                         newModel =
