@@ -28,7 +28,6 @@ tileBounds : Tiles -> Vec3 -> Vec3
 tileBounds { placement } pos =
     let bound x low high = if (x < low) then low else (if x > high then high else x)
         (x,y,z) = V3.toTuple pos
-    -- in vec3 (bound x -246 1782) (bound y 0 1000) (bound z -246 1782)
     in vec3
        (bound x (placement.xOffset + 10) (placement.xOffset + toFloat placement.bigSide * placement.xDelta - 10))
        (bound y 0 1000)
