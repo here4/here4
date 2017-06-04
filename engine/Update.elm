@@ -72,24 +72,28 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                         -- Animate
                         wm = worldAnimate terrain inputs1.dt model.worldModel
 
+                        -- Change ride?
+                        player1 = selectVehicle keyLimit inputs1 model.player1
+                        player2 = selectVehicle keyLimit inputs2 model.player2
+
                         -- Camera
-                        label1 = worldLabel (model.player1.rideKey) model.worldModel
-                        camera1 = worldCamera (model.player1.rideKey) model.worldModel
-                        (wm1, wm1Msg) = case model.player1.rideKey of
+                        label1 = worldLabel (player1.rideKey) model.worldModel
+                        camera1 = worldCamera (player1.rideKey) model.worldModel
+                        (wm1, wm1Msg) = case player1.rideKey of
                             Just key -> worldUpdate (Forward key (Control.Drive terrain inputs1)) wm
                             Nothing  -> (wm, Cmd.none)
 
-                        label2 = worldLabel (model.player2.rideKey) model.worldModel
-                        camera2 = worldCamera (model.player2.rideKey) model.worldModel
-                        (wm2, wm2Msg) = case model.player2.rideKey of
+                        label2 = worldLabel (player2.rideKey) model.worldModel
+                        camera2 = worldCamera (player2.rideKey) model.worldModel
+                        (wm2, wm2Msg) = case player2.rideKey of
                             Just key -> worldUpdate (Forward key (Control.Drive terrain inputs2)) wm1
                             Nothing  -> (wm1, Cmd.none)
 
                         -- Focus
-                        (wmF, wmFMsg, focPos) = let key = model.player1.focusKey in
+                        (wmF, wmFMsg, focPos) = let key = player1.focusKey in
                             case worldFocus key model.worldModel of
                                 Just focus ->
-                                    let dp = inputsToMove inputs1 model.player1
+                                    let dp = inputsToMove inputs1 player1
                                         (wmF, wmFMsg) =
                                             worldUpdate (Forward key (Control.Move dp)) wm2
                                     in (wmF, wmFMsg, Just focus.position)
@@ -97,8 +101,8 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
 
                         newModel =
                             { model | globalTime = model.globalTime + dt
-                                    , player1 = step terrain keyLimit inputs1 label1 camera1 focPos model.player1
-                                    , player2 = step terrain keyLimit inputs2 label2 camera2 Nothing model.player2
+                                    , player1 = step terrain inputs1 label1 camera1 focPos player1
+                                    , player2 = step terrain inputs2 label2 camera2 Nothing player2
                                     , inputs = clearStationaryInputs inputs1
                                     , worldModel = wmF
                             }
@@ -186,8 +190,8 @@ aboveGround eyeLevel pos =
     in
         if p.y < e then vec3 p.x e p.z else pos
 
-step : Ground -> Int -> Model.Inputs -> String -> Maybe Camera -> Maybe Vec3 -> Model.Player -> Model.Player
-step terrain keyLimit inputs label camera focPos player0 = if inputs.reset then Model.defaultPlayer else
+step : Ground -> Model.Inputs -> String -> Maybe Camera -> Maybe Vec3 -> Model.Player -> Model.Player
+step terrain inputs label camera focPos player0 = if inputs.reset then Model.defaultPlayer else
         let 
             eyeLevel pos = Model.eyeLevel + terrain.elevation pos
 
@@ -244,7 +248,6 @@ step terrain keyLimit inputs label camera focPos player0 = if inputs.reset then 
                                newCameraUp }
         in
             player0
-                |> selectVehicle keyLimit inputs
                 |> relabel
                 |> move
                 |> checkCamera
