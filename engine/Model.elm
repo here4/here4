@@ -23,25 +23,6 @@ type Msg worldMsg
     | Resize Window.Size
     | WorldMessage worldMsg
 
-{-
-type alias WhichVehicle = Int
-
-vehicleBuggy : Int
-vehicleBuggy = 0
-
-vehicleBird : Int
-vehicleBird = 1
-
-vehicleLookAt : Int
-vehicleLookAt = 2
-
-vehicleDebug : Int
-vehicleDebug = 3
-
-nextVehicle : WhichVehicle -> WhichVehicle
-nextVehicle v = (v+1) % (vehicleDebug+1) 
--}
-
 type alias World =
     { bodies : List Body
     , ground : Ground

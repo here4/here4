@@ -2,6 +2,7 @@ module Update exposing (update)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
+import Maybe.Extra exposing (isJust)
 import Time exposing (Time)
 
 import Bag
@@ -73,8 +74,9 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                         wm = worldAnimate terrain inputs1.dt model.worldModel
 
                         -- Change ride?
-                        player1 = selectVehicle keyLimit inputs1 model.player1
-                        player2 = selectVehicle keyLimit inputs2 model.player2
+                        hasCamera key = isJust (worldCamera (Just key) model.worldModel)
+                        player1 = selectVehicle hasCamera keyLimit inputs1 model.player1
+                        player2 = selectVehicle hasCamera keyLimit inputs2 model.player2
 
                         -- Camera
                         label1 = worldLabel (player1.rideKey) model.worldModel
@@ -253,11 +255,26 @@ step terrain inputs label camera focPos player0 = if inputs.reset then Model.def
                 |> checkCamera
                 |> moveCamera
 
-selectVehicle : Int -> Model.Inputs -> Model.Player -> Model.Player
-selectVehicle keyLimit inputs player =
-    if not inputs.button_X then
-        player
-    else
-        case player.rideKey of
-            Just n -> { player | rideKey = Just ((n+1) % keyLimit) }
-            Nothing -> { player | rideKey = Just 0 }
+selectVehicle : (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player -> Model.Player
+selectVehicle hasCamera keyLimit inputs player =
+    let nextKey key = (key+1) % keyLimit
+
+        findCameraHelp origKey key =
+            if hasCamera key then
+                key
+            else
+                let next = nextKey key
+                in
+                    if next == origKey then
+                        origKey
+                    else
+                        findCameraHelp origKey next
+
+        findCamera key = findCameraHelp key key
+
+        key = findCamera (Maybe.withDefault 0 player.rideKey)
+    in
+        if inputs.button_X then
+            { player | rideKey = Just (findCamera (nextKey key)) }
+        else
+            { player | rideKey = Just key }
