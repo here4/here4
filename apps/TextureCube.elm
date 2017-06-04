@@ -14,7 +14,7 @@ import Ground exposing (Ground)
 import Model exposing (Inputs)
 
 import Body.Cube exposing (textureCube)
-import Vehicles.DreamBuggy exposing (dreamBuggy)
+import Vehicles.DreamBuggy as DreamBuggy
 
 type alias Model = Maybe (Body, Vec3)
 
@@ -44,7 +44,7 @@ update msg model = case msg of
     Self (TextureLoaded textureResult) ->
         case textureResult of
             Ok texture ->
-                ( Just (put (vec3 -2 20 -17) (textureCube texture), vec3 0 0 0) , Cmd.none )
+                ( Just (put (vec3 -2 0 -17) (textureCube texture), vec3 0 0 0) , Cmd.none )
             Err msg ->
                 -- ( { model | message = "Error loading texture" }, Cmd.none )
                 ( model, Cmd.none )
@@ -78,7 +78,7 @@ drive ground inputs model = case model of
     Just (BCtr anchor scale p o appear, vel) ->
         let eyeLevel pos = 1.8 + ground.elevation pos
             motion0 = { position = p, orientation = o, velocity = vel }
-            motion = dreamBuggy.move Nothing eyeLevel inputs motion0
+            motion = DreamBuggy.move ground eyeLevel inputs motion0
         in
             Just ( BCtr anchor scale motion.position motion.orientation appear
                  , motion.velocity)

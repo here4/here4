@@ -206,7 +206,7 @@ step terrain keyLimit inputs label camera focPos player0 = if inputs.reset then 
 
             relabel player = { player | rideLabel = label }
 
-            keepWithinbounds motion = { motion | position = terrain.bounds motion.position }
+            -- keepWithinbounds motion = { motion | position = terrain.bounds motion.position }
 
             checkCamera player = { player |
                 cameraInside = if inputs.changeCamera then
@@ -251,11 +251,11 @@ step terrain keyLimit inputs label camera focPos player0 = if inputs.reset then 
                                newCameraUp }
         in
             player0
-                |> mapMotion (gravity eyeLevel inputs.dt)
+                -- |> mapMotion (gravity eyeLevel inputs.dt)
                 |> selectVehicle keyLimit inputs
                 |> relabel
                 |> move
-                |> mapMotion keepWithinbounds
+                -- |> mapMotion keepWithinbounds
                 |> checkCamera
                 |> moveCamera
 
@@ -289,12 +289,16 @@ selectVehicle keyLimit inputs player =
                 mapMotion DreamDebug.welcome { player | vehicle = newVehicle }
 -}
 
+{-
 mapMotion : (Model.Motion -> Model.Motion) -> Model.Player -> Model.Player
 mapMotion f player = { player | motion = f player.motion }
+-}
 
+{-
 gravity : Model.EyeLevel -> Float -> Model.Motion -> Model.Motion
 gravity eyeLevel dt motion =
   if getY motion.position <= eyeLevel motion.position then motion else
     let v = toRecord motion.velocity
     in
         { motion | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }
+-}

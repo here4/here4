@@ -1,4 +1,4 @@
-module Vehicles.DreamBuggy exposing (dreamBuggy)
+module Vehicles.DreamBuggy exposing (move)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
@@ -6,25 +6,22 @@ import Math.Matrix4 exposing (..)
 import Orientation exposing (..)
 
 import Model
+import Ground exposing (Ground)
 
 ----------------------------------------------------------------------
 -- DreamBuggy
-
-dreamBuggy : Model.Vehicle
-dreamBuggy =
-    { init = welcome
-    , move = move
-    }
 
 -- | Welcome a new driver to the DreamBuggy
 welcome : Model.Motion -> Model.Motion
 welcome motion = { motion | orientation = clampBuggy motion.orientation }
 
-move : Maybe Vec3 -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
-move _ eyeLevel inputs motion =
+move : Ground -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+move terrain eyeLevel inputs motion =
     motion |> turn eyeLevel inputs.mx inputs.my
            |> drive eyeLevel inputs
+           |> gravity eyeLevel inputs.dt
            |> physics eyeLevel inputs.dt
+           |> keepWithinbounds terrain
 
 clampBuggy : Orientation -> Orientation
 clampBuggy o = o
@@ -109,3 +106,12 @@ physics eyeLevel dt motion =
 -- | Clamp a vector to be no longer than len
 v3_clamp : Float -> Vec3 -> Vec3
 v3_clamp len v = if V3.length v <= len then v else V3.scale len (V3.normalize v)
+
+keepWithinbounds terrain motion = { motion | position = terrain.bounds motion.position }
+
+gravity : Model.EyeLevel -> Float -> Model.Motion -> Model.Motion
+gravity eyeLevel dt motion =
+  if getY motion.position <= eyeLevel motion.position then motion else
+    let v = V3.toRecord motion.velocity
+    in
+        { motion | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }
