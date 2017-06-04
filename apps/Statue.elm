@@ -10,7 +10,10 @@ import Body exposing (..)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 
-type alias Model = Body
+import Orientation
+import Vehicles.DreamBuggy as DreamBuggy
+
+type alias Model = Moving Body
 
 type alias Msg = ()
 
@@ -25,19 +28,33 @@ create label pos appear = App.create (init pos appear)
     }
 
 init : Vec3 -> Appearance -> (Model, Cmd (CtrlMsg Msg))
-init pos appear = ( put pos appear, Cmd.none )
+init pos appear =
+    ( { anchor = AnchorGround
+      , scale = vec3 1 1 1
+      , position = pos
+      , orientation = Orientation.initial
+      , appear = appear
+      , velocity = vec3 0 0 0
+      }
+    , Cmd.none )
 
 update : CtrlMsg Msg -> Model -> (Model, Cmd (CtrlMsg Msg))
 update msg model = case msg of
-    Ctrl (Control.Move dp) -> ( translate dp model, Cmd.none )
-    _                      -> ( model, Cmd.none)
+    Ctrl (Control.Move dp) ->
+        ( translate dp model, Cmd.none )
+
+    Ctrl (Control.Drive ground inputs) ->
+        ( DreamBuggy.drive ground inputs model, Cmd.none )
+
+    _ ->
+        ( model, Cmd.none )
 
 
 animate : Time -> Model -> Model
 animate dt body = body
 
 bodies : Model -> List Body
-bodies body = [body]
+bodies body = [toBody body]
 
 camera : Model -> Maybe Camera
 camera model = Just (bodyCamera model)
