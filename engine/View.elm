@@ -148,25 +148,26 @@ layoutSceneVR windowSize model render =
         ]
 
 bodyAppear : Mat4 -> Perception -> Body -> List WebGL.Entity
-bodyAppear skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
-    let rotate = Appearance.transform (Orientation.rotateLabM4 orientation)
-        translate = Appearance.transform (M4.translate position)
-        rescale = Appearance.transform (M4.scale scale)
-        appear = case anchor of
+-- bodyAppear skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
+bodyAppear skyMatrix p body =
+    let rotate = Appearance.transform (Orientation.rotateLabM4 body.orientation)
+        translate = Appearance.transform (M4.translate body.position)
+        scale = Appearance.transform (M4.scale body.scale)
+        appear = case body.anchor of
             Body.AnchorGround ->
-                appear0
+                body.appear
                   |> rotate
                   >> translate
-                  >> rescale
+                  >> scale
             Body.AnchorSky ->
-                appear0
+                body.appear
                   |> rotate
-                  >> rescale
+                  >> scale
             Body.AnchorHUD ->
-                appear0
-                  |> rescale
+                body.appear
+                  |> scale
         skyPerception = { p | viewMatrix = skyMatrix }
-    in case anchor of
+    in case body.anchor of
             Body.AnchorGround -> appear p
             Body.AnchorSky -> appear skyPerception
             Body.AnchorHUD -> appear skyPerception

@@ -75,11 +75,13 @@ focus model = Maybe.map (appToFocus << first) model
 
 drive : Ground -> Inputs -> Model -> Model
 drive ground inputs model = case model of
-    Just (BCtr anchor scale p o appear, vel) ->
+    -- Just (BCtr anchor scale p o appear, vel) ->
+    Just (body, vel) ->
         let eyeLevel pos = 1.8 + ground.elevation pos
-            motion0 = { position = p, orientation = o, velocity = vel }
+            motion0 = { position = body.position, orientation = body.orientation, velocity = vel }
             motion = DreamBuggy.move ground eyeLevel inputs motion0
         in
-            Just ( BCtr anchor scale motion.position motion.orientation appear
+            -- Just ( BCtr anchor scale motion.position motion.orientation appear
+            Just ( { body | position = motion.position, orientation = motion.orientation }
                  , motion.velocity)
     Nothing -> Nothing
