@@ -1,4 +1,4 @@
-module Statue exposing (create)
+module Statue exposing (create, VehicleType(..))
 
 import Math.Vector3 exposing (Vec3, vec3)
 import Task exposing (Task)
@@ -13,15 +13,18 @@ import Ground exposing (Ground)
 
 import Orientation
 import Vehicles.DreamBuggy as DreamBuggy
+import Vehicles.DreamBird as DreamBird
+
+type VehicleType = Buggy | Bird
 
 type alias Model = Moving Body
 
 type alias Msg = ()
 
-create : String -> Vec3 -> Appearance -> (App, Cmd AppMsg)
-create label pos appear = App.create (init pos appear)
+create : VehicleType -> String -> Vec3 -> Appearance -> (App, Cmd AppMsg)
+create vtype label pos appear = App.create (init pos appear)
     { label = always label
-    , update = update
+    , update = update vtype
     , animate = animate
     , bodies = bodies
     , camera = camera
@@ -39,13 +42,15 @@ init pos appear =
       }
     , Cmd.none )
 
-update : CtrlMsg Msg -> Model -> (Model, Cmd (CtrlMsg Msg))
-update msg model = case msg of
+update : VehicleType -> CtrlMsg Msg -> Model -> (Model, Cmd (CtrlMsg Msg))
+update vtype msg model = case msg of
     Ctrl (Control.Move dp) ->
         ( translate dp model, Cmd.none )
 
     Ctrl (Control.Drive ground inputs) ->
-        ( DreamBuggy.drive ground inputs model, Cmd.none )
+        case vtype of
+            Buggy -> ( DreamBuggy.drive ground inputs model, Cmd.none )
+            Bird -> ( DreamBird.drive ground inputs model, Cmd.none )
 
     _ ->
         ( model, Cmd.none )

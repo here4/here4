@@ -65,7 +65,8 @@ turn eyeLevel dx dy motion =
                 -- (dx*0.5, (tirePitch+dy)*0.05, tireRoll*0.05)
                 (dx*0.5, 0, 0)
 
-        orientation = clampBuggy (followedBy motion.orientation (fromRollPitchYaw (roll, pitch, yaw)))
+        orpy = fromRollPitchYaw (roll, pitch, yaw)
+        orientation = clampBuggy (followedBy motion.orientation orpy)
     in
         { motion | orientation = orientation }
 
