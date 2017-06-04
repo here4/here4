@@ -198,15 +198,8 @@ step terrain keyLimit inputs label camera focPos player0 = if inputs.reset then 
                                                }
                            }
                 Nothing -> player
-{-
-            move player = case player.vehicle of
-                Just v  -> mapMotion (v.move focPos eyeLevel inputs) player
-                Nothing -> player
--}
 
             relabel player = { player | rideLabel = label }
-
-            -- keepWithinbounds motion = { motion | position = terrain.bounds motion.position }
 
             checkCamera player = { player |
                 cameraInside = if inputs.changeCamera then
@@ -251,11 +244,9 @@ step terrain keyLimit inputs label camera focPos player0 = if inputs.reset then 
                                newCameraUp }
         in
             player0
-                -- |> mapMotion (gravity eyeLevel inputs.dt)
                 |> selectVehicle keyLimit inputs
                 |> relabel
                 |> move
-                -- |> mapMotion keepWithinbounds
                 |> checkCamera
                 |> moveCamera
 
@@ -267,38 +258,3 @@ selectVehicle keyLimit inputs player =
         case player.rideKey of
             Just n -> { player | rideKey = Just ((n+1) % keyLimit) }
             Nothing -> { player | rideKey = Just 0 }
-{-
-    let
-        switch = inputs.button_X
-        newVehicle = Model.nextVehicle player.vehicle
-    in
-        if not switch then
-            player
-        else if newVehicle == Model.vehicleBuggy then
-            Debug.log "Switch to buggy!" <|
-                mapMotion DreamBuggy.welcome { player | vehicle = newVehicle }
-        else if newVehicle == Model.vehicleBird then
-            Debug.log "Switch to flying!" <|
-                mapMotion DreamBird.welcome { player | vehicle = newVehicle }
-        else if newVehicle == Model.vehicleLookAt then
-            Debug.log "Switch to LookAt!" <|
-                mapMotion LookAt.welcome { player | vehicle = newVehicle }
-        -- else if newVehicle == vehicleDebug then
-        else
-            Debug.log "Switch to debug!" <|
-                mapMotion DreamDebug.welcome { player | vehicle = newVehicle }
--}
-
-{-
-mapMotion : (Model.Motion -> Model.Motion) -> Model.Player -> Model.Player
-mapMotion f player = { player | motion = f player.motion }
--}
-
-{-
-gravity : Model.EyeLevel -> Float -> Model.Motion -> Model.Motion
-gravity eyeLevel dt motion =
-  if getY motion.position <= eyeLevel motion.position then motion else
-    let v = toRecord motion.velocity
-    in
-        { motion | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }
--}

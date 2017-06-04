@@ -148,7 +148,6 @@ layoutSceneVR windowSize model render =
         ]
 
 bodyAppear : Mat4 -> Perception -> Body -> List WebGL.Entity
--- bodyAppear skyMatrix p (Body.BCtr anchor scale position orientation appear0) =
 bodyAppear skyMatrix p body =
     let rotate = Appearance.transform (Orientation.rotateLabM4 body.orientation)
         translate = Appearance.transform (M4.translate body.position)
