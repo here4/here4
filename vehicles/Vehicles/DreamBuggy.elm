@@ -93,9 +93,9 @@ turn eyeLevel dx dy motion =
 
         ( yaw, pitch, roll ) =
             if getY motion.position > (eyeLevel motion.position) + 5 then -- spin if in the air
-               (dx * 0.5, dy*0.1, 0)
+               (dx, dy*0.1, 0)
             else
-               (dx*0.5, (tirePitch+dy)*0.05, tireRoll*0.05)
+               (dx, (tirePitch+dy)*0.05, tireRoll*0.05)
 
         -- | clamp a1 st. low <= a0+a1 <= hi
         clampSum low hi a0 a1 = clamp (low-a0) (hi-a0) a1
