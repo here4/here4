@@ -4,9 +4,13 @@ import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import WebGL exposing (..)
 
+
 -- https://www.shadertoy.com/view/XslGRr
-clouds : Shader {} { u | iResolution:Vec3, iGlobalTime:Float, iHMD:Float } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
-clouds = [glsl|
+
+
+clouds : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+clouds =
+    [glsl|
 
 precision mediump float;
 uniform vec3 iResolution;
@@ -68,11 +72,11 @@ vec4 map( in vec3 p )
     d += 3.0 * f;
 
     d = clamp( d, 0.0, 1.0 );
-    
+
     vec4 res = vec4( d );
 
     res.xyz = mix( 1.15*vec3(1.0,0.95,0.8), vec3(0.7,0.7,0.7), res.x );
-    
+
     return res;
 }
 
@@ -91,16 +95,16 @@ vec4 raymarch( in vec3 ro, in vec3 rd )
 
         vec3 pos = ro + t*rd;
         vec4 col = map( pos );
-        
+
         float dif =  clamp((col.w - map(pos+0.3*sundir).w)/0.6, 0.0, 1.0 );
 
                 vec3 lin = vec3(0.65,0.68,0.7)*1.35 + 0.45*vec3(0.7, 0.5, 0.3)*dif;
         col.xyz *= lin;
-        
+
         col.a *= 0.35;
         col.rgb *= col.a;
 
-        sum = sum + col*(1.0 - sum.a);    
+        sum = sum + col*(1.0 - sum.a);
 
         t += max(0.1, 0.025*t);
     }
@@ -118,7 +122,7 @@ void clouds(vec2 tc)
     //p.x *= iResolution.x/ iResolution.y;
     p.x *= 1.5;
     //vec2 mo = -1.0 + 2.0*iMouse.xy / iResolution.xy;
-    
+
     // camera
     //vec3 ro = 4.0*normalize(vec3(cos(2.75-3.0*mo.x), 0.7+(mo.y+1.0), sin(2.75-3.0*mo.x)));
     vec3 ro = 4.0*normalize(vec3(cos(2.75-1.3), 0.7, sin(2.75-2.0)));
@@ -127,7 +131,7 @@ void clouds(vec2 tc)
     vec3 uu = normalize(cross( vec3(0.0,1.0,0.0), ww ));
     vec3 vv = normalize(cross(ww,uu));
     vec3 rd = normalize( p.x*uu + p.y*vv + 1.5*ww );
-    
+
     vec4 res = raymarch( ro, rd );
 
     float sun = clamp( dot(sundir,rd), 0.0, 1.0 );

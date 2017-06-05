@@ -4,8 +4,10 @@ import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (Vec3)
 import WebGL exposing (Shader, Texture)
 
-textureFragment : Shader {} { u | iResolution:Vec3, iHMD:Float, iTexture:Texture } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
-textureFragment = [glsl|
+
+textureFragment : Shader {} { u | iResolution : Vec3, iHMD : Float, iTexture : Texture } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+textureFragment =
+    [glsl|
 
 precision mediump float;
 uniform vec3 iResolution;

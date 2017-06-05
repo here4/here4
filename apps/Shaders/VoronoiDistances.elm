@@ -4,9 +4,13 @@ import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import WebGL exposing (..)
 
+
 -- https://www.shadertoy.com/view/ldl3W8
-voronoiDistances : Shader {} { u | iResolution:Vec3, iGlobalTime:Float, iHMD:Float } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
-voronoiDistances = [glsl|
+
+
+voronoiDistances : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+voronoiDistances =
+    [glsl|
 
 precision mediump float;
 uniform vec3 iResolution;
@@ -39,7 +43,7 @@ vec2 HmdWarp(vec2 in01, vec2 LensCenter)
 
 // I've not seen anybody out there computing correct cell interior distances for Voronoi
 // patterns yet. That's why they cannot shade the cell interior correctly, and why you've
-// never seen cell boundaries rendered correctly. 
+// never seen cell boundaries rendered correctly.
 
 // However, here's how you do mathematically correct distances (note the equidistant and non
 // degenerated grey isolines inside the cells) and hence edges (in yellow):
@@ -50,8 +54,8 @@ vec2 hash2( vec2 p )
 {
 	// texture based white noise
 	//return texture2D( iChannel0, (p+0.5)/256.0, -100.0 ).xy;
-	
-        // procedural white noise	
+
+        // procedural white noise
 	return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
 }
 
@@ -111,7 +115,7 @@ void voronoiDistances(vec2 tc)
 
 	// isolines
     vec3 col = c.x*(0.5 + 0.5*sin(64.0*c.x))*vec3(1.0);
-    // borders	
+    // borders
     col = mix( vec3(1.0,0.6,0.0), col, smoothstep( 0.04, 0.07, c.x ) );
     // feature points
 	float dd = length( c.yz );

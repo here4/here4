@@ -5,10 +5,14 @@ import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
 
-type alias Vertex = { pos:Vec3, color:Vec3, coord:Vec3 }
 
-worldVertex : Shader Vertex { u | iLensDistort:Float, view:Mat4 } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
-worldVertex = [glsl|
+type alias Vertex =
+    { pos : Vec3, color : Vec3, coord : Vec3 }
+
+
+worldVertex : Shader Vertex { u | iLensDistort : Float, view : Mat4 } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+worldVertex =
+    [glsl|
 
 attribute vec3 pos;
 attribute vec3 color;

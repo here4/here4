@@ -7,33 +7,41 @@ import Math.Matrix4 exposing (Mat4)
 import Time exposing (Time)
 import WebGL exposing (..)
 
-type alias NoiseVertex = { pos:Vec3, color:Vec4, coord:Vec3, textureScale:Float, timeScale:Float, smoothing:Float }
+
+type alias NoiseVertex =
+    { pos : Vec3, color : Vec4, coord : Vec3, textureScale : Float, timeScale : Float, smoothing : Float }
+
 
 type alias NoiseVertexInput =
-          { iDetail : Float
-          , iGlobalTime : Time
-          , iGlobalTimeV : Time
-          , iHMD : Float
-          , iLensDistort : Float
-          , iResolution : Vec3
-          , view : Mat4
-          }
+    { iDetail : Float
+    , iGlobalTime : Time
+    , iGlobalTimeV : Time
+    , iHMD : Float
+    , iLensDistort : Float
+    , iResolution : Vec3
+    , view : Mat4
+    }
 
-type alias NoiseVertexOutput = { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
+
+type alias NoiseVertexOutput =
+    { elm_FragColor : Vec4, elm_FragCoord : Vec2, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
+
 
 type alias RippleNoiseVertexInput =
-           { iDetail : Float
-           , iGlobalTime : Time
-           , iGlobalTimeV : Time
-           , iHMD : Float
-           , iLensDistort : Float
-           , iResolution : Vec3
-           , iRipple : Float
-           , view : Mat4
-           }
+    { iDetail : Float
+    , iGlobalTime : Time
+    , iGlobalTimeV : Time
+    , iHMD : Float
+    , iLensDistort : Float
+    , iResolution : Vec3
+    , iRipple : Float
+    , view : Mat4
+    }
 
-noiseVertex : Shader NoiseVertex (NoiseVertexInput) NoiseVertexOutput
-noiseVertex = [glsl|
+
+noiseVertex : Shader NoiseVertex NoiseVertexInput NoiseVertexOutput
+noiseVertex =
+    [glsl|
 
 attribute vec3 pos;
 attribute vec4 color;
@@ -88,8 +96,10 @@ void main () {
 
 |]
 
+
 rippleNoiseVertex : Shader NoiseVertex RippleNoiseVertexInput NoiseVertexOutput
-rippleNoiseVertex = [glsl|
+rippleNoiseVertex =
+    [glsl|
 
 attribute vec3 pos;
 attribute vec4 color;

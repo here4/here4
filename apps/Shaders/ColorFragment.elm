@@ -5,8 +5,10 @@ import Math.Vector3 exposing (Vec3)
 import Math.Vector4 exposing (Vec4)
 import WebGL exposing (..)
 
-colorFragment : Shader {} u { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
-colorFragment = [glsl|
+
+colorFragment : Shader {} u { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+colorFragment =
+    [glsl|
 
 precision mediump float;
 
@@ -19,15 +21,18 @@ void main () {
 
 |]
 
+
+
 -- TODO: Configure
 --  * size of fractal detail (multiplier on elm_FragCoord)
 --  * speed of motion (multiplier on iGlobalTime): can be motionless for solid objects
 --  * swaying in the breeze (oscillate with sin)
-
 -- TODO: make surface2D tile seamlessly
 
-noiseColorFragment : Shader {} { u | iResolution:Vec3, iGlobalTime:Float, iHMD:Float, iDetail:Float } { elm_FragColor:Vec4, elm_FragCoord:Vec2, iTextureScale:Float, iTimeScale:Float, iSmoothing:Float }
-noiseColorFragment = [glsl|
+
+noiseColorFragment : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float, iDetail : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
+noiseColorFragment =
+    [glsl|
 
 precision mediump float;
 uniform vec3 iResolution;
@@ -66,7 +71,7 @@ vec2 HmdWarp(vec2 in01, vec2 LensCenter)
 
 // by @301z
 
-float rand(vec2 n) { 
+float rand(vec2 n) {
 	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
 }
 
@@ -106,7 +111,7 @@ void texture(vec2 tc) {
         vec3 c;
 
         int detail = int(iDetail);
-         
+
         if (detail > 5) {
 		q = fbm(p - scaledTime * 0.1);
 		r = vec2(fbm(p + q + scaledTime * 0.7 - p.x - p.y), fbm(p + q - scaledTime * 0.4));

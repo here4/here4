@@ -4,9 +4,13 @@ import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import WebGL exposing (..)
 
+
 -- https://www.shadertoy.com/view/4sKGWt
-sky : Shader {} { u | iResolution:Vec3, iGlobalTime:Float, iHMD:Float } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
-sky = [glsl|
+
+
+sky : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+sky =
+    [glsl|
 
 precision mediump float;
 uniform vec3 iResolution;
@@ -52,7 +56,7 @@ float noise(vec2 x) {
 
 float fbm(vec2 p) {
     const mat2 m2 = mat2(0.8, -0.6, 0.6, 0.8);
-    
+
     float f = 0.5000 * noise(p); p = m2 * p * 2.02;
     f += 0.2500 * noise(p); p = m2 * p * 2.03;
     f += 0.1250 * noise(p); p = m2 * p * 2.01;
@@ -73,12 +77,12 @@ vec3 render(vec3 light, vec3 ro, vec3 rd, float resolution) {
     col += 0.75 * vec3(1.0, 0.8, 0.5) * pow(sundot, 64.0);
 
     // Clouds
-    col = mix(col, vec3(1.0, 0.95, 1.0), 0.5 * 
+    col = mix(col, vec3(1.0, 0.95, 1.0), 0.5 *
         smoothstep(0.5, 0.8, fbm((ro.xz + rd.xz * (250000.0 - ro.y) / rd.y) * 0.000008)));
 
     // Horizon/atmospheric perspective
     col = mix(col, vec3(0.7, 0.75, 0.8), pow(1.0 - max(abs(rd.y), 0.0), 8.0));
-    
+
     return col;
 }
 
@@ -91,7 +95,7 @@ void sky(vec2 tc) {
 
     vec3 ro = vec3(-iGlobalTime * 10000.0, sin(iGlobalTime) + 2.1 * 1000.0, 0.0);
     vec3 col = render(light, ro, rd, iResolution.y);
- 
+
     // Gamma encode
     col = pow(col, vec3(0.4545));
 

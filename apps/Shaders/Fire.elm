@@ -4,9 +4,13 @@ import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import WebGL exposing (..)
 
+
 -- https://www.shadertoy.com/view/Xsl3zN
-fire : Shader {} { u | iResolution:Vec3, iGlobalTime:Float, iHMD:Float } { elm_FragColor:Vec3, elm_FragCoord:Vec2 }
-fire = [glsl|
+
+
+fire : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+fire =
+    [glsl|
 
 precision mediump float;
 uniform vec3 iResolution;
@@ -35,7 +39,7 @@ vec2 HmdWarp(vec2 in01, vec2 LensCenter)
 
 // by @301z
 
-float rand(vec2 n) { 
+float rand(vec2 n) {
 	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
 }
 
