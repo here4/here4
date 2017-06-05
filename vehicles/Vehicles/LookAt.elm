@@ -2,13 +2,13 @@ module Vehicles.LookAt exposing (lookAt)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
-
 import Quaternion as Qn
-
 import Model
+
 
 ----------------------------------------------------------------------
 -- LookAt
+
 
 lookAt : Model.Vehicle
 lookAt =
@@ -16,78 +16,114 @@ lookAt =
     , move = move
     }
 
+
 welcome : Model.Motion -> Model.Motion
-welcome motion = motion
+welcome motion =
+    motion
+
 
 move : Maybe Vec3 -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
-move focPos eyeLevel inputs motion = case focPos of
-  Nothing -> motion
-  Just fpos ->
-    let
-        -- Some point directly above a given point
-        upwardsFrom p = V3.setY (V3.getY p + 1) p
+move focPos eyeLevel inputs motion =
+    case focPos of
+        Nothing ->
+            motion
 
-        p = V3.sub fpos motion.position
+        Just fpos ->
+            let
+                -- Some point directly above a given point
+                upwardsFrom p =
+                    V3.setY (V3.getY p + 1) p
 
-        -- inputs
-        upDown = V3.scale (3.0 * inputs.y) (V3.normalize p)
-        inputYaw = inputs.mx * 30 * inputs.dt
-        inputPitch = inputs.my * 30 * inputs.dt
+                p =
+                    V3.sub fpos motion.position
 
-        cPos = V3.add motion.position upDown
+                -- inputs
+                upDown =
+                    V3.scale (3.0 * inputs.y) (V3.normalize p)
 
-        -- Limit how close you can get. This should be a function of the size of the thing.
-        closePos = if V3.length (V3.sub fpos cPos) < 3.0 then motion.position else cPos
+                inputYaw =
+                    inputs.mx * 30 * inputs.dt
 
-{-
-        fromSpherical (r, theta, phi) = (r * sin theta * cos phi, r * sin theta * sin phi, r * cos theta)
-        toSpherical (x,y,z) = let r = sqrt(x*x+y*y+z*z) in (r, acos (z/r), atan2 y x)
+                inputPitch =
+                    inputs.my * 30 * inputs.dt
 
-        -- Move around a sphere centered at the origin
-        moveAroundSphere dTheta dPhi (x,y,z) =
-            let (r, theta, phi) = toSpherical (x,y,z)
-            in fromSpherical (r, theta+dTheta, phi+dPhi)
+                cPos =
+                    V3.add motion.position upDown
 
-        cv = closePos `V3.sub` fpos
-        (cx, cy, cz) = V3.toTuple cv
+                -- Limit how close you can get. This should be a function of the size of the thing.
+                closePos =
+                    if V3.length (V3.sub fpos cPos) < 3.0 then
+                        motion.position
+                    else
+                        cPos
 
-        (nx, ny, nz) = moveAroundSphere inputYaw inputPitch (cx, cy, cz)
+                {-
+                   fromSpherical (r, theta, phi) = (r * sin theta * cos phi, r * sin theta * sin phi, r * cos theta)
+                   toSpherical (x,y,z) = let r = sqrt(x*x+y*y+z*z) in (r, acos (z/r), atan2 y x)
 
-        wantPos = V3.add fpos <| V3.fromTuple (nx, ny, nz)
--}
+                   -- Move around a sphere centered at the origin
+                   moveAroundSphere dTheta dPhi (x,y,z) =
+                       let (r, theta, phi) = toSpherical (x,y,z)
+                       in fromSpherical (r, theta+dTheta, phi+dPhi)
 
-        yaw = Qn.fromAngleAxis inputYaw V3.j
-        xzPos = Qn.rotate yaw <| V3.sub closePos fpos
-        wantPos = V3.add fpos xzPos
+                   cv = closePos `V3.sub` fpos
+                   (cx, cy, cz) = V3.toTuple cv
 
-{-
-        pitchAxis = V3.cross xzPos V3.j
-        pitchQ = Qn.fromAngleAxis inputPitch pitchAxis
-        wantPos = V3.add fpos <| Qn.vrotate pitchQ xzPos
--}
+                   (nx, ny, nz) = moveAroundSphere inputYaw inputPitch (cx, cy, cz)
 
-        unboundPos = V3.add (V3.scale 0.3 wantPos) (V3.scale 0.7 motion.position)
+                   wantPos = V3.add fpos <| V3.fromTuple (nx, ny, nz)
+                -}
+                yaw =
+                    Qn.fromAngleAxis inputYaw V3.j
 
-        u = toRecord unboundPos
-        e = eyeLevel unboundPos
+                xzPos =
+                    Qn.rotate yaw <| V3.sub closePos fpos
 
-        newPos = if u.y < e then
-                   vec3 u.x e u.z
-               else
-                   unboundPos
+                wantPos =
+                    V3.add fpos xzPos
 
-        -- Find the orientation looking at fpos from newPos
-        f = V3.normalize (V3.sub fpos newPos)
-        orPos = Qn.fromTo V3.k f
+                {-
+                   pitchAxis = V3.cross xzPos V3.j
+                   pitchQ = Qn.fromAngleAxis inputPitch pitchAxis
+                   wantPos = V3.add fpos <| Qn.vrotate pitchQ xzPos
+                -}
+                unboundPos =
+                    V3.add (V3.scale 0.3 wantPos) (V3.scale 0.7 motion.position)
 
-        -- Ensure the camera is in an upright plane
-        -- camAxis = V3.cross f (V3.setY (V3.getY f + 1) f)
-        camAxis = V3.cross f (upwardsFrom f)
-        camQ = Qn.fromAngleAxis (pi/2) camAxis
-        cam = Qn.rotate camQ f
+                u =
+                    toRecord unboundPos
 
-        orCam = Qn.fromTo (Qn.rotate orPos V3.j) cam
-        orientation = Qn.multiply orCam orPos
-        
-    in
-        { motion | position = newPos, orientation = orientation }
+                e =
+                    eyeLevel unboundPos
+
+                newPos =
+                    if u.y < e then
+                        vec3 u.x e u.z
+                    else
+                        unboundPos
+
+                -- Find the orientation looking at fpos from newPos
+                f =
+                    V3.normalize (V3.sub fpos newPos)
+
+                orPos =
+                    Qn.fromTo V3.k f
+
+                -- Ensure the camera is in an upright plane
+                -- camAxis = V3.cross f (V3.setY (V3.getY f + 1) f)
+                camAxis =
+                    V3.cross f (upwardsFrom f)
+
+                camQ =
+                    Qn.fromAngleAxis (pi / 2) camAxis
+
+                cam =
+                    Qn.rotate camQ f
+
+                orCam =
+                    Qn.fromTo (Qn.rotate orPos V3.j) cam
+
+                orientation =
+                    Qn.multiply orCam orPos
+            in
+                { motion | position = newPos, orientation = orientation }
