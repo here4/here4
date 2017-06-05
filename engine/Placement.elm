@@ -1,27 +1,30 @@
-module Placement exposing
-    ( Placement, defaultPlacement
-    )
+module Placement
+    exposing
+        ( Placement
+        , defaultPlacement
+        )
+
 
 type alias Placement =
     { xOffset : Float
-    , xDelta  : Float
+    , xDelta : Float
     , yOffset : Float
-    , yMult   : Float
+    , yMult : Float
     , zOffset : Float
-    , zDelta  : Float
+    , zDelta : Float
     , tileSize : Int -- Length of side of a square tile
     , bigSide : Int
     }
 
+
 defaultPlacement : Placement
 defaultPlacement =
     { xOffset = -256
-    , xDelta  = 2
+    , xDelta = 2
     , yOffset = 0
-    , yMult   = 30
+    , yMult = 30
     , zOffset = -256
-    , zDelta  = 2
+    , zDelta = 2
     , tileSize = 8
     , bigSide = 512
     }
-

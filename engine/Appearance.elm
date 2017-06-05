@@ -6,27 +6,35 @@ import Time exposing (Time)
 import WebGL exposing (Entity)
 import Window
 
-type alias Perception = {
-    cameraPos   : Vec3,
-    windowSize  : Window.Size,
-    globalTime  : Time,
-    viewMatrix  : Mat4,
-    lensDistort : Float,
-    cameraVR    : Bool,
-    measuredFPS : Float
-}
 
-type alias Appearance = Perception -> List Entity
+type alias Perception =
+    { cameraPos : Vec3
+    , windowSize : Window.Size
+    , globalTime : Time
+    , viewMatrix : Mat4
+    , lensDistort : Float
+    , cameraVR : Bool
+    , measuredFPS : Float
+    }
+
+
+type alias Appearance =
+    Perception -> List Entity
+
 
 type alias ShaderPerception =
-   { iGlobalTime : Time
-   , iHMD : Float
-   , iResolution : Vec3
-   , iLensDistort : Float
-   , view : Mat4
-   }
+    { iGlobalTime : Time
+    , iHMD : Float
+    , iResolution : Vec3
+    , iLensDistort : Float
+    , view : Mat4
+    }
+
+
 
 -- | Transform the viewMatrix of an Appearance
-transform : (Mat4 -> Mat4) -> Appearance -> Appearance
-transform f appear p = appear { p | viewMatrix = f p.viewMatrix }
 
+
+transform : (Mat4 -> Mat4) -> Appearance -> Appearance
+transform f appear p =
+    appear { p | viewMatrix = f p.viewMatrix }

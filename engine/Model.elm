@@ -5,13 +5,12 @@ import Math.Vector3 as V3
 import Time exposing (..)
 import Task exposing (Task)
 import Window
-
 import Orientation exposing (Orientation)
 import Bag
 import Body exposing (Body)
 import Ground exposing (Ground)
-
 import Gamepad exposing (Gamepad, gamepads)
+
 
 type Msg worldMsg
     = KeyChange (Keys -> Keys)
@@ -23,16 +22,19 @@ type Msg worldMsg
     | Resize Window.Size
     | WorldMessage worldMsg
 
+
 type alias World =
     { bodies : List Body
     , ground : Ground
     }
+
 
 type alias Motion =
     { position : Vec3
     , velocity : Vec3
     , orientation : Orientation
     }
+
 
 type alias Player =
     { motion : Motion
@@ -43,20 +45,35 @@ type alias Player =
     , cameraInside : Bool
     , cameraPos : Vec3
     , cameraUp : Vec3
+
     -- , cameraOrientation : Orientation -- relative to ride
     }
+
 
 type alias Vehicle =
     { init : Motion -> Motion
     , move : Maybe Vec3 -> EyeLevel -> Inputs -> Motion -> Motion
     }
 
-type Eye = OneEye | LeftEye | RightEye
 
-type alias EyeLevel = Vec3 -> Float
+type Eye
+    = OneEye
+    | LeftEye
+    | RightEye
+
+
+type alias EyeLevel =
+    Vec3 -> Float
+
 
 eyeLevel : Float
-eyeLevel = 1.8 -- Make this a function of Vehicle
+eyeLevel =
+    1.8
+
+
+
+-- Make this a function of Vehicle
+
 
 defaultMotion : Motion
 defaultMotion =
@@ -64,6 +81,7 @@ defaultMotion =
     , velocity = vec3 0 0 0
     , orientation = Orientation.initial
     }
+
 
 defaultPlayer : Player
 defaultPlayer =
@@ -75,8 +93,10 @@ defaultPlayer =
     , cameraInside = True
     , cameraPos = vec3 0 eyeLevel 0
     , cameraUp = V3.j
+
     -- cameraOrientation = V3.j
     }
+
 
 type alias Keys =
     { left : Bool
@@ -89,41 +109,49 @@ type alias Keys =
     , kPeriod : Bool
     }
 
+
 type alias Inputs =
     { reset : Bool
     , changeVR : Bool
     , changeCamera : Bool
-    , isJumping: Bool
-    , button_X: Bool
-    , x: Float
-    , y: Float
-    , mx: Float
-    , my: Float
-    , cx: Float
-    , cy: Float
-    , dt: Float
+    , isJumping : Bool
+    , button_X : Bool
+    , x : Float
+    , y : Float
+    , mx : Float
+    , my : Float
+    , cx : Float
+    , cy : Float
+    , dt : Float
     }
 
+
 noInput : Inputs
-noInput = { reset = False
-          , changeVR = False
-          , changeCamera = False
-          , isJumping = False
-          , button_X = False
-          , x = 0
-          , y = 0
-          , mx = 0
-          , my = 0
-          , cx = 0
-          , cy = 0
-          , dt = 0
-          }
+noInput =
+    { reset = False
+    , changeVR = False
+    , changeCamera = False
+    , isJumping = False
+    , button_X = False
+    , x = 0
+    , y = 0
+    , mx = 0
+    , my = 0
+    , cx = 0
+    , cy = 0
+    , dt = 0
+    }
+
 
 {-| This type is returned by the fullscreen JS api in PointerLock.js
-for mouse movement -}
-type alias MouseMovement = (Int, Int)
+for mouse movement
+-}
+type alias MouseMovement =
+    ( Int, Int )
 
-{-| This is the application's Model data structure -}
+
+{-| This is the application's Model data structure
+-}
 type alias Model worldModel =
     { numPlayers : Int
     , player1 : Player
@@ -140,10 +168,12 @@ type alias Model worldModel =
     , worldModel : worldModel
     }
 
+
 type alias Args =
     { movement : MouseMovement
     , isLocked : Bool
     }
+
 
 {-| When the application first starts, this is the initial state of the Model.
 Not using the movement attribute of Args at this time;
@@ -151,36 +181,45 @@ it's a carryover from the original, and the additional complexity
 to actually use it is probably not worth it in this case.
 It's still a useful example using Html.programWithFlags though.
 -}
-init : (worldModel, Cmd worldMsg) -> Args -> (Model worldModel, Cmd (Msg worldMsg))
+init : ( worldModel, Cmd worldMsg ) -> Args -> ( Model worldModel, Cmd (Msg worldMsg) )
 init worldInit { movement, isLocked } =
-    let (worldModel, worldCmdMsg) = worldInit in
-    ( { numPlayers = 1
-      , player1 = defaultPlayer
-      , player2 = defaultPlayer
-      , globalTime = 0
-      , maybeWindowSize = Nothing
-      , keys = Keys False False False False False False False False
-      , gamepadIds = []
-      , inputs = noInput
-      , inputs2 = noInput
-      , wantToBeLocked = True
-      , isLocked = isLocked
-      , message = "No texture yet"
-      , worldModel = worldModel
-      }
-    , Cmd.batch
-        -- [ Window.size |> Task.perform (always Resize (0, 0)) Resize
-        [ Window.size |> Task.perform Resize
-        , gamepads GamepadUpdate
-        , Cmd.map WorldMessage worldCmdMsg
-        ]
-    )
+    let
+        ( worldModel, worldCmdMsg ) =
+            worldInit
+    in
+        ( { numPlayers = 1
+          , player1 = defaultPlayer
+          , player2 = defaultPlayer
+          , globalTime = 0
+          , maybeWindowSize = Nothing
+          , keys = Keys False False False False False False False False
+          , gamepadIds = []
+          , inputs = noInput
+          , inputs2 = noInput
+          , wantToBeLocked = True
+          , isLocked = isLocked
+          , message = "No texture yet"
+          , worldModel = worldModel
+          }
+        , Cmd.batch
+            -- [ Window.size |> Task.perform (always Resize (0, 0)) Resize
+            [ Window.size |> Task.perform Resize
+            , gamepads GamepadUpdate
+            , Cmd.map WorldMessage worldCmdMsg
+            ]
+        )
+
 
 orient : Motion -> Vec3 -> Vec3
-orient motion = Orientation.rotateBodyV motion.orientation
+orient motion =
+    Orientation.rotateBodyV motion.orientation
+
 
 direction : Motion -> Vec3
-direction motion = Orientation.rotateBodyV motion.orientation V3.k
+direction motion =
+    Orientation.rotateBodyV motion.orientation V3.k
+
 
 cameraUp : Player -> Vec3
-cameraUp player = Orientation.rotateBodyV player.motion.orientation (V3.negate V3.j)
+cameraUp player =
+    Orientation.rotateBodyV player.motion.orientation (V3.negate V3.j)

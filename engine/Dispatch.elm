@@ -1,9 +1,11 @@
 module Dispatch exposing (..)
 
+
 type Dispatch effectMsg ctrlMsg nodeMsg
     = Self nodeMsg
     | Ctrl ctrlMsg
     | Effect effectMsg
+
 
 type DispatchHub key effectMsg ctrlMsg nodeMsg hubMsg
     = Hub hubMsg
