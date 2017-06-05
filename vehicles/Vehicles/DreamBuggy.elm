@@ -71,6 +71,8 @@ flatten v =
 turn : Model.EyeLevel -> Float -> Float -> Model.Motion -> Model.Motion
 turn eyeLevel dx dy motion =
     let
+        (roll0, pitch0, yaw0) = Orientation.toRollPitchYaw motion.orientation
+
         motionY =
             eyeLevel motion.position
 
@@ -84,24 +86,31 @@ turn eyeLevel dx dy motion =
             eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -1 0 0)))
 
         tirePitch =
-            0
+            0 -- atan (-(frontTireY - motionY)/0.01)
 
-        -- atan (-(frontTireY - motionY)/0.01)
         tireRoll =
             atan ((rightTireY - leftTireY) / 0.1)
 
         ( yaw, pitch, roll ) =
-            -- if getY motion.position > (eyeLevel motion.position) + 5 then -- spin if in the air
-            --     (dx * 5, dy*0.1, 0)
-            -- else
-            -- (dx*0.5, (tirePitch+dy)*0.05, tireRoll*0.05)
-            ( dx * 0.5, 0, 0 )
+            if getY motion.position > (eyeLevel motion.position) + 5 then -- spin if in the air
+               (dx * 0.5, dy*0.1, 0)
+            else
+               (dx*0.5, (tirePitch+dy)*0.05, tireRoll*0.05)
+
+        -- | clamp a1 st. low <= a0+a1 <= hi
+        clampSum low hi a0 a1 = clamp (low-a0) (hi-a0) a1
 
         orpy =
-            fromRollPitchYaw ( roll, pitch, yaw )
+            fromRollPitchYaw ( roll
+                             , pitch -- clampSum (degrees -10) (degrees 10) pitch0 pitch
+                             , yaw -- clampSum (degrees -15) (degrees 15) yaw0 yaw
+                             )
+
+        flatO = Orientation.fromRollPitchYaw (0, 0, yaw0)
 
         orientation =
-            clampBuggy (followedBy motion.orientation orpy)
+            -- clampBuggy (followedBy motion.orientation orpy)
+            clampBuggy (followedBy flatO orpy)
     in
         { motion | orientation = orientation }
 
