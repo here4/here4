@@ -105,7 +105,7 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
 
                                 -- Change ride?
                                 hasCamera key =
-                                    isJust (worldCamera (Just key) model.worldModel)
+                                    isJust (worldCamera (Just key) wm)
 
                                 player1 =
                                     selectVehicle hasCamera keyLimit inputs1 model.player1
@@ -113,12 +113,11 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                                 player2 =
                                     selectVehicle hasCamera keyLimit inputs2 model.player2
 
-                                -- Camera
                                 label1 =
-                                    worldLabel (player1.rideKey) model.worldModel
+                                    worldLabel (player1.rideKey) wm
 
-                                camera1 =
-                                    worldCamera (player1.rideKey) model.worldModel
+                                label2 =
+                                    worldLabel (player2.rideKey) wm
 
                                 ( wm1, wm1Msg ) =
                                     case player1.rideKey of
@@ -127,12 +126,6 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
 
                                         Nothing ->
                                             ( wm, Cmd.none )
-
-                                label2 =
-                                    worldLabel (player2.rideKey) model.worldModel
-
-                                camera2 =
-                                    worldCamera (player2.rideKey) model.worldModel
 
                                 ( wm2, wm2Msg ) =
                                     case player2.rideKey of
@@ -162,6 +155,13 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                                             _ ->
                                                 ( wm2, Cmd.none, Nothing )
 
+                                -- Camera
+                                camera1 =
+                                    worldCamera (player1.rideKey) wmF
+
+                                camera2 =
+                                    worldCamera (player2.rideKey) wmF
+
                                 newModel =
                                     { model
                                         | globalTime = model.globalTime + dt
@@ -170,16 +170,13 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                                         , inputs = clearStationaryInputs inputs1
                                         , worldModel = wmF
                                     }
+
+                                gamepadUpdateMsg = Gamepad.gamepads Model.GamepadUpdate
+                                wMsg = Cmd.map Model.WorldMessage wmFMsg
                             in
-                                -- Cmd.batch ]wm1Msg, wm2Msg, wmFMsg]
-                                ( newModel, Cmd.map Model.WorldMessage wmFMsg )
+                                ( newModel, Cmd.batch [ gamepadUpdateMsg, wMsg ] )
             in
-                ( model_
-                , Cmd.batch
-                    [ Gamepad.gamepads Model.GamepadUpdate
-                    , newCmdMsg
-                    ]
-                )
+                ( model_ , newCmdMsg)
 
 
 inputsToMove : Model.Inputs -> Model.Player -> Vec3
@@ -355,7 +352,6 @@ step terrain inputs label camera focPos player0 =
 
             moveCamera player =
                 if player.cameraInside then
-                    -- let behind = player.pos `sub` (V3.scale 2.5 (Model.direction player.motion)) `sub` (vec3 0 0.5 0)
                     let
                         inside =
                             add player.motion.position
@@ -372,31 +368,20 @@ step terrain inputs label camera focPos player0 =
                 else
                     let
                         behind =
-                            sub player.motion.position (V3.scale 20 (Model.direction player.motion))
+                            sub player.motion.position (V3.scale 17 (Model.direction player.motion))
 
                         p =
                             toRecord player.motion.position
 
-                        yMax0 v =
-                            let
-                                vr =
-                                    V3.toRecord v
-                            in
-                                vec3 vr.x (min (-0.3) vr.y) vr.z
-
                         newCameraPos =
                             if p.y < Model.eyeLevel then
-                                yMax0 (add (vec3 0 2 0) behind)
-                            else if p.y < Model.eyeLevel + 1 then
                                 behind
                             else
-                                -- add (vec3 0 2 0) behind
-                                add (vec3 0 -2 0) behind
+                                add (vec3 0 6 0) behind
 
                         cameraPos =
                             aboveGround eyeLevel
-                                -- (V3.scale 0.5 newCameraPos `add` V3.scale 0.5 player.cameraPos) -- smooth
-                                newCameraPos
+                                (V3.add (V3.scale 0.5 newCameraPos) (V3.scale 0.5 player.cameraPos)) -- smooth
 
                         newCameraUp =
                             Model.cameraUp player
@@ -404,8 +389,7 @@ step terrain inputs label camera focPos player0 =
                         { player
                             | cameraPos = terrain.bounds cameraPos
                             , cameraUp =
-                                -- V3.scale 0.1 newCameraUp `add` V3.scale 0.9 player.cameraUp }
-                                newCameraUp
+                                (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
                         }
         in
             player0
