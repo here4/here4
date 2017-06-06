@@ -72,12 +72,16 @@ update vtype msg model =
             ( { model | body = translate dp model.body }, Cmd.none )
 
         Ctrl (Control.Drive ground inputs) ->
+            -- ( { model | camera = DreamBuggy.drive ground model.speed inputs model.camera }, Cmd.none )
+            ( { model | camera = LookAt.lookAt model.body.position ground inputs model.camera }, Cmd.none )
+{-
             case vtype of
                 Buggy ->
                     ( { model | body = DreamBuggy.drive ground model.speed inputs model.body }, Cmd.none )
 
                 Bird ->
                     ( { model | body = DreamBird.drive ground inputs model.body }, Cmd.none )
+-}
 
         _ ->
             ( model, Cmd.none )
