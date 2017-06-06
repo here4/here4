@@ -45,6 +45,11 @@ fromVec3 : V3.Vec3 -> Orientation
 fromVec3 =
     wToQ >> Qn.fromVec3
 
+fromAngleAxis : Float -> V3.Vec3 -> Orientation
+fromAngleAxis angle axis = Qn.fromAngleAxis angle (wToQ axis)
+
+fromTo : V3.Vec3 -> V3.Vec3 -> Orientation
+fromTo u v = Qn.fromTo (wToQ u) (wToQ v)
 
 fromRollPitchYaw : ( Float, Float, Float ) -> Orientation
 fromRollPitchYaw ( roll, pitch, yaw ) =
