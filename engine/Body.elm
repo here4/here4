@@ -29,11 +29,11 @@ type alias Anchored a =
 
 
 type alias Visible a =
-    { a | appear : Appearance }
+    { a | scale : Vec3, appear : Appearance }
 
 
 type alias Oriented a =
-    { a | scale : Vec3, position : Vec3, orientation : Orientation }
+    { a | position : Vec3, orientation : Orientation }
 
 
 type alias Moving a =
