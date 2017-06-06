@@ -1,6 +1,6 @@
 module Statue exposing (create, VehicleType(..))
 
-import Math.Vector3 exposing (Vec3, vec3)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
 import App exposing (App, AppMsg, Focus, appToFocus)
@@ -9,9 +9,11 @@ import Body exposing (..)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
+import Model exposing (Motion, motionCamera)
 import Orientation
 import Vehicles.DreamBuggy as DreamBuggy
 import Vehicles.DreamBird as DreamBird
+import Vehicles.LookAt as LookAt
 
 
 type VehicleType
@@ -22,6 +24,7 @@ type VehicleType
 type alias Model =
     { body : Moving Body
     , speed : Float
+    , camera : Motion
     }
 
 
@@ -52,6 +55,11 @@ init pos speed appear =
             , velocity = vec3 0 0 0
             }
       , speed = speed
+      , camera =
+            { position = V3.add pos (vec3 0 0 -5)
+            , velocity = vec3 0 0 0
+            , orientation = Orientation.initial
+            }
       }
     , Cmd.none
     )
@@ -91,7 +99,7 @@ bodies model =
 
 camera : Model -> Maybe Camera
 camera model =
-    Just (bodyCamera model.body)
+    Just (motionCamera model.camera)
 
 
 focus : Model -> Maybe Focus
