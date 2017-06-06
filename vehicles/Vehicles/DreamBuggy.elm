@@ -19,26 +19,16 @@ welcome motion =
     { motion | orientation = clampBuggy motion.orientation }
 
 
-drive : Ground -> Float -> Model.Inputs -> Moving (HasBody a) -> Moving (HasBody a)
-drive ground speed inputs body =
+drive : Ground -> Float -> Model.Inputs -> Moving a -> Moving a
+drive ground speed inputs thing =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
-
-        motion0 =
-            { position = body.position, orientation = body.orientation, velocity = body.velocity }
-
-        motion =
-            move ground speed eyeLevel inputs motion0
     in
-        { body
-            | position = motion.position
-            , orientation = motion.orientation
-            , velocity = motion.velocity
-        }
+        move ground speed eyeLevel inputs thing
 
 
-move : Ground -> Float -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+move : Ground -> Float -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
 move terrain speed eyeLevel inputs motion =
     motion
         |> turn eyeLevel inputs.mx inputs.my
@@ -68,7 +58,7 @@ flatten v =
         normalize (vec3 r.x 0 r.z)
 
 
-turn : Model.EyeLevel -> Float -> Float -> Model.Motion -> Model.Motion
+turn : Model.EyeLevel -> Float -> Float -> Moving a -> Moving a
 turn eyeLevel dx dy motion =
     let
         (roll0, pitch0, yaw0) = Orientation.toRollPitchYaw motion.orientation
@@ -115,7 +105,7 @@ turn eyeLevel dx dy motion =
         { motion | orientation = orientation }
 
 
-goForward : Model.EyeLevel -> Float -> { a | x : Float, y : Float, dt : Float } -> Model.Motion -> Model.Motion
+goForward : Model.EyeLevel -> Float -> { i | x : Float, y : Float, dt : Float } -> Moving a -> Moving a
 goForward eyeLevel speed inputs motion =
     -- if getY motion.position > eyeLevel motion.position then motion else
     let
@@ -167,7 +157,7 @@ adjustVelocity maxSpeed friction dv dt v =
     v3_clamp maxSpeed <| add (V3.scale dt dv) (V3.scale (1.0 - (friction * dt)) v)
 
 
-physics : Model.EyeLevel -> Float -> Model.Motion -> Model.Motion
+physics : Model.EyeLevel -> Float -> Moving a -> Moving a
 physics eyeLevel dt motion =
     let
         pos =
@@ -214,7 +204,7 @@ keepWithinbounds terrain motion =
     { motion | position = terrain.bounds motion.position }
 
 
-gravity : Model.EyeLevel -> Float -> Model.Motion -> Model.Motion
+gravity : Model.EyeLevel -> Float -> Moving a -> Moving a
 gravity eyeLevel dt motion =
     if getY motion.position <= eyeLevel motion.position then
         motion
