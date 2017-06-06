@@ -7,7 +7,7 @@ import Task exposing (Task)
 import Window
 import Orientation exposing (Orientation)
 import Bag
-import Body exposing (Body)
+import Body exposing (Body, Camera, Oriented)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 
@@ -35,6 +35,11 @@ type alias Motion =
     , orientation : Orientation
     }
 
+motionCamera : Motion -> Camera
+motionCamera motion =
+    { position = motion.position
+    , orientation = Orientation.rotateBodyV motion.orientation V3.k
+    }
 
 type alias Player =
     { motion : Motion
@@ -45,8 +50,6 @@ type alias Player =
     , cameraInside : Bool
     , cameraPos : Vec3
     , cameraUp : Vec3
-
-    -- , cameraOrientation : Orientation -- relative to ride
     }
 
 
@@ -215,7 +218,7 @@ orient motion =
     Orientation.rotateBodyV motion.orientation
 
 
-direction : Motion -> Vec3
+direction : Oriented a -> Vec3
 direction motion =
     Orientation.rotateBodyV motion.orientation V3.k
 
