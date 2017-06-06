@@ -2,27 +2,29 @@ module Vehicles.LookAt exposing (lookAt)
 
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
-import Quaternion as Qn
+import Orientation as Orientation
+
+import Body exposing (Moving)
+import Ground exposing (Ground)
 import Model
 
 
 ----------------------------------------------------------------------
 -- LookAt
 
-
-lookAt : Model.Vehicle
-lookAt =
-    { init = welcome
-    , move = move
-    }
-
-
 welcome : Model.Motion -> Model.Motion
 welcome motion =
     motion
 
+lookAt : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+lookAt focPos ground inputs thing =
+    let
+        eyeLevel pos =
+            1.8 + ground.elevation pos
+    in
+        move (Just focPos) eyeLevel inputs thing
 
-move : Maybe Vec3 -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+move : Maybe Vec3 -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
 move focPos eyeLevel inputs motion =
     case focPos of
         Nothing ->
@@ -57,30 +59,31 @@ move focPos eyeLevel inputs motion =
                     else
                         cPos
 
-                {-
-                   fromSpherical (r, theta, phi) = (r * sin theta * cos phi, r * sin theta * sin phi, r * cos theta)
-                   toSpherical (x,y,z) = let r = sqrt(x*x+y*y+z*z) in (r, acos (z/r), atan2 y x)
+                fromSpherical (r, theta, phi) = (r * sin theta * cos phi, r * sin theta * sin phi, r * cos theta)
+                toSpherical (x,y,z) = let r = sqrt(x*x+y*y+z*z) in (r, acos (z/r), atan2 y x)
 
-                   -- Move around a sphere centered at the origin
-                   moveAroundSphere dTheta dPhi (x,y,z) =
-                       let (r, theta, phi) = toSpherical (x,y,z)
-                       in fromSpherical (r, theta+dTheta, phi+dPhi)
+                -- Move around a sphere centered at the origin
+                moveAroundSphere dTheta dPhi (x,y,z) =
+                    let (r, theta, phi) = toSpherical (x,y,z)
+                    in fromSpherical (r, theta+dTheta, phi+dPhi)
 
-                   cv = closePos `V3.sub` fpos
-                   (cx, cy, cz) = V3.toTuple cv
+                cv = V3.sub closePos fpos
+                (cx, cy, cz) = V3.toTuple cv
+     
+                (nx, ny, nz) = moveAroundSphere inputYaw inputPitch (cx, cy, cz)
+     
+                wantPos = V3.add fpos <| V3.fromTuple (nx, ny, nz)
 
-                   (nx, ny, nz) = moveAroundSphere inputYaw inputPitch (cx, cy, cz)
-
-                   wantPos = V3.add fpos <| V3.fromTuple (nx, ny, nz)
-                -}
+{-
                 yaw =
-                    Qn.fromAngleAxis inputYaw V3.j
+                    Orientation.fromAngleAxis inputYaw V3.j
 
                 xzPos =
-                    Qn.rotate yaw <| V3.sub closePos fpos
+                    Orientation.rotateBodyV yaw <| V3.sub closePos fpos
 
                 wantPos =
                     V3.add fpos xzPos
+-}
 
                 {-
                    pitchAxis = V3.cross xzPos V3.j
@@ -107,7 +110,8 @@ move focPos eyeLevel inputs motion =
                     V3.normalize (V3.sub fpos newPos)
 
                 orPos =
-                    Qn.fromTo V3.k f
+                    -- Orientation.fromTo V3.k f
+                    Orientation.fromTo newPos fpos
 
                 -- Ensure the camera is in an upright plane
                 -- camAxis = V3.cross f (V3.setY (V3.getY f + 1) f)
@@ -115,15 +119,15 @@ move focPos eyeLevel inputs motion =
                     V3.cross f (upwardsFrom f)
 
                 camQ =
-                    Qn.fromAngleAxis (pi / 2) camAxis
+                    Orientation.fromAngleAxis (pi / 2) camAxis
 
                 cam =
-                    Qn.rotate camQ f
+                    Orientation.rotateBodyV camQ f
 
                 orCam =
-                    Qn.fromTo (Qn.rotate orPos V3.j) cam
+                    Orientation.fromTo (Orientation.rotateBodyV orPos V3.j) cam
 
                 orientation =
-                    Qn.multiply orCam orPos
+                    Orientation.followedBy orCam orPos
             in
                 { motion | position = newPos, orientation = orientation }
