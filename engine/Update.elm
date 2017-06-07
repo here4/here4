@@ -18,7 +18,7 @@ import GamepadInputs
 
 import App exposing (Focus)
 import Control exposing (WorldMsg)
-import Camera exposing (Camera)
+import Camera exposing (Camera, Shot(Tracking))
 import Camera.Util as Camera
 import Camera.Follow as Follow
 import Ground exposing (Ground)
@@ -36,7 +36,7 @@ update :
     -> (worldModel -> Int)
     -> (worldModel -> Maybe Ground)
     -> (Ground -> Time -> worldModel -> worldModel)
-    -> (Maybe Bag.Key -> worldModel -> Maybe Camera)
+    -> (Maybe Bag.Key -> Shot -> worldModel -> Maybe Camera)
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel
@@ -108,7 +108,7 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
 
                                 -- Change ride?
                                 hasCamera key =
-                                    isJust (worldCamera (Just key) wm)
+                                    isJust (worldCamera (Just key) Tracking wm)
 
                                 player1 =
                                     selectVehicle hasCamera keyLimit inputs1 model.player1
@@ -160,10 +160,10 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
 
                                 -- Camera
                                 camera1 =
-                                    worldCamera (player1.rideKey) wmF
+                                    worldCamera player1.rideKey player1.shot wmF
 
                                 camera2 =
-                                    worldCamera (player2.rideKey) wmF
+                                    worldCamera player2.rideKey player2.shot wmF
 
                                 newModel =
                                     { model

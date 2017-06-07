@@ -8,7 +8,7 @@ import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Model exposing (Args)
 import Body exposing (Body)
-import Camera exposing (Camera)
+import Camera exposing (Camera, Shot)
 import App exposing (..)
 import Ground exposing (Ground)
 
@@ -184,13 +184,13 @@ worldLabel mkey model =
                 none
 
 
-worldCamera : Maybe Bag.Key -> WorldModel a -> Maybe Camera
-worldCamera mkey model =
+worldCamera : Maybe Bag.Key -> Shot -> WorldModel a -> Maybe Camera
+worldCamera mkey shot model =
     case mkey of
         Just key ->
             case Bag.get key model.apps of
                 Just app ->
-                    App.camera app
+                    App.camera shot app
 
                 Nothing ->
                     Nothing

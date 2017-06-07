@@ -23,7 +23,7 @@ import Model
 import Update
 import View
 import App exposing (Focus)
-import Camera exposing (Camera)
+import Camera exposing (Camera, Shot)
 import Ground exposing (Ground)
 
 
@@ -35,7 +35,7 @@ programWithFlags :
     , animate : Ground -> Time -> model -> model
     , keyLimit : model -> Int
     , ground : model -> Maybe Ground
-    , camera : Maybe Bag.Key -> model -> Maybe Camera
+    , camera : Maybe Bag.Key -> Shot -> model -> Maybe Camera
     , focus : Bag.Key -> model -> Maybe Focus
     }
     -> Program Model.Args (Model.Model model) (Model.Msg (WorldMsg msg))

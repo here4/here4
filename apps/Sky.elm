@@ -3,7 +3,7 @@ module Sky exposing (create)
 import Math.Vector3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
-import App exposing (App, AppMsg, Focus, appToFocus)
+import App exposing (App, AppMsg, Focus, appToFocus, noCamera)
 import Appearance exposing (Appearance)
 import Body exposing (..)
 import Control exposing (CtrlMsg)
@@ -26,7 +26,7 @@ create appear =
         , update = update
         , animate = animate
         , bodies = bodies
-        , camera = always Nothing
+        , camera = noCamera
         , focus = always Nothing
         }
 

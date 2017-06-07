@@ -5,7 +5,7 @@ import Random
 import Time exposing (Time)
 import App exposing (..)
 import Body exposing (..)
-import Camera exposing (Camera)
+import Camera exposing (Camera, Shot(..))
 import Camera.Util exposing (toCamera)
 import Ground exposing (Ground)
 import Math.RandomVector exposing (randomVec3)
@@ -75,8 +75,8 @@ bodies =
     List.map toBody
 
 
-camera : Boids -> Maybe Camera
-camera boids =
+camera : Shot -> Boids -> Maybe Camera
+camera shot boids =
     Maybe.map (toCamera << toBody) (List.head boids)
 
 

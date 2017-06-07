@@ -8,7 +8,7 @@ import Window
 import Orientation exposing (Orientation)
 import Bag
 import Body exposing (Body, Oriented)
-import Camera exposing (Camera)
+import Camera exposing (Camera, Shot(..))
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 
@@ -44,6 +44,7 @@ type alias Player =
     , cameraVR : Bool
     , cameraInside : Bool
     , camera : Camera
+    , shot : Shot
     }
 
 
@@ -68,10 +69,6 @@ eyeLevel =
     1.8
 
 
-
--- Make this a function of Vehicle
-
-
 defaultMotion : Motion
 defaultMotion =
     { position = vec3 0 30 0
@@ -94,6 +91,7 @@ defaultPlayer =
     , cameraVR = False
     , cameraInside = True
     , camera = defaultCamera
+    , shot = Tracking
     }
 
 

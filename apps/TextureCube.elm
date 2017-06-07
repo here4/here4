@@ -101,8 +101,8 @@ bodies model =
             []
 
 
-camera : Model -> Maybe Camera
-camera model =
+camera : Shot -> Model -> Maybe Camera
+camera shot model =
     Maybe.map toCamera model
 
 

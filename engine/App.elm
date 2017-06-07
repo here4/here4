@@ -1,4 +1,4 @@
-module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, label, camera, focus, update, appToFocus, orientedToFocus)
+module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, label, camera, noCamera, focus, update, appToFocus, orientedToFocus)
 
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
@@ -7,7 +7,7 @@ import Time exposing (Time)
 import WebGL exposing (Entity)
 import Appearance exposing (..)
 import Body exposing (..)
-import Camera exposing (Camera)
+import Camera exposing (Camera, Shot)
 import Control exposing (..)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
@@ -19,7 +19,7 @@ type alias Animated model msg =
     , update : msg -> model -> ( model, Cmd msg )
     , bodies : model -> List Body
     , animate : Ground -> Time -> model -> model
-    , camera : model -> Maybe Camera
+    , camera : Shot -> model -> Maybe Camera
     , focus : model -> Maybe Focus
     }
 
@@ -93,9 +93,9 @@ packBodies f dyn =
     f (Dynamic.unpack dyn)
 
 
-packCamera : (a -> Maybe Camera) -> AppModel -> Maybe Camera
-packCamera f dyn =
-    f (Dynamic.unpack dyn)
+packCamera : (Shot -> a -> Maybe Camera) -> Shot -> AppModel -> Maybe Camera
+packCamera f shot dyn =
+    f shot (Dynamic.unpack dyn)
 
 
 packFocus : (a -> Maybe Focus) -> AppModel -> Maybe Focus
@@ -209,9 +209,9 @@ bodies { methods, model } =
     methods.bodies model
 
 
-camera : App -> Maybe Camera
-camera { methods, model } =
-    methods.camera model
+camera : Shot -> App -> Maybe Camera
+camera shot { methods, model } =
+    methods.camera shot model
 
 
 focus : App -> Maybe Focus
@@ -236,3 +236,6 @@ appToFocus body =
 orientedToFocus : Oriented a -> Focus
 orientedToFocus x =
     { position = x.position }
+
+noCamera : Shot -> model -> Maybe Camera
+noCamera _ _ = Nothing
