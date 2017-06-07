@@ -18,3 +18,9 @@ toCamera thing =
 cameraUp : { a | orientation : Orientation } -> Vec3
 cameraUp thing =
     Orientation.rotateBodyV thing.orientation V3.j
+
+
+nextShot : Shot -> Shot
+nextShot shot = case shot of
+    POV -> Tracking
+    Tracking -> POV

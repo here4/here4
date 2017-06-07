@@ -303,13 +303,6 @@ skyboxMatrix { width, height } player =
 
 hud : Model.Player -> Int -> Int -> Html (Msg worldMsg)
 hud player left right =
-    let
-        wher =
-            if player.cameraInside then
-                "Inside"
-            else
-                "Outside"
-    in
         div
             [ style
                 [ ( "position", "absolute" )
@@ -332,7 +325,7 @@ hud player left right =
                 , Html.text " "
                 , FontAwesome.diamond white 20
                 , Html.text " "
-                , Html.text wher
+                , Html.text (toString player.shot)
                 ]
             ]
 

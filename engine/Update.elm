@@ -331,6 +331,7 @@ step terrain inputs label camera focPos player0 =
                                 , velocity = player.motion.velocity
                                 , orientation = c.orientation
                                 }
+                            , camera = c
                         }
 
                     Nothing ->
@@ -341,11 +342,11 @@ step terrain inputs label camera focPos player0 =
 
             checkCamera player =
                 { player
-                    | cameraInside =
+                    | shot =
                         if inputs.changeCamera then
-                            not player.cameraInside
+                            Camera.nextShot player.shot
                         else
-                            player.cameraInside
+                            player.shot
                     , cameraVR =
                         if inputs.changeVR then
                             not player.cameraVR
@@ -353,6 +354,7 @@ step terrain inputs label camera focPos player0 =
                             player.cameraVR
                 }
 
+{-
             moveCamera player =
                 let setCamera c = { player | camera = c }
                 in
@@ -389,12 +391,13 @@ step terrain inputs label camera focPos player0 =
                             { position = terrain.bounds cameraPos
                             , orientation = cameraOrientation
                             }
+-}
         in
             player0
                 |> relabel
                 |> move
                 |> checkCamera
-                |> moveCamera
+                -- |> moveCamera
 
 
 selectVehicle : (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player -> Model.Player

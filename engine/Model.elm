@@ -42,7 +42,6 @@ type alias Player =
     , rideLabel : String
     , focusKey : Bag.Key
     , cameraVR : Bool
-    , cameraInside : Bool
     , camera : Camera
     , shot : Shot
     }
@@ -89,7 +88,6 @@ defaultPlayer =
     , rideLabel = ""
     , focusKey = 0
     , cameraVR = False
-    , cameraInside = True
     , camera = defaultCamera
     , shot = Tracking
     }
