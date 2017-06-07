@@ -224,6 +224,3 @@ direction motion =
     Orientation.rotateBodyV motion.orientation V3.k
 
 
-cameraUp : Player -> Vec3
-cameraUp player =
-    Orientation.rotateBodyV player.motion.orientation (V3.negate V3.j)

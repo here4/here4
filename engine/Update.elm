@@ -19,6 +19,7 @@ import GamepadInputs
 import App exposing (Focus)
 import Control exposing (WorldMsg)
 import Camera exposing (Camera)
+import Camera.Util as Camera
 import Camera.Follow as Follow
 import Ground exposing (Ground)
 import Vehicles.DreamBird as DreamBird
@@ -365,7 +366,7 @@ step terrain inputs label camera focPos player0 =
                     in
                         { player
                             | cameraPos = inside -- aboveGround eyeLevel inside
-                            , cameraUp = Model.cameraUp player
+                            , cameraUp = Camera.cameraUp player
                         }
                 else
                     let
@@ -375,7 +376,7 @@ step terrain inputs label camera focPos player0 =
                             (V3.add (V3.scale 0.5 newCameraPos) (V3.scale 0.5 player.cameraPos)) -- smooth
 
                         newCameraUp =
-                            Model.cameraUp player
+                            Camera.cameraUp player
 
                         cameraUp =
                             (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
