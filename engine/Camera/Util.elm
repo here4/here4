@@ -1,7 +1,7 @@
 module Camera.Util exposing (..)
 
 import Math.Vector3 as V3 exposing (Vec3)
-import Orientation as Orientation
+import Orientation exposing (Orientation)
 
 import Body exposing (..)
 import Camera exposing (..)
@@ -9,12 +9,12 @@ import Model exposing (Player)
 
 
 toCamera : Oriented a -> Camera
-toCamera body =
-    { position = body.position
-    , orientation = body.orientation
+toCamera thing =
+    { position = thing.position
+    , orientation = thing.orientation
     }
 
 
-cameraUp : Player -> Vec3
-cameraUp player =
-    Orientation.rotateBodyV player.motion.orientation V3.j
+cameraUp : { a | orientation : Orientation } -> Vec3
+cameraUp thing =
+    Orientation.rotateBodyV thing.orientation V3.j

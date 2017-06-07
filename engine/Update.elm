@@ -366,7 +366,7 @@ step terrain inputs label camera focPos player0 =
                     in
                         { player
                             | cameraPos = inside -- aboveGround eyeLevel inside
-                            , cameraUp = Camera.cameraUp player
+                            , cameraUp = Camera.cameraUp player.motion
                         }
                 else
                     let
@@ -376,7 +376,7 @@ step terrain inputs label camera focPos player0 =
                             (V3.add (V3.scale 0.5 newCameraPos) (V3.scale 0.5 player.cameraPos)) -- smooth
 
                         newCameraUp =
-                            Camera.cameraUp player
+                            Camera.cameraUp player.motion
 
                         cameraUp =
                             (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
