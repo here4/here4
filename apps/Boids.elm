@@ -6,6 +6,7 @@ import Time exposing (Time)
 import App exposing (..)
 import Body exposing (..)
 import Camera exposing (Camera)
+import Camera.Util as Camera
 import Ground exposing (Ground)
 import Math.RandomVector exposing (randomVec3)
 import Behavior.Boids exposing (..)
@@ -76,7 +77,7 @@ bodies =
 
 camera : Boids -> Maybe Camera
 camera boids =
-    Maybe.map (bodyCamera << toBody) (List.head boids)
+    Maybe.map (Camera.bodyCamera << toBody) (List.head boids)
 
 
 focus : Boids -> Maybe Focus

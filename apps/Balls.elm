@@ -6,6 +6,7 @@ import Time exposing (Time)
 import App exposing (..)
 import Body exposing (..)
 import Camera exposing (..)
+import Camera.Util as Camera
 import Ground exposing (Ground)
 import Math.RandomVector exposing (randomVec3)
 import Physics.Collisions exposing (collisions)
@@ -86,7 +87,7 @@ bodies =
 
 camera : Balls -> Maybe Camera
 camera balls =
-    Maybe.map (bodyCamera << toBody) (List.head balls)
+    Maybe.map (Camera.bodyCamera << toBody) (List.head balls)
 
 
 focus : Balls -> Maybe Focus

@@ -114,10 +114,3 @@ put position appear =
 anchorSky : Body -> Body
 anchorSky body =
     { body | anchor = AnchorSky }
-
-
-bodyCamera : Oriented a -> Camera
-bodyCamera body =
-    { position = body.position
-    , orientation = Orientation.rotateBodyV body.orientation V3.k
-    }
