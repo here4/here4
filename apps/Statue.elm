@@ -90,7 +90,7 @@ update vtype msg model =
 animate : Ground -> Time -> Model -> Model
 animate ground dt model =
     let
-        setElevation pos = V3.setY (ground.elevation pos) pos
+        setElevation pos = V3.setY (1.8 + ground.elevation pos) pos
         onGround body = { body | position = setElevation body.position }
     in
         { model | body = onGround model.body }
