@@ -111,10 +111,10 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                                     isJust (worldCamera (Just key) Tracking wm)
 
                                 player1 =
-                                    selectVehicle hasCamera keyLimit inputs1 model.player1
+                                    selectCamera hasCamera keyLimit inputs1 model.player1
 
                                 player2 =
-                                    selectVehicle hasCamera keyLimit inputs2 model.player2
+                                    selectCamera hasCamera keyLimit inputs2 model.player2
 
                                 label1 =
                                     worldLabel (player1.rideKey) wm
@@ -340,20 +340,6 @@ step terrain inputs label camera focPos player0 =
             relabel player =
                 { player | rideLabel = label }
 
-            checkCamera player =
-                { player
-                    | shot =
-                        if inputs.changeCamera then
-                            Camera.nextShot player.shot
-                        else
-                            player.shot
-                    , cameraVR =
-                        if inputs.changeVR then
-                            not player.cameraVR
-                        else
-                            player.cameraVR
-                }
-
 {-
             moveCamera player =
                 let setCamera c = { player | camera = c }
@@ -396,12 +382,10 @@ step terrain inputs label camera focPos player0 =
             player0
                 |> relabel
                 |> move
-                |> checkCamera
-                -- |> moveCamera
 
 
-selectVehicle : (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player -> Model.Player
-selectVehicle hasCamera keyLimit inputs player =
+selectCamera : (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player -> Model.Player
+selectCamera hasCamera keyLimit inputs player =
     let
         nextKey key =
             (key + 1) % keyLimit
@@ -424,8 +408,27 @@ selectVehicle hasCamera keyLimit inputs player =
 
         key =
             findCamera (Maybe.withDefault 0 player.rideKey)
+
+        newKey =
+            if inputs.button_X then
+                Just (findCamera (nextKey key))
+            else
+                Just key
+
+        newShot =
+            if inputs.changeCamera then
+                Camera.nextShot player.shot
+            else
+                player.shot
+
+        newVR =
+            if inputs.changeVR then
+                not player.cameraVR
+            else
+                player.cameraVR
+
     in
-        if inputs.button_X then
-            { player | rideKey = Just (findCamera (nextKey key)) }
-        else
-            { player | rideKey = Just key }
+        { player | rideKey = newKey
+                 , shot = newShot
+                 , cameraVR = newVR
+        }
