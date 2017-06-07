@@ -43,8 +43,7 @@ type alias Player =
     , focusKey : Bag.Key
     , cameraVR : Bool
     , cameraInside : Bool
-    , cameraPos : Vec3
-    , cameraUp : Vec3
+    , camera : Camera
     }
 
 
@@ -80,6 +79,11 @@ defaultMotion =
     , orientation = Orientation.initial
     }
 
+defaultCamera : Camera
+defaultCamera =
+    { position = vec3 0 eyeLevel 0
+    , orientation = Orientation.initial
+    }
 
 defaultPlayer : Player
 defaultPlayer =
@@ -89,10 +93,7 @@ defaultPlayer =
     , focusKey = 0
     , cameraVR = False
     , cameraInside = True
-    , cameraPos = vec3 0 eyeLevel 0
-    , cameraUp = V3.j
-
-    -- cameraOrientation = V3.j
+    , camera = defaultCamera
     }
 
 

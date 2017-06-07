@@ -18,6 +18,7 @@ import Window
 import App exposing (..)
 import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
+import Camera.Util exposing (cameraUp)
 import Model exposing (Model, Msg)
 import Orientation
 
@@ -262,7 +263,7 @@ renderWorld globalTime world eye windowSize player =
                 0.95
 
         p =
-            { cameraPos = player.cameraPos
+            { cameraPos = player.camera.position
             , viewMatrix = perspective windowSize player eye
             , globalTime = globalTime
             , windowSize = windowSize
@@ -285,9 +286,9 @@ renderWorld globalTime world eye windowSize player =
 perspective : Window.Size -> Model.Player -> Model.Eye -> Mat4
 perspective { width, height } player eye =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
-        (M4.makeLookAt (add player.cameraPos (eyeOffset player.motion eye))
-            (add player.cameraPos (scale 3 (Model.direction player.motion)))
-            player.cameraUp
+        (M4.makeLookAt (add player.camera.position (eyeOffset player.motion eye))
+            (add player.camera.position (scale 3 (Model.direction player.motion)))
+            (cameraUp player.camera)
         )
 
 
@@ -296,7 +297,7 @@ skyboxMatrix { width, height } player =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
         (M4.makeLookAt (vec3 0 0 0)
             (scale 3 (Model.direction player.motion))
-            player.cameraUp
+            (cameraUp player.camera)
         )
 
 

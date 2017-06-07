@@ -354,6 +354,8 @@ step terrain inputs label camera focPos player0 =
                 }
 
             moveCamera player =
+                let setCamera c = { player | camera = c }
+                in
                 if player.cameraInside then
                     let
                         inside =
@@ -364,28 +366,29 @@ step terrain inputs label camera focPos player0 =
                         -- Inside Jeep driver's seat
                         -- `add` Qn.vrotate player.orientQn (vec3 0.38 0.5 -2.3)
                     in
-                        { player
-                            | cameraPos = inside -- aboveGround eyeLevel inside
-                            , cameraUp = Camera.cameraUp player.motion
-                        }
+                        setCamera
+                            { position = inside -- aboveGround eyeLevel inside
+                            , orientation = player.camera.orientation
+                            }
                 else
                     let
                         newCameraPos = Follow.follow terrain player.motion
 
                         cameraPos =
-                            (V3.add (V3.scale 0.5 newCameraPos) (V3.scale 0.5 player.cameraPos)) -- smooth
+                            (V3.add (V3.scale 0.5 newCameraPos) (V3.scale 0.5 player.camera.position)) -- smooth
 
-                        newCameraUp =
-                            Camera.cameraUp player.motion
+                        newCameraOrientation =
+                            player.motion.orientation
 
-                        cameraUp =
-                            (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
+                        cameraOrientation = newCameraOrientation
+                            -- TODO: slerp between old and new camera orientations
+                            -- (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
 
                     in
-                        { player
-                            | cameraPos = terrain.bounds cameraPos
-                            , cameraUp = cameraUp
-                        }
+                        setCamera
+                            { position = terrain.bounds cameraPos
+                            , orientation = cameraOrientation
+                            }
         in
             player0
                 |> relabel
