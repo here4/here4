@@ -10,7 +10,7 @@ import Model exposing (Player)
 bodyCamera : Oriented a -> Camera
 bodyCamera body =
     { position = body.position
-    , orientation = Orientation.rotateBodyV body.orientation V3.k
+    , orientation = body.orientation
     }
 
 cameraUp : Player -> Vec3

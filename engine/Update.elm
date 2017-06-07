@@ -329,7 +329,7 @@ step terrain inputs label camera focPos player0 =
                             | motion =
                                 { position = c.position
                                 , velocity = player.motion.velocity
-                                , orientation = fromVec3 c.orientation
+                                , orientation = c.orientation
                                 }
                         }
 

@@ -39,7 +39,7 @@ type alias Motion =
 motionCamera : Motion -> Camera
 motionCamera motion =
     { position = motion.position
-    , orientation = Orientation.rotateBodyV motion.orientation V3.k
+    , orientation = motion.orientation
     }
 
 type alias Player =
