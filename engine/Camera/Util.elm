@@ -7,11 +7,13 @@ import Body exposing (..)
 import Camera exposing (..)
 import Model exposing (Player)
 
-bodyCamera : Oriented a -> Camera
-bodyCamera body =
+
+toCamera : Oriented a -> Camera
+toCamera body =
     { position = body.position
     , orientation = body.orientation
     }
+
 
 cameraUp : Player -> Vec3
 cameraUp player =

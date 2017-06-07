@@ -8,7 +8,7 @@ import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (App, AppMsg, Focus, appToFocus)
 import Body exposing (..)
 import Camera exposing (..)
-import Camera.Util as Camera
+import Camera.Util exposing (toCamera)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
@@ -103,7 +103,7 @@ bodies model =
 
 camera : Model -> Maybe Camera
 camera model =
-    Maybe.map Camera.bodyCamera model
+    Maybe.map toCamera model
 
 
 focus : Model -> Maybe Focus

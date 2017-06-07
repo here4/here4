@@ -36,12 +36,6 @@ type alias Motion =
     , orientation : Orientation
     }
 
-motionCamera : Motion -> Camera
-motionCamera motion =
-    { position = motion.position
-    , orientation = motion.orientation
-    }
-
 type alias Player =
     { motion : Motion
     , rideKey : Maybe Bag.Key

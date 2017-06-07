@@ -7,10 +7,11 @@ import App exposing (App, AppMsg, Focus, appToFocus)
 import Appearance exposing (Appearance)
 import Body exposing (..)
 import Camera exposing (..)
+import Camera.Util exposing (toCamera)
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
-import Model exposing (Motion, motionCamera)
+import Model exposing (Motion)
 import Orientation
 import Vehicles.DreamBuggy as DreamBuggy
 import Vehicles.DreamBird as DreamBird
@@ -104,7 +105,7 @@ bodies model =
 
 camera : Model -> Maybe Camera
 camera model =
-    Just (motionCamera model.camera)
+    Just (toCamera model.camera)
 
 
 focus : Model -> Maybe Focus
