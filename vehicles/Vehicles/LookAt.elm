@@ -1,7 +1,6 @@
 module Vehicles.LookAt exposing (lookAt)
 
-import Math.Vector3 exposing (..)
-import Math.Vector3 as V3
+import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
 
 import Body exposing (Moving)

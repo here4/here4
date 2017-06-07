@@ -5,6 +5,7 @@ import Random
 import Time exposing (Time)
 import App exposing (..)
 import Body exposing (..)
+import Camera exposing (..)
 import Ground exposing (Ground)
 import Math.RandomVector exposing (randomVec3)
 import Physics.Collisions exposing (collisions)

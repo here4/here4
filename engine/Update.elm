@@ -17,8 +17,8 @@ import Gamepad
 import GamepadInputs
 
 import App exposing (Focus)
-import Body exposing (Camera)
 import Control exposing (WorldMsg)
+import Camera exposing (Camera)
 import Camera.Follow as Follow
 import Ground exposing (Ground)
 import Vehicles.DreamBird as DreamBird

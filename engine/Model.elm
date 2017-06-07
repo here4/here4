@@ -7,7 +7,8 @@ import Task exposing (Task)
 import Window
 import Orientation exposing (Orientation)
 import Bag
-import Body exposing (Body, Camera, Oriented)
+import Body exposing (Body, Oriented)
+import Camera exposing (Camera)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 

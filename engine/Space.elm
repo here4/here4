@@ -23,7 +23,7 @@ import Model
 import Update
 import View
 import App exposing (Focus)
-import Body exposing (Camera)
+import Camera exposing (Camera)
 import Ground exposing (Ground)
 
 
