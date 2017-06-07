@@ -17,14 +17,14 @@ welcome motion =
     motion
 
 lookAt : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
-lookAt fpos ground inputs motion =
+lookAt target ground inputs motion =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
 
-        -- The original position, relative to fpos
+        -- The original position, relative to target
         p =
-            V3.sub fpos motion.position
+            V3.sub target motion.position
 
         -- Some point directly above a given point
         upwardsFrom p =
@@ -45,7 +45,7 @@ lookAt fpos ground inputs motion =
 
         -- Limit how close you can get. This should be a function of the size of the thing.
         closePos =
-            if V3.length (V3.sub fpos cPos) < 3.0 then
+            if V3.length (V3.sub target cPos) < 3.0 then
                 motion.position
             else
                 cPos
@@ -58,28 +58,28 @@ lookAt fpos ground inputs motion =
             let (r, theta, phi) = toSpherical (x,y,z)
             in fromSpherical (r, theta+dTheta, phi+dPhi)
 
-        cv = V3.sub closePos fpos
+        cv = V3.sub closePos target
         (cx, cy, cz) = V3.toTuple cv
 
         (nx, ny, nz) = moveAroundSphere inputYaw inputPitch (cx, cy, cz)
 
-        wantPos = V3.add fpos <| V3.fromTuple (nx, ny, nz)
+        wantPos = V3.add target <| V3.fromTuple (nx, ny, nz)
 
 {-
         yaw =
             Orientation.fromAngleAxis inputYaw V3.j
 
         xzPos =
-            Orientation.rotateBodyV yaw <| V3.sub closePos fpos
+            Orientation.rotateBodyV yaw <| V3.sub closePos target
 
         wantPos =
-            V3.add fpos xzPos
+            V3.add target xzPos
 -}
 
         {-
            pitchAxis = V3.cross xzPos V3.j
            pitchQ = Qn.fromAngleAxis inputPitch pitchAxis
-           wantPos = V3.add fpos <| Qn.vrotate pitchQ xzPos
+           wantPos = V3.add target <| Qn.vrotate pitchQ xzPos
         -}
         unboundPos =
             V3.add (V3.scale 0.3 wantPos) (V3.scale 0.7 motion.position)
@@ -96,13 +96,13 @@ lookAt fpos ground inputs motion =
             else
                 unboundPos
 
-        -- Find the orientation looking at fpos from newPos
+        -- Find the orientation looking at target from newPos
         f =
-            V3.normalize (V3.sub fpos newPos)
+            V3.normalize (V3.sub target newPos)
 
         orPos =
             Orientation.fromTo V3.k f
-            -- Orientation.fromTo newPos fpos
+            -- Orientation.fromTo newPos target
 
         -- Ensure the camera is in an upright plane
         -- camAxis = V3.cross f (V3.setY (V3.getY f + 1) f)
