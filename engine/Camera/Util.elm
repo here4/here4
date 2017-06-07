@@ -15,4 +15,4 @@ bodyCamera body =
 
 cameraUp : Player -> Vec3
 cameraUp player =
-    Orientation.rotateBodyV player.motion.orientation (V3.negate V3.j)
+    Orientation.rotateBodyV player.motion.orientation V3.j
