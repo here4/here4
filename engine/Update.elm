@@ -15,9 +15,11 @@ import Orientation exposing (fromVec3)
 import Ports
 import Gamepad
 import GamepadInputs
-import Control exposing (WorldMsg)
-import Body exposing (Camera)
+
 import App exposing (Focus)
+import Body exposing (Camera)
+import Control exposing (WorldMsg)
+import Camera.Follow as Follow
 import Ground exposing (Ground)
 import Vehicles.DreamBird as DreamBird
 import Vehicles.DreamBuggy as DreamBuggy
@@ -362,34 +364,26 @@ step terrain inputs label camera focPos player0 =
                         -- `add` Qn.vrotate player.orientQn (vec3 0.38 0.5 -2.3)
                     in
                         { player
-                            | cameraPos = inside -- aboveGround eyeLevel behind
+                            | cameraPos = inside -- aboveGround eyeLevel inside
                             , cameraUp = Model.cameraUp player
                         }
                 else
                     let
-                        behind =
-                            sub player.motion.position (V3.scale 17 (Model.direction player.motion))
-
-                        p =
-                            toRecord player.motion.position
-
-                        newCameraPos =
-                            if p.y < Model.eyeLevel then
-                                behind
-                            else
-                                add (vec3 0 6 0) behind
+                        newCameraPos = Follow.follow terrain player.motion
 
                         cameraPos =
-                            aboveGround eyeLevel
-                                (V3.add (V3.scale 0.5 newCameraPos) (V3.scale 0.5 player.cameraPos)) -- smooth
+                            (V3.add (V3.scale 0.5 newCameraPos) (V3.scale 0.5 player.cameraPos)) -- smooth
 
                         newCameraUp =
                             Model.cameraUp player
+
+                        cameraUp =
+                            (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
+
                     in
                         { player
                             | cameraPos = terrain.bounds cameraPos
-                            , cameraUp =
-                                (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
+                            , cameraUp = cameraUp
                         }
         in
             player0

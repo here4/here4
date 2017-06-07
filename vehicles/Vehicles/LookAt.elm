@@ -9,13 +9,6 @@ import Ground exposing (Ground)
 import Model
 
 
-----------------------------------------------------------------------
--- LookAt
-
-welcome : Model.Motion -> Model.Motion
-welcome motion =
-    motion
-
 lookAt : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 lookAt target ground inputs motion =
     let
