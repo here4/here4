@@ -22,17 +22,9 @@ lookAt target ground inputs motion =
         eyeLevel pos =
             1.8 + ground.elevation pos
 
-        -- The original position, relative to target
-        p =
-            V3.sub target motion.position
-
-        -- Some point directly above a given point
-        upwardsFrom p =
-            V3.setY (V3.getY p + 1) p
-
         -- inputs
-        upDown =
-            V3.scale (3.0 * inputs.y) (V3.normalize p)
+        inputNearFar =
+            inputs.y * 30 * inputs.dt
 
         inputYaw =
             inputs.mx * 30 * inputs.dt
@@ -40,8 +32,61 @@ lookAt target ground inputs motion =
         inputPitch =
             inputs.my * 30 * inputs.dt
 
+        -- The original position, relative from target
+        p =
+            V3.sub target motion.position
+
+        -- Some point directly above a given point
+        upwardsFrom p =
+            V3.setY (V3.getY p + 1) p
+
+        -- Vector to move closer to target
+        moveCloser =
+            V3.scale inputNearFar (V3.normalize p)
+
         cPos =
-            V3.add motion.position upDown
+            V3.add motion.position moveCloser
+
+        -- Limit how close you can get. This should be a function of the size of the thing.
+        closePos =
+            if V3.length (V3.sub target cPos) < 3.0 then
+                motion.position
+            else
+                cPos
+
+    in
+        { motion | position = closePos }
+
+
+totalRandomStuff target ground inputs motion =
+    let
+        eyeLevel pos =
+            1.8 + ground.elevation pos
+
+        -- inputs
+        inputNearFar =
+            inputs.y * 30 * inputs.dt
+
+        inputYaw =
+            inputs.mx * 30 * inputs.dt
+
+        inputPitch =
+            inputs.my * 30 * inputs.dt
+
+        -- The original position, relative from target
+        p =
+            V3.sub target motion.position
+
+        -- Some point directly above a given point
+        upwardsFrom p =
+            V3.setY (V3.getY p + 1) p
+
+        -- Vector to move closer to target
+        moveCloser =
+            V3.scale inputNearFar (V3.normalize p)
+
+        cPos =
+            V3.add motion.position moveCloser
 
         -- Limit how close you can get. This should be a function of the size of the thing.
         closePos =
