@@ -17,117 +17,108 @@ welcome motion =
     motion
 
 lookAt : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
-lookAt focPos ground inputs thing =
+lookAt fpos ground inputs motion =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
-    in
-        move (Just focPos) eyeLevel inputs thing
 
-move : Maybe Vec3 -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
-move focPos eyeLevel inputs motion =
-    case focPos of
-        Nothing ->
-            motion
+        -- The original position, relative to fpos
+        p =
+            V3.sub fpos motion.position
 
-        Just fpos ->
-            let
-                -- Some point directly above a given point
-                upwardsFrom p =
-                    V3.setY (V3.getY p + 1) p
+        -- Some point directly above a given point
+        upwardsFrom p =
+            V3.setY (V3.getY p + 1) p
 
-                p =
-                    V3.sub fpos motion.position
+        -- inputs
+        upDown =
+            V3.scale (3.0 * inputs.y) (V3.normalize p)
 
-                -- inputs
-                upDown =
-                    V3.scale (3.0 * inputs.y) (V3.normalize p)
+        inputYaw =
+            inputs.mx * 30 * inputs.dt
 
-                inputYaw =
-                    inputs.mx * 30 * inputs.dt
+        inputPitch =
+            inputs.my * 30 * inputs.dt
 
-                inputPitch =
-                    inputs.my * 30 * inputs.dt
+        cPos =
+            V3.add motion.position upDown
 
-                cPos =
-                    V3.add motion.position upDown
+        -- Limit how close you can get. This should be a function of the size of the thing.
+        closePos =
+            if V3.length (V3.sub fpos cPos) < 3.0 then
+                motion.position
+            else
+                cPos
 
-                -- Limit how close you can get. This should be a function of the size of the thing.
-                closePos =
-                    if V3.length (V3.sub fpos cPos) < 3.0 then
-                        motion.position
-                    else
-                        cPos
+        fromSpherical (r, theta, phi) = (r * sin theta * cos phi, r * sin theta * sin phi, r * cos theta)
+        toSpherical (x,y,z) = let r = sqrt(x*x+y*y+z*z) in (r, acos (z/r), atan2 y x)
 
-                fromSpherical (r, theta, phi) = (r * sin theta * cos phi, r * sin theta * sin phi, r * cos theta)
-                toSpherical (x,y,z) = let r = sqrt(x*x+y*y+z*z) in (r, acos (z/r), atan2 y x)
+        -- Move around a sphere centered at the origin
+        moveAroundSphere dTheta dPhi (x,y,z) =
+            let (r, theta, phi) = toSpherical (x,y,z)
+            in fromSpherical (r, theta+dTheta, phi+dPhi)
 
-                -- Move around a sphere centered at the origin
-                moveAroundSphere dTheta dPhi (x,y,z) =
-                    let (r, theta, phi) = toSpherical (x,y,z)
-                    in fromSpherical (r, theta+dTheta, phi+dPhi)
+        cv = V3.sub closePos fpos
+        (cx, cy, cz) = V3.toTuple cv
 
-                cv = V3.sub closePos fpos
-                (cx, cy, cz) = V3.toTuple cv
-     
-                (nx, ny, nz) = moveAroundSphere inputYaw inputPitch (cx, cy, cz)
-     
-                wantPos = V3.add fpos <| V3.fromTuple (nx, ny, nz)
+        (nx, ny, nz) = moveAroundSphere inputYaw inputPitch (cx, cy, cz)
+
+        wantPos = V3.add fpos <| V3.fromTuple (nx, ny, nz)
 
 {-
-                yaw =
-                    Orientation.fromAngleAxis inputYaw V3.j
+        yaw =
+            Orientation.fromAngleAxis inputYaw V3.j
 
-                xzPos =
-                    Orientation.rotateBodyV yaw <| V3.sub closePos fpos
+        xzPos =
+            Orientation.rotateBodyV yaw <| V3.sub closePos fpos
 
-                wantPos =
-                    V3.add fpos xzPos
+        wantPos =
+            V3.add fpos xzPos
 -}
 
-                {-
-                   pitchAxis = V3.cross xzPos V3.j
-                   pitchQ = Qn.fromAngleAxis inputPitch pitchAxis
-                   wantPos = V3.add fpos <| Qn.vrotate pitchQ xzPos
-                -}
-                unboundPos =
-                    V3.add (V3.scale 0.3 wantPos) (V3.scale 0.7 motion.position)
+        {-
+           pitchAxis = V3.cross xzPos V3.j
+           pitchQ = Qn.fromAngleAxis inputPitch pitchAxis
+           wantPos = V3.add fpos <| Qn.vrotate pitchQ xzPos
+        -}
+        unboundPos =
+            V3.add (V3.scale 0.3 wantPos) (V3.scale 0.7 motion.position)
 
-                u =
-                    toRecord unboundPos
+        u =
+            toRecord unboundPos
 
-                e =
-                    eyeLevel unboundPos
+        e =
+            eyeLevel unboundPos
 
-                newPos =
-                    if u.y < e then
-                        vec3 u.x e u.z
-                    else
-                        unboundPos
+        newPos =
+            if u.y < e then
+                vec3 u.x e u.z
+            else
+                unboundPos
 
-                -- Find the orientation looking at fpos from newPos
-                f =
-                    V3.normalize (V3.sub fpos newPos)
+        -- Find the orientation looking at fpos from newPos
+        f =
+            V3.normalize (V3.sub fpos newPos)
 
-                orPos =
-                    -- Orientation.fromTo V3.k f
-                    Orientation.fromTo newPos fpos
+        orPos =
+            Orientation.fromTo V3.k f
+            -- Orientation.fromTo newPos fpos
 
-                -- Ensure the camera is in an upright plane
-                -- camAxis = V3.cross f (V3.setY (V3.getY f + 1) f)
-                camAxis =
-                    V3.cross f (upwardsFrom f)
+        -- Ensure the camera is in an upright plane
+        -- camAxis = V3.cross f (V3.setY (V3.getY f + 1) f)
+        camAxis =
+            V3.cross f (upwardsFrom f)
 
-                camQ =
-                    Orientation.fromAngleAxis (pi / 2) camAxis
+        camQ =
+            Orientation.fromAngleAxis (pi / 2) camAxis
 
-                cam =
-                    Orientation.rotateBodyV camQ f
+        cam =
+            Orientation.rotateBodyV camQ f
 
-                orCam =
-                    Orientation.fromTo (Orientation.rotateBodyV orPos V3.j) cam
+        orCam =
+            Orientation.fromTo (Orientation.rotateBodyV orPos V3.j) cam
 
-                orientation =
-                    Orientation.followedBy orCam orPos
-            in
-                { motion | position = newPos, orientation = orientation }
+        orientation =
+            Orientation.followedBy orCam orPos
+    in
+        { motion | position = newPos, orientation = orientation }
