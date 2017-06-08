@@ -1,4 +1,4 @@
-module Statue exposing (create, VehicleType(..))
+module Statue exposing (create)
 
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
@@ -13,14 +13,7 @@ import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Motion)
 import Orientation
-import Vehicles.DreamBuggy as DreamBuggy
-import Vehicles.DreamBird as DreamBird
 import Camera.DollyArc as Camera
-
-
-type VehicleType
-    = Buggy
-    | Bird
 
 
 type alias Model =
@@ -34,11 +27,11 @@ type alias Msg =
     ()
 
 
-create : VehicleType -> Float -> String -> Vec3 -> Appearance -> ( App, Cmd AppMsg )
-create vtype speed label pos appear =
+create : Float -> String -> Vec3 -> Appearance -> ( App, Cmd AppMsg )
+create speed label pos appear =
     App.create (init pos speed appear)
         { label = always label
-        , update = update vtype
+        , update = update
         , animate = animate
         , bodies = bodies
         , framing = framing
@@ -67,23 +60,11 @@ init pos speed appear =
     )
 
 
-update : VehicleType -> CtrlMsg Msg -> Model -> ( Model, Cmd (CtrlMsg Msg) )
-update vtype msg model =
+update : CtrlMsg Msg -> Model -> ( Model, Cmd (CtrlMsg Msg) )
+update msg model =
     case msg of
         Ctrl (Control.Move dp) ->
             ( { model | body = translate dp model.body }, Cmd.none )
-
-{-
-        Ctrl (Control.Drive ground inputs) ->
-            -- ( { model | camera = DreamBuggy.drive ground model.speed inputs model.camera }, Cmd.none )
-            ( { model | camera = Camera.dolly model.body.position ground inputs model.camera }, Cmd.none )
-            case vtype of
-                Buggy ->
-                    ( { model | body = DreamBuggy.drive ground model.speed inputs model.body }, Cmd.none )
-
-                Bird ->
-                    ( { model | body = DreamBird.drive ground inputs model.body }, Cmd.none )
--}
 
         _ ->
             ( model, Cmd.none )
