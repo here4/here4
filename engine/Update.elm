@@ -187,7 +187,7 @@ inputsToMove inputs player =
         dp =
             vec3 -inputs.cx 0 inputs.cy
     in
-        Orientation.rotateBodyV player.motion.orientation dp
+        Orientation.rotateBodyV player.camera.orientation dp
 
 
 timeToInputs : Time -> Model.Inputs -> Model.Inputs
