@@ -321,6 +321,7 @@ step terrain inputs label camera focPos player0 =
             eyeLevel pos =
                 Model.eyeLevel + terrain.elevation pos
 
+{-
             move player =
                 case camera of
                     Just c ->
@@ -335,6 +336,7 @@ step terrain inputs label camera focPos player0 =
 
                     Nothing ->
                         player
+-}
 
             relabel player =
                 { player | rideLabel = label }
@@ -397,7 +399,7 @@ step terrain inputs label camera focPos player0 =
         in
             player0
                 |> relabel
-                |> move
+                -- |> move
                 |> smoothCamera
 
 
