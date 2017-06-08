@@ -14,6 +14,15 @@ toCamera thing =
     , orientation = thing.orientation
     }
 
+framing : Moving a -> Framing
+framing thing =
+    { target =
+        { position = thing.position
+        , orientation = thing.orientation
+        , velocity = thing.velocity
+        }
+    }
+
 
 cameraUp : { a | orientation : Orientation } -> Vec3
 cameraUp thing =

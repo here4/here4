@@ -8,7 +8,7 @@ import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Model exposing (Args)
 import Body exposing (Body)
-import Camera exposing (Camera, Shot)
+import Camera exposing (Framing, Shot)
 import App exposing (..)
 import Ground exposing (Ground)
 
@@ -35,7 +35,7 @@ create hubInit hubUpdate details =
         , label = worldLabel
         , keyLimit = worldKeyLimit
         , animate = worldAnimate
-        , camera = worldCamera
+        , framing = worldFraming
         , focus = worldFocus
         , ground = worldGround
         }
@@ -184,13 +184,13 @@ worldLabel mkey model =
                 none
 
 
-worldCamera : Maybe Bag.Key -> Ground -> Shot -> WorldModel a -> Maybe Camera
-worldCamera mkey ground shot model =
+worldFraming : Maybe Bag.Key -> WorldModel a -> Maybe Framing
+worldFraming mkey model =
     case mkey of
         Just key ->
             case Bag.get key model.apps of
                 Just app ->
-                    App.camera ground shot app
+                    App.framing app
 
                 Nothing ->
                     Nothing

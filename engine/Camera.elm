@@ -11,6 +11,16 @@ https://www.videomaker.com/article/c10/14221-camera-movement-techniques-tilt-pan
 
 type Shot = POV | Tracking
 
+type alias Target =
+    { position : Vec3
+    , orientation : Orientation
+    , velocity : Vec3
+    }
+
+type alias Framing =
+    { target : Target
+    }
+
 type alias Camera =
     { position : Vec3
     , orientation : Orientation

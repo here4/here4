@@ -23,7 +23,7 @@ import Model
 import Update
 import View
 import App exposing (Focus)
-import Camera exposing (Camera, Shot)
+import Camera exposing (Framing, Shot)
 import Ground exposing (Ground)
 
 
@@ -35,14 +35,14 @@ programWithFlags :
     , animate : Ground -> Time -> model -> model
     , keyLimit : model -> Int
     , ground : model -> Maybe Ground
-    , camera : Maybe Bag.Key -> Ground -> Shot -> model -> Maybe Camera
+    , framing : Maybe Bag.Key -> model -> Maybe Framing
     , focus : Bag.Key -> model -> Maybe Focus
     }
     -> Program Model.Args (Model.Model model) (Model.Msg (WorldMsg msg))
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.label world.keyLimit world.ground world.animate world.camera world.focus
+        , update = Update.update world.update world.label world.keyLimit world.ground world.animate world.framing world.focus
         , subscriptions = subscriptions
         , view = View.view world.view
         }

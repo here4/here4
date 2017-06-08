@@ -1,4 +1,4 @@
-module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, label, camera, noCamera, focus, update, appToFocus, orientedToFocus)
+module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, label, framing, noFraming, focus, update, appToFocus, orientedToFocus)
 
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
@@ -7,7 +7,7 @@ import Time exposing (Time)
 import WebGL exposing (Entity)
 import Appearance exposing (..)
 import Body exposing (..)
-import Camera exposing (Camera, Shot)
+import Camera exposing (Framing, Shot)
 import Control exposing (..)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
@@ -19,7 +19,7 @@ type alias Animated model msg =
     , update : msg -> model -> ( model, Cmd msg )
     , bodies : model -> List Body
     , animate : Ground -> Time -> model -> model
-    , camera : Ground -> Shot -> model -> Maybe Camera
+    , framing : model -> Maybe Framing
     , focus : model -> Maybe Focus
     }
 
@@ -93,9 +93,9 @@ packBodies f dyn =
     f (Dynamic.unpack dyn)
 
 
-packCamera : (Ground -> Shot -> a -> Maybe Camera) -> Ground -> Shot -> AppModel -> Maybe Camera
-packCamera f ground shot dyn =
-    f ground shot (Dynamic.unpack dyn)
+packFraming : (a -> Maybe Framing) -> AppModel -> Maybe Framing
+packFraming f dyn =
+    f (Dynamic.unpack dyn)
 
 
 packFocus : (a -> Maybe Focus) -> AppModel -> Maybe Focus
@@ -104,12 +104,12 @@ packFocus f dyn =
 
 
 packMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
-packMethods { label, update, animate, bodies, camera, focus } =
+packMethods { label, update, animate, bodies, framing, focus } =
     { label = packLabel label
     , update = packUpdate update
     , animate = packAnimate animate
     , bodies = packBodies bodies
-    , camera = packCamera camera
+    , framing = packFraming framing
     , focus = packFocus focus
     }
 
@@ -209,9 +209,9 @@ bodies { methods, model } =
     methods.bodies model
 
 
-camera : Ground -> Shot -> App -> Maybe Camera
-camera ground shot { methods, model } =
-    methods.camera ground shot model
+framing : App -> Maybe Framing
+framing { methods, model } =
+    methods.framing model
 
 
 focus : App -> Maybe Focus
@@ -237,5 +237,5 @@ orientedToFocus : Oriented a -> Focus
 orientedToFocus x =
     { position = x.position }
 
-noCamera : Ground -> Shot -> model -> Maybe Camera
-noCamera _ _ _ = Nothing
+noFraming : model -> Maybe Framing
+noFraming _ = Nothing

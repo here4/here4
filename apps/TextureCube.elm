@@ -8,8 +8,7 @@ import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (App, AppMsg, Focus, appToFocus)
 import Body exposing (..)
 import Camera exposing (..)
-import Camera.POV as Camera
-import Camera.Tracking as Camera
+import Camera.Util as Camera
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
@@ -21,7 +20,6 @@ import Vehicles.DreamBuggy as DreamBuggy
 
 type alias Model =
     Maybe { body : Moving Body
-          , camera : Camera
           }
 
 
@@ -36,7 +34,7 @@ create label path =
         , update = update
         , animate = animate
         , bodies = bodies
-        , camera = camera
+        , framing = framing
         , focus = focus
         }
 
@@ -71,7 +69,7 @@ update msg model =
                             , velocity = vec3 0 0 0
                             }
                     in
-                        ( Just { body = body, camera = Camera.pov body }, Cmd.none )
+                        ( Just { body = body }, Cmd.none )
 
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
@@ -104,15 +102,15 @@ bodies model_ =
             []
 
 
-camera : Ground -> Shot -> Model -> Maybe Camera
-camera ground shot model_ = flip Maybe.map model_ <| \model ->
-    case shot of
-        POV ->
-            Camera.pov model.body
+framing : Model -> Maybe Framing
+framing model_ =
+    case model_ of
+        Just model ->
+            Just (Camera.framing model.body)
 
-        Tracking ->
-            Camera.tracking ground model.body model.camera
-
+        Nothing ->
+            Nothing
+    
 
 focus : Model -> Maybe Focus
 focus model =

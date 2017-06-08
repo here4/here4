@@ -7,7 +7,10 @@ import Time exposing (Time)
 
 import App exposing (Focus)
 import Bag
-import Camera exposing (Camera, Shot(Tracking))
+import Body exposing (reposition)
+import Camera exposing (..)
+import Camera.POV as Camera
+import Camera.Tracking as Camera
 import Camera.Util as Camera
 import Control exposing (WorldMsg)
 import Dispatch exposing (..)
@@ -27,12 +30,12 @@ update :
     -> (worldModel -> Int)
     -> (worldModel -> Maybe Ground)
     -> (Ground -> Time -> worldModel -> worldModel)
-    -> (Maybe Bag.Key -> Ground -> Shot -> worldModel -> Maybe Camera)
+    -> (Maybe Bag.Key -> worldModel -> Maybe Framing)
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel
     -> ( Model worldModel, Cmd (Msg (WorldMsg worldMsg)) )
-update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamera worldFocus msg model =
+update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFraming worldFocus msg model =
     case msg of
         Model.WorldMessage worldMsg ->
             let
@@ -98,14 +101,14 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                                     worldAnimate terrain inputs1.dt model.worldModel
 
                                 -- Change ride?
-                                hasCamera key =
-                                    isJust (worldCamera (Just key) terrain Tracking wm)
+                                hasFraming key =
+                                    isJust (worldFraming (Just key) wm)
 
                                 player1 =
-                                    selectCamera hasCamera keyLimit inputs1 model.player1
+                                    selectCamera hasFraming keyLimit inputs1 model.player1
 
                                 player2 =
-                                    selectCamera hasCamera keyLimit inputs2 model.player2
+                                    selectCamera hasFraming keyLimit inputs2 model.player2
 
                                 label1 =
                                     worldLabel (player1.rideKey) wm
@@ -150,17 +153,17 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                                                 ( wm2, Cmd.none, Nothing )
 
                                 -- Camera
-                                camera1 =
-                                    worldCamera player1.rideKey terrain player1.shot wmF
+                                framing1 =
+                                    worldFraming player1.rideKey wmF
 
-                                camera2 =
-                                    worldCamera player2.rideKey terrain player2.shot wmF
+                                framing2 =
+                                    worldFraming player2.rideKey wmF
 
                                 newModel =
                                     { model
                                         | globalTime = model.globalTime + dt
-                                        , player1 = updatePlayer terrain inputs1 label1 camera1 focPos player1
-                                        , player2 = updatePlayer terrain inputs2 label2 camera2 Nothing player2
+                                        , player1 = updatePlayer terrain inputs1 label1 player1.shot framing1 player1
+                                        , player2 = updatePlayer terrain inputs2 label2 player2.shot framing2 player2
                                         , inputs = clearStationaryInputs inputs1
                                         , worldModel = wmF
                                     }
@@ -303,9 +306,17 @@ aboveGround eyeLevel pos =
         else
             pos
 
+shoot : Ground -> Shot -> Framing -> Camera -> Camera
+shoot ground shot framing camera =
+    case shot of
+        POV ->
+            Camera.pov framing.target
 
-updatePlayer : Ground -> Model.Inputs -> String -> Maybe Camera -> Maybe Vec3 -> Model.Player -> Model.Player
-updatePlayer terrain inputs label camera focPos player0 =
+        Tracking ->
+            Camera.tracking ground framing.target camera
+
+updatePlayer : Ground -> Model.Inputs -> String -> Shot -> Maybe Framing -> Model.Player -> Model.Player
+updatePlayer terrain inputs label shot framing player0 =
     if inputs.reset then
         Model.defaultPlayer
     else
@@ -317,22 +328,30 @@ updatePlayer terrain inputs label camera focPos player0 =
             relabel player =
                 { player | rideLabel = label }
 
-            smoothCamera player =
-                case camera of
-                    Just c ->
-                        let cameraPos =
-                                (V3.add (V3.scale 0.5 c.position) (V3.scale 0.5 player.camera.position))
-                                |> aboveGround eyeLevel
+            mapCamera f player =
+                { player | camera = f player.camera }
 
-                            -- TODO: slerp between old and new camera orientations
-                            -- (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
-                        in
-                            { player
-                                | camera = { c | position = cameraPos }
-                            }
+            shootFraming player =
+                case framing of
+                    Just framing_ ->
+                        mapCamera (shoot terrain shot framing_) player
 
                     Nothing ->
                         player
+
+            smoothCamera player =
+                let cameraPos =
+                    (V3.add (V3.scale 0.5 player.camera.position) (V3.scale 0.5 player0.camera.position))
+                    |> aboveGround eyeLevel
+
+                    -- TODO: slerp between old and new camera orientations
+                    -- (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
+                in
+                    mapCamera (reposition cameraPos) player
+
+                    -- { player
+                    --     | camera = { c | position = cameraPos }
+                   --  }
 
 {-
             moveCamera player =
@@ -375,17 +394,18 @@ updatePlayer terrain inputs label camera focPos player0 =
         in
             player0
                 |> relabel
+                |> shootFraming
                 |> smoothCamera
 
 
 selectCamera : (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player -> Model.Player
-selectCamera hasCamera keyLimit inputs player =
+selectCamera hasFraming keyLimit inputs player =
     let
         nextKey key =
             (key + 1) % keyLimit
 
         findCameraHelp origKey key =
-            if hasCamera key then
+            if hasFraming key then
                 key
             else
                 let

@@ -2,7 +2,7 @@ module StaticGround exposing (create)
 
 import Task exposing (Task)
 import Time exposing (Time)
-import App exposing (App, AppMsg, Focus, noCamera)
+import App exposing (App, AppMsg, Focus, noFraming)
 import Body exposing (Body)
 import Control exposing (..)
 import Dispatch exposing (..)
@@ -26,7 +26,7 @@ create makeGround =
         , update = update
         , animate = animate
         , bodies = bodies
-        , camera = noCamera
+        , framing = noFraming
         , focus = always Nothing
         }
 

@@ -7,7 +7,7 @@ import App exposing (App, AppMsg, Focus, appToFocus)
 import Appearance exposing (Appearance)
 import Body exposing (..)
 import Camera exposing (..)
-import Camera.Util exposing (toCamera)
+import Camera.Util as Camera
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
@@ -41,7 +41,7 @@ create vtype speed label pos appear =
         , update = update vtype
         , animate = animate
         , bodies = bodies
-        , camera = camera
+        , framing = framing
         , focus = focus
         }
 
@@ -103,9 +103,9 @@ bodies model =
     [ toBody model.body ]
 
 
-camera : Ground -> Shot -> Model -> Maybe Camera
-camera ground shot model =
-    Just (toCamera model.camera)
+framing : Model -> Maybe Framing
+framing model =
+    Just (Camera.framing model.body)
 
 
 focus : Model -> Maybe Focus

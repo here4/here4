@@ -6,7 +6,7 @@ import Time exposing (Time)
 import App exposing (..)
 import Body exposing (..)
 import Camera exposing (..)
-import Camera.POV as Camera
+import Camera.Util as Camera
 import Ground exposing (Ground)
 import Math.RandomVector exposing (randomVec3)
 import Physics.Collisions exposing (collisions)
@@ -33,7 +33,7 @@ create n =
         , update = update
         , animate = animate
         , bodies = bodies
-        , camera = camera
+        , framing = framing
         , focus = focus
         }
 
@@ -85,9 +85,9 @@ bodies =
     List.map toBody
 
 
-camera : Ground -> Shot -> Balls -> Maybe Camera
-camera ground shot balls =
-    Maybe.map (Camera.pov << toBody) (List.head balls)
+framing : Balls -> Maybe Framing
+framing balls =
+    Maybe.map Camera.framing (List.head balls)
 
 
 focus : Balls -> Maybe Focus

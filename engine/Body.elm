@@ -78,9 +78,9 @@ toBody x =
 -- | Reposition a Body
 
 
-reposition : Vec3 -> Body -> Body
-reposition t body =
-    { body | position = t }
+reposition : Vec3 -> Oriented a -> Oriented a
+reposition t thing =
+    { thing | position = t }
 
 
 
