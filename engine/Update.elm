@@ -330,7 +330,7 @@ step terrain inputs label camera focPos player0 =
                                 , velocity = player.motion.velocity
                                 , orientation = c.orientation
                                 }
-                            , camera = c
+                            -- , camera = c
                         }
 
                     Nothing ->
@@ -338,6 +338,23 @@ step terrain inputs label camera focPos player0 =
 
             relabel player =
                 { player | rideLabel = label }
+
+            smoothCamera player =
+                case camera of
+                    Just c ->
+                        let cameraPos =
+                                (V3.add (V3.scale 1.0 c.position) (V3.scale 0.0 player.camera.position))
+                                |> aboveGround eyeLevel
+
+                            -- TODO: slerp between old and new camera orientations
+                            -- (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
+                        in
+                            { player
+                                | camera = { c | position = cameraPos }
+                            }
+
+                    Nothing ->
+                        player
 
 {-
             moveCamera player =
@@ -381,6 +398,7 @@ step terrain inputs label camera focPos player0 =
             player0
                 |> relabel
                 |> move
+                |> smoothCamera
 
 
 selectCamera : (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player -> Model.Player

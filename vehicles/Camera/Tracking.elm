@@ -19,11 +19,17 @@ tracking ground target camera =
             sub target.position (V3.scale 17 (Model.direction target))
 
         newCameraPos =
-            add (vec3 0 6 0) behind
+            if getY behind < Model.eyeLevel then
+                behind
+            else
+                add (vec3 0 6 0) behind
 
         cameraPos =
-            ground.bounds
-                (V3.add (V3.scale 0.5 newCameraPos) (V3.scale 0.5 camera.position)) -- smooth
+            ground.bounds newCameraPos
+
+        cameraOrientation =
+            target.orientation
 
     in
-        { camera | position = cameraPos }
+        { camera | position = cameraPos
+                 , orientation = target.orientation}
