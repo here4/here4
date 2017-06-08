@@ -9,6 +9,7 @@ import App exposing (App, AppMsg, Focus, appToFocus)
 import Body exposing (..)
 import Camera exposing (..)
 import Camera.Util exposing (toCamera)
+import Camera.Follow as Camera
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
@@ -19,7 +20,9 @@ import Vehicles.DreamBuggy as DreamBuggy
 
 
 type alias Model =
-    Maybe (Moving Body)
+    Maybe { body : Moving Body
+          , camera : Camera
+          }
 
 
 type Msg
@@ -51,6 +54,9 @@ update :
     -> Model
     -> ( Model, Cmd (CtrlMsg Msg) )
 update msg model =
+    let mapBody f =
+            Maybe.map (\m -> { m | body = f m.body } ) model
+    in
     case msg of
         Self (TextureLoaded textureResult) ->
             case textureResult of
@@ -65,22 +71,19 @@ update msg model =
                             , velocity = vec3 0 0 0
                             }
                     in
-                        ( Just body, Cmd.none )
+                        ( Just { body = body, camera = toCamera body }, Cmd.none )
 
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
                     ( model, Cmd.none )
 
         Ctrl (Control.Move dp) ->
-            case model of
-                Just body ->
-                    ( Just (translate dp body), Cmd.none )
-
-                Nothing ->
-                    ( Nothing, Cmd.none )
+            ( mapBody (translate dp), Cmd.none)
+            -- ( Maybe.map (\m -> { m | body = translate dp m.body } model, Cmd.none )
 
         Ctrl (Control.Drive ground inputs) ->
-            ( Maybe.map (DreamBuggy.drive ground 8.0 inputs) model, Cmd.none )
+            ( mapBody (DreamBuggy.drive ground 8.0 inputs), Cmd.none )
+            -- ( Maybe.map (\m -> { m | body = DreamBuggy.drive ground 8.0 inputs) m.body } model, Cmd.none )
 
         Effect _ ->
             ( model, Cmd.none )
@@ -92,20 +95,25 @@ animate ground dt model =
 
 
 bodies : Model -> List Body
-bodies model =
-    case model of
-        Just body ->
-            [ toBody body ]
+bodies model_ =
+    case model_ of
+        Just model ->
+            [ toBody model.body ]
 
         Nothing ->
             []
 
 
-camera : Shot -> Model -> Maybe Camera
-camera shot model =
-    Maybe.map toCamera model
+camera : Ground -> Shot -> Model -> Maybe Camera
+camera ground shot model_ = flip Maybe.map model_ <| \model ->
+    case shot of
+        POV ->
+            toCamera model.body
+
+        Tracking ->
+            Camera.follow ground model.body model.camera
 
 
 focus : Model -> Maybe Focus
 focus model =
-    Maybe.map appToFocus model
+    Maybe.map (.body >> appToFocus) model

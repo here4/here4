@@ -184,13 +184,13 @@ worldLabel mkey model =
                 none
 
 
-worldCamera : Maybe Bag.Key -> Shot -> WorldModel a -> Maybe Camera
-worldCamera mkey shot model =
+worldCamera : Maybe Bag.Key -> Ground -> Shot -> WorldModel a -> Maybe Camera
+worldCamera mkey ground shot model =
     case mkey of
         Just key ->
             case Bag.get key model.apps of
                 Just app ->
-                    App.camera shot app
+                    App.camera ground shot app
 
                 Nothing ->
                     Nothing

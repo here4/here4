@@ -19,7 +19,7 @@ type alias Animated model msg =
     , update : msg -> model -> ( model, Cmd msg )
     , bodies : model -> List Body
     , animate : Ground -> Time -> model -> model
-    , camera : Shot -> model -> Maybe Camera
+    , camera : Ground -> Shot -> model -> Maybe Camera
     , focus : model -> Maybe Focus
     }
 
@@ -93,9 +93,9 @@ packBodies f dyn =
     f (Dynamic.unpack dyn)
 
 
-packCamera : (Shot -> a -> Maybe Camera) -> Shot -> AppModel -> Maybe Camera
-packCamera f shot dyn =
-    f shot (Dynamic.unpack dyn)
+packCamera : (Ground -> Shot -> a -> Maybe Camera) -> Ground -> Shot -> AppModel -> Maybe Camera
+packCamera f ground shot dyn =
+    f ground shot (Dynamic.unpack dyn)
 
 
 packFocus : (a -> Maybe Focus) -> AppModel -> Maybe Focus
@@ -209,9 +209,9 @@ bodies { methods, model } =
     methods.bodies model
 
 
-camera : Shot -> App -> Maybe Camera
-camera shot { methods, model } =
-    methods.camera shot model
+camera : Ground -> Shot -> App -> Maybe Camera
+camera ground shot { methods, model } =
+    methods.camera ground shot model
 
 
 focus : App -> Maybe Focus
@@ -237,5 +237,5 @@ orientedToFocus : Oriented a -> Focus
 orientedToFocus x =
     { position = x.position }
 
-noCamera : Shot -> model -> Maybe Camera
-noCamera _ _ = Nothing
+noCamera : Ground -> Shot -> model -> Maybe Camera
+noCamera _ _ _ = Nothing

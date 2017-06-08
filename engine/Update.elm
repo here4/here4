@@ -36,7 +36,7 @@ update :
     -> (worldModel -> Int)
     -> (worldModel -> Maybe Ground)
     -> (Ground -> Time -> worldModel -> worldModel)
-    -> (Maybe Bag.Key -> Shot -> worldModel -> Maybe Camera)
+    -> (Maybe Bag.Key -> Ground -> Shot -> worldModel -> Maybe Camera)
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel
@@ -108,7 +108,7 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
 
                                 -- Change ride?
                                 hasCamera key =
-                                    isJust (worldCamera (Just key) Tracking wm)
+                                    isJust (worldCamera (Just key) terrain Tracking wm)
 
                                 player1 =
                                     selectCamera hasCamera keyLimit inputs1 model.player1
@@ -160,10 +160,10 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
 
                                 -- Camera
                                 camera1 =
-                                    worldCamera player1.rideKey player1.shot wmF
+                                    worldCamera player1.rideKey terrain player1.shot wmF
 
                                 camera2 =
-                                    worldCamera player2.rideKey player2.shot wmF
+                                    worldCamera player2.rideKey terrain player2.shot wmF
 
                                 newModel =
                                     { model

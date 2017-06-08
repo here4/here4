@@ -103,8 +103,8 @@ bodies model =
     [ toBody model.body ]
 
 
-camera : Shot -> Model -> Maybe Camera
-camera shot model =
+camera : Ground -> Shot -> Model -> Maybe Camera
+camera ground shot model =
     Just (toCamera model.camera)
 
 

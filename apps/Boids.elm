@@ -75,8 +75,8 @@ bodies =
     List.map toBody
 
 
-camera : Shot -> Boids -> Maybe Camera
-camera shot boids =
+camera : Ground -> Shot -> Boids -> Maybe Camera
+camera ground shot boids =
     Maybe.map (toCamera << toBody) (List.head boids)
 
 
