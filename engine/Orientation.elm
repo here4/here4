@@ -89,7 +89,7 @@ rotateBodyM4 o =
         if angle == 0 then
             identity
         else
-            M4.rotate (2 * angle) (Qn.getAxis o |> qToW)
+            M4.rotate angle (Qn.getAxis o |> qToW)
 
 
 rotateLabM4 : Orientation -> M4.Mat4 -> M4.Mat4
@@ -101,7 +101,7 @@ rotateLabM4 o =
         if angle == 0 then
             identity
         else
-            M4.rotate (2 * angle) (Qn.getAxis o |> qToW |> V3.negate)
+            M4.rotate angle (Qn.getAxis o |> qToW |> V3.negate)
 
 
 toMat4 : Orientation -> M4.Mat4
