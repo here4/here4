@@ -9,7 +9,10 @@ http://www.empireonline.com/movies/features/film-studies-101-camera-shots-styles
 https://www.videomaker.com/article/c10/14221-camera-movement-techniques-tilt-pan-zoom-pedestal-dolly-and-truck
 -}
 
-type Shot = POV | Tracking
+type Shot =
+      POV
+    | Tracking
+    | Dolly
 
 type alias Target =
     { position : Vec3

@@ -32,4 +32,5 @@ cameraUp thing =
 nextShot : Shot -> Shot
 nextShot shot = case shot of
     POV -> Tracking
-    Tracking -> POV
+    Tracking -> Dolly
+    Dolly -> POV

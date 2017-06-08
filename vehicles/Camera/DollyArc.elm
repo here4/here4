@@ -4,12 +4,13 @@ import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
 
 import Body exposing (Moving)
+import Camera exposing (Camera, Target)
 import Ground exposing (Ground)
 import Model
 
 
-dolly : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
-dolly target ground inputs motion =
+dolly : Ground -> Model.Inputs -> Target -> Camera -> Camera
+dolly ground inputs target camera =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
@@ -20,24 +21,24 @@ dolly target ground inputs motion =
 
         -- The original position, relative from target
         p =
-            V3.sub target motion.position
+            V3.sub target.position camera.position
 
         -- Vector to move closer to target
         moveCloser =
             V3.scale inputNearFar (V3.normalize p)
 
-        cPos =
-            V3.add motion.position moveCloser
+        rawClosePos =
+            V3.add camera.position moveCloser
 
         -- Limit how close you can get. This should be a function of the size of the thing.
         closePos =
-            if V3.length (V3.sub target cPos) < 3.0 then
-                motion.position
+            if V3.length (V3.sub target.position rawClosePos) < 3.0 then
+                camera.position
             else
-                cPos
+                rawClosePos
 
     in
-        { motion | position = closePos }
+        { camera | position = closePos }
 
 
 dollyArc : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a

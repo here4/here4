@@ -10,6 +10,7 @@ import Bag
 import Body exposing (reposition)
 import Camera exposing (..)
 import Camera.POV as Camera
+import Camera.DollyArc as Camera
 import Camera.Tracking as Camera
 import Camera.Util as Camera
 import Control exposing (WorldMsg)
@@ -306,14 +307,17 @@ aboveGround eyeLevel pos =
         else
             pos
 
-shoot : Ground -> Shot -> Framing -> Camera -> Camera
-shoot ground shot framing camera =
+shoot : Ground -> Model.Inputs -> Shot -> Framing -> Camera -> Camera
+shoot ground inputs shot framing camera =
     case shot of
         POV ->
             Camera.pov framing.target
 
         Tracking ->
             Camera.tracking ground framing.target camera
+
+        Dolly ->
+            Camera.dolly ground inputs framing.target camera
 
 updatePlayer : Ground -> Model.Inputs -> String -> Shot -> Maybe Framing -> Model.Player -> Model.Player
 updatePlayer terrain inputs label shot framing player0 =
@@ -334,7 +338,7 @@ updatePlayer terrain inputs label shot framing player0 =
             shootFraming player =
                 case framing of
                     Just framing_ ->
-                        mapCamera (shoot terrain shot framing_) player
+                        mapCamera (shoot terrain inputs shot framing_) player
 
                     Nothing ->
                         player
