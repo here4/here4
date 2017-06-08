@@ -18,6 +18,7 @@ import Window
 import App exposing (..)
 import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
+import Camera exposing (Camera)
 import Camera.Util exposing (cameraUp)
 import Model exposing (Model, Msg)
 import Orientation
@@ -221,14 +222,14 @@ bodyAppear skyMatrix p body =
                 appear skyPerception
 
 
-eyeOffset : Model.Motion -> Model.Eye -> Vec3
-eyeOffset motion eye =
+eyeOffset : Model.Eye -> Camera -> Vec3
+eyeOffset eye camera =
     if eye == Model.LeftEye then
-        -- Orientation.rotateLabV motion.orientation (vec3 (-0.04) 0 0)
-        Orientation.rotateBodyV motion.orientation (vec3 (-0.04) 0 0)
+        -- Orientation.rotateLabV camera.orientation (vec3 (-0.04) 0 0)
+        Orientation.rotateBodyV camera.orientation (vec3 (-0.04) 0 0)
     else if eye == Model.RightEye then
-        -- Orientation.rotateLabV motion.orientation (vec3 0.04 0 0)
-        Orientation.rotateBodyV motion.orientation (vec3 0.04 0 0)
+        -- Orientation.rotateLabV camera.orientation (vec3 0.04 0 0)
+        Orientation.rotateBodyV camera.orientation (vec3 0.04 0 0)
     else
         vec3 0 0 0
 
@@ -286,8 +287,8 @@ renderWorld globalTime world eye windowSize player =
 perspective : Window.Size -> Model.Player -> Model.Eye -> Mat4
 perspective { width, height } player eye =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
-        (M4.makeLookAt (add player.camera.position (eyeOffset player.motion eye))
-            (add player.camera.position (scale 3 (Model.direction player.motion)))
+        (M4.makeLookAt (add player.camera.position (eyeOffset eye player.camera))
+            (add player.camera.position (scale 3 (Model.direction player.camera)))
             (cameraUp player.camera)
         )
 
@@ -296,7 +297,7 @@ skyboxMatrix : Window.Size -> Model.Player -> Mat4
 skyboxMatrix { width, height } player =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
         (M4.makeLookAt (vec3 0 0 0)
-            (scale 3 (Model.direction player.motion))
+            (scale 3 (Model.direction player.camera))
             (cameraUp player.camera)
         )
 
