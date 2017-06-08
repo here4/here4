@@ -8,7 +8,6 @@ import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (App, AppMsg, Focus, appToFocus)
 import Body exposing (..)
 import Camera exposing (..)
-import Camera.Util exposing (toCamera)
 import Camera.POV as Camera
 import Camera.Tracking as Camera
 import Control exposing (CtrlMsg)
@@ -72,7 +71,7 @@ update msg model =
                             , velocity = vec3 0 0 0
                             }
                     in
-                        ( Just { body = body, camera = toCamera body }, Cmd.none )
+                        ( Just { body = body, camera = Camera.pov body }, Cmd.none )
 
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
