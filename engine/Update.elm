@@ -329,7 +329,7 @@ updatePlayer terrain inputs label camera focPos player0 =
                 case camera of
                     Just c ->
                         let cameraPos =
-                                (V3.add (V3.scale 1.0 c.position) (V3.scale 0.0 player.camera.position))
+                                (V3.add (V3.scale 0.5 c.position) (V3.scale 0.5 player.camera.position))
                                 |> aboveGround eyeLevel
 
                             -- TODO: slerp between old and new camera orientations
