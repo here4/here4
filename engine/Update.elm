@@ -167,8 +167,8 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldCamer
                                 newModel =
                                     { model
                                         | globalTime = model.globalTime + dt
-                                        , player1 = step terrain inputs1 label1 camera1 focPos player1
-                                        , player2 = step terrain inputs2 label2 camera2 Nothing player2
+                                        , player1 = updatePlayer terrain inputs1 label1 camera1 focPos player1
+                                        , player2 = updatePlayer terrain inputs2 label2 camera2 Nothing player2
                                         , inputs = clearStationaryInputs inputs1
                                         , worldModel = wmF
                                     }
@@ -312,8 +312,8 @@ aboveGround eyeLevel pos =
             pos
 
 
-step : Ground -> Model.Inputs -> String -> Maybe Camera -> Maybe Vec3 -> Model.Player -> Model.Player
-step terrain inputs label camera focPos player0 =
+updatePlayer : Ground -> Model.Inputs -> String -> Maybe Camera -> Maybe Vec3 -> Model.Player -> Model.Player
+updatePlayer terrain inputs label camera focPos player0 =
     if inputs.reset then
         Model.defaultPlayer
     else
