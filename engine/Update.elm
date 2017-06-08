@@ -20,7 +20,6 @@ import App exposing (Focus)
 import Control exposing (WorldMsg)
 import Camera exposing (Camera, Shot(Tracking))
 import Camera.Util as Camera
-import Camera.Follow as Follow
 import Ground exposing (Ground)
 import Vehicles.DreamBird as DreamBird
 import Vehicles.DreamBuggy as DreamBuggy

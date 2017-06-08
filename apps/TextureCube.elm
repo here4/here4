@@ -9,7 +9,7 @@ import App exposing (App, AppMsg, Focus, appToFocus)
 import Body exposing (..)
 import Camera exposing (..)
 import Camera.Util exposing (toCamera)
-import Camera.Follow as Camera
+import Camera.Tracking as Camera
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
@@ -111,7 +111,7 @@ camera ground shot model_ = flip Maybe.map model_ <| \model ->
             toCamera model.body
 
         Tracking ->
-            Camera.follow ground model.body model.camera
+            Camera.tracking ground model.body model.camera
 
 
 focus : Model -> Maybe Focus

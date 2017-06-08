@@ -1,4 +1,4 @@
-module Camera.Follow exposing (follow)
+module Camera.Tracking exposing (tracking)
 
 import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
@@ -8,8 +8,8 @@ import Camera exposing (..)
 import Ground exposing (Ground)
 import Model
 
-follow : Ground -> Moving a -> Camera -> Camera
-follow ground target camera =
+tracking : Ground -> Moving a -> Camera -> Camera
+tracking ground target camera =
     let
         eyeLevel pos =
             Model.eyeLevel + ground.elevation pos
