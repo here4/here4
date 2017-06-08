@@ -15,7 +15,7 @@ import Model exposing (Motion)
 import Orientation
 import Vehicles.DreamBuggy as DreamBuggy
 import Vehicles.DreamBird as DreamBird
-import Vehicles.LookAt as LookAt
+import Camera.DollyArc as Camera
 
 
 type VehicleType
@@ -75,7 +75,7 @@ update vtype msg model =
 
         Ctrl (Control.Drive ground inputs) ->
             -- ( { model | camera = DreamBuggy.drive ground model.speed inputs model.camera }, Cmd.none )
-            ( { model | camera = LookAt.lookAt model.body.position ground inputs model.camera }, Cmd.none )
+            ( { model | camera = Camera.dolly model.body.position ground inputs model.camera }, Cmd.none )
 {-
             case vtype of
                 Buggy ->

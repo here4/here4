@@ -1,4 +1,4 @@
-module Vehicles.LookAt exposing (lookAt)
+module Camera.DollyArc exposing (dolly, dollyArc)
 
 import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
@@ -8,8 +8,8 @@ import Ground exposing (Ground)
 import Model
 
 
-lookAt : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
-lookAt target ground inputs motion =
+dolly : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+dolly target ground inputs motion =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
@@ -18,19 +18,9 @@ lookAt target ground inputs motion =
         inputNearFar =
             inputs.y * 30 * inputs.dt
 
-        inputYaw =
-            inputs.mx * 30 * inputs.dt
-
-        inputPitch =
-            inputs.my * 30 * inputs.dt
-
         -- The original position, relative from target
         p =
             V3.sub target motion.position
-
-        -- Some point directly above a given point
-        upwardsFrom p =
-            V3.setY (V3.getY p + 1) p
 
         -- Vector to move closer to target
         moveCloser =
@@ -50,7 +40,8 @@ lookAt target ground inputs motion =
         { motion | position = closePos }
 
 
-totalRandomStuff target ground inputs motion =
+dollyArc : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+dollyArc target ground inputs motion =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos

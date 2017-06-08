@@ -4,27 +4,19 @@ import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Maybe.Extra exposing (isJust)
 import Time exposing (Time)
-import Bag
-import Dispatch exposing (..)
-import Model exposing (Model, Msg)
-import Orientation exposing (fromVec3)
-
-
--- import Quaternion as Qn -- Don't expose this here
-
-import Ports
-import Gamepad
-import GamepadInputs
 
 import App exposing (Focus)
-import Control exposing (WorldMsg)
+import Bag
 import Camera exposing (Camera, Shot(Tracking))
 import Camera.Util as Camera
+import Control exposing (WorldMsg)
+import Dispatch exposing (..)
+import Gamepad
+import GamepadInputs
 import Ground exposing (Ground)
-import Vehicles.DreamBird as DreamBird
-import Vehicles.DreamBuggy as DreamBuggy
-import Vehicles.LookAt as LookAt
-import Vehicles.DreamDebug as DreamDebug
+import Model exposing (Model, Msg)
+import Orientation exposing (fromVec3)
+import Ports
 
 
 {-| Take a Msg and a Model and return an updated Model
