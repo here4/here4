@@ -49,14 +49,17 @@ cameraUp thing =
     Orientation.rotateBodyV thing.orientation V3.j
 
 
--- | Point the camera towards target, keeping it as upright as possible
+-- | Point the camera towards target
 retarget : Target -> Camera -> Camera
 retarget target camera =
     let
         displacement = V3.sub target.position camera.position
 
         orientation =
-            Orientation.upright <| Orientation.fromTo V3.k displacement
+            Orientation.fromTo V3.k displacement
     in
         { camera | orientation = orientation
                  , target = target }
+
+upright : Camera -> Camera
+upright camera = { camera | orientation = Orientation.upright camera.orientation }
