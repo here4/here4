@@ -345,7 +345,7 @@ updatePlayer terrain inputs label shot framing player0 =
 
             smoothCamera player =
                 let cameraPos =
-                    (V3.add (V3.scale 0.5 player.camera.position) (V3.scale 0.5 player0.camera.position))
+                    (V3.add (V3.scale 0.9 player.camera.position) (V3.scale 0.1 player0.camera.position))
                     |> aboveGround eyeLevel
 
                     -- TODO: slerp between old and new camera orientations
