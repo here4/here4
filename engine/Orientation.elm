@@ -48,6 +48,9 @@ fromVec3 =
 fromAngleAxis : Float -> V3.Vec3 -> Orientation
 fromAngleAxis angle axis = Qn.fromAngleAxis angle (wToQ axis)
 
+getAxis : Orientation -> V3.Vec3
+getAxis = Qn.getAxis >> qToW
+
 fromTo : V3.Vec3 -> V3.Vec3 -> Orientation
 fromTo u v = Qn.fromTo (wToQ u) (wToQ v)
 
@@ -116,3 +119,42 @@ toMat4 =
     in
         -- Qn.toMat4 >> M4.mul flipY
         Qn.toMat4
+
+
+-- | Projection onto the plane containing vectors v1, v2
+v3_projectPlane v2 v3 v1 =
+    let
+        n = V3.normalize <| V3.cross v2 v3
+    in
+        V3.sub v1 (V3.scale (V3.dot v1 n) n)
+
+
+upright : Orientation -> Orientation
+upright o =
+    let
+        axis = getAxis o
+
+        up = rotateBodyV o V3.j
+
+        newUp = v3_projectPlane axis V3.j up
+
+        ur = fromTo up newUp
+    in
+        followedBy ur o
+
+{-
+        camQ =
+            Orientation.fromAngleAxis (pi / 2) axis
+
+        cam =
+            Orientation.rotateBodyV camQ displacement
+
+        orCam =
+            Orientation.fromTo (Orientation.rotateBodyV camera.orientation V3.j) cam
+
+        orientation =
+            Orientation.followedBy orCam camera.orientation
+    in
+        { camera | orientation = orientation }
+-}
+
