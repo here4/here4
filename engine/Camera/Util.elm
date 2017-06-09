@@ -6,6 +6,13 @@ import Orientation exposing (Orientation)
 import Body exposing (..)
 import Camera exposing (..)
 
+
+nextShot : Shot -> Shot
+nextShot shot = case shot of
+    POV -> Tracking
+    Tracking -> Dolly
+    Dolly -> POV
+
 toTarget : Moving a -> Target
 toTarget thing =
     { position = thing.position
@@ -42,8 +49,14 @@ cameraUp thing =
     Orientation.rotateBodyV thing.orientation V3.j
 
 
-nextShot : Shot -> Shot
-nextShot shot = case shot of
-    POV -> Tracking
-    Tracking -> Dolly
-    Dolly -> POV
+-- | Point the camera towards target, keeping it as upright as possible
+retarget : Target -> Camera -> Camera
+retarget target camera =
+    let
+        displacement = V3.sub target.position camera.position
+
+        orientation =
+            Orientation.upright <| Orientation.fromTo V3.k displacement
+    in
+        { camera | orientation = orientation
+                 , target = target }
