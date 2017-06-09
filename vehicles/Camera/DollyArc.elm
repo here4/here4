@@ -26,7 +26,7 @@ dolly ground inputs target camera =
 
         -- New position of the camera, just tracking the target
         trackingPosition =
-            V3.add originalDisplacement target.position
+            V3.add target.position originalDisplacement
 
         -- Vector to move closer to target
         moveCloser =
