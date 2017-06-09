@@ -122,11 +122,13 @@ toMat4 =
 
 
 -- | Projection onto the plane containing vectors v1, v2
-v3_projectPlane v2 v3 v1 =
+v3_projectPlane v1 v2 u =
     let
-        n = V3.normalize <| V3.cross v2 v3
+        -- normal vector to the plane containing v1, v2
+        n = V3.normalize <| V3.cross v1 v2
     in
-        V3.sub v1 (V3.scale (V3.dot v1 n) n)
+        -- u, without its component that is not in the plane
+        V3.sub u (V3.scale (V3.dot u n) n)
 
 
 upright : Orientation -> Orientation
@@ -136,9 +138,9 @@ upright o =
 
         up = rotateBodyV o V3.j
 
-        newUp = v3_projectPlane axis V3.j up
+        upProj = v3_projectPlane axis V3.j up
 
-        ur = fromTo up newUp
+        ur = fromTo up upProj
     in
         followedBy ur o
 
