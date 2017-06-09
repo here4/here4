@@ -5,6 +5,7 @@ import Orientation as Orientation
 
 import Body exposing (Moving)
 import Camera exposing (Camera, Target)
+import Camera.Util as Camera
 import Ground exposing (Ground)
 import Model
 
@@ -35,6 +36,7 @@ dolly ground inputs target camera =
         newPosition =
             V3.add trackingPosition moveCloser
 
+        -- Displacement looking at target from newPosition
         newDisplacement =
             V3.sub target.position newPosition
 
@@ -45,13 +47,8 @@ dolly ground inputs target camera =
             else
                 newPosition
 
-        orientation =
-            Orientation.fromTo V3.k newDisplacement
+    in Camera.retarget target { camera | position = position }
 
-    in
-        { camera | position = position
-                 , orientation = orientation
-                 , target = target }
 
 
 dollyArc : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
@@ -137,6 +134,8 @@ dollyArc target ground inputs motion =
                 vec3 u.x e u.z
             else
                 unboundPos
+
+        -- TODO: Use Camera.retarget from here
 
         -- Find the orientation looking at target from newPos
         f =
