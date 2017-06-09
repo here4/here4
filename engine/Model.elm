@@ -9,6 +9,7 @@ import Orientation exposing (Orientation)
 import Bag
 import Body exposing (Body, Oriented)
 import Camera exposing (Camera, Shot(..))
+import Camera.Util exposing (toCamera)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 
@@ -75,7 +76,7 @@ defaultMotion =
     }
 
 defaultCamera : Camera
-defaultCamera =
+defaultCamera = toCamera
     { position = vec3 0 eyeLevel 0
     , orientation = Orientation.initial
     }

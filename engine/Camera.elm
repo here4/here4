@@ -27,4 +27,5 @@ type alias Framing =
 type alias Camera =
     { position : Vec3
     , orientation : Orientation
+    , target : Target
     }

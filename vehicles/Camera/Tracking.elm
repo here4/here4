@@ -5,6 +5,7 @@ import Orientation as Orientation
 
 import Body exposing (Moving)
 import Camera exposing (..)
+import Camera.Util as Camera
 import Ground exposing (Ground)
 import Model
 
@@ -32,4 +33,6 @@ tracking ground target camera =
 
     in
         { camera | position = cameraPos
-                 , orientation = target.orientation}
+                 , orientation = target.orientation
+                 , target = Camera.toTarget target
+                 }

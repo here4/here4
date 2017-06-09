@@ -17,28 +17,33 @@ dolly ground inputs target camera =
 
         -- inputs
         inputNearFar =
-            inputs.y * 30 * inputs.dt
+            -inputs.y * 30 * inputs.dt
 
-        -- The original position, relative from target
-        p =
-            V3.sub target.position camera.position
+        -- The original displacement of the camera, relative to where the target was
+        originalDisplacement =
+            V3.sub camera.position camera.target.position
+
+        -- New position of the camera, just tracking the target
+        trackingPosition =
+            V3.add originalDisplacement target.position
 
         -- Vector to move closer to target
         moveCloser =
-            V3.scale inputNearFar (V3.normalize p)
+            V3.scale inputNearFar (V3.normalize originalDisplacement)
 
+        -- The new position, relative to where the target is now
         rawClosePos =
-            V3.add camera.position moveCloser
+            V3.add trackingPosition moveCloser
 
         -- Limit how close you can get. This should be a function of the size of the thing.
         closePos =
             if V3.length (V3.sub target.position rawClosePos) < 3.0 then
-                camera.position
+                trackingPosition
             else
                 rawClosePos
 
     in
-        { camera | position = closePos }
+        { camera | position = closePos, target = target }
 
 
 dollyArc : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
