@@ -24,6 +24,9 @@ build:
 	mkdir -p scripts
 	cp ${TARGET} ${DEPLOY}
 
+test:
+	elm-test
+
 publish: build
 	git add -f ${TARGET}
 	git commit -m "Update ${TARGET}"
