@@ -74,10 +74,9 @@ update msg model =
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
                     ( model, Cmd.none )
-
         Ctrl (Control.Move dp) ->
-            ( mapBody (translate dp), Cmd.none)
-            -- ( Maybe.map (\m -> { m | body = translate dp m.body } model, Cmd.none )
+            -- ( mapBody (translate dp), Cmd.none)
+            ( model, Cmd.none )
 
         Ctrl (Control.Drive ground inputs) ->
             ( mapBody (DreamBuggy.drive ground 8.0 inputs), Cmd.none )
