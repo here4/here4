@@ -8,7 +8,7 @@ import Window
 import Orientation exposing (Orientation)
 import Bag
 import Body exposing (Body, Oriented)
-import Camera exposing (Camera, Shot(..))
+import Camera exposing (Camera, Shot)
 import Camera.Util exposing (toCamera)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
@@ -39,7 +39,7 @@ type alias Motion =
 
 type alias Player =
     { camera : Camera
-    , shot : Shot
+    , shot : Maybe Shot
     , rideKey : Maybe Bag.Key
     , rideLabel : String
     , focusKey : Bag.Key
@@ -84,7 +84,7 @@ defaultCamera = toCamera
 defaultPlayer : Player
 defaultPlayer =
     { camera = defaultCamera
-    , shot = Tracking
+    , shot = Nothing
     , rideKey = Nothing
     , rideLabel = ""
     , focusKey = 0

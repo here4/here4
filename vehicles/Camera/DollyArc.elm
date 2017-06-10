@@ -4,21 +4,35 @@ import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
 
 import Body exposing (Moving)
-import Camera exposing (Camera, Target)
+import Camera exposing (..)
 import Camera.Util as Camera
 import Ground exposing (Ground)
 import Model
 
+dolly : Shot
+dolly =
+    { label = "Dolly"
+    , init = dollyInit
+    , shoot = dollyShoot
+    }
 
-dolly : Ground -> Model.Inputs -> Target -> Camera -> Camera
-dolly ground inputs target camera =
+dollyInit : Ground -> Camera -> Camera
+dollyInit ground camera =
+    let
+        target = camera.target
+        position =
+            sub target.position (V3.scale 17 (Model.direction target))
+    in Camera.retarget camera.target { camera | position = position }
+
+dollyShoot : Ground -> Input -> Target -> Camera -> Camera
+dollyShoot ground input target camera =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
 
-        -- inputs
+        -- input
         inputNearFar =
-            -inputs.y * 30 * inputs.dt
+            -input.y * 30 * input.dt
 
         -- The original displacement of the camera, relative to where the target was
         originalDisplacement =

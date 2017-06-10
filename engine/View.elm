@@ -304,6 +304,10 @@ skyboxMatrix { width, height } player =
 
 hud : Model.Player -> Int -> Int -> Html (Msg worldMsg)
 hud player left right =
+    let
+        shotLabel = Maybe.map .label player.shot
+                    |> Maybe.withDefault ""
+    in
         div
             [ style
                 [ ( "position", "absolute" )
@@ -326,7 +330,7 @@ hud player left right =
                 , Html.text " "
                 , FontAwesome.diamond white 20
                 , Html.text " "
-                , Html.text (toString player.shot)
+                , Html.text shotLabel
                 ]
             ]
 

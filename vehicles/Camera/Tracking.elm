@@ -9,12 +9,28 @@ import Camera.Util as Camera
 import Ground exposing (Ground)
 import Model
 
-tracking : Ground -> Moving a -> Camera -> Camera
-tracking ground target camera =
+tracking : Shot
+tracking =
+    { label = "Tracking"
+    , init = trackingInit
+    , shoot = trackingShoot
+    }
+
+trackingInit : Ground -> Camera -> Camera
+trackingInit ground camera =
+    let
+        target = camera.target
+        position =
+            sub target.position (V3.scale 17 (Model.direction target))
+    in Camera.retarget camera.target { camera | position = position }
+
+trackingShoot : Ground -> Input -> Moving a -> Camera -> Camera
+trackingShoot ground input target camera =
     let
         eyeLevel pos =
             Model.eyeLevel + ground.elevation pos
 
+        -- TODO: move distance by nearFar
         -- TODO: make distance relative to target size, speed
         behind =
             sub target.position (V3.scale 17 (Model.direction target))

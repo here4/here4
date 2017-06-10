@@ -6,13 +6,6 @@ import Orientation exposing (Orientation)
 import Body exposing (..)
 import Camera exposing (..)
 
-
-nextShot : Shot -> Shot
-nextShot shot = case shot of
-    POV -> Tracking
-    Tracking -> Dolly
-    Dolly -> POV
-
 toTarget : Moving a -> Target
 toTarget thing =
     { position = thing.position

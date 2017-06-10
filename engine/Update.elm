@@ -9,9 +9,9 @@ import App exposing (Focus)
 import Bag
 import Body exposing (reposition)
 import Camera exposing (..)
-import Camera.POV as Camera
-import Camera.DollyArc as Camera
-import Camera.Tracking as Camera
+import Camera.POV exposing (pov)
+import Camera.DollyArc exposing (dolly)
+import Camera.Tracking exposing (tracking)
 import Camera.Util as Camera
 import Control exposing (WorldMsg)
 import Dispatch exposing (..)
@@ -309,18 +309,16 @@ aboveGround eyeLevel pos =
 
 shoot : Ground -> Model.Inputs -> Shot -> Framing -> Camera -> Camera
 shoot ground inputs shot framing camera =
-    case shot of
-        POV ->
-            Camera.pov framing.target
+    let cameraInput =
+            { x = inputs.x
+            , y = inputs.y
+            , dt = inputs.dt
+            }
+    in
+        shot.shoot ground cameraInput framing.target camera
 
-        Tracking ->
-            Camera.tracking ground framing.target camera
-
-        Dolly ->
-            Camera.dolly ground inputs framing.target camera
-
-updatePlayer : Ground -> Model.Inputs -> String -> Shot -> Maybe Framing -> Model.Player -> Model.Player
-updatePlayer terrain inputs label shot framing player0 =
+updatePlayer : Ground -> Model.Inputs -> String -> Maybe Shot -> Maybe Framing -> Model.Player -> Model.Player
+updatePlayer terrain inputs label mshot framing player0 =
     if inputs.reset then
         Model.defaultPlayer
     else
@@ -328,6 +326,8 @@ updatePlayer terrain inputs label shot framing player0 =
             eyeLevel pos =
                 Model.eyeLevel + terrain.elevation pos
 
+            shot =
+                Maybe.withDefault tracking mshot
 
             relabel player =
                 { player | rideLabel = label }
@@ -401,6 +401,16 @@ updatePlayer terrain inputs label shot framing player0 =
                 |> shootFraming
                 |> smoothCamera
 
+nextShot : Shot -> Shot
+nextShot shot =
+    if shot.label == pov.label then
+        tracking
+    else if shot.label == tracking.label then
+        dolly
+    else if shot.label == dolly.label then
+        pov
+    else
+        tracking
 
 selectCamera : (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player -> Model.Player
 selectCamera hasFraming keyLimit inputs player =
@@ -433,11 +443,14 @@ selectCamera hasFraming keyLimit inputs player =
             else
                 Just key
 
+        ensureShot =
+            Maybe.withDefault tracking player.shot
+
         newShot =
             if inputs.changeCamera then
-                Camera.nextShot player.shot
+                Just (nextShot ensureShot)
             else
-                player.shot
+                Just ensureShot
 
         newVR =
             if inputs.changeVR then

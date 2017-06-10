@@ -4,7 +4,6 @@ module Ground
         )
 
 import Math.Vector3 as V3 exposing (Vec3)
-import Body exposing (Body)
 
 
 type alias Ground =
