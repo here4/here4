@@ -310,8 +310,8 @@ aboveGround eyeLevel pos =
 shoot : Ground -> Model.Inputs -> Shot -> Framing -> Camera -> Camera
 shoot ground inputs shot framing camera =
     let cameraInput =
-            { x = inputs.x
-            , y = inputs.y
+            { x = inputs.cx
+            , y = inputs.cy
             , dt = inputs.dt
             }
     in
