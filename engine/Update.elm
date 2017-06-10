@@ -106,10 +106,10 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
                                     isJust (worldFraming (Just key) wm)
 
                                 player1 =
-                                    selectCamera hasFraming keyLimit inputs1 model.player1
+                                    selectCamera terrain hasFraming keyLimit inputs1 model.player1
 
                                 player2 =
-                                    selectCamera hasFraming keyLimit inputs2 model.player2
+                                    selectCamera terrain hasFraming keyLimit inputs2 model.player2
 
                                 label1 =
                                     worldLabel (player1.rideKey) wm
@@ -412,8 +412,8 @@ nextShot shot =
     else
         tracking
 
-selectCamera : (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player -> Model.Player
-selectCamera hasFraming keyLimit inputs player =
+selectCamera : Ground -> (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player -> Model.Player
+selectCamera ground hasFraming keyLimit inputs player =
     let
         nextKey key =
             (key + 1) % keyLimit
@@ -446,11 +446,12 @@ selectCamera hasFraming keyLimit inputs player =
         ensureShot =
             Maybe.withDefault tracking player.shot
 
-        newShot =
+        (newShot, newCamera) =
             if inputs.changeCamera then
-                Just (nextShot ensureShot)
+                let shot = nextShot ensureShot
+                in (Just shot, shot.init ground player.camera)
             else
-                Just ensureShot
+                (Just ensureShot, player.camera)
 
         newVR =
             if inputs.changeVR then
