@@ -2,10 +2,23 @@ module Math exposing (..)
 
 import Test exposing (..)
 import Expect
-import Fuzz exposing (list, int, string)
+import Fuzz exposing (Fuzzer, conditional, float)
 
 import Orientation
-import Math.Vector3 as V3
+import Math.Vector3 as V3 exposing (Vec3)
+
+vec3 : Fuzzer Vec3
+vec3 =
+    Fuzz.map3 V3.vec3 float float float
+
+nonZeroVec3 : Fuzzer Vec3
+nonZeroVec3 =
+    conditional
+        { retries = 1
+        , fallback = always V3.i
+        , condition = \v -> V3.length v /= 0
+        }
+        vec3
 
 suite : Test
 suite =
@@ -23,4 +36,19 @@ suite =
                         , (dotY >> Expect.equal 0)
                         ]
                         proj
+{-
+        , fuzz3 nonZeroVec3 nonZeroVec3 nonZeroVec3 "Project vector onto plane" <|
+            \v1 v2 u ->
+                let proj = Orientation.v3_projectPlane v1 v2 u
+                    cross1 = V3.cross v1 proj
+                    cross2 = V3.cross v2 proj
+                    dot1 = V3.dot cross1
+                    dot2 = V3.dot cross2
+                in
+                    Expect.all
+                        [ (dot1 >> Expect.equal 0)
+                        , (dot2 >> Expect.equal 0)
+                        ]
+                        proj
+-}
         ] 
