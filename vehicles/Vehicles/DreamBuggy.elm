@@ -109,17 +109,11 @@ goForward : Model.EyeLevel -> Float -> { i | x : Float, y : Float, dt : Float } 
 goForward eyeLevel speed inputs motion =
     -- if getY motion.position > eyeLevel motion.position then motion else
     let
-        moveDir =
-            normalize (flatten (Model.direction motion))
-
-        strafeDir =
-            transform (makeRotate (degrees -90) j) moveDir
-
         move =
-            V3.scale (8.0 * inputs.y) moveDir
+            V3.scale (8.0 * inputs.y) V3.k
 
         strafe =
-            V3.scale (8.0 * inputs.x) strafeDir
+            V3.scale (8.0 * inputs.x) V3.i
 
         -- e = (eyeLevel motion.position) / 80.0 -- placement.yMult
         e =
