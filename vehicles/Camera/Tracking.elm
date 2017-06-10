@@ -30,10 +30,23 @@ trackingShoot ground input target camera =
         eyeLevel pos =
             Model.eyeLevel + ground.elevation pos
 
-        -- TODO: move distance by nearFar
+        -- input
+        inputNearFar =
+            -input.y * 30 * input.dt
+
+        -- The original displacement of the camera, relative to where the target was
+        originalDisplacement =
+            V3.sub camera.position camera.target.position
+
+        originalDistance =
+            V3.length originalDisplacement
+
+        newDistance =
+            max 3.0 (originalDistance + inputNearFar)
+
         -- TODO: make distance relative to target size, speed
         behind =
-            sub target.position (V3.scale 17 (Model.direction target))
+            sub target.position (V3.scale newDistance (Model.direction target))
 
         newCameraPos =
             if getY behind < Model.eyeLevel then
