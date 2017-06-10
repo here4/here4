@@ -21,7 +21,7 @@ trackingInit ground camera =
     let
         target = camera.target
         position =
-            sub target.position (V3.scale 17 (Model.direction target))
+            sub target.position (V3.scale 23 (Model.direction target))
     in Camera.retarget camera.target { camera | position = position }
 
 trackingShoot : Ground -> Input -> Moving a -> Camera -> Camera
@@ -53,7 +53,7 @@ trackingShoot ground input target camera =
             V3.length originalDisplacement
 
         newDistance =
-            clamp 10 100 (originalDistance + inputNearFar)
+            clamp 16 100 (originalDistance + inputNearFar)
 
         -- TODO: make distance relative to target size, speed
         behind =
