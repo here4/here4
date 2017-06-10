@@ -24,7 +24,7 @@ main =
             , Statue.create 2.0 "Landscape Diamond" (vec3 0 1.5 0) fogMountainsDiamond
             , Statue.create 4.0 "Sky Diamond" (vec3 5 1.5 1) cloudsDiamond
             , Statue.create 7.0 "Voronoi Cube" (vec3 10 0 10) voronoiCube
-            , Statue.create 3.0 "Sky Cube" (vec3 -10 0 -10) fireCube
+            , Statue.create 3.0 "Fire Cube" (vec3 -10 0 -10) fireCube
             , Statue.create 4.0 "Landscape Cube" (vec3 10 1.5 -10) fogMountainsCube
             , Boids.create 100
             , Balls.create 30
