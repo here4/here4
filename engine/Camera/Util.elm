@@ -54,5 +54,6 @@ retarget target camera =
         { camera | orientation = orientation
                  , target = target }
 
+-- | Roll a cmaera to upright
 upright : Camera -> Camera
 upright camera = { camera | orientation = Orientation.upright camera.orientation }

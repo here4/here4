@@ -22,7 +22,10 @@ dollyInit ground camera =
         target = camera.target
         position =
             sub target.position (V3.scale 17 (Model.direction target))
-    in Camera.retarget camera.target { camera | position = position }
+    in
+        { camera | position = position }
+        |> Camera.retarget camera.target
+        |> Camera.upright
 
 dollyShoot : Ground -> Input -> Target -> Camera -> Camera
 dollyShoot ground input target camera =
@@ -61,7 +64,10 @@ dollyShoot ground input target camera =
             else
                 newPosition
 
-    in Camera.retarget target { camera | position = position }
+    in
+        { camera | position = position }
+        |> Camera.retarget target
+        |> Camera.upright
 
 
 

@@ -37,6 +37,16 @@ suite =
                         ]
                         proj
 {-
+        , test "Upright" <|
+            \() ->
+                let
+                    o = Orientation.fromAngleAxis (pi/4) V3.k
+                    upr = Orientation.upright o
+                in
+                    Expect.all
+                        [ (Expect.equal Orientation.initial)
+                        ]
+                        upr
         , fuzz3 nonZeroVec3 nonZeroVec3 nonZeroVec3 "Project vector onto plane" <|
             \v1 v2 u ->
                 let proj = Orientation.v3_projectPlane v1 v2 u

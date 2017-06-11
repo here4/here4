@@ -4,6 +4,7 @@ import Math.Matrix4 as M4
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Quaternion as Qn
+import Internal.Quaternion as QnI
 
 
 type alias Orientation =
@@ -50,6 +51,9 @@ fromAngleAxis angle axis = Qn.fromAngleAxis angle (wToQ axis)
 
 getAxis : Orientation -> V3.Vec3
 getAxis = Qn.getAxis >> qToW
+
+getAngle : Orientation -> Float
+getAngle = Qn.getAngle
 
 fromTo : V3.Vec3 -> V3.Vec3 -> Orientation
 fromTo u v = Qn.fromTo (wToQ u) (wToQ v)
@@ -131,32 +135,16 @@ v3_projectPlane v1 v2 u =
         V3.sub u (V3.scale (V3.dot u n) n)
 
 
+-- | Roll to upright
 upright : Orientation -> Orientation
 upright o =
     let
-        axis = getAxis o
+        fwd = rotateBodyV o V3.k
 
         up = rotateBodyV o V3.j
 
-        upProj = v3_projectPlane axis V3.j up
+        upProj = v3_projectPlane V3.j fwd up
 
         ur = fromTo up upProj
     in
         followedBy ur o
-
-{-
-        camQ =
-            Orientation.fromAngleAxis (pi / 2) axis
-
-        cam =
-            Orientation.rotateBodyV camQ displacement
-
-        orCam =
-            Orientation.fromTo (Orientation.rotateBodyV camera.orientation V3.j) cam
-
-        orientation =
-            Orientation.followedBy orCam camera.orientation
-    in
-        { camera | orientation = orientation }
--}
-
