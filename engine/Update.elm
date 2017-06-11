@@ -451,6 +451,8 @@ selectCamera ground hasFraming keyLimit inputs player =
             if inputs.changeCamera then
                 let shot = nextShot ensureShot
                 in (Just shot, shot.init ground player.camera)
+            else if inputs.button_X then
+                (Just ensureShot, ensureShot.init ground player.camera)
             else
                 (Just ensureShot, player.camera)
 
