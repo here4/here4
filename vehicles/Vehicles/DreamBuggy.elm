@@ -8,8 +8,6 @@ import Body exposing (..)
 import Model
 import Ground exposing (Ground)
 
-import Debug
-
 ----------------------------------------------------------------------
 -- DreamBuggy
 -- | Welcome a new driver to the DreamBuggy
@@ -95,10 +93,9 @@ turn eyeLevel dx dy motion =
         clampSum low hi a0 a1 = clamp (low-a0) (hi-a0) a1
 
         orpy =
-            Debug.log "orpy" <|
-            fromRollPitchYaw ( roll
-                             , pitch -- clampSum (degrees -10) (degrees 10) pitch0 pitch
-                             , yaw -- clampSum (degrees -15) (degrees 15) yaw0 yaw
+            fromRollPitchYaw ( roll -- clampSum (degrees -10) (degrees 10) roll0 roll
+                             , pitch -- clampSum (degrees -15) (degrees 15) pitch0 pitch
+                             , yaw
                              )
 
         orientation =
