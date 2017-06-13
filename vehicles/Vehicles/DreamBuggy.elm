@@ -8,6 +8,8 @@ import Body exposing (..)
 import Model
 import Ground exposing (Ground)
 
+import Debug
+
 ----------------------------------------------------------------------
 -- DreamBuggy
 -- | Welcome a new driver to the DreamBuggy
@@ -30,7 +32,7 @@ drive ground speed inputs thing =
 move : Ground -> Float -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
 move terrain speed eyeLevel inputs motion =
     motion
-        |> turn eyeLevel inputs.mx inputs.my
+        |> turn eyeLevel inputs.mx inputs.my inputs.dt
         |> goForward eyeLevel speed inputs
         |> gravity eyeLevel inputs.dt
         |> physics eyeLevel inputs.dt
@@ -57,11 +59,9 @@ flatten v =
         normalize (vec3 r.x 0 r.z)
 
 
-turn : Model.EyeLevel -> Float -> Float -> Moving a -> Moving a
-turn eyeLevel dx dy motion =
+turn : Model.EyeLevel -> Float -> Float -> Float -> Moving a -> Moving a
+turn eyeLevel dx dy dt motion =
     let
-        (roll0, pitch0, yaw0) = Orientation.toRollPitchYaw motion.orientation
-
         motionY =
             eyeLevel motion.position
 
@@ -74,32 +74,29 @@ turn eyeLevel dx dy motion =
         leftTireY =
             eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -1 0 0)))
 
-        tirePitch =
-            0 -- atan (-(frontTireY - motionY)/0.01)
+        perp2dCCW x y = (-y, x)
 
-        tireRoll =
-            atan ((rightTireY - leftTireY) / 0.1)
+        targetUpRoll =
+            let
+                vehicleWidth = 1.0
+                (x, y) = perp2dCCW vehicleWidth (rightTireY - leftTireY)
+            in
+                vec3 x y 0
 
-        ( yaw, pitch, roll ) =
-{-
-            if getY motion.position > (eyeLevel motion.position) + 5 then -- spin if in the air
-               (dx, dy*0.1, 0)
-            else
-               (dx, (tirePitch+dy)*0.05, tireRoll*0.05)
--}
-            (dx, 0, 0)
+        targetUpPitch =
+            let
+                vehicleFwdLength = 1.0
+                (z, y) = perp2dCCW vehicleFwdLength (frontTireY - motionY)
+            in
+                vec3 0 y z
 
-        -- | clamp a1 st. low <= a0+a1 <= hi
-        clampSum low hi a0 a1 = clamp (low-a0) (hi-a0) a1
+        targetOrientation =
+            motion.orientation
+            |> rollTo targetUpRoll
+            |> pitchTo targetUpPitch
+            |> followedBy (fromAngleAxis dx V3.j)
 
-        orpy =
-            fromRollPitchYaw ( roll -- clampSum (degrees -10) (degrees 10) roll0 roll
-                             , pitch -- clampSum (degrees -15) (degrees 15) pitch0 pitch
-                             , yaw
-                             )
-
-        orientation =
-            clampBuggy (followedBy orpy motion.orientation)
+        orientation = targetOrientation
     in
         { motion | orientation = orientation }
 
