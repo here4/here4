@@ -1,4 +1,4 @@
-module Camera.DollyArc exposing (dolly, dollyArc)
+module Camera.DollyArc exposing (dolly, arc)
 
 import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
@@ -14,6 +14,13 @@ dolly =
     { label = "Dolly"
     , init = dollyInit
     , shoot = dollyShoot
+    }
+
+arc : Shot
+arc =
+    { label = "Arc"
+    , init = dollyInit
+    , shoot = arcShoot
     }
 
 dollyInit : Ground -> Camera -> Camera
@@ -71,115 +78,50 @@ dollyShoot ground input target camera =
 
 
 
-dollyArc : Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
-dollyArc target ground inputs motion =
+arcShoot : Ground -> Input -> Target -> Camera -> Camera
+arcShoot ground input target camera =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
 
-        -- inputs
-        inputNearFar =
-            inputs.y * 30 * inputs.dt
+        fromSpherical (r, theta, phi) =
+            V3.vec3 (r * sin theta * cos phi)
+                    (r * cos theta)
+                    (r * sin theta * sin phi)
 
-        inputYaw =
-            inputs.mx * 30 * inputs.dt
-
-        inputPitch =
-            inputs.my * 30 * inputs.dt
-
-        -- The original position, relative from target
-        p =
-            V3.sub target motion.position
-
-        -- Some point directly above a given point
-        upwardsFrom p =
-            V3.setY (V3.getY p + 1) p
-
-        -- Vector to move closer to target
-        moveCloser =
-            V3.scale inputNearFar (V3.normalize p)
-
-        cPos =
-            V3.add motion.position moveCloser
-
-        -- Limit how close you can get. This should be a function of the size of the thing.
-        closePos =
-            if V3.length (V3.sub target cPos) < 3.0 then
-                motion.position
-            else
-                cPos
-
-        fromSpherical (r, theta, phi) = (r * sin theta * cos phi, r * sin theta * sin phi, r * cos theta)
-        toSpherical (x,y,z) = let r = sqrt(x*x+y*y+z*z) in (r, acos (z/r), atan2 y x)
+        toSpherical v =
+            let
+                (x,y,z) = V3.toTuple v
+                r = V3.length v -- sqrt(x*x + y*y + z*z)
+            in
+                (r, acos (y/r), atan2 z x)
 
         -- Move around a sphere centered at the origin
-        moveAroundSphere dTheta dPhi (x,y,z) =
-            let (r, theta, phi) = toSpherical (x,y,z)
-            in fromSpherical (r, theta+dTheta, phi+dPhi)
+        moveAroundSphere dTheta dPhi pos =
+            let (r, theta, phi) = toSpherical pos
+                thetaNew = clamp 0 pi <| theta + dTheta
+                phiNew = phi + dPhi
+            in
+                if r == 0 || (thetaNew == 0 || thetaNew == pi) then
+                    pos
+                else
+                    fromSpherical (r, thetaNew, phiNew)
 
-        cv = V3.sub closePos target
-        (cx, cy, cz) = V3.toTuple cv
+        inputYaw =
+            -input.x * 1 * input.dt
 
-        (nx, ny, nz) = moveAroundSphere inputYaw inputPitch (cx, cy, cz)
+        inputPitch =
+            -input.y * 1 * input.dt
 
-        wantPos = V3.add target <| V3.fromTuple (nx, ny, nz)
+        -- The original displacement of the camera, relative to where the target was
+        originalDisplacement =
+            V3.sub camera.position camera.target.position
 
-{-
-        yaw =
-            Orientation.fromAngleAxis inputYaw V3.j
+        newDisplacement =
+            moveAroundSphere inputPitch inputYaw originalDisplacement
 
-        xzPos =
-            Orientation.rotateBodyV yaw <| V3.sub closePos target
-
-        wantPos =
-            V3.add target xzPos
--}
-
-        {-
-           pitchAxis = V3.cross xzPos V3.j
-           pitchQ = Qn.fromAngleAxis inputPitch pitchAxis
-           wantPos = V3.add target <| Qn.vrotate pitchQ xzPos
-        -}
-        unboundPos =
-            V3.add (V3.scale 0.3 wantPos) (V3.scale 0.7 motion.position)
-
-        u =
-            toRecord unboundPos
-
-        e =
-            eyeLevel unboundPos
-
-        newPos =
-            if u.y < e then
-                vec3 u.x e u.z
-            else
-                unboundPos
-
-        -- TODO: Use Camera.retarget from here
-
-        -- Find the orientation looking at target from newPos
-        f =
-            V3.normalize (V3.sub target newPos)
-
-        orPos =
-            Orientation.fromTo V3.k f
-            -- Orientation.fromTo newPos target
-
-        -- Ensure the camera is in an upright plane
-        -- camAxis = V3.cross f (V3.setY (V3.getY f + 1) f)
-        camAxis =
-            V3.cross f (upwardsFrom f)
-
-        camQ =
-            Orientation.fromAngleAxis (pi / 2) camAxis
-
-        cam =
-            Orientation.rotateBodyV camQ f
-
-        orCam =
-            Orientation.fromTo (Orientation.rotateBodyV orPos V3.j) cam
-
-        orientation =
-            Orientation.followedBy orCam orPos
+        position = V3.add target.position newDisplacement
     in
-        { motion | position = newPos, orientation = orientation }
+        { camera | position = position }
+        |> Camera.retarget target
+        |> Camera.upright

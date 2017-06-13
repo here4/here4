@@ -10,7 +10,7 @@ import Bag
 import Body exposing (reposition)
 import Camera exposing (..)
 import Camera.POV exposing (pov)
-import Camera.DollyArc exposing (dolly)
+import Camera.DollyArc exposing (dolly, arc)
 import Camera.Tracking exposing (tracking)
 import Camera.Util as Camera
 import Control exposing (WorldMsg)
@@ -409,6 +409,8 @@ nextShot shot =
     else if shot.label == tracking.label then
         dolly
     else if shot.label == dolly.label then
+        arc
+    else if shot.label == arc.label then
         pov
     else
         tracking
