@@ -8,6 +8,7 @@ import Body exposing (..)
 import Model
 import Ground exposing (Ground)
 
+import Debug
 
 ----------------------------------------------------------------------
 -- DreamBuggy
@@ -82,25 +83,26 @@ turn eyeLevel dx dy motion =
             atan ((rightTireY - leftTireY) / 0.1)
 
         ( yaw, pitch, roll ) =
+{-
             if getY motion.position > (eyeLevel motion.position) + 5 then -- spin if in the air
                (dx, dy*0.1, 0)
             else
                (dx, (tirePitch+dy)*0.05, tireRoll*0.05)
+-}
+            (dx, 0, 0)
 
         -- | clamp a1 st. low <= a0+a1 <= hi
         clampSum low hi a0 a1 = clamp (low-a0) (hi-a0) a1
 
         orpy =
+            Debug.log "orpy" <|
             fromRollPitchYaw ( roll
                              , pitch -- clampSum (degrees -10) (degrees 10) pitch0 pitch
                              , yaw -- clampSum (degrees -15) (degrees 15) yaw0 yaw
                              )
 
-        flatO = Orientation.fromRollPitchYaw (0, 0, yaw0)
-
         orientation =
-            -- clampBuggy (followedBy motion.orientation orpy)
-            clampBuggy (followedBy flatO orpy)
+            clampBuggy (followedBy orpy motion.orientation)
     in
         { motion | orientation = orientation }
 
