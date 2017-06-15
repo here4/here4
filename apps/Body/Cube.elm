@@ -116,12 +116,13 @@ rotatedFace ( angleX, angleY, coordX ) =
             makeRotate (degrees angleY) (vec3 0 1 0)
 
         t =
-            mul x (mul y (makeTranslate (vec3 0 0 1)))
+            M4.transform (mul x (mul y (makeTranslate (vec3 0 0 0.5))))
+            >> add (vec3 0 0.5 0)
 
         each f ( a, b, c ) =
             ( f a, f b, f c )
     in
-        List.map (each (\x -> { x | pos = M4.transform t x.pos, coord = add (vec3 coordX 0 0) x.coord })) face
+        List.map (each (\x -> { x | pos = t x.pos, coord = add (vec3 coordX 0 0) x.coord })) face
 
 
 face : List (Triple Vertex)
@@ -131,16 +132,20 @@ face =
             vec3 1 1 1
 
         topLeft =
-            { pos = vec3 -1 1 0, color = white, coord = vec3 0 1 0 }
+            -- { pos = vec3 -1 1 0, color = white, coord = vec3 0 1 0 }
+            { pos = vec3 -0.5 0.5 0, color = white, coord = vec3 0 1 0 }
 
         topRight =
-            { pos = vec3 1 1 0, color = white, coord = vec3 1 1 0 }
+            -- { pos = vec3 1 1 0, color = white, coord = vec3 1 1 0 }
+            { pos = vec3 0.5 0.5 0, color = white, coord = vec3 1 1 0 }
 
         bottomLeft =
-            { pos = vec3 -1 -1 0, color = white, coord = vec3 0 0 0 }
+            -- { pos = vec3 -1 -1 0, color = white, coord = vec3 0 0 0 }
+            { pos = vec3 -0.5 -0.5 0, color = white, coord = vec3 0 0 0 }
 
         bottomRight =
-            { pos = vec3 1 -1 0, color = white, coord = vec3 1 0 0 }
+            -- { pos = vec3 1 -1 0, color = white, coord = vec3 1 0 0 }
+            { pos = vec3 0.5 -0.5 0, color = white, coord = vec3 1 0 0 }
     in
         [ ( topLeft, topRight, bottomLeft )
         , ( bottomLeft, topRight, bottomRight )
