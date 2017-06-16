@@ -139,6 +139,7 @@ v3_projectPlane v1 v2 u =
 rollUpright : Orientation -> Orientation
 rollUpright = rollTo V3.j
 
+-- | Project rotated V3.j onto plane formed by V3.j and rotated V3.k
 rollTo : V3.Vec3 -> Orientation -> Orientation
 rollTo targetUp o =
     let
@@ -166,6 +167,7 @@ rollTo targetUp o =
 pitchUpright : Orientation -> Orientation
 pitchUpright = pitchTo V3.j
 
+-- | Project rotated V3.j onto plane formed by V3.j and rotated V3.i
 pitchTo : V3.Vec3 -> Orientation -> Orientation
 pitchTo targetUp o =
     let
