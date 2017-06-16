@@ -137,7 +137,10 @@ v3_projectPlane v1 v2 u =
 
 -- | Roll to upright
 upright : Orientation -> Orientation
-upright o =
+upright = rollTo V3.j
+
+rollTo : V3.Vec3 -> Orientation -> Orientation
+rollTo targetUp o =
     let
         -- Camera forward vector of the original orientation
         fwd = rotateBodyV o V3.k
@@ -147,7 +150,7 @@ upright o =
 
         -- Projection of the up vector onto the plane formed by
         -- the forward vector and the Y axis
-        upProj = v3_projectPlane V3.j fwd up
+        upProj = v3_projectPlane targetUp fwd up
 
         -- Helper function to flip a vector if it is pointing downwards
         -- We use this to ensure we don't end up with an upside-down camera
