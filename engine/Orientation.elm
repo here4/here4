@@ -161,3 +161,26 @@ rollTo targetUp o =
     in
         -- Apply the uprighting roll to the original orientation
         followedBy roll o
+
+pitchTo : V3.Vec3 -> Orientation -> Orientation
+pitchTo targetUp o =
+    let
+        -- Camera forward vector of the original orientation
+        right = rotateBodyV o V3.i
+
+        -- Camera up vector of the original orientation
+        up = rotateBodyV o V3.j
+
+        -- Projection of the up vector onto the plane formed by
+        -- the forward vector and the Y axis
+        upProj = v3_projectPlane targetUp right up
+
+        -- Helper function to flip a vector if it is pointing downwards
+        -- We use this to ensure we don't end up with an upside-down camera
+        positiveY v = if V3.getY v >= 0 then v else V3.negate v
+
+        -- Orientation that rolls the camera back to an upright position
+        pitch = fromTo up (positiveY upProj)
+    in
+        -- Apply the uprighting roll to the original orientation
+        followedBy pitch o
