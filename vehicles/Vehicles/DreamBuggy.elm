@@ -90,11 +90,18 @@ turn eyeLevel dx dy dt motion =
             in
                 vec3 0 y z
 
+        
         targetOrientation =
-            motion.orientation
-            |> rollTo targetUpRoll
-            |> pitchTo targetUpPitch
-            |> followedBy (fromAngleAxis dx V3.j)
+            if getY motion.position > (eyeLevel motion.position) + 5 then -- spin if in the air
+                motion.orientation
+                |> rollUpright
+                |> pitchUpright
+                |> followedBy (fromAngleAxis dx V3.j)
+            else
+                motion.orientation
+                |> rollTo targetUpRoll
+                |> pitchTo targetUpPitch
+                |> followedBy (fromAngleAxis dx V3.j)
 
         orientation = targetOrientation
     in
