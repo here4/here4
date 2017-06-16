@@ -22,7 +22,7 @@ drive : Ground -> Float -> Model.Inputs -> Moving a -> Moving a
 drive ground speed inputs thing =
     let
         eyeLevel pos =
-            1.8 + ground.elevation pos
+            ground.elevation pos
     in
         move ground speed eyeLevel inputs thing
 
