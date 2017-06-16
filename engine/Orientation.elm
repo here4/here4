@@ -136,8 +136,8 @@ v3_projectPlane v1 v2 u =
 
 
 -- | Roll to upright
-upright : Orientation -> Orientation
-upright = rollTo V3.j
+rollUpright : Orientation -> Orientation
+rollUpright = rollTo V3.j
 
 rollTo : V3.Vec3 -> Orientation -> Orientation
 rollTo targetUp o =
@@ -161,6 +161,10 @@ rollTo targetUp o =
     in
         -- Apply the uprighting roll to the original orientation
         followedBy roll o
+
+-- | Pitch to upright
+pitchUpright : Orientation -> Orientation
+pitchUpright = pitchTo V3.j
 
 pitchTo : V3.Vec3 -> Orientation -> Orientation
 pitchTo targetUp o =

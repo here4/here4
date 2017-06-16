@@ -32,7 +32,7 @@ dollyInit ground camera =
     in
         { camera | position = position }
         |> Camera.retarget camera.target
-        |> Camera.upright
+        |> Camera.rollUpright
 
 dollyShoot : Ground -> Input -> Target -> Camera -> Camera
 dollyShoot ground input target camera =
@@ -74,7 +74,7 @@ dollyShoot ground input target camera =
     in
         { camera | position = position }
         |> Camera.retarget target
-        |> Camera.upright
+        |> Camera.rollUpright
 
 
 
@@ -124,4 +124,4 @@ arcShoot ground input target camera =
     in
         { camera | position = position }
         |> Camera.retarget target
-        |> Camera.upright
+        |> Camera.rollUpright
