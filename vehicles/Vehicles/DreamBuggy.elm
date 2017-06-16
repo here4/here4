@@ -65,14 +65,25 @@ turn eyeLevel dx dy dt motion =
         motionY =
             eyeLevel motion.position
 
-        frontTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 0 0 1)))
+        frontRightTireY =
+            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 0.5 0 0.5)))
 
-        rightTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 1 0 0)))
+        frontLeftTireY =
+            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 0.5 0 0.5)))
 
-        leftTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -1 0 0)))
+        rearRightTireY =
+            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 0.5 0 -0.5)))
+
+        rearLeftTireY =
+            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -0.5 0 -0.5)))
+
+        frontTireY = max frontLeftTireY frontRightTireY
+
+        rearTireY = max rearLeftTireY rearRightTireY
+
+        rightTireY = max frontRightTireY rearRightTireY
+
+        leftTireY = max frontRightTireY rearRightTireY
 
         perp2dCCW x y = (-y, x)
 
@@ -86,7 +97,7 @@ turn eyeLevel dx dy dt motion =
         targetUpPitch =
             let
                 vehicleFwdLength = 1.0
-                (z, y) = perp2dCCW vehicleFwdLength (frontTireY - motionY)
+                (z, y) = perp2dCCW vehicleFwdLength (frontTireY - rearTireY)
             in
                 vec3 0 y z
 
