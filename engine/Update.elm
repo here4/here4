@@ -206,7 +206,7 @@ keysToInputs keys inputs0 =
             | x = minusPlus keys.left keys.right
             , y = minusPlus keys.down keys.up
             , button_X = keys.space
-            , changeCamera = keys.kI
+            , nextCamera = keys.kI
             , mx = minusPlus keys.kComma keys.kPeriod
         }
 
@@ -236,7 +236,7 @@ gamepadToInputs gamepad inputs0 =
         { inputs0
             | reset = bs.bStart
             , changeVR = risingEdge inputs0.changeVR bs.bB
-            , changeCamera = risingEdge inputs0.changeCamera bs.bRightBumper
+            , nextCamera = risingEdge inputs0.nextCamera bs.bRightBumper
             , x = x
             , y = y
             , mx = mx
@@ -447,7 +447,7 @@ selectCamera ground hasFraming keyLimit inputs player =
             Maybe.withDefault tracking player.shot
 
         (newShot, newCamera) =
-            if inputs.changeCamera then
+            if inputs.nextCamera then
                 let shot = nextShot ensureShot
                 in (Just shot, shot.init ground player.camera)
             else if inputs.button_X then

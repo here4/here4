@@ -107,7 +107,7 @@ type alias Keys =
 type alias Inputs =
     { reset : Bool
     , changeVR : Bool
-    , changeCamera : Bool
+    , nextCamera : Bool
     , isJumping : Bool
     , button_X : Bool
     , x : Float
@@ -124,7 +124,7 @@ noInput : Inputs
 noInput =
     { reset = False
     , changeVR = False
-    , changeCamera = False
+    , nextCamera = False
     , isJumping = False
     , button_X = False
     , x = 0
