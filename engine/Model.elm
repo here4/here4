@@ -47,12 +47,6 @@ type alias Player =
     }
 
 
-type alias Vehicle =
-    { init : Motion -> Motion
-    , move : Maybe Vec3 -> EyeLevel -> Inputs -> Motion -> Motion
-    }
-
-
 type Eye
     = OneEye
     | LeftEye
