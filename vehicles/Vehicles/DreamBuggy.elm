@@ -121,12 +121,16 @@ turn eyeLevel speed dx dt motion =
         { motion | orientation = orientation }
 
 
-goForward : Model.EyeLevel -> Float -> { i | mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
+goForward : Model.EyeLevel -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
 goForward eyeLevel speed inputs motion =
     -- if getY motion.position > eyeLevel motion.position then motion else
     let
+        accel =
+            clamp -1.0 1.0 <|
+            inputs.y + inputs.rightTrigger - inputs.leftTrigger
+
         move =
-            V3.scale (speed * inputs.y) V3.k
+            V3.scale (speed * accel) V3.k
 
         strafe =
             V3.scale (0.1 * speed * -inputs.mx) V3.i

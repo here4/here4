@@ -234,7 +234,7 @@ clearStationaryInputs inputs0 =
 gamepadToInputs : Gamepad.Gamepad -> Model.Inputs -> Model.Inputs
 gamepadToInputs gamepad inputs0 =
     let
-        { x, y, mx, my, cx, cy } =
+        { x, y, mx, my, cx, cy, rightTrigger, leftTrigger } =
             GamepadInputs.gamepadToArrows gamepad
 
         bs =
@@ -255,6 +255,8 @@ gamepadToInputs gamepad inputs0 =
             , cx = cx
             , cy = cy
             , button_X = risingEdge inputs0.button_X bs.bX
+            , rightTrigger = rightTrigger
+            , leftTrigger = leftTrigger
         }
 
 

@@ -53,7 +53,8 @@ fly : Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
 fly eyeLevel inputs motion =
     let
         thrust =
-            2 * inputs.y
+            clamp -1.0 1.0 <|
+            inputs.y + inputs.rightTrigger - inputs.leftTrigger
 
         yaw =
             0.5 * inputs.x * inputs.dt
@@ -74,10 +75,10 @@ fly eyeLevel inputs motion =
             rotateBodyV orientation
 
         dv =
-            V3.scale (5 * thrust * inputs.dt) <| orient V3.k
+            V3.scale (10 * thrust * inputs.dt) <| orient V3.k
 
         du =
-            V3.scale (2 * thrust * inputs.dt) <| orient V3.j
+            V3.scale (4 * thrust * inputs.dt) <| orient V3.j
 
         dv_ =
             add dv du
