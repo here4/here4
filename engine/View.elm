@@ -81,7 +81,7 @@ layoutScene1 windowSize model render =
                 ]
             ]
             (render Model.OneEye windowSize model.player1)
-        , hud model.player1 0 0
+        , hud model.paused model.player1 0 0
         ]
 
 
@@ -118,7 +118,7 @@ layoutScene2 windowSize model render =
                             ]
                         ]
                         (render Model.OneEye ws2 model.player1)
-                    , hud model.player1 0 w2
+                    , hud model.paused model.player1 0 w2
                     ]
                 , div []
                     [ WebGL.toHtml
@@ -136,7 +136,7 @@ layoutScene2 windowSize model render =
                             ]
                         ]
                         (render Model.OneEye ws2 model.player2)
-                    , hud model.player2 w2 0
+                    , hud model.paused model.player2 w2 0
                     ]
                 ]
             ]
@@ -302,11 +302,12 @@ skyboxMatrix { width, height } player =
         )
 
 
-hud : Model.Player -> Int -> Int -> Html (Msg worldMsg)
-hud player left right =
+hud : Bool -> Model.Player -> Int -> Int -> Html (Msg worldMsg)
+hud paused player left right =
     let
         shotLabel = Maybe.map .label player.shot
                     |> Maybe.withDefault ""
+        pausedLabel = if paused then " (Paused)" else ""
     in
         div
             [ style
@@ -331,6 +332,7 @@ hud player left right =
                 , FontAwesome.diamond white 20
                 , Html.text " "
                 , Html.text shotLabel
+                , Html.text pausedLabel
                 ]
             ]
 
