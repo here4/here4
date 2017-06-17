@@ -1,7 +1,5 @@
 module GamepadInputs exposing (GamepadButtons, persistentGamepads, gamepadToArrows, gamepadToButtons)
 
--- import Maybe.Extra exposing (mapDefault)
-
 import String exposing (contains)
 import Gamepad exposing (..)
 
@@ -63,81 +61,6 @@ gamepadsToArrows =
     List.map gamepadToArrows
 
 
-
-{-
-   gamepadNothing : Gamepad.Gamepad
-   gamepadNothing =
-       { id = "", axes = [], buttons = [], mapping = "" }
-
-   toStandardGamepad : Gamepad.Gamepad -> Gamepad.Gamepad
-   toStandardGamepad gamepad =
-       if contains gamepad.id "STANDARD GAMEPAD" then
-           gamepad
-       else
-           let
-               ( axes_, buttons_ ) =
-                   case ( gamepad.axes, gamepad.buttons ) of
-                       -- Performance Designed Products Rock Candy Gamepad for Xbox 360 (Vendor: 0e6f Product: 011f)
-                       ( [ x1, y1, b1, x2, y2, b2, x3, y3 ], [ a, b, x, y, lb, rb, back, start, logo, lstick, rstick ] ) ->
-                           let
-                               toTrigger b =
-                                   let
-                                       b_ =
-                                           (b + 1.0) / 2.0
-                                   in
-                                       if b_ > 0 then
-                                           { pressed = True, value = b_ }
-                                       else
-                                           { pressed = False, value = 0 }
-
-                               b1_ =
-                                   toTrigger b1
-
-                               b2_ =
-                                   toTrigger b2
-
-                               toPads ax =
-                                   if ax > 0 then
-                                       ( { pressed = True, value = ax }, { pressed = False, value = 0 } )
-                                   else if ax < 0 then
-                                       ( { pressed = False, value = 0 }, { pressed = True, value = -ax } )
-                                   else
-                                       ( { pressed = False, value = 0 }, { pressed = False, value = 0 } )
-
-                               ( padR, padL ) =
-                                   toPads x3
-
-                               ( padD, padU ) =
-                                   toPads y3
-                           in
-                               ( [ x1, y1, x2, y2 ]
-                               , [ a
-                                 , b
-                                 , x
-                                 , y
-                                 , lb
-                                 , rb
-                                 , b1_
-                                 , b2_
-                                 , back
-                                 , start
-                                 , lstick
-                                 , rstick
-                                 , padU
-                                 , padD
-                                 , padL
-                                 , padR
-                                 , logo
-                                 ]
-                               )
-
-                       _ ->
-                           ( gamepad.axes, gamepad.buttons )
-           in
-               { gamepad | axes = axes_, buttons = buttons_ }
--}
-
-
 persistentGamepads : List String -> List Gamepad.Gamepad -> ( List (Maybe Gamepad.Gamepad), List String )
 persistentGamepads is0 gs0 =
     let
@@ -193,44 +116,6 @@ persistentGamepads is0 gs0 =
         ( gs, remap is0 gs )
 
 
-
-{-
-   standardGamepads : Signal (List Gamepad.Gamepad)
-   standardGamepads = Signal.map (List.map toStandardGamepad) Gamepad.gamepads
-
-   persistentGamepads : Signal (List (Maybe Gamepad.Gamepad))
-   persistentGamepads =
-       let
-           extract acc i gs0 = case gs0 of
-               []      -> (Nothing, List.reverse acc ++ gs0)
-               (g::gs) -> if g.id == i then (Just g, List.reverse acc ++ gs)
-                          else extract (g::acc) i gs
-
-           reorder is0 gs0 = case is0 of
-               []        -> List.map Just (List.sortBy getId gs0)
-               (i::is) -> let (gm,gs) = extract [] i gs0 in gm :: reorder is gs
-
-           getId g = g.id
-           catMaybes = List.filterMap Basics.identity
-
-           remap : List String -> List (Maybe Gamepad.Gamepad) -> List String
-           remap ids0 gs0 = case (ids0, gs0) of
-               ([], _)            -> catMaybes (List.map (Maybe.map getId) gs0)
-               (is, [])           -> is
-               ((i::is), (g::gs)) -> Maybe.withDefault i (Maybe.map getId g) :: remap is gs
-
-           step gs0 is0 = let gs = reorder is0 gs0 in (gs, remap is0 gs)
-           a = Automaton.hiddenState [] step
-       in Automaton.run a [] standardGamepads
--}
-{- a b x y lbumper rbumper l r
-   l tiny (back), r tiny (start)
-   stick l down, stick r down
-   4way: u d l r
-   Xbox-logo
--}
-
-
 type alias GamepadButtons =
     { bA : Bool
     , bB : Bool
@@ -277,23 +162,3 @@ gamepadToButtons gamepad =
 gamepadsToButtons : List Gamepad.Gamepad -> List GamepadButtons
 gamepadsToButtons =
     List.map gamepadToButtons
-
-
-
-----------------------------------------------------------------------
-{-
-   gamepadToInputs : Time -> Gamepad.Gamepad -> Model.Inputs
-   gamepadToInputs dt gamepad =
-       let {x,y,mx,my} = gamepadToArrows gamepad
-           bs = gamepadToButtons gamepad
-       in  { noInput | reset = bs.bStart, changeVR = bs.bB, changeCamera = bs.bRightBumper, x = x, y = y, mx=mx, my=my, button_X = bs.bX, dt = dt }
-
-   gamepadsToInputs : List (Maybe Gamepad.Gamepad) -> Time -> List Model.Inputs
-   gamepadsToInputs gamepads dt = List.map (mapDefault noInput (gamepadToInputs dt)) gamepads
-
-   gamepadInputs : Signal (List Model.Inputs)
-   gamepadInputs =
-     let dt = Signal.map Time.inSeconds (fps 60)
-     in  sampleOn dt <| Signal.map2 gamepadsToInputs persistentGamepads dt
-
--}
