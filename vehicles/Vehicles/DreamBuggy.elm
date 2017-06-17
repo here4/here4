@@ -101,7 +101,7 @@ turn eyeLevel speed dx dt motion =
             in
                 vec3 0 y z
 
-        steer = speed * dx * dt
+        steer = 0.1 * speed * dx * dt
 
         
         targetOrientation =
@@ -126,7 +126,7 @@ goForward eyeLevel speed inputs motion =
     -- if getY motion.position > eyeLevel motion.position then motion else
     let
         move =
-            V3.scale (10.0 * speed * inputs.y) V3.k
+            V3.scale (speed * inputs.y) V3.k
 
         strafe =
             V3.scale (speed * -inputs.mx) V3.i
