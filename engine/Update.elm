@@ -222,11 +222,8 @@ clearStationaryInputs inputs0 =
 
 
 gamepadToInputs : Gamepad.Gamepad -> Model.Inputs -> Model.Inputs
-gamepadToInputs gamepad0 inputs0 =
+gamepadToInputs gamepad inputs0 =
     let
-        gamepad =
-            GamepadInputs.toStandardGamepad gamepad0
-
         { x, y, mx, my, cx, cy } =
             GamepadInputs.gamepadToArrows gamepad
 
