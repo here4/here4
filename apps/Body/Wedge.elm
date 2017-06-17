@@ -7,36 +7,37 @@ import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (vec4)
 import Math.Matrix4 exposing (..)
 import WebGL exposing (..)
+import Appearance exposing (..)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 import Shaders.VoronoiDistances exposing (voronoiDistances)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
 import Model
-import Engine exposing (..)
 
 
-wedge =
-    Signal.constant <| { pos = vec3 0 0 0, orientation = vec3 1 0 1, appear = appearWedge }
-
-
-appearWedge p =
+wedge : Perception -> List Entity
+wedge p =
     let
-        ( w, h ) =
-            p.resolution
-
         resolution =
-            vec3 (toFloat w) (toFloat h) 0
+            vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
 
         s =
             p.globalTime
 
         detail =
             p.measuredFPS / 3.0
+
+        iHMD =
+            if p.cameraVR then
+                1.0
+            else
+                0.0
     in
         [ entity worldVertex
             voronoiDistances
             topMesh
             { iResolution = resolution
+            , iHMD = iHMD
             , iGlobalTime = s
             , iLensDistort = p.lensDistort
             , view = p.viewMatrix
@@ -45,6 +46,7 @@ appearWedge p =
             noiseColorFragment
             bottomMesh
             { iResolution = resolution
+            , iHMD = iHMD
             , iDetail = detail
             , iGlobalTime = s
             , iGlobalTimeV = s
@@ -78,7 +80,7 @@ topMesh =
         wRT =
             { pos = vec3 0.3 0.2 0, color = white, coord = vec3 0.5 1 0 }
     in
-        Triangle <|
+        triangles <|
             [ ( wHead, wLB, wLT )
             , ( wHead, wLT, wRT )
             , ( wHead, wRT, wRB )
@@ -121,4 +123,4 @@ bottomMesh =
             , timeScale = 20.0
             }
     in
-        Triangle <| [ ( wHead, wLB, wRB ) ]
+        triangles <| [ ( wHead, wLB, wRB ) ]
