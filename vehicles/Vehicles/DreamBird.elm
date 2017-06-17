@@ -56,7 +56,7 @@ fly eyeLevel inputs motion =
             inputs.y
 
         yaw =
-            -5 * inputs.x * inputs.dt
+            5 * inputs.x * inputs.dt
 
         pitch =
             -4 * inputs.my * inputs.dt
