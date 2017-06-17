@@ -32,7 +32,7 @@ drive ground speed inputs thing =
 move : Ground -> Float -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
 move terrain speed eyeLevel inputs motion =
     motion
-        |> turn eyeLevel speed inputs.mx inputs.my inputs.dt
+        |> turn eyeLevel speed inputs.x inputs.dt
         |> goForward eyeLevel speed inputs
         |> gravity eyeLevel inputs.dt
         |> physics eyeLevel inputs.dt
@@ -59,8 +59,8 @@ flatten v =
         normalize (vec3 r.x 0 r.z)
 
 
-turn : Model.EyeLevel -> Float -> Float -> Float -> Float -> Moving a -> Moving a
-turn eyeLevel speed dx dy dt motion =
+turn : Model.EyeLevel -> Float -> Float -> Float -> Moving a -> Moving a
+turn eyeLevel speed dx dt motion =
     let
         motionY =
             eyeLevel motion.position
@@ -101,7 +101,7 @@ turn eyeLevel speed dx dy dt motion =
             in
                 vec3 0 y z
 
-        steer = 0.33 * speed * dx * dt
+        steer = speed * dx * dt
 
         
         targetOrientation =
@@ -121,15 +121,15 @@ turn eyeLevel speed dx dy dt motion =
         { motion | orientation = orientation }
 
 
-goForward : Model.EyeLevel -> Float -> { i | x : Float, y : Float, dt : Float } -> Moving a -> Moving a
+goForward : Model.EyeLevel -> Float -> { i | mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
 goForward eyeLevel speed inputs motion =
     -- if getY motion.position > eyeLevel motion.position then motion else
     let
         move =
-            V3.scale (8.0 * inputs.y) V3.k
+            V3.scale (10.0 * speed * inputs.y) V3.k
 
         strafe =
-            V3.scale (8.0 * inputs.x) V3.i
+            V3.scale (speed * -inputs.mx) V3.i
 
         -- e = (eyeLevel motion.position) / 80.0 -- placement.yMult
         e =

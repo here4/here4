@@ -29,23 +29,18 @@ gamepadToArrows gamepad =
                 deadzone =
                     u 0.2
 
-                {-
-                   -- Map a trigger to a standard range [0..1], applying a deadzone
-                   dc l x = let xm = (x+1.0)/2.0 in u l xm
-                   toTrigger = dc 0.2
-                -}
                 axs =
-                    { x = deadzone g.leftStick.x / 10
-                    , y = deadzone (-1.0 * g.leftStick.y) / 10
-                    , mx = deadzone g.rightStick.x / 20
-                    , my = deadzone (-1.0 * g.rightStick.y) / 20
+                    { x = deadzone g.rightStick.x * 0.1
+                    , y = deadzone (-1.0 * g.rightStick.y) * 0.1
+                    , mx = deadzone g.leftStick.x * 0.1
+                    , my = deadzone (-1.0 * g.leftStick.y) * 0.1
                     , cx = 0
                     , cy = 0
                     }
 
                 -- Interpret brake, accelerator as y input
                 ( btns_y, cx, cy ) =
-                    ( g.rightTrigger.value - g.leftTrigger.value
+                    ( (g.rightTrigger.value - g.leftTrigger.value) * 0.1
                     , g.dPadRight.value - g.dPadLeft.value
                     , g.dPadUp.value - g.dPadDown.value
                     )

@@ -56,13 +56,13 @@ fly eyeLevel inputs motion =
             inputs.y
 
         yaw =
-            5 * inputs.x * inputs.dt
+            5 * inputs.mx * inputs.dt
 
         pitch =
-            -4 * inputs.my * inputs.dt
+            -8 * inputs.y * inputs.dt
 
         roll =
-            6 * inputs.mx * inputs.dt
+            12 * inputs.x * inputs.dt
 
         orpy =
             fromRollPitchYaw ( roll, pitch, yaw )

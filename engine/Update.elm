@@ -208,10 +208,10 @@ keysToInputs keys inputs0 =
             x && keys.shift
     in
         { inputs0
-            | x = minusPlus 1.0 keys.kA keys.kD
-            , y = minusPlus 1.0 keys.kS keys.kW
-            , mx = minusPlus 0.25 keys.left keys.right
-            , my = minusPlus 0.25 keys.down keys.up
+            | x = minusPlus 0.1 keys.kA keys.kD
+            , y = minusPlus 0.1 keys.kS keys.kW
+            , mx = minusPlus 0.1 keys.left keys.right
+            , my = minusPlus 0.1 keys.down keys.up
             , cx = minusPlus 1.0 keys.kH keys.kL
             , cy = minusPlus 1.0 keys.kJ keys.kK
             , button_X = keys.space
