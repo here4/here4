@@ -59,7 +59,7 @@ fly eyeLevel inputs motion =
             -5 * inputs.x * inputs.dt
 
         pitch =
-            4 * inputs.my * inputs.dt
+            -4 * inputs.my * inputs.dt
 
         roll =
             6 * inputs.mx * inputs.dt
