@@ -32,7 +32,7 @@ drive ground speed inputs thing =
 move : Ground -> Float -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
 move terrain speed eyeLevel inputs motion =
     motion
-        |> turn eyeLevel inputs.mx inputs.my inputs.dt
+        |> turn eyeLevel speed inputs.mx inputs.my inputs.dt
         |> goForward eyeLevel speed inputs
         |> gravity eyeLevel inputs.dt
         |> physics eyeLevel inputs.dt
@@ -59,8 +59,8 @@ flatten v =
         normalize (vec3 r.x 0 r.z)
 
 
-turn : Model.EyeLevel -> Float -> Float -> Float -> Moving a -> Moving a
-turn eyeLevel dx dy dt motion =
+turn : Model.EyeLevel -> Float -> Float -> Float -> Float -> Moving a -> Moving a
+turn eyeLevel speed dx dy dt motion =
     let
         motionY =
             eyeLevel motion.position
@@ -101,18 +101,20 @@ turn eyeLevel dx dy dt motion =
             in
                 vec3 0 y z
 
+        steer = 0.33 * speed * dx * dt
+
         
         targetOrientation =
             if getY motion.position > (eyeLevel motion.position) + 5 then -- spin if in the air
                 motion.orientation
                 |> rollUpright
                 |> pitchUpright
-                |> followedBy (fromAngleAxis dx V3.j)
+                |> followedBy (fromAngleAxis steer V3.j)
             else
                 motion.orientation
                 |> rollTo targetUpRoll
                 |> pitchTo targetUpPitch
-                |> followedBy (fromAngleAxis dx V3.j)
+                |> followedBy (fromAngleAxis steer V3.j)
 
         orientation = targetOrientation
     in

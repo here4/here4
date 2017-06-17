@@ -194,11 +194,11 @@ timeToInputs dt inputs0 =
 keysToInputs : Model.Keys -> Model.Inputs -> Model.Inputs
 keysToInputs keys inputs0 =
     let
-        minusPlus a b =
+        minusPlus v a b =
             if a && not b then
-                -1
+                -v
             else if b && not a then
-                1
+                v
             else
                 0
         unshifted x =
@@ -208,12 +208,12 @@ keysToInputs keys inputs0 =
             x && keys.shift
     in
         { inputs0
-            | x = minusPlus keys.kA keys.kD
-            , y = minusPlus keys.kS keys.kW
-            , mx = minusPlus keys.left keys.right
-            , my = minusPlus keys.down keys.up
-            , cx = minusPlus keys.kH keys.kL
-            , cy = minusPlus keys.kJ keys.kK
+            | x = minusPlus 1.0 keys.kA keys.kD
+            , y = minusPlus 1.0 keys.kS keys.kW
+            , mx = minusPlus 0.25 keys.left keys.right
+            , my = minusPlus 0.25 keys.down keys.up
+            , cx = minusPlus 1.0 keys.kH keys.kL
+            , cy = minusPlus 1.0 keys.kJ keys.kK
             , button_X = keys.space
             , prevCamera = shifted keys.kC
             , nextCamera = unshifted keys.kC
