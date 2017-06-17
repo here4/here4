@@ -26,7 +26,6 @@ import App exposing (Focus)
 import Camera exposing (Framing, Shot)
 import Ground exposing (Ground)
 
-
 programWithFlags :
     { init : ( model, Cmd (WorldMsg msg) )
     , update : WorldMsg msg -> model -> ( model, Cmd (WorldMsg msg) )
@@ -58,19 +57,49 @@ keyChange on keyCode =
         Model.LockRequest False
     else
         (case keyCode of
+            9 ->
+                \k -> { k | tab = on }
+
+            16 ->
+                \k -> { k | shift = on }
+
             32 ->
                 \k -> { k | space = on }
 
-            65 ->
-                \k -> { k | left = on }
+            72 ->
+                \k -> { k | kH = on }
 
-            68 ->
-                \k -> { k | right = on }
+            74 ->
+                \k -> { k | kJ = on }
+
+            75 ->
+                \k -> { k | kK = on }
+
+            76 ->
+                \k -> { k | kL = on }
 
             87 ->
-                \k -> { k | up = on }
+                \k -> { k | kW = on }
+
+            65 ->
+                \k -> { k | kA = on }
 
             83 ->
+                \k -> { k | kS = on }
+
+            68 ->
+                \k -> { k | kD = on }
+
+            37 ->
+                \k -> { k | left = on }
+
+            39 ->
+                \k -> { k | right = on }
+
+            38 ->
+                \k -> { k | up = on }
+
+            40 ->
                 \k -> { k | down = on }
 
             188 ->
@@ -81,6 +110,9 @@ keyChange on keyCode =
 
             73 ->
                 \k -> { k | kI = on }
+
+            67 ->
+                \k -> { k | kC = on }
 
             _ ->
                 Basics.identity

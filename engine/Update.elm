@@ -201,13 +201,23 @@ keysToInputs keys inputs0 =
                 1
             else
                 0
+        unshifted x =
+            x && not keys.shift
+
+        shifted x =
+            x && keys.shift
     in
         { inputs0
-            | x = minusPlus keys.left keys.right
-            , y = minusPlus keys.down keys.up
+            | x = minusPlus keys.kA keys.kD
+            , y = minusPlus keys.kS keys.kW
+            , mx = minusPlus keys.left keys.right
+            , my = minusPlus keys.down keys.up
+            , cx = minusPlus keys.kH keys.kL
+            , cy = minusPlus keys.kJ keys.kK
             , button_X = keys.space
-            , nextCamera = keys.kI
-            , mx = minusPlus keys.kComma keys.kPeriod
+            , prevCamera = shifted keys.kC
+            , nextCamera = unshifted keys.kC
+            -- , mx = minusPlus keys.kComma keys.kPeriod
         }
 
 

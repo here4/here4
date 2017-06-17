@@ -91,10 +91,44 @@ type alias Keys =
     , right : Bool
     , up : Bool
     , down : Bool
+    , tab : Bool
+    , shift : Bool
     , space : Bool
+    , kW : Bool
+    , kA : Bool
+    , kS : Bool
+    , kD : Bool
+    , kH : Bool
+    , kJ : Bool
+    , kK : Bool
+    , kL : Bool
     , kI : Bool
+    , kC : Bool
     , kComma : Bool
     , kPeriod : Bool
+    }
+
+noKeys : Keys
+noKeys =
+    { left = False
+    , right = False
+    , up = False
+    , down = False
+    , tab = False
+    , shift = False
+    , space = False
+    , kW = False
+    , kA = False
+    , kS = False
+    , kD = False
+    , kH = False
+    , kJ = False
+    , kK = False
+    , kL = False
+    , kI = False
+    , kC = False
+    , kComma = False
+    , kPeriod = False
     }
 
 
@@ -182,7 +216,7 @@ init worldInit { movement, isLocked } =
           , player2 = defaultPlayer
           , globalTime = 0
           , maybeWindowSize = Nothing
-          , keys = Keys False False False False False False False False
+          , keys = noKeys
           , gamepadIds = []
           , inputs = noInput
           , inputs2 = noInput
