@@ -129,7 +129,7 @@ goForward eyeLevel speed inputs motion =
             V3.scale (speed * inputs.y) V3.k
 
         strafe =
-            V3.scale (speed * -inputs.mx) V3.i
+            V3.scale (0.1 * speed * -inputs.mx) V3.i
 
         -- e = (eyeLevel motion.position) / 80.0 -- placement.yMult
         e =

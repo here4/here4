@@ -32,8 +32,8 @@ gamepadToArrows gamepad =
                 axs =
                     { x = deadzone g.rightStick.x
                     , y = deadzone (-1.0 * g.rightStick.y)
-                    , mx = deadzone g.leftStick.x * 0.1
-                    , my = deadzone (-1.0 * g.leftStick.y) * 0.1
+                    , mx = deadzone g.leftStick.x
+                    , my = deadzone (-1.0 * g.leftStick.y)
                     , cx = 0
                     , cy = 0
                     }
