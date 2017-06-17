@@ -114,6 +114,9 @@ keyChange on keyCode =
             67 ->
                 \k -> { k | kC = on }
 
+            80 ->
+                \k -> { k | kP = on }
+
             _ ->
                 Basics.identity
         )

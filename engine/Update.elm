@@ -47,11 +47,24 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
 
         Model.KeyChange keyfunc ->
             let
+                risingEdge old new =
+                    new && (not old)
+
                 keys =
                     keyfunc model.keys
+
+                pausePressed =
+                    risingEdge model.keys.kP keys.kP
+
+                paused =
+                    if pausePressed then
+                        not model.paused
+                    else
+                        model.paused
             in
                 ( { model
                     | keys = keys
+                    , paused = paused
                     , inputs = keysToInputs keys model.inputs
                   }
                 , Cmd.none
@@ -79,7 +92,7 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
 
-        Model.Animate dt ->
+        Model.Animate dt0 ->
             let
                 ( model_, newCmdMsg ) =
                     case worldTerrain model.worldModel of
@@ -88,6 +101,12 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
 
                         Just terrain ->
                             let
+                                dt =
+                                    if model.paused then
+                                        0
+                                    else
+                                        dt0
+
                                 inputs1 =
                                     timeToInputs dt model.inputs
 

@@ -104,6 +104,7 @@ type alias Keys =
     , kL : Bool
     , kI : Bool
     , kC : Bool
+    , kP : Bool
     , kComma : Bool
     , kPeriod : Bool
     }
@@ -127,6 +128,7 @@ noKeys =
     , kL = False
     , kI = False
     , kC = False
+    , kP = False
     , kComma = False
     , kPeriod = False
     }
@@ -185,6 +187,7 @@ type alias Model worldModel =
     , player1 : Player
     , player2 : Player
     , globalTime : Time
+    , paused : Bool
     , maybeWindowSize : Maybe Window.Size
     , keys : Keys
     , gamepadIds : List String
@@ -219,6 +222,7 @@ init worldInit { movement, isLocked } =
           , player1 = defaultPlayer
           , player2 = defaultPlayer
           , globalTime = 0
+          , paused = False
           , maybeWindowSize = Nothing
           , keys = noKeys
           , gamepadIds = []
