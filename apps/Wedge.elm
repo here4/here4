@@ -13,7 +13,7 @@ import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation
 import Body.Wedge exposing (wedge)
-import Vehicles.DreamBuggy as DreamBuggy
+import Vehicles.DreamBird as DreamBird
 
 
 type alias Model =
@@ -66,7 +66,7 @@ update msg model =
                 ( model, Cmd.none )
 
             Ctrl (Control.Drive ground inputs) ->
-                ( mapBody (DreamBuggy.drive ground 8.0 inputs), Cmd.none )
+                ( mapBody (DreamBird.drive ground inputs), Cmd.none )
 
             _ ->
                 ( model, Cmd.none )
