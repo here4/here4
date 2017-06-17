@@ -236,6 +236,7 @@ gamepadToInputs gamepad inputs0 =
         { inputs0
             | reset = bs.bStart
             , changeVR = risingEdge inputs0.changeVR bs.bB
+            , prevCamera = risingEdge inputs0.prevCamera bs.bLeftBumper
             , nextCamera = risingEdge inputs0.nextCamera bs.bRightBumper
             , x = x
             , y = y
@@ -399,6 +400,19 @@ updatePlayer terrain inputs label mshot framing player0 =
                 |> shootFraming
                 |> smoothCamera
 
+prevShot : Shot -> Shot
+prevShot shot =
+    if shot.label == pov.label then
+        arc
+    else if shot.label == tracking.label then
+        pov
+    else if shot.label == dolly.label then
+        tracking
+    else if shot.label == arc.label then
+        dolly
+    else
+        tracking
+
 nextShot : Shot -> Shot
 nextShot shot =
     if shot.label == pov.label then
@@ -447,7 +461,10 @@ selectCamera ground hasFraming keyLimit inputs player =
             Maybe.withDefault tracking player.shot
 
         (newShot, newCamera) =
-            if inputs.nextCamera then
+            if inputs.prevCamera then
+                let shot = prevShot ensureShot
+                in (Just shot, shot.init ground player.camera)
+            else if inputs.nextCamera then
                 let shot = nextShot ensureShot
                 in (Just shot, shot.init ground player.camera)
             else if inputs.button_X then
