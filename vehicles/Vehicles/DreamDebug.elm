@@ -10,24 +10,8 @@ import Model
 -- DreamDebug
 
 
-dreamDebug : Model.Vehicle
-dreamDebug =
-    { init = welcome
-    , move = move
-    }
-
-
-
--- | Welcome a new driver to debug
-
-
-welcome : Model.Motion -> Model.Motion
-welcome motion =
-    motion
-
-
-move : Maybe Vec3 -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
-move _ eyeLevel inputs motion =
+move : Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+move eyeLevel inputs motion =
     motion
         |> fly eyeLevel inputs
         |> flyPhysics eyeLevel inputs.dt
