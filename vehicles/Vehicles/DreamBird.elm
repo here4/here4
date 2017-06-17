@@ -54,16 +54,16 @@ fly eyeLevel inputs motion =
     let
         thrust =
             clamp -1.0 1.0 <|
-            inputs.y + inputs.rightTrigger - inputs.leftTrigger
+            inputs.my + inputs.rightTrigger - inputs.leftTrigger
 
         yaw =
-            0.5 * inputs.x * inputs.dt
+            0.5 * inputs.mx * inputs.dt
 
         pitch =
-            -0.8 * inputs.my * inputs.dt
+            -0.8 * inputs.y * inputs.dt
 
         roll =
-            1.2 * inputs.mx * inputs.dt
+            1.2 * inputs.x * inputs.dt
 
         orpy =
             fromRollPitchYaw ( roll, pitch, yaw )
