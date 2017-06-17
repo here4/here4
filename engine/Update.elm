@@ -118,7 +118,7 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
 
                                 -- Animate
                                 wm =
-                                    worldAnimate terrain inputs1.dt model.worldModel
+                                    worldAnimate terrain dt model.worldModel
 
                                 -- Change ride?
                                 hasFraming key =
@@ -182,8 +182,8 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
                                 newModel =
                                     { model
                                         | globalTime = model.globalTime + dt
-                                        , player1 = updatePlayer terrain inputs1 label1 player1.shot framing1 player1
-                                        , player2 = updatePlayer terrain inputs2 label2 player2.shot framing2 player2
+                                        , player1 = updatePlayer terrain inputs1 dt0 label1 player1.shot framing1 player1
+                                        , player2 = updatePlayer terrain inputs2 dt0 label2 player2.shot framing2 player2
                                         , inputs = clearStationaryInputs inputs1
                                         , worldModel = wmF
                                     }
@@ -336,18 +336,18 @@ aboveGround eyeLevel pos =
         else
             pos
 
-shoot : Ground -> Model.Inputs -> Shot -> Framing -> Camera -> Camera
-shoot ground inputs shot framing camera =
+shoot : Ground -> Model.Inputs -> Float -> Shot -> Framing -> Camera -> Camera
+shoot ground inputs dt shot framing camera =
     let cameraInput =
             { x = inputs.cx
             , y = inputs.cy
-            , dt = inputs.dt
+            , dt = dt
             }
     in
         shot.shoot ground cameraInput framing.target camera
 
-updatePlayer : Ground -> Model.Inputs -> String -> Maybe Shot -> Maybe Framing -> Model.Player -> Model.Player
-updatePlayer terrain inputs label mshot framing player0 =
+updatePlayer : Ground -> Model.Inputs -> Float -> String -> Maybe Shot -> Maybe Framing -> Model.Player -> Model.Player
+updatePlayer terrain inputs dt label mshot framing player0 =
     if inputs.reset then
         Model.defaultPlayer
     else
@@ -367,7 +367,7 @@ updatePlayer terrain inputs label mshot framing player0 =
             shootFraming player =
                 case framing of
                     Just framing_ ->
-                        mapCamera (shoot terrain inputs shot framing_) player
+                        mapCamera (shoot terrain inputs dt shot framing_) player
 
                     Nothing ->
                         player
