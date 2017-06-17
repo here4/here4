@@ -59,13 +59,12 @@ layoutScene windowSize model world =
 type alias RenderWorld =
     Model.Eye -> Window.Size -> Model.Player -> List WebGL.Entity
 
-
 layoutScene1 : Window.Size -> Model worldModel -> RenderWorld -> Html (Msg worldMsg)
 layoutScene1 windowSize model render =
     div
         [ style
-            [ ( "width", toString width ++ "px" )
-            , ( "height", toString height ++ "px" )
+            [ ( "width", toString windowSize.width ++ "px" )
+            , ( "height", toString windowSize.height ++ "px" )
             , ( "backgroundColor", "rgb(135, 206, 235)" )
             ]
         ]
@@ -81,7 +80,7 @@ layoutScene1 windowSize model render =
                 ]
             ]
             (render Model.OneEye windowSize model.player1)
-        , hud model.player1 0 0
+        , hud model.player1 0 0 (windowSize.width//10) (windowSize.height//10)
         ]
 
 
@@ -118,7 +117,7 @@ layoutScene2 windowSize model render =
                             ]
                         ]
                         (render Model.OneEye ws2 model.player1)
-                    , hud model.player1 0 w2
+                    , hud model.player1 0 w2 (windowSize.width//20) (windowSize.height//10)
                     ]
                 , div []
                     [ WebGL.toHtml
@@ -136,7 +135,7 @@ layoutScene2 windowSize model render =
                             ]
                         ]
                         (render Model.OneEye ws2 model.player2)
-                    , hud model.player2 w2 0
+                    , hud model.player2 w2 0 (windowSize.width//20) (windowSize.height//10)
                     ]
                 ]
             ]
@@ -302,13 +301,14 @@ skyboxMatrix { width, height } player =
         )
 
 
-hud : Model.Player -> Int -> Int -> Html (Msg worldMsg)
-hud player left right =
+hud : Model.Player -> Int -> Int -> Int -> Int -> Html (Msg worldMsg)
+hud player left right helpHMargin helpVMargin =
     let
         shotLabel = Maybe.map .label player.shot
                     |> Maybe.withDefault ""
     in
-        div
+        div [] [
+          div
             [ style
                 [ ( "position", "absolute" )
                 , ( "font-family", "Verdana, Geneva, sans-serif" )
@@ -333,6 +333,38 @@ hud player left right =
                 , Html.text shotLabel
                 ]
             ]
+          ,
+          overlay left right helpHMargin helpVMargin
+        ]
+
+overlay : Int -> Int -> Int -> Int -> Html (Msg worldMsg)
+overlay left right hMargin vMargin =
+    let
+        title = "Welcome to Dreambuggy"
+    in
+        div
+            [ style
+                [ ( "position", "absolute" )
+                , ( "font-family", "Verdana, Geneva, sans-serif" )
+                , ( "text-align", "center" )
+                , ( "left", toString (left + hMargin) ++ "px" )
+                , ( "right", toString (right + hMargin) ++ "px" )
+                , ( "top", toString vMargin ++ "px" )
+                , ( "bottom", toString vMargin ++ "px" )
+                , ( "border", "0px" )
+                , ( "padding", "0px" )
+                , ( "background-color", "rgba(0,0,0,0.5)" )
+                , ( "color", "#fff" )
+                , ( "font-size", "xx-large" )
+                , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
+                , ( "z-index", "1" )
+                ]
+            ]
+            [ span []
+                [ Html.h1 [] [ Html.text title ]
+                ]
+            ]
+
 
 
 enterMsg : List (Html Msg)
