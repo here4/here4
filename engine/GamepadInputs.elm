@@ -8,7 +8,7 @@ import Gamepad exposing (..)
 -- Gamepad
 
 
-gamepadToArrows : Gamepad.Gamepad -> { x : Float, y : Float, mx : Float, my : Float, cx : Float, cy : Float }
+gamepadToArrows : Gamepad.Gamepad -> { x : Float, y : Float, mx : Float, my : Float, cx : Float, cy : Float, rightTrigger : Float, leftTrigger : Float }
 gamepadToArrows gamepad =
     case gamepad of
         StandardGamepad g ->
@@ -29,29 +29,25 @@ gamepadToArrows gamepad =
                 deadzone =
                     u 0.2
 
-                axs =
-                    { x = deadzone g.rightStick.x
-                    , y = deadzone (-1.0 * g.rightStick.y)
-                    , mx = deadzone g.leftStick.x
-                    , my = deadzone (-1.0 * g.leftStick.y)
-                    , cx = 0
-                    , cy = 0
-                    }
-
-                -- Interpret brake, accelerator as y input
-                ( btns_y, cx, cy ) =
-                    ( g.rightTrigger.value - g.leftTrigger.value
-                    , g.dPadRight.value - g.dPadLeft.value
-                    , g.dPadUp.value - g.dPadDown.value
-                    )
             in
-                { axs | y = btns_y + axs.y, cx = cx, cy = cy }
+                { x = deadzone g.rightStick.x
+                , y = deadzone (-1.0 * g.rightStick.y)
+                , mx = deadzone g.leftStick.x
+                , my = deadzone (-1.0 * g.leftStick.y)
+                , cx = g.dPadRight.value - g.dPadLeft.value
+                , cy = g.dPadUp.value - g.dPadDown.value
+                , rightTrigger = g.rightTrigger.value
+                , leftTrigger = g.leftTrigger.value
+                }
 
         RawGamepad g ->
-            { x = 0, y = 0, mx = 0, my = 0, cx = 0, cy = 0 }
+            { x = 0, y = 0, mx = 0, my = 0, cx = 0, cy = 0
+            , rightTrigger = 0
+            , leftTrigger = 0
+            }
 
 
-gamepadsToArrows : List Gamepad.Gamepad -> List { x : Float, y : Float, mx : Float, my : Float, cx : Float, cy : Float }
+gamepadsToArrows : List Gamepad.Gamepad -> List { x : Float, y : Float, mx : Float, my : Float, cx : Float, cy : Float, rightTrigger : Float, leftTrigger : Float }
 gamepadsToArrows =
     List.map gamepadToArrows
 

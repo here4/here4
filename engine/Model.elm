@@ -139,6 +139,8 @@ type alias Inputs =
     , nextCamera : Bool
     , isJumping : Bool
     , button_X : Bool
+    , rightTrigger : Float
+    , leftTrigger : Float
     , x : Float
     , y : Float
     , mx : Float
@@ -157,6 +159,8 @@ noInput =
     , nextCamera = False
     , isJumping = False
     , button_X = False
+    , rightTrigger = 0.0
+    , leftTrigger = 0.0
     , x = 0
     , y = 0
     , mx = 0
