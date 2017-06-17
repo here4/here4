@@ -53,16 +53,16 @@ fly : Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
 fly eyeLevel inputs motion =
     let
         thrust =
-            inputs.y
+            20 * inputs.y
 
         yaw =
-            5 * inputs.mx * inputs.dt
+            5 * inputs.x * inputs.dt
 
         pitch =
-            -8 * inputs.y * inputs.dt
+            -8 * inputs.my * inputs.dt
 
         roll =
-            12 * inputs.x * inputs.dt
+            12 * inputs.mx * inputs.dt
 
         orpy =
             fromRollPitchYaw ( roll, pitch, yaw )
