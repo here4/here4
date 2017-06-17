@@ -28,8 +28,8 @@ test:
 	elm-test
 
 publish: build
-	git add -f ${TARGET}
-	git commit -m "Update ${TARGET}"
+	git add -f ${DEPLOY}
+	git commit -m "Update ${DEPLOY}"
 	git push --force ${REMOTE} HEAD:gh-pages
 	git reset --hard HEAD^
 
