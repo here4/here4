@@ -213,6 +213,9 @@ timeToInputs dt inputs0 =
 keysToInputs : Model.Keys -> Model.Inputs -> Model.Inputs
 keysToInputs keys inputs0 =
     let
+        risingEdge old new =
+            new && (not old)
+
         minusPlus v a b =
             if a && not b then
                 -v
@@ -233,9 +236,10 @@ keysToInputs keys inputs0 =
             , my = minusPlus 1.0 keys.down keys.up
             , cx = minusPlus 1.0 keys.kH keys.kL
             , cy = minusPlus 1.0 keys.kJ keys.kK
-            , button_X = keys.space
-            , prevCamera = shifted keys.kC
-            , nextCamera = unshifted keys.kC
+            , button_X = risingEdge inputs0.button_X keys.space
+            , prevCamera = shifted <| risingEdge inputs0.prevCamera keys.kC
+            , nextCamera = unshifted <| risingEdge inputs0.nextCamera keys.kC
+            , nextOverlay = unshifted <| risingEdge inputs0.nextOverlay keys.kI
             -- , mx = minusPlus keys.kComma keys.kPeriod
         }
 
@@ -509,8 +513,15 @@ selectCamera ground hasFraming keyLimit inputs player =
             else
                 player.cameraVR
 
+        newOverlay =
+            if inputs.nextOverlay then
+                not player.overlay
+            else
+                player.overlay
+
     in
         { player | rideKey = newKey
                  , shot = newShot
                  , cameraVR = newVR
+                 , overlay = newOverlay
         }

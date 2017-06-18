@@ -307,6 +307,11 @@ hud paused player left right helpHMargin helpVMargin =
         shotLabel = Maybe.map .label player.shot
                     |> Maybe.withDefault ""
         pausedLabel = if paused then " (Paused)" else ""
+        showOverlay =
+            if player.overlay then
+                overlay left right helpHMargin helpVMargin
+            else
+                Html.text ""
     in
         div [] [
           div
@@ -336,7 +341,7 @@ hud paused player left right helpHMargin helpVMargin =
                 ]
             ]
           ,
-          overlay left right helpHMargin helpVMargin
+          showOverlay
         ]
 
 overlay : Int -> Int -> Int -> Int -> Html (Msg worldMsg)

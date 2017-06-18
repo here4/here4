@@ -44,6 +44,7 @@ type alias Player =
     , rideLabel : String
     , focusKey : Bag.Key
     , cameraVR : Bool
+    , overlay : Bool
     }
 
 
@@ -83,6 +84,7 @@ defaultPlayer =
     , rideLabel = ""
     , focusKey = 0
     , cameraVR = False
+    , overlay = False
     }
 
 
@@ -139,6 +141,7 @@ type alias Inputs =
     , changeVR : Bool
     , prevCamera : Bool
     , nextCamera : Bool
+    , nextOverlay : Bool
     , isJumping : Bool
     , button_X : Bool
     , rightTrigger : Float
@@ -159,6 +162,7 @@ noInput =
     , changeVR = False
     , prevCamera = False
     , nextCamera = False
+    , nextOverlay = False
     , isJumping = False
     , button_X = False
     , rightTrigger = 0.0
