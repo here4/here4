@@ -80,7 +80,7 @@ layoutScene1 windowSize model render =
                 ]
             ]
             (render Model.OneEye windowSize model.player1)
-        , hud model.player1 0 0 (windowSize.width//10) (windowSize.height//10)
+        , hud model.paused model.player1 0 0 (windowSize.width//10) (windowSize.height//10)
         ]
 
 
@@ -117,7 +117,7 @@ layoutScene2 windowSize model render =
                             ]
                         ]
                         (render Model.OneEye ws2 model.player1)
-                    , hud model.player1 0 w2 (windowSize.width//20) (windowSize.height//10)
+                    , hud model.paused model.player1 0 w2 (windowSize.width//20) (windowSize.height//10)
                     ]
                 , div []
                     [ WebGL.toHtml
@@ -135,7 +135,7 @@ layoutScene2 windowSize model render =
                             ]
                         ]
                         (render Model.OneEye ws2 model.player2)
-                    , hud model.player2 w2 0 (windowSize.width//20) (windowSize.height//10)
+                    , hud model.paused model.player2 w2 0 (windowSize.width//20) (windowSize.height//10)
                     ]
                 ]
             ]
@@ -301,11 +301,12 @@ skyboxMatrix { width, height } player =
         )
 
 
-hud : Model.Player -> Int -> Int -> Int -> Int -> Html (Msg worldMsg)
-hud player left right helpHMargin helpVMargin =
+hud : Bool -> Model.Player -> Int -> Int -> Int -> Int -> Html (Msg worldMsg)
+hud paused player left right helpHMargin helpVMargin =
     let
         shotLabel = Maybe.map .label player.shot
                     |> Maybe.withDefault ""
+        pausedLabel = if paused then " (Paused)" else ""
     in
         div [] [
           div
@@ -331,6 +332,7 @@ hud player left right helpHMargin helpVMargin =
                 , FontAwesome.diamond white 20
                 , Html.text " "
                 , Html.text shotLabel
+                , Html.text pausedLabel
                 ]
             ]
           ,

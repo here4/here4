@@ -47,11 +47,24 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
 
         Model.KeyChange keyfunc ->
             let
+                risingEdge old new =
+                    new && (not old)
+
                 keys =
                     keyfunc model.keys
+
+                pausePressed =
+                    risingEdge model.keys.kP keys.kP
+
+                paused =
+                    if pausePressed then
+                        not model.paused
+                    else
+                        model.paused
             in
                 ( { model
                     | keys = keys
+                    , paused = paused
                     , inputs = keysToInputs keys model.inputs
                   }
                 , Cmd.none
@@ -79,7 +92,7 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
 
-        Model.Animate dt ->
+        Model.Animate dt0 ->
             let
                 ( model_, newCmdMsg ) =
                     case worldTerrain model.worldModel of
@@ -88,6 +101,12 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
 
                         Just terrain ->
                             let
+                                dt =
+                                    if model.paused then
+                                        0
+                                    else
+                                        dt0
+
                                 inputs1 =
                                     timeToInputs dt model.inputs
 
@@ -99,7 +118,7 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
 
                                 -- Animate
                                 wm =
-                                    worldAnimate terrain inputs1.dt model.worldModel
+                                    worldAnimate terrain dt model.worldModel
 
                                 -- Change ride?
                                 hasFraming key =
@@ -163,8 +182,8 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
                                 newModel =
                                     { model
                                         | globalTime = model.globalTime + dt
-                                        , player1 = updatePlayer terrain inputs1 label1 player1.shot framing1 player1
-                                        , player2 = updatePlayer terrain inputs2 label2 player2.shot framing2 player2
+                                        , player1 = updatePlayer terrain inputs1 dt0 label1 player1.shot framing1 player1
+                                        , player2 = updatePlayer terrain inputs2 dt0 label2 player2.shot framing2 player2
                                         , inputs = clearStationaryInputs inputs1
                                         , worldModel = wmF
                                     }
@@ -317,18 +336,18 @@ aboveGround eyeLevel pos =
         else
             pos
 
-shoot : Ground -> Model.Inputs -> Shot -> Framing -> Camera -> Camera
-shoot ground inputs shot framing camera =
+shoot : Ground -> Model.Inputs -> Float -> Shot -> Framing -> Camera -> Camera
+shoot ground inputs dt shot framing camera =
     let cameraInput =
             { x = inputs.cx
             , y = inputs.cy
-            , dt = inputs.dt
+            , dt = dt
             }
     in
         shot.shoot ground cameraInput framing.target camera
 
-updatePlayer : Ground -> Model.Inputs -> String -> Maybe Shot -> Maybe Framing -> Model.Player -> Model.Player
-updatePlayer terrain inputs label mshot framing player0 =
+updatePlayer : Ground -> Model.Inputs -> Float -> String -> Maybe Shot -> Maybe Framing -> Model.Player -> Model.Player
+updatePlayer terrain inputs dt label mshot framing player0 =
     if inputs.reset then
         Model.defaultPlayer
     else
@@ -348,7 +367,7 @@ updatePlayer terrain inputs label mshot framing player0 =
             shootFraming player =
                 case framing of
                     Just framing_ ->
-                        mapCamera (shoot terrain inputs shot framing_) player
+                        mapCamera (shoot terrain inputs dt shot framing_) player
 
                     Nothing ->
                         player
