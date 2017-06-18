@@ -239,7 +239,9 @@ keysToInputs keys inputs0 =
             , button_X = risingEdge inputs0.button_X keys.space
             , prevCamera = shifted <| risingEdge inputs0.prevCamera keys.kC
             , nextCamera = unshifted <| risingEdge inputs0.nextCamera keys.kC
-            , nextOverlay = unshifted <| risingEdge inputs0.nextOverlay keys.kI
+            , toggleOverlay = risingEdge inputs0.toggleOverlay keys.kI
+            , prevOverlay = risingEdge inputs0.prevOverlay keys.pageUp
+            , nextOverlay = risingEdge inputs0.nextOverlay keys.pageDown
             -- , mx = minusPlus keys.kComma keys.kPeriod
         }
 
@@ -267,10 +269,11 @@ gamepadToInputs gamepad inputs0 =
             new && (not old)
     in
         { inputs0
-            | reset = bs.bStart
-            , changeVR = risingEdge inputs0.changeVR bs.bB
-            , prevCamera = risingEdge inputs0.prevCamera bs.bLeftBumper
+            | prevCamera = risingEdge inputs0.prevCamera bs.bLeftBumper
             , nextCamera = risingEdge inputs0.nextCamera bs.bRightBumper
+            , toggleOverlay = risingEdge inputs0.toggleOverlay bs.bGuide
+            , prevOverlay = risingEdge inputs0.prevOverlay bs.bBack
+            , nextOverlay = risingEdge inputs0.nextOverlay bs.bStart
             , x = x
             , y = y
             , mx = mx
@@ -280,6 +283,7 @@ gamepadToInputs gamepad inputs0 =
             , button_X = risingEdge inputs0.button_X bs.bX
             , rightTrigger = rightTrigger
             , leftTrigger = leftTrigger
+            --, changeVR = risingEdge inputs0.changeVR bs.bB
         }
 
 
@@ -514,7 +518,7 @@ selectCamera ground hasFraming keyLimit inputs player =
                 player.cameraVR
 
         newOverlay =
-            if inputs.nextOverlay then
+            if inputs.toggleOverlay then
                 not player.overlay
             else
                 player.overlay

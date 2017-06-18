@@ -66,6 +66,12 @@ keyChange on keyCode =
             32 ->
                 \k -> { k | space = on }
 
+            33 ->
+                \k -> { k | pageUp = on }
+
+            34 ->
+                \k -> { k | pageDown = on }
+
             72 ->
                 \k -> { k | kH = on }
 

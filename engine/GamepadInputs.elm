@@ -116,6 +116,7 @@ type alias GamepadButtons =
     , bRightBumper : Bool
     , bBack : Bool
     , bStart : Bool
+    , bGuide : Bool
     }
 
 
@@ -129,6 +130,7 @@ gamepadButtonsNone =
     , bRightBumper = False
     , bBack = False
     , bStart = False
+    , bGuide = False
     }
 
 
@@ -144,6 +146,7 @@ gamepadToButtons gamepad =
             , bRightBumper = g.rightBumper.pressed
             , bBack = g.buttonBack.pressed
             , bStart = g.buttonStart.pressed
+            , bGuide = g.buttonLogo.pressed
             }
 
         _ ->

@@ -96,6 +96,8 @@ type alias Keys =
     , tab : Bool
     , shift : Bool
     , space : Bool
+    , pageUp : Bool
+    , pageDown : Bool
     , kW : Bool
     , kA : Bool
     , kS : Bool
@@ -120,6 +122,8 @@ noKeys =
     , tab = False
     , shift = False
     , space = False
+    , pageUp = False
+    , pageDown = False
     , kW = False
     , kA = False
     , kS = False
@@ -141,6 +145,8 @@ type alias Inputs =
     , changeVR : Bool
     , prevCamera : Bool
     , nextCamera : Bool
+    , toggleOverlay : Bool
+    , prevOverlay : Bool
     , nextOverlay : Bool
     , isJumping : Bool
     , button_X : Bool
@@ -162,6 +168,8 @@ noInput =
     , changeVR = False
     , prevCamera = False
     , nextCamera = False
+    , toggleOverlay = False
+    , prevOverlay = False
     , nextOverlay = False
     , isJumping = False
     , button_X = False
