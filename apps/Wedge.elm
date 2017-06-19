@@ -98,6 +98,8 @@ overlay _ =
     Html.div []
         [ Html.h2 []
               [ Html.text "Delta Wedge" ]
-        , Html.text "An alien spacecraft"
+        , Html.text "A manoueverable delta wing with solid plasma anti-gravity thrusters and zero-friction flight surfaces."
+        , Html.br [] []
+        , Html.hr [] []
         , DreamBird.overlay
         ]
