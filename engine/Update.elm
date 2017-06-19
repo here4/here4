@@ -517,15 +517,15 @@ selectCamera ground hasFraming keyLimit inputs player =
             else
                 player.cameraVR
 
-        newOverlay =
+        newOverlayVisible =
             if inputs.toggleOverlay then
-                not player.overlay
+                not player.overlayVisible
             else
-                player.overlay
+                player.overlayVisible
 
     in
         { player | rideKey = newKey
                  , shot = newShot
                  , cameraVR = newVR
-                 , overlay = newOverlay
+                 , overlayVisible = newOverlayVisible
         }

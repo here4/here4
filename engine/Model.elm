@@ -44,7 +44,7 @@ type alias Player =
     , rideLabel : String
     , focusKey : Bag.Key
     , cameraVR : Bool
-    , overlay : Bool
+    , overlayVisible : Bool
     }
 
 
@@ -84,7 +84,7 @@ defaultPlayer =
     , rideLabel = ""
     , focusKey = 0
     , cameraVR = False
-    , overlay = False
+    , overlayVisible = False
     }
 
 

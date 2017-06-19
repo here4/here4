@@ -308,7 +308,7 @@ hud paused player left right helpHMargin helpVMargin =
                     |> Maybe.withDefault ""
         pausedLabel = if paused then " (Paused)" else ""
         showOverlay =
-            if player.overlay then
+            if player.overlayVisible then
                 overlay left right helpHMargin helpVMargin
             else
                 Html.text ""
