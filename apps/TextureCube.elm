@@ -118,4 +118,12 @@ focus model =
     Maybe.map (.body >> appToFocus) model
 
 overlay : Model -> Html msg
-overlay _ = Html.text "OMG A WOODEN BOX!"
+overlay _ =
+    Html.div []
+        [ Html.h2 []
+              [ Html.text "A wooden box" ]
+        , Html.text "This highly attractive wooden box doubles as a secret vehicle."
+        , Html.br [] []
+        , Html.hr [] []
+        , DreamBuggy.overlay
+        ]
