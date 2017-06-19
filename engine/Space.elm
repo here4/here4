@@ -10,7 +10,7 @@ module Space exposing (programWithFlags)
 -}
 
 import AnimationFrame
-import Html
+import Html exposing (Html)
 import Keyboard
 import Mouse
 import Time exposing (Time)
@@ -30,6 +30,7 @@ programWithFlags :
     { init : ( model, Cmd (WorldMsg msg) )
     , update : WorldMsg msg -> model -> ( model, Cmd (WorldMsg msg) )
     , label : Maybe Bag.Key -> model -> String
+    , overlay : Maybe Bag.Key -> model -> Html (WorldMsg msg)
     , view : model -> Maybe Model.World
     , animate : Ground -> Time -> model -> model
     , keyLimit : model -> Int
@@ -41,7 +42,7 @@ programWithFlags :
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.label world.keyLimit world.ground world.animate world.framing world.focus
+        , update = Update.update world.update world.label world.overlay world.keyLimit world.ground world.animate world.framing world.focus
         , subscriptions = subscriptions
         , view = View.view world.view
         }

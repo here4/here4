@@ -1,5 +1,6 @@
 module Update exposing (update)
 
+import Html exposing (Html)
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Maybe.Extra exposing (isJust)
@@ -28,6 +29,7 @@ import Ports
 update :
     (WorldMsg worldMsg -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg) ))
     -> (Maybe Bag.Key -> worldModel -> String)
+    -> (Maybe Bag.Key -> worldModel -> Html (WorldMsg worldMsg))
     -> (worldModel -> Int)
     -> (worldModel -> Maybe Ground)
     -> (Ground -> Time -> worldModel -> worldModel)
@@ -36,7 +38,7 @@ update :
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel (WorldMsg worldMsg)
     -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
-update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFraming worldFocus msg model =
+update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnimate worldFraming worldFocus msg model =
     case msg of
         Model.WorldMessage worldMsg ->
             let
@@ -133,8 +135,14 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
                                 label1 =
                                     worldLabel (player1.rideKey) wm
 
+                                overlay1 =
+                                    worldOverlay (player1.rideKey) wm
+
                                 label2 =
                                     worldLabel (player2.rideKey) wm
+
+                                overlay2 =
+                                    worldOverlay (player2.rideKey) wm
 
                                 ( wm1, wm1Msg ) =
                                     case player1.rideKey of

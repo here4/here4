@@ -1,5 +1,6 @@
 module World exposing (WorldModel, create)
 
+import Html exposing (Html)
 import Bag exposing (Bag)
 import Time exposing (Time)
 import Space
@@ -33,6 +34,7 @@ create hubInit hubUpdate details =
         , view = worldView
         , update = worldUpdate hubUpdate
         , label = worldLabel
+        , overlay = worldOverlay
         , keyLimit = worldKeyLimit
         , animate = worldAnimate
         , framing = worldFraming
@@ -176,6 +178,24 @@ worldLabel mkey model =
                 case Bag.get key model.apps of
                     Just app ->
                         App.label app
+
+                    Nothing ->
+                        none
+
+            Nothing ->
+                none
+
+worldOverlay : Maybe Bag.Key -> WorldModel a -> Html (WorldMsg msg)
+worldOverlay mkey model =
+    let
+        none =
+            Html.text "Welcome to DreamBuggy"
+    in
+        case mkey of
+            Just key ->
+                case Bag.get key model.apps of
+                    Just app ->
+                        Html.map (Send key) (App.overlay app)
 
                     Nothing ->
                         none

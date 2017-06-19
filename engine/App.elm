@@ -1,4 +1,4 @@
-module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, label, framing, noFraming, focus, update, appToFocus, orientedToFocus)
+module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, label, overlay, framing, noFraming, focus, update, appToFocus, orientedToFocus)
 
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
