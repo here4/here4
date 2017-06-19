@@ -1,80 +1,80 @@
 module KeyboardInput exposing (..)
 
-import Keyboard
+import Keyboard.Extra exposing (Key(..))
 import Model
 
 {- Subscribe to keychange events. -}
 
-keyChange : Bool -> Keyboard.KeyCode -> Model.Msg worldMsg
-keyChange on keyCode =
-    if keyCode == 27 && on then
+keyChange : Bool -> Key -> Model.Msg worldMsg
+keyChange on key =
+    if key == Escape && on then
         Model.LockRequest False
     else
-        (case keyCode of
-            9 ->
+        (case key of
+            Tab ->
                 \k -> { k | tab = on }
 
-            16 ->
+            Shift ->
                 \k -> { k | shift = on }
 
-            32 ->
+            Space ->
                 \k -> { k | space = on }
 
-            33 ->
+            PageUp ->
                 \k -> { k | pageUp = on }
 
-            34 ->
+            PageDown ->
                 \k -> { k | pageDown = on }
 
-            72 ->
+            CharH ->
                 \k -> { k | kH = on }
 
-            74 ->
+            CharJ ->
                 \k -> { k | kJ = on }
 
-            75 ->
+            CharK ->
                 \k -> { k | kK = on }
 
-            76 ->
+            CharL ->
                 \k -> { k | kL = on }
 
-            87 ->
+            CharW ->
                 \k -> { k | kW = on }
 
-            65 ->
+            CharA ->
                 \k -> { k | kA = on }
 
-            83 ->
+            CharS ->
                 \k -> { k | kS = on }
 
-            68 ->
+            CharD ->
                 \k -> { k | kD = on }
 
-            37 ->
+            ArrowLeft ->
                 \k -> { k | left = on }
 
-            39 ->
+            ArrowRight ->
                 \k -> { k | right = on }
 
-            38 ->
+            ArrowUp ->
                 \k -> { k | up = on }
 
-            40 ->
+            ArrowDown ->
                 \k -> { k | down = on }
 
-            188 ->
+            Comma ->
                 \k -> { k | kComma = on }
 
-            190 ->
+            Period ->
                 \k -> { k | kPeriod = on }
 
-            73 ->
+            CharI ->
                 \k -> { k | kI = on }
 
-            67 ->
+            CharC ->
                 \k -> { k | kC = on }
 
-            80 ->
+            CharP ->
                 \k -> { k | kP = on }
 
             _ ->

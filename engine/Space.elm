@@ -11,7 +11,7 @@ module Space exposing (programWithFlags)
 
 import AnimationFrame
 import Html exposing (Html)
-import Keyboard
+import Keyboard.Extra
 import KeyboardInput
 import Mouse
 import Time exposing (Time)
@@ -53,8 +53,8 @@ programWithFlags world =
 subscriptions : Model.Model worldModel worldMsg -> Sub (Model.Msg worldMsg)
 subscriptions model =
     [ AnimationFrame.diffs (Model.Animate << Time.inSeconds)
-    , Keyboard.downs (KeyboardInput.keyChange True)
-    , Keyboard.ups (KeyboardInput.keyChange False)
+    , Keyboard.Extra.downs (KeyboardInput.keyChange True)
+    , Keyboard.Extra.ups (KeyboardInput.keyChange False)
     , Window.resizes Model.Resize
     , Ports.isLocked Model.LockUpdate
     ]
