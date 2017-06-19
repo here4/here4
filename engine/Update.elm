@@ -34,8 +34,8 @@ update :
     -> (Maybe Bag.Key -> worldModel -> Maybe Framing)
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
-    -> Model worldModel
-    -> ( Model worldModel, Cmd (Msg (WorldMsg worldMsg)) )
+    -> Model worldModel (WorldMsg worldMsg)
+    -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
 update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFraming worldFocus msg model =
     case msg of
         Model.WorldMessage worldMsg ->
@@ -196,7 +196,7 @@ update worldUpdate worldLabel worldKeyLimit worldTerrain worldAnimate worldFrami
                 ( model_ , newCmdMsg)
 
 
-inputsToMove : Model.Inputs -> Model.Player -> Vec3
+inputsToMove : Model.Inputs -> Model.Player msg -> Vec3
 inputsToMove inputs player =
     let
         dp =
@@ -287,7 +287,7 @@ gamepadToInputs gamepad inputs0 =
         }
 
 
-updateGamepads : List Gamepad.Gamepad -> Model worldModel -> Model worldModel
+updateGamepads : List Gamepad.Gamepad -> Model worldModel worldMsg -> Model worldModel worldMsg
 updateGamepads gps0 model =
     let
         ( gps, is ) =
@@ -354,7 +354,7 @@ shoot ground inputs dt shot framing camera =
     in
         shot.shoot ground cameraInput framing.target camera
 
-updatePlayer : Ground -> Model.Inputs -> Float -> String -> Maybe Shot -> Maybe Framing -> Model.Player -> Model.Player
+updatePlayer : Ground -> Model.Inputs -> Float -> String -> Maybe Shot -> Maybe Framing -> Model.Player msg -> Model.Player msg
 updatePlayer terrain inputs dt label mshot framing player0 =
     if inputs.reset then
         Model.defaultPlayer
@@ -465,7 +465,7 @@ nextShot shot =
     else
         tracking
 
-selectCamera : Ground -> (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player -> Model.Player
+selectCamera : Ground -> (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player msg -> Model.Player msg
 selectCamera ground hasFraming keyLimit inputs player =
     let
         nextKey key =

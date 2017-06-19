@@ -26,7 +26,7 @@ create :
     ( model, Cmd msg )
     -> (msg -> model -> ( model, Cmd msg ))
     -> { apps : List ( App, Cmd AppMsg ) }
-    -> Program Args (Model.Model (WorldModel model)) (Model.Msg (WorldMsg msg))
+    -> Program Args (Model.Model (WorldModel model) (WorldMsg msg)) (Model.Msg (WorldMsg msg))
 create hubInit hubUpdate details =
     Space.programWithFlags
         { init = worldInit hubInit details

@@ -28,7 +28,7 @@ import Orientation
 -}
 view :
     (worldModel -> Maybe Model.World)
-    -> Model worldModel
+    -> Model worldModel worldMsg
     -> Html (Msg worldMsg)
 view worldView model =
     case ( model.maybeWindowSize, worldView model.worldModel ) of
@@ -42,7 +42,7 @@ view worldView model =
             layoutScene windowSize model world
 
 
-layoutScene : Window.Size -> Model worldModel -> Model.World -> Html (Msg worldMsg)
+layoutScene : Window.Size -> Model worldModel worldMsg -> Model.World -> Html (Msg worldMsg)
 layoutScene windowSize model world =
     let
         render =
@@ -56,10 +56,10 @@ layoutScene windowSize model world =
             layoutScene1 windowSize model render
 
 
-type alias RenderWorld =
-    Model.Eye -> Window.Size -> Model.Player -> List WebGL.Entity
+type alias RenderWorld msg =
+    Model.Eye -> Window.Size -> Model.Player msg -> List WebGL.Entity
 
-layoutScene1 : Window.Size -> Model worldModel -> RenderWorld -> Html (Msg worldMsg)
+layoutScene1 : Window.Size -> Model worldModel worldMsg -> RenderWorld worldMsg -> Html (Msg worldMsg)
 layoutScene1 windowSize model render =
     div
         [ style
@@ -84,7 +84,7 @@ layoutScene1 windowSize model render =
         ]
 
 
-layoutScene2 : Window.Size -> Model worldModel -> RenderWorld -> Html (Msg worldMsg)
+layoutScene2 : Window.Size -> Model worldModel worldMsg -> RenderWorld worldMsg -> Html (Msg worldMsg)
 layoutScene2 windowSize model render =
     let
         w2 =
@@ -141,7 +141,7 @@ layoutScene2 windowSize model render =
             ]
 
 
-layoutSceneVR : Window.Size -> Model worldModel -> RenderWorld -> Html (Msg worldMsg)
+layoutSceneVR : Window.Size -> Model worldModel worldMsg -> RenderWorld worldMsg -> Html (Msg worldMsg)
 layoutSceneVR windowSize model render =
     let
         w2 =
@@ -250,7 +250,7 @@ aboveGround eyeLevel pos =
 
 {-| Set up 3D world
 -}
-renderWorld : Time -> Model.World -> Model.Eye -> Window.Size -> Model.Player -> List WebGL.Entity
+renderWorld : Time -> Model.World -> Model.Eye -> Window.Size -> Model.Player msg -> List WebGL.Entity
 renderWorld globalTime world eye windowSize player =
     let
         eyeLevel pos =
@@ -283,7 +283,7 @@ renderWorld globalTime world eye windowSize player =
 
 {-| Calculate the viewer's field of view
 -}
-perspective : Window.Size -> Model.Player -> Model.Eye -> Mat4
+perspective : Window.Size -> Model.Player msg -> Model.Eye -> Mat4
 perspective { width, height } player eye =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
         (M4.makeLookAt (add player.camera.position (eyeOffset eye player.camera))
@@ -292,7 +292,7 @@ perspective { width, height } player eye =
         )
 
 
-skyboxMatrix : Window.Size -> Model.Player -> Mat4
+skyboxMatrix : Window.Size -> Model.Player msg -> Mat4
 skyboxMatrix { width, height } player =
     M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
         (M4.makeLookAt (vec3 0 0 0)
@@ -301,7 +301,7 @@ skyboxMatrix { width, height } player =
         )
 
 
-hud : Bool -> Model.Player -> Int -> Int -> Int -> Int -> Html (Msg worldMsg)
+hud : Bool -> Model.Player worldMsg -> Int -> Int -> Int -> Int -> Html (Msg worldMsg)
 hud paused player left right helpHMargin helpVMargin =
     let
         shotLabel = Maybe.map .label player.shot

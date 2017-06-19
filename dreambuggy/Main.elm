@@ -16,7 +16,7 @@ import Body.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Body.Sphere exposing (skySphere, cloudsSphere)
 
 
-main : Program Args (Model.Model NewWorld.Model) (Model.Msg NewWorld.Msg)
+main : Program Args (Model.Model NewWorld.Model NewWorld.Msg) (Model.Msg NewWorld.Msg)
 main =
     NewWorld.create
         { apps =

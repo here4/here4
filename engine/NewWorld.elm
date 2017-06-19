@@ -26,7 +26,7 @@ type alias Model =
 
 create :
     { apps : List ( App, Cmd AppMsg ) }
-    -> Program Args (Model.Model Model) (Model.Msg Msg)
+    -> Program Args (Model.Model Model Msg) (Model.Msg Msg)
 create details =
     World.create init update details
 

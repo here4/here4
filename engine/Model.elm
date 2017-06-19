@@ -1,5 +1,6 @@
 module Model exposing (..)
 
+import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Time exposing (..)
@@ -37,7 +38,7 @@ type alias Motion =
     , orientation : Orientation
     }
 
-type alias Player =
+type alias Player msg =
     { camera : Camera
     , shot : Maybe Shot
     , rideKey : Maybe Bag.Key
@@ -45,6 +46,7 @@ type alias Player =
     , focusKey : Bag.Key
     , cameraVR : Bool
     , overlayVisible : Bool
+    , overlayContent : Html msg
     }
 
 
@@ -76,7 +78,7 @@ defaultCamera = toCamera
     , orientation = Orientation.initial
     }
 
-defaultPlayer : Player
+defaultPlayer : Player msg
 defaultPlayer =
     { camera = defaultCamera
     , shot = Nothing
@@ -85,6 +87,7 @@ defaultPlayer =
     , focusKey = 0
     , cameraVR = False
     , overlayVisible = False
+    , overlayContent = Html.text ""
     }
 
 
@@ -194,10 +197,10 @@ type alias MouseMovement =
 
 {-| This is the application's Model data structure
 -}
-type alias Model worldModel =
+type alias Model worldModel worldMsg =
     { numPlayers : Int
-    , player1 : Player
-    , player2 : Player
+    , player1 : Player worldMsg
+    , player2 : Player worldMsg
     , globalTime : Time
     , paused : Bool
     , maybeWindowSize : Maybe Window.Size
@@ -224,7 +227,7 @@ it's a carryover from the original, and the additional complexity
 to actually use it is probably not worth it in this case.
 It's still a useful example using Html.programWithFlags though.
 -}
-init : ( worldModel, Cmd worldMsg ) -> Args -> ( Model worldModel, Cmd (Msg worldMsg) )
+init : ( worldModel, Cmd worldMsg ) -> Args -> ( Model worldModel worldMsg, Cmd (Msg worldMsg) )
 init worldInit { movement, isLocked } =
     let
         ( worldModel, worldCmdMsg ) =

@@ -37,7 +37,7 @@ programWithFlags :
     , framing : Maybe Bag.Key -> model -> Maybe Framing
     , focus : Bag.Key -> model -> Maybe Focus
     }
-    -> Program Model.Args (Model.Model model) (Model.Msg (WorldMsg msg))
+    -> Program Model.Args (Model.Model model (WorldMsg msg)) (Model.Msg (WorldMsg msg))
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
@@ -129,7 +129,7 @@ keyChange on keyCode =
             |> Model.KeyChange
 
 
-subscriptions : Model.Model worldModel -> Sub (Model.Msg worldMsg)
+subscriptions : Model.Model worldModel worldMsg -> Sub (Model.Msg worldMsg)
 subscriptions model =
     [ AnimationFrame.diffs (Model.Animate << Time.inSeconds)
     , Keyboard.downs (keyChange True)
