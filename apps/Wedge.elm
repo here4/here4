@@ -94,4 +94,10 @@ focus model =
     Just (appToFocus model.body)
 
 overlay : Model -> Html msg
-overlay _ = Html.text "An alien spacecraft"
+overlay _ =
+    Html.div []
+        [ Html.h2 []
+              [ Html.text "Delta Wedge" ]
+        , Html.text "An alien spacecraft"
+        , DreamBird.overlay
+        ]

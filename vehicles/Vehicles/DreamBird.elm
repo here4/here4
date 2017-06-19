@@ -1,5 +1,9 @@
-module Vehicles.DreamBird exposing (drive)
+module Vehicles.DreamBird exposing (drive, overlay)
 
+import Html exposing (Html)
+import Html.Attributes as Html
+import FontAwesome
+import Color exposing (white)
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Orientation exposing (..)
@@ -115,3 +119,74 @@ flyPhysics eyeLevel dt motion =
 
 keepWithinbounds ground motion =
     { motion | position = ground.bounds motion.position }
+
+
+overlay : Html msg
+overlay =
+    let
+        textStyle =
+            Html.style
+                [ ( "font-family", "Verdana, Geneva, sans-serif" )
+                , ( "color", "#fff" )
+                , ( "font-size", "xx-large" )
+                , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
+                , ( "z-index", "1" )
+                ]
+        textLeft =
+            Html.style [ ( "text-align", "left" ) ]
+
+        textCenter =
+            Html.style [ ( "text-align", "center" ) ]
+    in
+        Html.div []
+            [ Html.h3
+                [ textStyle ]
+                [ Html.text "Dreambird controls:" ]
+            , Html.table
+                [ textStyle
+                , textCenter
+                , Html.style
+                    [ ( "width", "80%" )
+                    , ( "margin", "auto" )
+                    ]
+                ]
+                [ Html.thead []
+                    [ Html.tr []
+                        [ Html.th [] [ Html.text "" ]
+                        , Html.th [] [ FontAwesome.keyboard_o white 40 ]
+                        , Html.th [] [ FontAwesome.gamepad white 40 ]
+                        ]
+                    ]
+                , Html.tbody []
+                    [ Html.tr []
+                        [ Html.th [ textLeft ] [ Html.text "Thrust +/-" ]
+                        , Html.td [] [ Html.text "Arrow up,down" ]
+                        , Html.td []
+                              [ Html.span [] [ Html.text "Right,left triggers" ]
+                              , Html.span [] [ Html.text "Left stick up,down" ]
+                              ]
+                        ]
+                    , Html.tr []
+                        [ Html.th [ textLeft ] [ Html.text "Yaw left, right" ]
+                        , Html.td [] [ Html.text "Arrow left, right" ]
+                        , Html.td [] [ Html.text "Left stick left,right" ]
+                        ]
+                    , Html.tr []
+                        [ Html.th [ textLeft ] [ Html.text "Pitch up,down" ]
+                        , Html.td [] [ Html.text "W, S" ]
+                        , Html.td [] [ Html.text "Right stick up,down" ]
+                        ]
+                    , Html.tr []
+                        [ Html.th [ textLeft ] [ Html.text "Roll left, right" ]
+                        , Html.td [] [ Html.text "A, D" ]
+                        , Html.td [] [ Html.text "Right stick left,right" ]
+                        ]
+                    ]
+                ]
+    {-
+            , Html.ul []
+                [ Html.li [] [ Html.text "WASD / Right stick: pitch+roll" ]
+                , Html.li [] [ Html.text "Arrows / Left stick: Thrust+yaw" ]
+                ]
+    -}
+            ]
