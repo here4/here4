@@ -20,7 +20,7 @@ import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
 import Camera exposing (Camera)
 import Camera.Util exposing (cameraUp)
-import Model exposing (Model, Msg)
+import Model exposing (Model, Msg(..))
 import Orientation
 
 
@@ -309,7 +309,7 @@ hud paused player left right helpHMargin helpVMargin =
         pausedLabel = if paused then " (Paused)" else ""
         showOverlay =
             if player.overlayVisible then
-                overlay left right helpHMargin helpVMargin
+                overlay left right helpHMargin helpVMargin player.overlayContent
             else
                 Html.text ""
     in
@@ -344,11 +344,8 @@ hud paused player left right helpHMargin helpVMargin =
           showOverlay
         ]
 
-overlay : Int -> Int -> Int -> Int -> Html (Msg worldMsg)
-overlay left right hMargin vMargin =
-    let
-        title = "Welcome to Dreambuggy"
-    in
+overlay : Int -> Int -> Int -> Int -> Html worldMsg -> Html (Msg worldMsg)
+overlay left right hMargin vMargin content =
         div
             [ style
                 [ ( "position", "absolute" )
@@ -367,9 +364,7 @@ overlay left right hMargin vMargin =
                 , ( "z-index", "1" )
                 ]
             ]
-            [ span []
-                [ Html.h1 [] [ Html.text title ]
-                ]
+            [ Html.map WorldMessage content
             ]
 
 
