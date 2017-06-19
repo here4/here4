@@ -190,8 +190,8 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
                                 newModel =
                                     { model
                                         | globalTime = model.globalTime + dt
-                                        , player1 = updatePlayer terrain inputs1 dt0 label1 player1.shot framing1 player1
-                                        , player2 = updatePlayer terrain inputs2 dt0 label2 player2.shot framing2 player2
+                                        , player1 = updatePlayer terrain inputs1 dt0 label1 overlay1 player1.shot framing1 player1
+                                        , player2 = updatePlayer terrain inputs2 dt0 label2 overlay2 player2.shot framing2 player2
                                         , inputs = clearStationaryInputs inputs1
                                         , worldModel = wmF
                                     }
@@ -362,8 +362,8 @@ shoot ground inputs dt shot framing camera =
     in
         shot.shoot ground cameraInput framing.target camera
 
-updatePlayer : Ground -> Model.Inputs -> Float -> String -> Maybe Shot -> Maybe Framing -> Model.Player msg -> Model.Player msg
-updatePlayer terrain inputs dt label mshot framing player0 =
+updatePlayer : Ground -> Model.Inputs -> Float -> String -> Html msg -> Maybe Shot -> Maybe Framing -> Model.Player msg -> Model.Player msg
+updatePlayer terrain inputs dt label overlayContent mshot framing player0 =
     if inputs.reset then
         Model.defaultPlayer
     else
@@ -375,7 +375,9 @@ updatePlayer terrain inputs dt label mshot framing player0 =
                 Maybe.withDefault tracking mshot
 
             relabel player =
-                { player | rideLabel = label }
+                { player | rideLabel = label
+                         , overlayContent = overlayContent
+                }
 
             mapCamera f player =
                 { player | camera = f player.camera }
