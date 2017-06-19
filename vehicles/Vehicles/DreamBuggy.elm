@@ -1,5 +1,9 @@
-module Vehicles.DreamBuggy exposing (drive)
+module Vehicles.DreamBuggy exposing (drive, overlay)
 
+import Color exposing (white)
+import FontAwesome
+import Html exposing (Html)
+import Html.Attributes as Html
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (..)
@@ -228,3 +232,71 @@ gravity eyeLevel dt motion =
                 V3.toRecord motion.velocity
         in
             { motion | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }
+
+
+overlay : Html msg
+overlay =
+    let
+        textStyle =
+            Html.style
+                [ ( "font-family", "Verdana, Geneva, sans-serif" )
+                , ( "color", "#fff" )
+                , ( "font-size", "xx-large" )
+                , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
+                , ( "z-index", "1" )
+                ]
+        textLeft =
+            Html.style [ ( "text-align", "left" ) ]
+
+        textCenter =
+            Html.style [ ( "text-align", "center" ) ]
+    in
+        Html.div []
+            [ Html.div
+                [ textStyle
+                , textLeft
+                , Html.style
+                    [ ( "margin-left", "3em" ) ]
+                ]
+                [ Html.i [] [ Html.text "Dreambuggy" ]
+                , Html.text " controls:"
+                ]
+            , Html.table
+                [ textStyle
+                , textCenter
+                , Html.style
+                    [ ( "width", "80%" )
+                    , ( "height", "60%" )
+                    , ( "margin", "auto" )
+                    ]
+                ]
+                [ Html.thead []
+                    [ Html.tr []
+                        [ Html.th [] [ Html.text "" ]
+                        , Html.th [] [ FontAwesome.keyboard_o white 48 ]
+                        , Html.th [] [ FontAwesome.gamepad white 48 ]
+                        ]
+                    ]
+                , Html.tbody []
+                    [ Html.tr []
+                        [ Html.th [ textLeft ] [ Html.text "Accelerate / Brake" ]
+                        , Html.td [] [ Html.text "W, S" ]
+                        , Html.td []
+                              [ Html.text "Right,left triggers"
+                              , Html.br [] []
+                              , Html.text "Right stick up, down"
+                              ]
+                        ]
+                    , Html.tr []
+                        [ Html.th [ textLeft ] [ Html.text "Steer left, right" ]
+                        , Html.td [] [ Html.text "A, D" ]
+                        , Html.td [] [ Html.text "Right stick left, right" ]
+                        ]
+                    , Html.tr []
+                        [ Html.th [ textLeft ] [ Html.text "Slide left, right" ]
+                        , Html.td [] [ Html.text "Arrow left, right" ]
+                        , Html.td [] [ Html.text "Left stick left, right" ]
+                        ]
+                    ]
+                ]
+            ]
