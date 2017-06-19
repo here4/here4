@@ -1,5 +1,6 @@
 module TextureCube exposing (create)
 
+import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
@@ -36,6 +37,7 @@ create label path =
         , bodies = bodies
         , framing = framing
         , focus = focus
+        , overlay = overlay
         }
 
 
@@ -114,3 +116,6 @@ framing model_ =
 focus : Model -> Maybe Focus
 focus model =
     Maybe.map (.body >> appToFocus) model
+
+overlay : Model -> Html msg
+overlay _ = Html.text "OMG A WOODEN BOX!"

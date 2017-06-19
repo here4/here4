@@ -1,5 +1,6 @@
 module Balls exposing (create)
 
+import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, add, vec3)
 import Random
 import Time exposing (Time)
@@ -35,6 +36,7 @@ create n =
         , bodies = bodies
         , framing = framing
         , focus = focus
+        , overlay = overlay
         }
 
 
@@ -93,3 +95,6 @@ framing balls =
 focus : Balls -> Maybe Focus
 focus balls =
     Nothing
+
+overlay : Balls -> Html msg
+overlay _ = Html.text "Bouncy balls"

@@ -1,5 +1,6 @@
 module StaticGround exposing (create)
 
+import Html exposing (Html)
 import Task exposing (Task)
 import Time exposing (Time)
 import App exposing (App, AppMsg, Focus, noFraming)
@@ -28,6 +29,7 @@ create makeGround =
         , bodies = bodies
         , framing = noFraming
         , focus = always Nothing
+        , overlay = overlay
         }
 
 
@@ -64,3 +66,6 @@ animate ground dt model =
 bodies : Model -> List Body
 bodies =
     identity
+
+overlay : Model -> Html msg
+overlay _ = Html.text "Generated terrain"

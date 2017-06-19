@@ -1,5 +1,6 @@
 module Sky exposing (create)
 
+import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
@@ -28,6 +29,7 @@ create appear =
         , bodies = bodies
         , framing = noFraming
         , focus = always Nothing
+        , overlay = overlay
         }
 
 
@@ -54,3 +56,6 @@ animate ground dt body =
 bodies : Model -> List Body
 bodies body =
     [ body ]
+
+overlay : Model -> Html msg
+overlay _ = Html.text "A clear blue sky"

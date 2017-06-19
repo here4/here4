@@ -1,5 +1,6 @@
 module Wedge exposing (create)
 
+import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
@@ -34,6 +35,7 @@ create label pos =
         , bodies = bodies
         , framing = framing
         , focus = focus
+        , overlay = overlay
         }
 
 
@@ -90,3 +92,6 @@ framing model =
 focus : Model -> Maybe Focus
 focus model =
     Just (appToFocus model.body)
+
+overlay : Model -> Html msg
+overlay _ = Html.text "An alien spacecraft"

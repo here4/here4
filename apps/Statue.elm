@@ -1,5 +1,6 @@
 module Statue exposing (create)
 
+import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
@@ -36,6 +37,7 @@ create speed label pos appear =
         , bodies = bodies
         , framing = framing
         , focus = focus
+        , overlay = overlay
         }
 
 
@@ -92,3 +94,6 @@ framing model =
 focus : Model -> Maybe Focus
 focus model =
     Just (appToFocus model.body)
+
+overlay : Model -> Html msg
+overlay _ = Html.text "A statue"

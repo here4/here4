@@ -1,5 +1,6 @@
 module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, label, framing, noFraming, focus, update, appToFocus, orientedToFocus)
 
+import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (Mat4)
@@ -21,6 +22,7 @@ type alias Animated model msg =
     , animate : Ground -> Time -> model -> model
     , framing : model -> Maybe Framing
     , focus : model -> Maybe Focus
+    , overlay : model -> Html msg
     }
 
 
@@ -102,15 +104,19 @@ packFocus : (a -> Maybe Focus) -> AppModel -> Maybe Focus
 packFocus f dyn =
     f (Dynamic.unpack dyn)
 
+packOverlay : (a -> Html (CtrlMsg msg)) -> AppModel -> Html AppMsg
+packOverlay f dyn =
+    Html.map msgPack <| f (Dynamic.unpack dyn)
 
 packMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
-packMethods { label, update, animate, bodies, framing, focus } =
+packMethods { label, update, animate, bodies, framing, focus, overlay } =
     { label = packLabel label
     , update = packUpdate update
     , animate = packAnimate animate
     , bodies = packBodies bodies
     , framing = packFraming framing
     , focus = packFocus focus
+    , overlay = packOverlay overlay
     }
 
 
@@ -133,8 +139,14 @@ create ( model, msg ) methods =
 
 createUncontrolled : ( model, Cmd msg ) -> Animated model msg -> ( App, Cmd AppMsg )
 createUncontrolled ( model, msg ) methods =
-    create ( model, Cmd.map Self msg ) { methods | update = updateSelf methods.update }
+    create
+        ( model, Cmd.map Self msg )
+        { methods | update = updateSelf methods.update
+                  , overlay = overlaySelf methods.overlay
+        }
 
+overlaySelf : (a -> Html msg) -> a -> Html (CtrlMsg msg)
+overlaySelf f model = Html.map Self (f model)
 
 
 -- | Update helper for apps with no children
@@ -218,6 +230,9 @@ focus : App -> Maybe Focus
 focus { methods, model } =
     methods.focus model
 
+overlay : App -> Html AppMsg
+overlay { methods, model } =
+    methods.overlay model
 
 
 -- TODO: focus on a plane/surface/controls
