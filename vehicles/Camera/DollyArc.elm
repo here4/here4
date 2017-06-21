@@ -1,4 +1,4 @@
-module Camera.DollyArc exposing (dolly, arc)
+module Camera.DollyArc exposing (dollyZoom, dolly, arc)
 
 import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
@@ -8,6 +8,13 @@ import Camera exposing (..)
 import Camera.Util as Camera
 import Ground exposing (Ground)
 import Model
+
+dollyZoom : Shot
+dollyZoom =
+    { label = "Dolly Zoom"
+    , init = dollyInit
+    , shoot = dollyZoomShoot
+    }
 
 dolly : Shot
 dolly =
@@ -73,6 +80,58 @@ dollyShoot ground input target camera =
 
     in
         { camera | position = position }
+        |> Camera.retarget target
+        |> Camera.rollUpright
+
+dollyZoomShoot : Ground -> Input -> Target -> Camera -> Camera
+dollyZoomShoot ground input target camera =
+    let
+        eyeLevel pos =
+            1.8 + ground.elevation pos
+
+        -- input
+        inputNearFar =
+            -input.y * 30 * input.dt
+
+        -- The original displacement of the camera, relative to where the target was
+        originalDisplacement =
+            V3.sub camera.position camera.target.position
+
+        -- New position of the camera, just tracking the target
+        trackingPosition =
+            V3.add target.position originalDisplacement
+
+        -- Vector to move closer to target
+        moveCloser =
+            V3.scale inputNearFar (V3.normalize originalDisplacement)
+
+        -- The new position, relative to where the target is now
+        newPosition =
+            V3.add trackingPosition moveCloser
+
+        -- Displacement looking at target from newPosition
+        newDisplacement =
+            V3.sub target.position newPosition
+
+        minDistance = 3.0
+
+        -- Limit how close you can get. This should be a function of the size of the thing.
+        position =
+            if V3.length newDisplacement < minDistance then
+                trackingPosition
+            else
+                newPosition
+
+        finalDistance =
+            V3.length (V3.sub position target.position)
+
+        fovy =
+            clamp 1 89 (10 * (10 - sqrt (finalDistance-minDistance)))
+
+    in
+        { camera | position = position
+                 , fovy = fovy
+        }
         |> Camera.retarget target
         |> Camera.rollUpright
 

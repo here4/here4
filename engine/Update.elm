@@ -11,7 +11,7 @@ import Bag
 import Body exposing (reposition)
 import Camera exposing (..)
 import Camera.POV exposing (pov)
-import Camera.DollyArc exposing (dolly, arc)
+import Camera.DollyArc exposing (dollyZoom, dolly, arc)
 import Camera.Tracking exposing (tracking)
 import Camera.Util as Camera
 import Control exposing (WorldMsg)
@@ -420,8 +420,10 @@ prevShot shot =
         arc
     else if shot.label == tracking.label then
         pov
-    else if shot.label == dolly.label then
+    else if shot.label == dollyZoom.label then
         tracking
+    else if shot.label == dolly.label then
+        dollyZoom
     else if shot.label == arc.label then
         dolly
     else
@@ -432,6 +434,8 @@ nextShot shot =
     if shot.label == pov.label then
         tracking
     else if shot.label == tracking.label then
+        dollyZoom
+    else if shot.label == dollyZoom.label then
         dolly
     else if shot.label == dolly.label then
         arc
