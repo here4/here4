@@ -9,6 +9,7 @@ import Sky
 import Statue
 import TextureCube
 import StaticGround
+import Suzanne
 import Wedge
 import Body.Terrain as Terrain
 import Body.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
@@ -20,7 +21,8 @@ main : Program Args (Model.Model NewWorld.Model NewWorld.Msg) (Model.Msg NewWorl
 main =
     NewWorld.create
         { apps =
-            [ TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
+            [ Suzanne.create "Suzanne" "resources/woodCrate.jpg"
+            , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
             , Wedge.create "Wedge" (vec3 23 0 12)
             , Statue.create 3.0 "Clouds Sphere" (vec3 3 10 5) cloudsSphere
             , Statue.create 2.0 "Landscape Diamond" (vec3 0 1.5 0) fogMountainsDiamond
