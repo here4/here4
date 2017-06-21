@@ -36,4 +36,5 @@ type alias Camera =
     { position : Vec3
     , orientation : Orientation
     , target : Target
+    , fovy : Float
     }

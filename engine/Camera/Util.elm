@@ -25,6 +25,7 @@ toCamera thing =
     { position = thing.position
     , orientation = thing.orientation
     , target = toStationaryTarget thing
+    , fovy = 45
     }
 
 framing : Moving a -> Framing
