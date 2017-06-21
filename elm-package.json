@@ -14,6 +14,7 @@
     "exposed-modules": [],
     "native-modules": true,
     "dependencies": {
+        "Zinggi/elm-obj-loader": "1.0.2 <= v < 2.0.0",
         "elm-community/linear-algebra": "3.1.0 <= v < 4.0.0",
         "elm-community/list-extra": "6.0.0 <= v < 7.0.0",
         "elm-community/maybe-extra": "4.0.0 <= v < 5.0.0",
