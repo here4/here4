@@ -18,14 +18,19 @@ import Orientation
 import Body.Cube exposing (textureCube)
 import Vehicles.DreamBuggy as DreamBuggy
 
+import OBJ
+import OBJ.Types exposing (MeshWith, VertexWithTexture)
 
 type alias Model =
-    Maybe { body : Moving Body
-          }
+    { body : Maybe (Moving Body)
+    , mesh : Result String (MeshWith VertexWithTexture)
+    , reflectionTexture : Result String Texture
+    }
 
 
 type Msg
     = TextureLoaded (Result Error Texture)
+    | LoadObj (Result String (MeshWith VertexWithTexture))
 
 
 create : String -> String -> ( App, Cmd AppMsg )
@@ -43,7 +48,10 @@ create label path =
 
 init : String -> ( Model, Cmd (CtrlMsg Msg) )
 init path =
-    ( Nothing
+    ( { body = Nothing
+      , mesh = Err "Loading ..."
+      , reflectionTexture = Err "Loading texture ..."
+      }
     , Texture.load path
         |> Task.attempt (Self << TextureLoaded)
     )
@@ -55,7 +63,7 @@ update :
     -> ( Model, Cmd (CtrlMsg Msg) )
 update msg model =
     let mapBody f =
-            Maybe.map (\m -> { m | body = f m.body } ) model
+            (\m -> { m | body = Maybe.map f m.body } ) model
     in
     case msg of
         Self (TextureLoaded textureResult) ->
@@ -71,18 +79,22 @@ update msg model =
                             , velocity = vec3 0 0 0
                             }
                     in
-                        ( Just { body = body }, Cmd.none )
+                        ( { model | body = Just body }, Cmd.none )
 
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
                     ( model, Cmd.none )
+
+        Self (LoadObj mesh) ->
+            ( { model | mesh = mesh }, Cmd.none )
+
+
         Ctrl (Control.Move dp) ->
             -- ( mapBody (translate dp), Cmd.none)
             ( model, Cmd.none )
 
         Ctrl (Control.Drive ground inputs) ->
             ( mapBody (DreamBuggy.drive ground 8.0 inputs), Cmd.none )
-            -- ( Maybe.map (\m -> { m | body = DreamBuggy.drive ground 8.0 inputs) m.body } model, Cmd.none )
 
         Effect _ ->
             ( model, Cmd.none )
@@ -95,27 +107,21 @@ animate ground dt model =
 
 bodies : Model -> List Body
 bodies model_ =
-    case model_ of
-        Just model ->
-            [ toBody model.body ]
+    case model_.body of
+        Just body ->
+            [ toBody body ]
 
         Nothing ->
             []
 
 
 framing : Model -> Maybe Framing
-framing model_ =
-    case model_ of
-        Just model ->
-            Just (Camera.framing model.body)
-
-        Nothing ->
-            Nothing
+framing model = Maybe.map (Camera.framing) model.body
     
 
 focus : Model -> Maybe Focus
 focus model =
-    Maybe.map (.body >> appToFocus) model
+    Maybe.map appToFocus model.body
 
 overlay : Model -> Html msg
 overlay _ =
