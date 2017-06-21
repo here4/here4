@@ -1,6 +1,9 @@
 module Boids exposing (create)
 
 import Html exposing (Html)
+import Html.Attributes as Html
+import FontAwesome
+import Color exposing (white)
 import Math.Vector3 exposing (add, vec3)
 import Random
 import Time exposing (Time)
@@ -87,4 +90,76 @@ focus boids =
     Maybe.map orientedToFocus (List.head boids)
 
 overlay : Boids -> Html msg
-overlay _ = Html.text "Flocking boids"
+overlay _ =
+    let
+        textLeft =
+            Html.style [ ( "text-align", "left" ) ]
+    in
+        Html.div []
+            [ Html.h2 []
+                [ Html.text "Boids" ]
+            , Html.text "A model of natural flocking."
+            , Html.div
+                [ Html.style
+                    [ ( "padding-left", "3em" )
+                    , ( "padding-right", "3em" )
+                    ]
+                ]
+                [ Html.p
+                    [ textLeft ]
+                    [ Html.text (
+                          "The algorithm models the behavior of flocking animals (eg. birds) " ++
+                          "by simple rules which describe only the behavior of individuals.")
+                    ]
+                , Html.p
+                    [ textLeft ]
+                    [ Html.text "Briefly, the rules are:" ]
+                , Html.ol
+                    [ Html.style
+                        [ ( "width", "80%" )
+                        , ( "height", "20%" )
+                        , ( "margin", "auto" )
+                        ]
+                    ]
+                    [ Html.li
+                        [ textLeft ]
+                        [ Html.text "Boids try to fly towards the centre of mass of neighbouring boids." ]
+                    , Html.li
+                        [ textLeft ]
+                        [ Html.text "Boids try to keep a small distance away from other objects (including other boids)." ]
+                    , Html.li
+                        [ textLeft ]
+                        [ Html.text "Boids try to match velocity with near boids." ]
+                    ]
+                , Html.p
+                    [ textLeft ]
+                    [ Html.text
+                          "If you would like to learn more about how these rules are implemented see "
+                    , Html.a
+                          [ Html.href "http://www.kfish.org/boids/pseudocode.html"
+                          , Html.target "_blank"
+                          ]
+                          [ Html.text "Conrad Parker's boids pseudocode." ]
+                    ]
+                , Html.p
+                    [ textLeft ]
+                    [ Html.text
+                          "For a full explanation and an informative history see "
+                    , Html.a
+                          [ Html.href "http://www.red3d.com/cwr/boids/"
+                          , Html.target "_blank"
+                          ]
+                          [ Html.text "Craig Reynolds' boids page." ]
+                    ]
+                ]
+            , Html.p
+                [ textLeft
+                , Html.style [ ( "bottom", "0px" ) ]
+                ]
+                [ Html.a
+                    [ Html.href "https://github.com/kfish/dreambuggy/blob/master/apps/Behavior/Boids.elm"
+                    , Html.target "_blank"
+                    ]
+                    [ Html.text "View source on GitHub" ]
+                ]
+            ]
