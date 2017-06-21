@@ -285,7 +285,7 @@ renderWorld globalTime world eye windowSize player =
 -}
 perspective : Window.Size -> Model.Player msg -> Model.Eye -> Mat4
 perspective { width, height } player eye =
-    M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
+    M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.1 1000)
         (M4.makeLookAt (add player.camera.position (eyeOffset eye player.camera))
             (add player.camera.position (scale 3 (Model.direction player.camera)))
             (cameraUp player.camera)
@@ -294,7 +294,7 @@ perspective { width, height } player eye =
 
 skyboxMatrix : Window.Size -> Model.Player msg -> Mat4
 skyboxMatrix { width, height } player =
-    M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.01 100)
+    M4.mul (M4.makePerspective 45 (toFloat width / toFloat height) 0.1 1000)
         (M4.makeLookAt (vec3 0 0 0)
             (scale 3 (Model.direction player.camera))
             (cameraUp player.camera)
