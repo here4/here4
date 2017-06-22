@@ -11,7 +11,8 @@ type alias Perception =
     { cameraPos : Vec3
     , windowSize : Window.Size
     , globalTime : Time
-    , viewMatrix : Mat4
+    , perspective : Mat4 -- p.viewMatrix = M4.mul p.perspective p.lookAt
+    , lookAt : Mat4
     , lensDistort : Float
     , cameraVR : Bool
     , measuredFPS : Float
@@ -32,9 +33,9 @@ type alias ShaderPerception =
 
 
 
--- | Transform the viewMatrix of an Appearance
+-- | Transform the lookAt of an Appearance
 
 
 transform : (Mat4 -> Mat4) -> Appearance -> Appearance
 transform f appear p =
-    appear { p | viewMatrix = f p.viewMatrix }
+    appear { p | lookAt = f p.lookAt }

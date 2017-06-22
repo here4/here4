@@ -179,7 +179,7 @@ layoutSceneVR windowSize model render =
 
 
 bodyAppear : Mat4 -> Perception -> Body -> List WebGL.Entity
-bodyAppear skyMatrix p body =
+bodyAppear skyLookAt p body =
     let
         rotate =
             Appearance.transform (Orientation.rotateLabM4 body.orientation)
@@ -208,7 +208,7 @@ bodyAppear skyMatrix p body =
                         |> scale
 
         skyPerception =
-            { p | viewMatrix = skyMatrix }
+            { p | lookAt = skyLookAt }
     in
         case body.anchor of
             Body.AnchorGround ->
@@ -264,7 +264,8 @@ renderWorld globalTime world eye windowSize player =
 
         p =
             { cameraPos = player.camera.position
-            , viewMatrix = perspective windowSize player eye
+            , perspective = perspective windowSize player
+            , lookAt = lookAtBody windowSize player eye
             , globalTime = globalTime
             , windowSize = windowSize
             , lensDistort = lensDistort
@@ -272,33 +273,33 @@ renderWorld globalTime world eye windowSize player =
             , measuredFPS = 30.0
             }
 
-        skyMatrix =
-            skyboxMatrix windowSize player
+        skyLookAt =
+            lookAtSky windowSize player
 
         appears =
-            List.concat <| List.map (bodyAppear skyMatrix p) world.bodies
+            List.concat <| List.map (bodyAppear skyLookAt p) world.bodies
     in
         appears
 
 
 {-| Calculate the viewer's field of view
 -}
-perspective : Window.Size -> Model.Player msg -> Model.Eye -> Mat4
-perspective { width, height } player eye =
-    M4.mul (M4.makePerspective player.camera.fovy (toFloat width / toFloat height) 0.1 1000)
-        (M4.makeLookAt (add player.camera.position (eyeOffset eye player.camera))
-            (add player.camera.position (scale 3 (Model.direction player.camera)))
-            (cameraUp player.camera)
-        )
+perspective : Window.Size -> Model.Player msg -> Mat4
+perspective { width, height } player =
+    M4.makePerspective player.camera.fovy (toFloat width / toFloat height) 0.1 1000
+
+lookAtBody : Window.Size -> Model.Player msg -> Model.Eye -> Mat4
+lookAtBody { width, height } player eye =
+    M4.makeLookAt (add player.camera.position (eyeOffset eye player.camera))
+        (add player.camera.position (scale 3 (Model.direction player.camera)))
+        (cameraUp player.camera)
 
 
-skyboxMatrix : Window.Size -> Model.Player msg -> Mat4
-skyboxMatrix { width, height } player =
-    M4.mul (M4.makePerspective player.camera.fovy (toFloat width / toFloat height) 0.1 1000)
-        (M4.makeLookAt (vec3 0 0 0)
-            (scale 3 (Model.direction player.camera))
-            (cameraUp player.camera)
-        )
+lookAtSky : Window.Size -> Model.Player msg -> Mat4
+lookAtSky { width, height } player =
+    M4.makeLookAt (vec3 0 0 0)
+        (scale 3 (Model.direction player.camera))
+        (cameraUp player.camera)
 
 
 hud : Bool -> Model.Player worldMsg -> Int -> Int -> Int -> Int -> Html (Msg worldMsg)
