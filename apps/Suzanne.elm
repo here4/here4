@@ -52,8 +52,11 @@ init path =
       , mesh = Err "Loading ..."
       , reflectionTexture = Err "Loading texture ..."
       }
-    , Texture.load path
-        |> Task.attempt (Self << TextureLoaded)
+    , Cmd.batch
+        [ Texture.load path
+            |> Task.attempt (Self << TextureLoaded)
+        , OBJ.loadMesh "meshes/suzanne.obj" (Self << LoadObj)
+        ]
     )
 
 
