@@ -29,7 +29,7 @@ type alias Model =
 
 
 type Msg
-    = TextureLoaded (Result Error Texture)
+    = TextureLoaded (Result String Texture)
     | LoadObj (Result String (MeshWith VertexWithTexture))
 
 
@@ -53,12 +53,24 @@ init path =
       , reflectionTexture = Err "Loading texture ..."
       }
     , Cmd.batch
-        [ Texture.load path
-            |> Task.attempt (Self << TextureLoaded)
+        [ loadTexture "textures/chavant.jpg" (Self << TextureLoaded)
         , OBJ.loadMesh "meshes/suzanne.obj" (Self << LoadObj)
         ]
     )
 
+
+loadTexture : String -> (Result String Texture -> msg) -> Cmd msg
+loadTexture url msg =
+    Texture.load url
+        |> Task.attempt
+            (\r ->
+                case r of
+                    Ok t ->
+                        msg (Ok t)
+
+                    Err e ->
+                        msg (Err ("Failed to load texture: " ++ toString e))
+            )
 
 update :
     CtrlMsg Msg
@@ -67,13 +79,11 @@ update :
 update msg model =
     let mapBody f =
             (\m -> { m | body = Maybe.map f m.body } ) model
-    in
-    case msg of
-        Self (TextureLoaded textureResult) ->
-            case textureResult of
-                Ok texture ->
-                    let
-                        body =
+
+        loadBody m =
+            case (m.mesh, m.reflectionTexture) of
+                (Ok mesh, Ok texture) ->
+                    { m | body = Just
                             { anchor = AnchorGround
                             , scale = vec3 1 1 1
                             , position = vec3 13 0 38
@@ -81,16 +91,15 @@ update msg model =
                             , appear = textureCube texture
                             , velocity = vec3 0 0 0
                             }
-                    in
-                        ( { model | body = Just body }, Cmd.none )
+                    }
+                _ -> m
+    in
+    case msg of
+        Self (TextureLoaded textureResult) ->
+            ( loadBody { model | reflectionTexture = textureResult }, Cmd.none )
 
-                Err msg ->
-                    -- ( { model | message = "Error loading texture" }, Cmd.none )
-                    ( model, Cmd.none )
-
-        Self (LoadObj mesh) ->
-            ( { model | mesh = mesh }, Cmd.none )
-
+        Self (LoadObj meshResult) ->
+            ( loadBody { model | mesh = meshResult }, Cmd.none )
 
         Ctrl (Control.Move dp) ->
             -- ( mapBody (translate dp), Cmd.none)
