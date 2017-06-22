@@ -24,12 +24,14 @@ import OBJ.Types exposing (MeshWith, VertexWithTexture)
 type alias Model =
     { body : Maybe (Moving Body)
     , mesh : Result String (MeshWith VertexWithTexture)
-    , reflectionTexture : Result String Texture
+    , diffTexture : Result String Texture
+    , normTexture : Result String Texture
     }
 
 
 type Msg
-    = TextureLoaded (Result String Texture)
+    = DiffTextureLoaded (Result String Texture)
+    | NormTextureLoaded (Result String Texture)
     | LoadObj (Result String (MeshWith VertexWithTexture))
 
 
@@ -50,10 +52,12 @@ init : ( Model, Cmd (CtrlMsg Msg) )
 init =
     ( { body = Nothing
       , mesh = Err "Loading ..."
-      , reflectionTexture = Err "Loading texture ..."
+      , diffTexture = Err "Loading texture ..."
+      , normTexture = Err "Loading texture ..."
       }
     , Cmd.batch
-        [ loadTexture "textures/elmLogoNorm.png" (Self << TextureLoaded)
+        [ loadTexture "textures/elmLogoDiffuse.png" (Self << DiffTextureLoaded)
+        , loadTexture "textures/elmLogoNorm.png" (Self << NormTextureLoaded)
         , OBJ.loadMesh "meshes/elmLogo.obj" (Self << LoadObj)
         ]
     )
@@ -81,22 +85,25 @@ update msg model =
             (\m -> { m | body = Maybe.map f m.body } ) model
 
         loadBody m =
-            case (m.mesh, m.reflectionTexture) of
-                (Ok mesh, Ok texture) ->
+            case (m.mesh, m.diffTexture, m.normTexture) of
+                (Ok mesh, Ok diffTexture, Ok normTexture) ->
                     { m | body = Just
                             { anchor = AnchorGround
                             , scale = vec3 1 1 1
                             , position = vec3 38 0 12
                             , orientation = Orientation.initial
-                            , appear = obj mesh texture
+                            , appear = obj mesh diffTexture
                             , velocity = vec3 0 0 0
                             }
                     }
                 _ -> m
     in
     case msg of
-        Self (TextureLoaded textureResult) ->
-            ( loadBody { model | reflectionTexture = textureResult }, Cmd.none )
+        Self (DiffTextureLoaded textureResult) ->
+            ( loadBody { model | diffTexture = textureResult }, Cmd.none )
+
+        Self (NormTextureLoaded textureResult) ->
+            ( loadBody { model | normTexture = textureResult }, Cmd.none )
 
         Self (LoadObj meshResult) ->
             ( loadBody { model | mesh = meshResult }, Cmd.none )
