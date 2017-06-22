@@ -5,6 +5,7 @@ import Model exposing (Args)
 import NewWorld
 import Boids
 import Balls
+import ElmLogo
 import Sky
 import Statue
 import TextureCube
@@ -21,7 +22,8 @@ main : Program Args (Model.Model NewWorld.Model NewWorld.Msg) (Model.Msg NewWorl
 main =
     NewWorld.create
         { apps =
-            [ Suzanne.create "Suzanne" "resources/woodCrate.jpg"
+            [ ElmLogo.create "Elm Logo"
+            , Suzanne.create "Suzanne" "resources/woodCrate.jpg"
             , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
             , Wedge.create "Wedge" (vec3 23 0 12)
             , Statue.create 3.0 "Clouds Sphere" (vec3 3 10 5) cloudsSphere
