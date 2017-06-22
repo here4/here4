@@ -10,14 +10,15 @@ type alias Vertex =
     { pos : Vec3, color : Vec3, coord : Vec3 }
 
 
-worldVertex : Shader Vertex { u | iLensDistort : Float, view : Mat4 } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+worldVertex : Shader Vertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4 } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
 worldVertex =
     [glsl|
 
 attribute vec3 pos;
 attribute vec3 color;
 attribute vec3 coord;
-uniform mat4 view;
+uniform mat4 iPerspective;
+uniform mat4 iLookAt;
 uniform float iLensDistort;
 varying vec3 elm_FragColor;
 varying vec2 elm_FragCoord;
@@ -41,7 +42,7 @@ vec4 distort(vec4 p)
 }
 
 void main () {
-  vec4 p = view * vec4(pos, 1.0);
+  vec4 p = iPerspective * iLookAt * vec4(pos, 1.0);
   if (iLensDistort > 0.0) {
     gl_Position = distort(p);
   } else {

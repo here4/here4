@@ -40,7 +40,8 @@ wedge p =
             , iHMD = iHMD
             , iGlobalTime = s
             , iLensDistort = p.lensDistort
-            , view = p.viewMatrix
+            , iPerspective = p.perspective
+            , iLookAt = p.lookAt
             }
         , entity noiseVertex
             noiseColorFragment
@@ -51,7 +52,8 @@ wedge p =
             , iGlobalTime = s
             , iGlobalTimeV = s
             , iLensDistort = p.lensDistort
-            , view = p.viewMatrix
+            , iPerspective = p.perspective
+            , iLookAt = p.lookAt
             }
         ]
 

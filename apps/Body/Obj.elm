@@ -14,12 +14,8 @@ import Shaders.Reflection exposing (reflectionVert, reflectionFrag)
 import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
 
-type alias Triple a =
-    ( a, a, a )
-
-
 obj : MeshWith VertexWithTexture -> WebGL.Texture -> Appearance
-obj mesh texture p =
+obj { vertices, indices } texture p =
     let
         resolution =
             vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
@@ -29,6 +25,8 @@ obj mesh texture p =
                 1.0
             else
                 0.0
+
+        mesh = indexedTriangles vertices indices
     in
         [ entityWith [ DepthTest.default, cullFace front ]
             reflectionVert
@@ -41,7 +39,8 @@ obj mesh texture p =
             , iHMD = iHMD
             , iTexture = texture
             , iLensDistort = p.lensDistort
-            , view = p.viewMatrix
+            , iPerspective = p.perspective
+            , iLookAt = p.lookAt
             }
 -}
         ]

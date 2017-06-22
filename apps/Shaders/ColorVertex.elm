@@ -10,13 +10,14 @@ type alias ColorVertex =
     { pos : Vec3, color : Vec3 }
 
 
-colorVertex : Shader ColorVertex { u | iLensDistort : Float, view : Mat4 } { elm_FragColor : Vec3 }
+colorVertex : Shader ColorVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4 } { elm_FragColor : Vec3 }
 colorVertex =
     [glsl|
 
 attribute vec3 pos;
 attribute vec3 color;
-uniform mat4 view;
+uniform mat4 iPerspective;
+uniform mat4 iLookAt;
 uniform float iLensDistort;
 
 varying vec3 elm_FragColor;
@@ -40,7 +41,7 @@ vec4 distort(vec4 p)
 }
 
 void main () {
-  vec4 p = view * vec4(pos, 1.0);
+  vec4 p = iPerspective * iLookAt * vec4(pos, 1.0);
   if (iLensDistort > 0.0) {
     gl_Position = distort(p);
   } else {

@@ -21,7 +21,8 @@ type alias BoidShaderInput =
     , iHMD : Float
     , iLensDistort : Float
     , iResolution : Vec3
-    , view : Mat4
+    , iPerspective : Mat4
+    , iLookAt : Mat4
     }
 
 
@@ -75,7 +76,8 @@ appearBFly vertexShader fragmentShader flapStart p =
             , iGlobalTime = s
             , iHMD = iHMD
             , iLensDistort = p.lensDistort
-            , view = p.viewMatrix
+            , iPerspective = p.perspective
+            , iLookAt = p.lookAt
             , flapL = flapL
             , flapR = flapR
             }
@@ -103,7 +105,7 @@ mesh =
         triangles <| [ ( bHead, bTail, bLeft ), ( bHead, bTail, bRight ) ]
 
 
-bflyVertex : Shader BoidVertex { u | iLensDistort : Float, view : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+bflyVertex : Shader BoidVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
 bflyVertex =
     [glsl|
 
@@ -112,7 +114,8 @@ attribute vec3 color;
 attribute vec3 coord;
 attribute vec3 wing;
 uniform float iLensDistort;
-uniform mat4 view;
+uniform mat4 iPerspective;
+uniform mat4 iLookAt;
 uniform mat4 flapL;
 uniform mat4 flapR;
 varying vec3 elm_FragColor;
@@ -141,7 +144,7 @@ void main () {
   if (wing.x < 0.0) { flap = flapL; }
   else if (wing.x > 0.0) { flap = flapR; }
   else { flap = mat4(1.0); }
-  vec4 p = view * flap * vec4(pos, 1.0);
+  vec4 p = iPerspective * iLookAt * flap * vec4(pos, 1.0);
   if (iLensDistort > 0.0) {
     gl_Position = distort(p);
   } else {

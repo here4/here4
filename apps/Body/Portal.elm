@@ -71,7 +71,8 @@ appearPortal vertexShader fragmentShader p =
             { iResolution = resolution
             , iGlobalTime = s
             , iLensDistort = p.lensDistort
-            , view = p.viewMatrix
+            , iPerspective - p.perspective
+            , iLookAt = p.lookAt
             }
         ]
 

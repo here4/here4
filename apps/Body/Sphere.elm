@@ -68,7 +68,8 @@ appearSphere vertexShader fragmentShader p =
             , iGlobalTime = s
             , iHMD = iHMD
             , iLensDistort = p.lensDistort
-            , view = p.viewMatrix
+            , iPerspective = p.perspective
+            , iLookAt = p.lookAt
             }
         ]
 

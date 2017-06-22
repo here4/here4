@@ -70,7 +70,8 @@ cube vertexShader fragmentShader p =
             , iHMD = iHMD
             , iGlobalTime = s
             , iLensDistort = p.lensDistort
-            , view = p.viewMatrix
+            , iPerspective = p.perspective
+            , iLookAt = p.lookAt
             }
         ]
 
@@ -94,7 +95,8 @@ textureCube texture p =
             , iHMD = iHMD
             , iTexture = texture
             , iLensDistort = p.lensDistort
-            , view = p.viewMatrix
+            , iPerspective = p.perspective
+            , iLookAt = p.lookAt
             }
         ]
 

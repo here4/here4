@@ -28,7 +28,8 @@ type alias ShaderPerception =
     , iHMD : Float
     , iResolution : Vec3
     , iLensDistort : Float
-    , view : Mat4
+    , iPerspective : Mat4
+    , iLookAt : Mat4
     }
 
 

@@ -19,7 +19,8 @@ type alias NoiseVertexInput =
     , iHMD : Float
     , iLensDistort : Float
     , iResolution : Vec3
-    , view : Mat4
+    , iPerspective : Mat4
+    , iLookAt : Mat4
     }
 
 
@@ -35,7 +36,8 @@ type alias RippleNoiseVertexInput =
     , iLensDistort : Float
     , iResolution : Vec3
     , iRipple : Float
-    , view : Mat4
+    , iPerspective : Mat4
+    , iLookAt : Mat4
     }
 
 
@@ -51,7 +53,8 @@ attribute float timeScale;
 attribute float smoothing;
 uniform float iGlobalTimeV;
 uniform float iLensDistort;
-uniform mat4 view;
+uniform mat4 iPerspective;
+uniform mat4 iLookAt;
 varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
 varying float iTextureScale;
@@ -83,7 +86,7 @@ void main () {
   iTimeScale = timeScale;
   iSmoothing = smoothing;
 
-  vec4 p = view * vec4(pos, 1.0);
+  vec4 p = iPerspective * iLookAt * vec4(pos, 1.0);
   if (iLensDistort > 0.0) {
     vec4 d = distort(p);
     gl_Position = d;
@@ -110,7 +113,8 @@ attribute float smoothing;
 uniform float iGlobalTimeV;
 uniform float iLensDistort;
 uniform float iRipple;
-uniform mat4 view;
+uniform mat4 iPerspective;
+uniform mat4 iLookAt;
 varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
 varying float iTextureScale;
@@ -139,7 +143,7 @@ void main () {
   float y = pos.y + iRipple*sin(coord.x*coord.y + iGlobalTimeV);
   vec3 newPos = vec3(pos.x, y, pos.z);
 
-  vec4 p = view * vec4(newPos, 1.0);
+  vec4 p = iPerspective * iLookAt * vec4(newPos, 1.0);
   if (iLensDistort > 0.0) {
     vec4 d = distort(p);
     gl_Position = d;
