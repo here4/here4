@@ -32,7 +32,6 @@ obj { vertices, indices } texture p =
             reflectionVert
             reflectionFrag
             mesh
-            -- { camera = camera, mvMat = modelView, texture = texture }
             { camera = p.perspective, mvMat = p.lookAt, texture = texture }
 {-
             { iResolution = resolution
