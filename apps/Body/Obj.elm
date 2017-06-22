@@ -7,13 +7,15 @@ import Appearance exposing (..)
 import Shaders.TextureFragment exposing (textureFragment)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
+import OBJ
+import OBJ.Types exposing (MeshWith, VertexWithTexture)
 
 type alias Triple a =
     ( a, a, a )
 
 
-obj : WebGL.Texture -> Appearance
-obj texture p =
+obj : MeshWith VertexWithTexture -> WebGL.Texture -> Appearance
+obj mesh0 texture p =
     let
         resolution =
             vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0

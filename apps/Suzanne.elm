@@ -15,7 +15,7 @@ import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation
-import Body.Cube exposing (textureCube)
+import Body.Obj exposing (obj)
 import Vehicles.DreamBuggy as DreamBuggy
 
 import OBJ
@@ -88,7 +88,7 @@ update msg model =
                             , scale = vec3 1 1 1
                             , position = vec3 13 0 38
                             , orientation = Orientation.initial
-                            , appear = textureCube texture
+                            , appear = obj mesh texture
                             , velocity = vec3 0 0 0
                             }
                     }
