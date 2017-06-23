@@ -3,7 +3,7 @@ module Camera.Tracking exposing (tracking)
 import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
 
-import Body exposing (Moving)
+import Body exposing (Moving, Oriented)
 import Camera exposing (..)
 import Camera.Util as Camera
 import Ground exposing (Ground)
@@ -12,20 +12,20 @@ import Model
 tracking : Shot
 tracking =
     { label = "Tracking"
-    , init = trackingInit
-    , shoot = trackingShoot
+    , init = trackingInit Model.direction
+    , shoot = trackingShoot Model.direction
     }
 
-trackingInit : Ground -> Camera -> Camera
-trackingInit ground camera =
+trackingInit : (Target -> Vec3) -> Ground -> Camera -> Camera
+trackingInit direction ground camera =
     let
         target = camera.target
         position =
-            sub target.position (V3.scale 23 (Model.direction target))
+            sub target.position (V3.scale 23 (direction target))
     in Camera.retarget camera.target { camera | position = position }
 
-trackingShoot : Ground -> Input -> Moving a -> Camera -> Camera
-trackingShoot ground input target camera =
+trackingShoot : (Moving a -> Vec3) -> Ground -> Input -> Moving a -> Camera -> Camera
+trackingShoot direction ground input target camera =
     let
         eyeLevel pos =
             Model.eyeLevel + ground.elevation pos
@@ -57,7 +57,7 @@ trackingShoot ground input target camera =
 
         -- TODO: make distance relative to target size, speed
         behind =
-            sub target.position (V3.scale newDistance (Model.direction target))
+            sub target.position (V3.scale newDistance (direction target))
 
         newCameraPos =
             if getY target.position < Model.eyeLevel then
