@@ -13,14 +13,14 @@ dollyZoom : Shot
 dollyZoom =
     { label = "Dolly Zoom"
     , init = dollyInit
-    , shoot = dollyZoomShoot
+    , shoot = dollyZoomShoot 3.0
     }
 
 dolly : Shot
 dolly =
     { label = "Dolly"
     , init = dollyInit
-    , shoot = dollyShoot
+    , shoot = dollyShoot 3.0
     }
 
 arc : Shot
@@ -41,8 +41,8 @@ dollyInit ground camera =
         |> Camera.retarget camera.target
         |> Camera.rollUpright
 
-dollyShoot : Ground -> Input -> Target -> Camera -> Camera
-dollyShoot ground input target camera =
+dollyShoot : Float -> Ground -> Input -> Target -> Camera -> Camera
+dollyShoot minDistance ground input target camera =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
@@ -79,7 +79,7 @@ dollyShoot ground input target camera =
 
         -- Limit how close you can get. This should be a function of the size of the thing.
         position =
-            if V3.length newDisplacement < 3.0 then
+            if V3.length newDisplacement < minDistance then
                 trackingPosition
             else
                 newPosition
@@ -89,64 +89,20 @@ dollyShoot ground input target camera =
         |> Camera.retarget target
         |> Camera.rollUpright
 
-dollyZoomShoot : Ground -> Input -> Target -> Camera -> Camera
-dollyZoomShoot ground input target camera =
+
+dollyZoomShoot : Float -> Ground -> Input -> Target -> Camera -> Camera
+dollyZoomShoot minDistance ground input target camera =
     let
-        eyeLevel pos =
-            1.8 + ground.elevation pos
-
-        -- input
-        inputNearFar =
-            -input.y * 30 * input.dt
-
-        inputYaw =
-            -input.x * 1 * input.dt
-
-        -- The original displacement of the camera, relative to where the target was
-        originalDisplacement =
-            V3.sub camera.position camera.target.position
-
-        -- New position of the camera, just tracking the target
-        trackingPosition =
-            V3.add target.position originalDisplacement
-
-        -- Vector to move closer to target
-        moveCloser =
-            V3.scale inputNearFar (V3.normalize originalDisplacement)
-
-        -- Displacement looking at target from newPosition
-        closeDisplacement =
-            V3.add originalDisplacement moveCloser
-
-        newDisplacement =
-            moveAroundSphere 0 inputYaw closeDisplacement
-
-        -- The new position, relative to where the target is now
-        newPosition =
-            V3.add target.position newDisplacement
-
-        minDistance = 3.0
-
-        -- Limit how close you can get. This should be a function of the size of the thing.
-        position =
-            if V3.length newDisplacement < minDistance then
-                trackingPosition
-            else
-                newPosition
+        dollyCamera = dollyShoot minDistance ground input target camera
 
         finalDistance =
-            V3.length (V3.sub position target.position)
+            V3.length (V3.sub dollyCamera.position target.position)
 
         fovy =
             clamp 1 89 (10 * (10 - sqrt (finalDistance-minDistance)))
 
     in
-        { camera | position = position
-                 , fovy = fovy
-        }
-        |> Camera.retarget target
-        |> Camera.rollUpright
-
+        { dollyCamera | fovy = fovy }
 
 
 arcShoot : Ground -> Input -> Target -> Camera -> Camera
