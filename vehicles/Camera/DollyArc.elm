@@ -143,29 +143,6 @@ arcShoot ground input target camera =
         eyeLevel pos =
             1.8 + ground.elevation pos
 
-        fromSpherical (r, theta, phi) =
-            V3.vec3 (r * sin theta * cos phi)
-                    (r * cos theta)
-                    (r * sin theta * sin phi)
-
-        toSpherical v =
-            let
-                (x,y,z) = V3.toTuple v
-                r = V3.length v -- sqrt(x*x + y*y + z*z)
-            in
-                (r, acos (y/r), atan2 z x)
-
-        -- Move around a sphere centered at the origin
-        moveAroundSphere dTheta dPhi pos =
-            let (r, theta, phi) = toSpherical pos
-                thetaNew = clamp 0 pi <| theta + dTheta
-                phiNew = phi + dPhi
-            in
-                if r == 0 || (thetaNew == 0 || thetaNew == pi) then
-                    pos
-                else
-                    fromSpherical (r, thetaNew, phiNew)
-
         inputYaw =
             -input.x * 1 * input.dt
 
@@ -184,3 +161,32 @@ arcShoot ground input target camera =
         { camera | position = position }
         |> Camera.retarget target
         |> Camera.rollUpright
+
+
+-- Move around a sphere centered at the origin
+moveAroundSphere : Float -> Float -> Vec3 -> Vec3
+moveAroundSphere dTheta dPhi pos =
+    let
+        fromSpherical (r, theta, phi) =
+            V3.vec3 (r * sin theta * cos phi)
+                    (r * cos theta)
+                    (r * sin theta * sin phi)
+
+        toSpherical v =
+            let
+                (x,y,z) = V3.toTuple v
+                r = V3.length v -- sqrt(x*x + y*y + z*z)
+            in
+                (r, acos (y/r), atan2 z x)
+
+        (r, theta, phi) = toSpherical pos
+        thetaNew = clamp 0 pi <| theta + dTheta
+        phiNew = phi + dPhi
+
+    in
+        if r == 0 || (thetaNew == 0 || thetaNew == pi) then
+            pos
+        else
+            fromSpherical (r, thetaNew, phiNew)
+
+
