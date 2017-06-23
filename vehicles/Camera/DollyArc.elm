@@ -99,6 +99,9 @@ dollyZoomShoot ground input target camera =
         inputNearFar =
             -input.y * 30 * input.dt
 
+        inputYaw =
+            -input.x * 1 * input.dt
+
         -- The original displacement of the camera, relative to where the target was
         originalDisplacement =
             V3.sub camera.position camera.target.position
@@ -111,13 +114,16 @@ dollyZoomShoot ground input target camera =
         moveCloser =
             V3.scale inputNearFar (V3.normalize originalDisplacement)
 
+        -- Displacement looking at target from newPosition
+        closeDisplacement =
+            V3.add originalDisplacement moveCloser
+
+        newDisplacement =
+            moveAroundSphere 0 inputYaw closeDisplacement
+
         -- The new position, relative to where the target is now
         newPosition =
-            V3.add trackingPosition moveCloser
-
-        -- Displacement looking at target from newPosition
-        newDisplacement =
-            V3.sub target.position newPosition
+            V3.add target.position newDisplacement
 
         minDistance = 3.0
 
