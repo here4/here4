@@ -2,6 +2,7 @@ module ElmLogo exposing (create)
 
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
+import Dict exposing (Dict)
 import Task exposing (Task)
 import Time exposing (Time)
 import Tuple exposing (first)
@@ -15,15 +16,15 @@ import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation
-import Body.Obj exposing (obj)
+import Body.Obj exposing (obj2)
 import Vehicles.DreamBuggy as DreamBuggy
 
 import OBJ
-import OBJ.Types exposing (MeshWith, VertexWithTexture)
+import OBJ.Types exposing (ObjFile, Mesh(..))
 
 type alias Model =
     { body : Maybe (Moving Body)
-    , mesh : Result String (MeshWith VertexWithTexture)
+    , mesh : Result String ObjFile
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
     }
@@ -32,7 +33,9 @@ type alias Model =
 type Msg
     = DiffTextureLoaded (Result String Texture)
     | NormTextureLoaded (Result String Texture)
-    | LoadObj (Result String (MeshWith VertexWithTexture))
+    -- | LoadObj (Result String (MeshWith VertexWithTexture))
+    -- | LoadObj String (Result String ObjFile)
+    | LoadObj String (Result String (Dict String (Dict String Mesh)))
 
 
 create : String -> ( App, Cmd AppMsg )
@@ -58,9 +61,13 @@ init =
     , Cmd.batch
         [ loadTexture "textures/elmLogoDiffuse.png" (Self << DiffTextureLoaded)
         , loadTexture "textures/elmLogoNorm.png" (Self << NormTextureLoaded)
-        , OBJ.loadMesh "meshes/elmLogo.obj" (Self << LoadObj)
+        , loadModel True "meshes/elmLogo.obj"
         ]
     )
+
+loadModel : Bool -> String -> Cmd (CtrlMsg Msg)
+loadModel withTangents url =
+    OBJ.loadObjFileWith { withTangents = withTangents } url (Self << LoadObj url)
 
 
 loadTexture : String -> (Result String Texture -> msg) -> Cmd msg
@@ -87,15 +94,21 @@ update msg model =
         loadBody m =
             case (m.mesh, m.diffTexture, m.normTexture) of
                 (Ok mesh, Ok diffTexture, Ok normTexture) ->
-                    { m | body = Just
-                            { anchor = AnchorGround
-                            , scale = vec3 1 1 1
-                            , position = vec3 38 0 12
-                            , orientation = Orientation.initial
-                            , appear = obj mesh diffTexture
-                            , velocity = vec3 0 0 0
-                            }
-                    }
+                    let 
+                        appear p =
+                            Dict.values mesh
+                                |> List.concatMap Dict.values 
+                                |> List.concatMap (\m -> obj2 diffTexture normTexture m p)
+                    in
+                        { m | body = Just
+                                { anchor = AnchorGround
+                                , scale = vec3 1 1 1
+                                , position = vec3 38 0 12
+                                , orientation = Orientation.initial
+                                , appear = appear
+                                , velocity = vec3 0 0 0
+                                }
+                        }
                 _ -> m
     in
     case msg of
@@ -105,7 +118,7 @@ update msg model =
         Self (NormTextureLoaded textureResult) ->
             ( loadBody { model | normTexture = textureResult }, Cmd.none )
 
-        Self (LoadObj meshResult) ->
+        Self (LoadObj url meshResult) ->
             ( loadBody { model | mesh = meshResult }, Cmd.none )
 
         Ctrl (Control.Move dp) ->
