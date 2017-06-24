@@ -22,9 +22,9 @@ run the following sequence of commands:
 ```bash
 git clone https://github.com/kfish/dreambuggy.git
 cd dreambuggy
-elm-package install
-elm-make dreambuggy/Main.elm --output build/Main.js
-elm-reactor
+elm-install
+make
+./server.py
 ```
 
 And then open [http://localhost:8000/index.html](http://localhost:8000/index.html) to see it in action!
