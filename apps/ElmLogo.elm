@@ -33,8 +33,6 @@ type alias Model =
 type Msg
     = DiffTextureLoaded (Result String Texture)
     | NormTextureLoaded (Result String Texture)
-    -- | LoadObj (Result String (MeshWith VertexWithTexture))
-    -- | LoadObj String (Result String ObjFile)
     | LoadObj String (Result String (Dict String (Dict String Mesh)))
 
 
@@ -159,8 +157,7 @@ overlay : Model -> Html msg
 overlay _ =
     Html.div []
         [ Html.h2 []
-              [ Html.text "Suzanne" ]
-        , Html.text "From Blender."
+              [ Html.text "Elm Logo" ]
         , Html.br [] []
         , Html.hr [] []
         , DreamBuggy.overlay
