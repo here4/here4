@@ -16,8 +16,14 @@ Supports up to 2 USB gamepads.
 
 ## Build Locally
 
-After installing [the Elm Platform](https://github.com/elm-lang/elm-platform),
-run the following sequence of commands:
+This package depends on kfish/elm-gamepad and kfish/dynamic,
+which contain experimental Native code. They are not yet
+whiteliested for inclusion in the Elm package archive.
+You will need to use an unofficial installer like
+[elm-install](https://github.com/gdotdesign/elm-github-install)
+
+Clone this repository and run a local HTTP file server,
+such as the included ./server.py:
 
 ```bash
 git clone https://github.com/kfish/dreambuggy.git
