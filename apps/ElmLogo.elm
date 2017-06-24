@@ -22,6 +22,13 @@ import Vehicles.DreamBuggy as DreamBuggy
 import OBJ
 import OBJ.Types exposing (ObjFile, Mesh(..))
 
+type alias Attributes =
+    { label : String
+    , meshPath : String
+    , diffuseTexturePath : String
+    , normalTexturePath : String
+    }
+
 type alias Model =
     { body : Maybe (Moving Body)
     , mesh : Result String ObjFile
@@ -36,10 +43,10 @@ type Msg
     | LoadObj String (Result String (Dict String (Dict String Mesh)))
 
 
-create : String -> ( App, Cmd AppMsg )
-create label =
-    App.create init
-        { label = always label
+create : Attributes -> ( App, Cmd AppMsg )
+create attributes =
+    App.create (init attributes)
+        { label = always attributes.label
         , update = update
         , animate = animate
         , bodies = bodies
@@ -49,17 +56,17 @@ create label =
         }
 
 
-init : ( Model, Cmd (CtrlMsg Msg) )
-init =
+init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
+init attributes =
     ( { body = Nothing
       , mesh = Err "Loading ..."
       , diffTexture = Err "Loading texture ..."
       , normTexture = Err "Loading texture ..."
       }
     , Cmd.batch
-        [ loadTexture "textures/elmLogoDiffuse.png" (Self << DiffTextureLoaded)
-        , loadTexture "textures/elmLogoNorm.png" (Self << NormTextureLoaded)
-        , loadModel True "meshes/elmLogo.obj"
+        [ loadTexture attributes.diffuseTexturePath (Self << DiffTextureLoaded)
+        , loadTexture attributes.normalTexturePath(Self << NormTextureLoaded)
+        , loadModel True attributes.meshPath
         ]
     )
 

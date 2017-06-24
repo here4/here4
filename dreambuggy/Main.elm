@@ -22,7 +22,12 @@ main : Program Args (Model.Model NewWorld.Model NewWorld.Msg) (Model.Msg NewWorl
 main =
     NewWorld.create
         { apps =
-            [ ElmLogo.create "Elm Logo"
+            [ ElmLogo.create
+                { label = "Elm Logo"
+                , meshPath = "meshes/elmLogo.obj"
+                , diffuseTexturePath = "textures/elmLogoDiffuse.png"
+                , normalTexturePath = "textures/elmLogoNorm.png"
+                }
             , Suzanne.create "Suzanne" "resources/woodCrate.jpg"
             , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
             , Wedge.create "Wedge" (vec3 23 0 12)
