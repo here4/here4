@@ -5,7 +5,7 @@ import Model exposing (Args)
 import NewWorld
 import Boids
 import Balls
-import ElmLogo
+import Obj
 import Sky
 import Statue
 import TextureCube
@@ -22,7 +22,7 @@ main : Program Args (Model.Model NewWorld.Model NewWorld.Msg) (Model.Msg NewWorl
 main =
     NewWorld.create
         { apps =
-            [ ElmLogo.create
+            [ Obj.create
                 { label = "Elm Logo"
                 , meshPath = "meshes/elmLogo.obj"
                 , diffuseTexturePath = "textures/elmLogoDiffuse.png"

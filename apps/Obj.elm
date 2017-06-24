@@ -1,4 +1,4 @@
-module ElmLogo exposing (create)
+module Obj exposing (create)
 
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
