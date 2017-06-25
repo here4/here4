@@ -194,14 +194,14 @@ bodyAppear skyLookAt p body =
             case body.anchor of
                 Body.AnchorGround ->
                     body.appear
-                        |> rotate
+                        |> scale
+                        >> rotate
                         >> translate
-                        >> scale
 
                 Body.AnchorSky ->
                     body.appear
-                        |> rotate
-                        >> scale
+                        |> scale
+                        >> rotate
 
                 Body.AnchorHUD ->
                     body.appear
