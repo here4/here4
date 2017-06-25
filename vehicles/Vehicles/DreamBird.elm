@@ -14,16 +14,14 @@ import Ground exposing (Ground)
 
 ----------------------------------------------------------------------
 -- DreamBird
--- | Welcome a new driver to the DreamBird
+
+type alias Attributes =
+    { speed : Float
+    }
 
 
-welcome : Model.Motion -> Model.Motion
-welcome motion =
-    motion
-
-
-drive : Ground -> Model.Inputs -> Moving (HasBody a) -> Moving (HasBody a)
-drive ground inputs body =
+drive : Attributes -> Ground -> Model.Inputs -> Moving (HasBody a) -> Moving (HasBody a)
+drive attributes ground inputs body =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
@@ -32,7 +30,7 @@ drive ground inputs body =
             { position = body.position, orientation = body.orientation, velocity = body.velocity }
 
         motion =
-            move ground eyeLevel inputs motion0
+            move attributes ground eyeLevel inputs motion0
     in
         { body
             | position = motion.position
@@ -41,10 +39,10 @@ drive ground inputs body =
         }
 
 
-move : Ground -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
-move ground eyeLevel inputs motion =
+move : Attributes -> Ground -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+move attributes ground eyeLevel inputs motion =
     motion
-        |> fly eyeLevel inputs
+        |> fly attributes.speed eyeLevel inputs
         |> flyPhysics eyeLevel inputs.dt
         |> keepWithinbounds ground
 
@@ -53,8 +51,8 @@ move ground eyeLevel inputs motion =
 -- http://www.dtic.mil/dtic/tr/fulltext/u2/a152616.pdf
 
 
-fly : Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
-fly eyeLevel inputs motion =
+fly : Float -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+fly speed eyeLevel inputs motion =
     let
         thrust =
             clamp -1.0 1.0 <|
@@ -79,7 +77,7 @@ fly eyeLevel inputs motion =
             rotateBodyV orientation
 
         dv =
-            V3.scale (10 * thrust * inputs.dt) <| orient V3.k
+            V3.scale (speed * thrust * inputs.dt) <| orient V3.k
 
         du =
             V3.scale (4 * thrust * inputs.dt) <| orient V3.j
