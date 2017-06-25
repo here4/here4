@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import App exposing (App, AppMsg)
 import Math.Vector3 exposing (vec3)
 import Model exposing (Args)
 import NewWorld
@@ -22,12 +23,7 @@ main : Program Args (Model.Model NewWorld.Model NewWorld.Msg) (Model.Msg NewWorl
 main =
     NewWorld.create
         { apps =
-            [ Obj.create
-                { label = "Elm Logo"
-                , meshPath = "meshes/elmLogo.obj"
-                , diffuseTexturePath = "textures/elmLogoDiffuse.png"
-                , normalTexturePath = "textures/elmLogoNorm.png"
-                }
+            [ elmLogo
             , Suzanne.create "Suzanne" "resources/woodCrate.jpg"
             , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
             , Wedge.create "Wedge" (vec3 23 0 12)
@@ -43,3 +39,13 @@ main =
             , Sky.create skySphere
             ]
         }
+
+elmLogo : (App, Cmd AppMsg)
+elmLogo =
+    Obj.create
+        { label = "Elm Logo"
+        , meshPath = "meshes/elmLogo.obj"
+        , diffuseTexturePath = "textures/elmLogoDiffuse.png"
+        , normalTexturePath = "textures/elmLogoNorm.png"
+        }
+        
