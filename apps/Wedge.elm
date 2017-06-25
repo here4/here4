@@ -68,7 +68,7 @@ update msg model =
                 ( model, Cmd.none )
 
             Ctrl (Control.Drive ground inputs) ->
-                ( mapBody (DreamBird.drive { speed = 10.0 } ground inputs), Cmd.none )
+                ( mapBody (DreamBird.drive { speed = 20.0 } ground inputs), Cmd.none )
 
             _ ->
                 ( model, Cmd.none )
