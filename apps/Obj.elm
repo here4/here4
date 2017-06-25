@@ -17,7 +17,6 @@ import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation
 import Body.Obj exposing (obj2)
-import Vehicles.DreamBuggy as DreamBuggy
 
 import OBJ
 import OBJ.Types exposing (ObjFile, Mesh(..))
@@ -28,6 +27,7 @@ type alias Attributes =
     , meshPath : String
     , diffuseTexturePath : String
     , normalTexturePath : String
+    , drive : Maybe (Ground -> Inputs -> Moving Body -> Moving Body)
     }
 
 type alias Model =
@@ -48,7 +48,7 @@ create : Attributes -> ( App, Cmd AppMsg )
 create attributes =
     App.create (init attributes)
         { label = always attributes.label
-        , update = update
+        , update = update attributes.drive
         , animate = animate
         , bodies = bodies
         , framing = framing
@@ -90,10 +90,11 @@ loadTexture url msg =
             )
 
 update :
-    CtrlMsg Msg
+    Maybe (Ground -> Inputs -> Moving Body -> Moving Body)
+    -> CtrlMsg Msg
     -> Model
     -> ( Model, Cmd (CtrlMsg Msg) )
-update msg model =
+update mDrive msg model =
     let mapBody f =
             (\m -> { m | body = Maybe.map f m.body } ) model
 
@@ -132,7 +133,11 @@ update msg model =
             ( model, Cmd.none )
 
         Ctrl (Control.Drive ground inputs) ->
-            ( mapBody (DreamBuggy.drive ground 8.0 inputs), Cmd.none )
+            case mDrive of
+                Just drive ->
+                    ( mapBody (drive ground inputs), Cmd.none )
+                Nothing ->
+                    ( model, Cmd.none )
 
         Effect _ ->
             ( model, Cmd.none )

@@ -53,6 +53,7 @@ elmLogo =
                 , Html.hr [] []
                 , DreamBuggy.overlay
                 ]
+        drive ground inputs = DreamBuggy.drive ground 8.0 inputs
     in
         Obj.create
             { label = "Elm Logo"
@@ -60,5 +61,6 @@ elmLogo =
             , meshPath = "meshes/elmLogo.obj"
             , diffuseTexturePath = "textures/elmLogoDiffuse.png"
             , normalTexturePath = "textures/elmLogoNorm.png"
+            , drive = Just drive
             }
         
