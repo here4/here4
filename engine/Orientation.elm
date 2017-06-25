@@ -4,7 +4,7 @@ import Math.Matrix4 as M4
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Quaternion as Qn
-import Internal.Quaternion as QnI
+import Quaternion.Internal as QnI
 
 
 type alias Orientation =
