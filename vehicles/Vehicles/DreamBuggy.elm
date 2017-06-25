@@ -16,28 +16,30 @@ import Debug
 
 ----------------------------------------------------------------------
 -- DreamBuggy
--- | Welcome a new driver to the DreamBuggy
 
+type alias Attributes =
+    { speed : Float
+    }
 
 welcome : Model.Motion -> Model.Motion
 welcome motion =
     { motion | orientation = clampBuggy motion.orientation }
 
 
-drive : Ground -> Float -> Model.Inputs -> Moving a -> Moving a
-drive ground speed inputs thing =
+drive : Attributes -> Ground -> Model.Inputs -> Moving a -> Moving a
+drive attributes ground inputs thing =
     let
         eyeLevel pos =
             ground.elevation pos
     in
-        move ground speed eyeLevel inputs thing
+        move attributes ground eyeLevel inputs thing
 
 
-move : Ground -> Float -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
-move terrain speed eyeLevel inputs motion =
+move : Attributes -> Ground -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
+move attributes terrain eyeLevel inputs motion =
     motion
-        |> turn eyeLevel speed inputs.x inputs.dt
-        |> goForward eyeLevel speed inputs
+        |> turn eyeLevel attributes.speed inputs.x inputs.dt
+        |> goForward eyeLevel attributes.speed inputs
         |> gravity eyeLevel inputs.dt
         |> physics eyeLevel inputs.dt
         |> keepWithinbounds terrain

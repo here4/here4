@@ -106,7 +106,7 @@ update msg model =
             ( model, Cmd.none )
 
         Ctrl (Control.Drive ground inputs) ->
-            ( mapBody (DreamBuggy.drive ground 8.0 inputs), Cmd.none )
+            ( mapBody (DreamBuggy.drive { speed = 8.0 } ground inputs), Cmd.none )
 
         Effect _ ->
             ( model, Cmd.none )

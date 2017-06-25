@@ -53,7 +53,7 @@ elmLogo =
                 , Html.hr [] []
                 , DreamBuggy.overlay
                 ]
-        drive ground inputs = DreamBuggy.drive ground 8.0 inputs
+        drive = DreamBuggy.drive { speed = 8.0 }
     in
         Obj.create
             { label = "Elm Logo"
