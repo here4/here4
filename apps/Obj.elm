@@ -24,6 +24,7 @@ import OBJ.Types exposing (ObjFile, Mesh(..))
 
 type alias Attributes =
     { label : String
+    , overlay : Html (CtrlMsg Msg)
     , meshPath : String
     , diffuseTexturePath : String
     , normalTexturePath : String
@@ -52,7 +53,7 @@ create attributes =
         , bodies = bodies
         , framing = framing
         , focus = focus
-        , overlay = overlay
+        , overlay = always attributes.overlay
         }
 
 
@@ -159,13 +160,3 @@ framing model = Maybe.map (Camera.framing) model.body
 focus : Model -> Maybe Focus
 focus model =
     Maybe.map appToFocus model.body
-
-overlay : Model -> Html msg
-overlay _ =
-    Html.div []
-        [ Html.h2 []
-              [ Html.text "Elm Logo" ]
-        , Html.br [] []
-        , Html.hr [] []
-        , DreamBuggy.overlay
-        ]

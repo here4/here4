@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import App exposing (App, AppMsg)
+import Html exposing (Html)
 import Math.Vector3 exposing (vec3)
 import Model exposing (Args)
 import NewWorld
@@ -17,6 +18,7 @@ import Body.Terrain as Terrain
 import Body.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
 import Body.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Body.Sphere exposing (skySphere, cloudsSphere)
+import Vehicles.DreamBuggy as DreamBuggy
 
 
 main : Program Args (Model.Model NewWorld.Model NewWorld.Msg) (Model.Msg NewWorld.Msg)
@@ -42,10 +44,21 @@ main =
 
 elmLogo : (App, Cmd AppMsg)
 elmLogo =
-    Obj.create
-        { label = "Elm Logo"
-        , meshPath = "meshes/elmLogo.obj"
-        , diffuseTexturePath = "textures/elmLogoDiffuse.png"
-        , normalTexturePath = "textures/elmLogoNorm.png"
-        }
+    let
+        overlay =
+            Html.div []
+                [ Html.h2 []
+                      [ Html.text "Elm Logo" ]
+                , Html.br [] []
+                , Html.hr [] []
+                , DreamBuggy.overlay
+                ]
+    in
+        Obj.create
+            { label = "Elm Logo"
+            , overlay = overlay
+            , meshPath = "meshes/elmLogo.obj"
+            , diffuseTexturePath = "textures/elmLogoDiffuse.png"
+            , normalTexturePath = "textures/elmLogoNorm.png"
+            }
         
