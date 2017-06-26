@@ -16,7 +16,6 @@ import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation
 import Body.Cube exposing (textureCube)
-import Vehicles.DreamBuggy as DreamBuggy
 
 
 type alias Model =
@@ -65,7 +64,7 @@ update msg model =
                         body =
                             { anchor = AnchorGround
                             , scale = vec3 1 1 1
-                            , position = vec3 -2 0 -17
+                            , position = vec3 56 0 -35
                             , orientation = Orientation.initial
                             , appear = textureCube texture
                             , velocity = vec3 0 0 0
@@ -76,13 +75,12 @@ update msg model =
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
                     ( model, Cmd.none )
+
         Ctrl (Control.Move dp) ->
-            -- ( mapBody (translate dp), Cmd.none)
             ( model, Cmd.none )
 
         Ctrl (Control.Drive ground inputs) ->
-            ( mapBody (DreamBuggy.drive { speed = 8.0 } ground inputs), Cmd.none )
-            -- ( Maybe.map (\m -> { m | body = DreamBuggy.drive ground 8.0 inputs) m.body } model, Cmd.none )
+            ( model, Cmd.none )
 
         Effect _ ->
             ( model, Cmd.none )
@@ -121,9 +119,8 @@ overlay : Model -> Html msg
 overlay _ =
     Html.div []
         [ Html.h2 []
-              [ Html.text "A wooden box" ]
-        , Html.text "This highly attractive wooden box doubles as a secret vehicle."
+              [ Html.text "Shufflepuck" ]
+        , Html.text "An air hockey game."
         , Html.br [] []
         , Html.hr [] []
-        , DreamBuggy.overlay
         ]
