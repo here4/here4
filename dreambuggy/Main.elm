@@ -26,7 +26,7 @@ main =
     NewWorld.create
         { apps =
             [ elmLogo
-            , Suzanne.create "Suzanne" "resources/woodCrate.jpg"
+            , Suzanne.create "Suzanne"
             , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
             , Wedge.create "Wedge" (vec3 23 0 12)
             , Statue.create 3.0 "Clouds Sphere" (vec3 3 10 5) cloudsSphere

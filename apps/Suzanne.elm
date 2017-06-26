@@ -33,9 +33,9 @@ type Msg
     | LoadObj (Result String (MeshWith VertexWithTexture))
 
 
-create : String -> String -> ( App, Cmd AppMsg )
-create label path =
-    App.create (init path)
+create : String -> ( App, Cmd AppMsg )
+create label =
+    App.create init
         { label = always label
         , update = update
         , animate = animate
@@ -46,8 +46,8 @@ create label path =
         }
 
 
-init : String -> ( Model, Cmd (CtrlMsg Msg) )
-init path =
+init : ( Model, Cmd (CtrlMsg Msg) )
+init =
     ( { body = Nothing
       , mesh = Err "Loading ..."
       , reflectionTexture = Err "Loading texture ..."
