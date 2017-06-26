@@ -8,8 +8,7 @@
         "engine",
         "terrain",
         "apps",
-        "vehicles",
-        "quaternion"
+        "vehicles"
     ],
     "exposed-modules": [],
     "native-modules": true,
