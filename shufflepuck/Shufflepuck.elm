@@ -19,8 +19,8 @@ import Body.Cube exposing (textureCube)
 
 
 type alias Model =
-    Maybe { body : Moving Body
-          }
+    { table : Maybe Body
+    }
 
 
 type Msg
@@ -42,7 +42,8 @@ create label path =
 
 init : String -> ( Model, Cmd (CtrlMsg Msg) )
 init path =
-    ( Nothing
+    ( { table = Nothing
+      }
     , Texture.load path
         |> Task.attempt (Self << TextureLoaded)
     )
@@ -53,24 +54,21 @@ update :
     -> Model
     -> ( Model, Cmd (CtrlMsg Msg) )
 update msg model =
-    let mapBody f =
-            Maybe.map (\m -> { m | body = f m.body } ) model
-    in
     case msg of
         Self (TextureLoaded textureResult) ->
             case textureResult of
                 Ok texture ->
                     let
-                        body =
+                        table =
                             { anchor = AnchorGround
-                            , scale = vec3 1 1 1
+                            , scale = vec3 1 0.1 3
                             , position = vec3 56 0 -35
                             , orientation = Orientation.initial
                             , appear = textureCube texture
                             , velocity = vec3 0 0 0
                             }
                     in
-                        ( Just { body = body }, Cmd.none )
+                        ( { table = Just table }, Cmd.none )
 
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
@@ -92,28 +90,21 @@ animate ground dt model =
 
 
 bodies : Model -> List Body
-bodies model_ =
-    case model_ of
-        Just model ->
-            [ toBody model.body ]
+bodies model =
+    case model.table_ of
+        Just table ->
+            [ toBody table ]
 
         Nothing ->
             []
-
-
 framing : Model -> Maybe Framing
-framing model_ =
-    case model_ of
-        Just model ->
-            Just (Camera.framing model.body)
-
-        Nothing ->
-            Nothing
+framing model =
+        Maybe.map Camera.framing model.table
     
 
 focus : Model -> Maybe Focus
 focus model =
-    Maybe.map (.body >> appToFocus) model
+    Maybe.map appToFocus model.table
 
 overlay : Model -> Html msg
 overlay _ =
