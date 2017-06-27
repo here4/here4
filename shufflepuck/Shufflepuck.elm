@@ -81,54 +81,66 @@ create attributes =
         , overlay = overlay
         }
 
+
+-- | Move the entire table, maintaining the relative positions of the paddles and puck
 reposition : Vec3 -> Model -> Model
 reposition pos0 model =
     let
         a = model.attributes
+
+        puckRelPos = V3.sub model.puck.position a.position
+        paddle1RelPos = V3.sub model.paddle1.position a.position
+        paddle2RelPos = V3.sub model.paddle2.position a.position
+
+        setPos pos body = { body | position = pos }
+    in
+        { model | attributes = { a | position = pos0 }
+                , table = Maybe.map (setPos pos0) model.table
+                , puck = setPos (V3.add pos0 puckRelPos) model.puck
+                , paddle1 = setPos (V3.add pos0 paddle1RelPos) model.paddle1
+                , paddle2 = setPos (V3.add pos0 paddle2RelPos) model.paddle2
+        } 
+
+
+init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
+init a =
+    let
         puckY = a.puckHover + (a.tableThickness + a.puckThickness) / 2.0
         paddleY = a.paddleHover + (a.tableThickness + a.paddleThickness) / 2.0
         paddleZ = a.tableLength / 4.0
         setPos pos body = { body | position = pos }
     in
-        { model | table = Maybe.map (setPos pos0) model.table
-                , puck = setPos (V3.add pos0 (vec3 0 puckY 0)) model.puck
-                , paddle1 = setPos (V3.add pos0 (vec3 0 paddleY -paddleZ)) model.paddle1
-                , paddle2 = setPos (V3.add pos0 (vec3 0 paddleY paddleZ)) model.paddle2
-        } 
-
-init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
-init a =
-    ( reposition a.position
-        { attributes = a
-        , table = Nothing
-        , puck =
-              { anchor = AnchorGround
-              , scale = vec3 a.puckRadius (a.puckThickness/2.0) a.puckRadius
-              , position = vec3 0 0 0
-              , orientation = Orientation.initial
-              , appear = cloudsSphere
-              , velocity = vec3 0 0 0
-              }
-        , paddle1 =
-              { anchor = AnchorGround
-              , scale = vec3 a.paddleRadius (a.paddleThickness/2.0) a.paddleRadius
-              , position = vec3 0 0 0
-              , orientation = Orientation.initial
-              , appear = cloudsSphere
-              , velocity = vec3 0 0 0
-              }
-        , paddle2 =
-              { anchor = AnchorGround
-              , scale = vec3 a.paddleRadius (a.paddleThickness/2.0) a.paddleRadius
-              , position = vec3 0 0 0
-              , orientation = Orientation.initial
-              , appear = cloudsSphere
-              , velocity = vec3 0 0 0
-              }
-        }
-    , Texture.load a.tableTexture
-        |> Task.attempt (Self << TextureLoaded)
-    )
+        ( reposition a.position
+            { attributes = { a | position = vec3 0 0 0 } -- First set up the table at 0 0 0, then reposition it
+            , table = Nothing
+            , puck =
+                  { anchor = AnchorGround
+                  , scale = vec3 a.puckRadius (a.puckThickness/2.0) a.puckRadius
+                  , position = vec3 0 puckY 0
+                  , orientation = Orientation.initial
+                  , appear = cloudsSphere
+                  , velocity = vec3 0 0 0
+                  }
+            , paddle1 =
+                  { anchor = AnchorGround
+                  , scale = vec3 a.paddleRadius (a.paddleThickness/2.0) a.paddleRadius
+                  , position = vec3 0 paddleY -paddleZ
+                  , orientation = Orientation.initial
+                  , appear = cloudsSphere
+                  , velocity = vec3 0 0 0
+                  }
+            , paddle2 =
+                  { anchor = AnchorGround
+                  , scale = vec3 a.paddleRadius (a.paddleThickness/2.0) a.paddleRadius
+                  , position = vec3 0 paddleY paddleZ
+                  , orientation = Orientation.initial
+                  , appear = cloudsSphere
+                  , velocity = vec3 0 0 0
+                  }
+            }
+        , Texture.load a.tableTexture
+            |> Task.attempt (Self << TextureLoaded)
+        )
 
 
 update :
