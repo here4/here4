@@ -35,9 +35,19 @@ outside a pos = not (a.methods.inside a.model pos)
 emplace : Bounding a -> Vec3 -> Vec3
 emplace a pos = a.methods.emplace a.model pos
 
-bounce : Bounding a -> Float -> Motion -> Motion
-bounce a radius motion = a.methods.bounce a.model radius motion
+bounce : Bounding a -> Float -> Spherical (Moving b) -> Spherical (Moving b)
+bounce a radius body =
+    let
+        motion = { position = body.position, velocity = body.velocity }
+        { position, velocity } = a.methods.bounce a.model body.radius motion
+    in
+        { body | position = position, velocity = velocity }
 
-bump : Bounding a -> Float -> Motion -> Motion
-bump a radius motion = a.methods.bump a.model radius motion
+bump : Bounding a -> Float -> Spherical (Moving b) -> Spherical (Moving b)
+bump a radius body =
+    let
+        motion = { position = body.position, velocity = body.velocity }
+        { position, velocity } = a.methods.bump a.model body.radius motion
+    in
+        { body | position = position, velocity = velocity }
 
