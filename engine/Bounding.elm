@@ -1,4 +1,4 @@
-module Boundary
+module Bounding
     exposing
         ( Bounding
         , inside
