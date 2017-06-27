@@ -8,6 +8,7 @@ import NewWorld
 import Boids
 import Balls
 import Obj
+import Shufflepuck
 import Sky
 import Statue
 import TextureCube
@@ -28,6 +29,7 @@ main =
             [ elmLogo
             , Suzanne.create "Suzanne"
             , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
+            , let s = Shufflepuck.default in Shufflepuck.create { s | position = vec3 53 0 18 }
             , Wedge.create "Wedge" (vec3 23 0 12)
             , Statue.create 3.0 "Clouds Sphere" (vec3 3 10 5) cloudsSphere
             , Statue.create 2.0 "Landscape Diamond" (vec3 0 1.5 0) fogMountainsDiamond

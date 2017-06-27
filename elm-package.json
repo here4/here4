@@ -8,7 +8,8 @@
         "engine",
         "terrain",
         "apps",
-        "vehicles"
+        "vehicles",
+        "shufflepuck"
     ],
     "exposed-modules": [],
     "native-modules": true,

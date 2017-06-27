@@ -1,7 +1,7 @@
-module Shufflepuck exposing (create)
+module Shufflepuck exposing (create, default)
 
 import Html exposing (Html)
-import Math.Vector3 exposing (Vec3, vec3)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
 import Tuple exposing (first)
@@ -14,12 +14,50 @@ import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Inputs)
-import Orientation
+import Orientation exposing (Orientation)
 import Body.Cube exposing (textureCube)
+import Body.Sphere exposing (cloudsSphere, fogMountainsSphere)
 
+
+type alias Attributes =
+    { label : String
+    , position : Vec3
+    , scale : Vec3
+    , orientation : Orientation
+    , tableTexture : String
+    , tableWidth : Float
+    , tableLength : Float
+    , tableThickness : Float
+    , tableHeight : Float
+    , puckRadius : Float
+    , puckThickness : Float
+    , paddleRadius : Float
+    , paddleThickness : Float
+    }
+
+default : Attributes
+default =
+    { label = "Shufflepuck"
+    , position = vec3 0 0 0
+    , scale = vec3 1 1 1
+    , orientation = Orientation.initial
+    , tableTexture = "resources/woodCrate.jpg"
+    , tableWidth = 3
+    , tableLength = 7
+    , tableHeight = 0.9
+    , tableThickness = 0.1
+    , puckRadius = 0.12
+    , puckThickness = 0.3
+    , paddleRadius = 0.18
+    , paddleThickness = 0.7
+    }
 
 type alias Model =
-    { table : Maybe Body
+    { attributes : Attributes
+    , table : Maybe Body
+    , puck : Moving Body
+    , paddle1 : Moving Body
+    , paddle2 : Moving Body
     }
 
 
@@ -27,10 +65,10 @@ type Msg
     = TextureLoaded (Result Error Texture)
 
 
-create : String -> String -> ( App, Cmd AppMsg )
-create label path =
-    App.create (init path)
-        { label = always label
+create : Attributes -> ( App, Cmd AppMsg )
+create attributes =
+    App.create (init attributes)
+        { label = always attributes.label
         , update = update
         , animate = animate
         , bodies = bodies
@@ -39,12 +77,52 @@ create label path =
         , overlay = overlay
         }
 
+reposition : Vec3 -> Model -> Model
+reposition pos0 model =
+    let
+        a = model.attributes
+        puckY = (a.tableThickness + a.puckThickness) / 2.0
+        paddleY = (a.tableThickness + a.paddleThickness) / 2.0
+        paddleZ = a.tableLength / 4.0
+        setPos pos body = { body | position = pos }
+    in
+        { model | table = Maybe.map (setPos pos0) model.table
+                , puck = setPos (V3.add pos0 (vec3 0 puckY 0)) model.puck
+                , paddle1 = setPos (V3.add pos0 (vec3 0 paddleY -paddleZ)) model.paddle1
+                , paddle2 = setPos (V3.add pos0 (vec3 0 paddleY paddleZ)) model.paddle2
+        } 
 
-init : String -> ( Model, Cmd (CtrlMsg Msg) )
-init path =
-    ( { table = Nothing
-      }
-    , Texture.load path
+init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
+init a =
+    ( reposition a.position
+        { attributes = a
+        , table = Nothing
+        , puck =
+              { anchor = AnchorGround
+              , scale = vec3 a.puckRadius (a.puckThickness/2.0) a.puckRadius
+              , position = vec3 0 0 0
+              , orientation = Orientation.initial
+              , appear = cloudsSphere
+              , velocity = vec3 0 0 0
+              }
+        , paddle1 =
+              { anchor = AnchorGround
+              , scale = vec3 a.paddleRadius (a.paddleThickness/2.0) a.paddleRadius
+              , position = vec3 0 0 0
+              , orientation = Orientation.initial
+              , appear = cloudsSphere
+              , velocity = vec3 0 0 0
+              }
+        , paddle2 =
+              { anchor = AnchorGround
+              , scale = vec3 a.paddleRadius (a.paddleThickness/2.0) a.paddleRadius
+              , position = vec3 0 0 0
+              , orientation = Orientation.initial
+              , appear = cloudsSphere
+              , velocity = vec3 0 0 0
+              }
+        }
+    , Texture.load a.tableTexture
         |> Task.attempt (Self << TextureLoaded)
     )
 
@@ -59,16 +137,16 @@ update msg model =
             case textureResult of
                 Ok texture ->
                     let
+                        a = model.attributes
                         table =
                             { anchor = AnchorGround
-                            , scale = vec3 1 0.1 3
-                            , position = vec3 56 0 -35
+                            , scale = vec3 a.tableWidth a.tableThickness a.tableLength
+                            , position = a.position
                             , orientation = Orientation.initial
                             , appear = textureCube texture
-                            , velocity = vec3 0 0 0
                             }
                     in
-                        ( { table = Just table }, Cmd.none )
+                        ( { model | table = Just table }, Cmd.none )
 
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
@@ -84,22 +162,37 @@ update msg model =
             ( model, Cmd.none )
 
 
-animate : ground -> Time -> Model -> Model
+animate : Ground -> Time -> Model -> Model
 animate ground dt model =
-    model
+    let
+        setElevation pos = V3.setY (model.attributes.tableHeight + ground.elevation pos) pos
+    in
+        reposition (setElevation model.attributes.position) model
 
 
 bodies : Model -> List Body
 bodies model =
-    case model.table_ of
-        Just table ->
-            [ toBody table ]
+    let
+        ps = List.map toBody [ model.puck, model.paddle1, model.paddle2 ]
+    in
+        case model.table of
+            Just t ->
+                t :: ps
 
-        Nothing ->
-            []
+            Nothing ->
+                ps
+
+
 framing : Model -> Maybe Framing
 framing model =
-        Maybe.map Camera.framing model.table
+    let
+        target =
+            { position = model.attributes.position
+            , orientation = model.attributes.orientation
+            , velocity = vec3 0 0 0
+            }
+    in
+        Just { target = target }
     
 
 focus : Model -> Maybe Focus
