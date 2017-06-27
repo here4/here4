@@ -172,10 +172,23 @@ update msg model =
             ( model, Cmd.none )
 
         Ctrl (Control.Drive ground inputs) ->
-            ( model, Cmd.none )
+            ( movePaddle inputs model, Cmd.none )
 
         Effect _ ->
             ( model, Cmd.none )
+
+
+movePaddle : Inputs -> Model -> Model
+movePaddle inputs model =
+    let
+        dx = -2.0 * (inputs.x + inputs.mx) * inputs.dt
+        dy = 2.0 * (inputs.y + inputs.my) * inputs.dt
+
+        p = model.paddle1
+        newPosition = V3.add (vec3 dx 0 dy) p.position
+        paddle = { p | position = newPosition }
+    in
+        { model | paddle1 = paddle }
 
 
 animate : Ground -> Time -> Model -> Model
