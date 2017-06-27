@@ -31,8 +31,10 @@ type alias Attributes =
     , tableHeight : Float
     , puckRadius : Float
     , puckThickness : Float
+    , puckHover : Float
     , paddleRadius : Float
     , paddleThickness : Float
+    , paddleHover : Float
     }
 
 default : Attributes
@@ -44,12 +46,14 @@ default =
     , tableTexture = "resources/woodCrate.jpg"
     , tableWidth = 3
     , tableLength = 7
-    , tableHeight = 0.9
-    , tableThickness = 0.1
+    , tableHeight = 3.0 -- 0.9
+    , tableThickness = 0.2
     , puckRadius = 0.12
-    , puckThickness = 0.3
+    , puckThickness = 0.03
+    , puckHover = 0.2
     , paddleRadius = 0.18
-    , paddleThickness = 0.7
+    , paddleThickness = 0.07
+    , paddleHover = 0.2
     }
 
 type alias Model =
@@ -81,8 +85,8 @@ reposition : Vec3 -> Model -> Model
 reposition pos0 model =
     let
         a = model.attributes
-        puckY = (a.tableThickness + a.puckThickness) / 2.0
-        paddleY = (a.tableThickness + a.paddleThickness) / 2.0
+        puckY = a.puckHover + (a.tableThickness + a.puckThickness) / 2.0
+        paddleY = a.paddleHover + (a.tableThickness + a.paddleThickness) / 2.0
         paddleZ = a.tableLength / 4.0
         setPos pos body = { body | position = pos }
     in
@@ -187,7 +191,7 @@ framing : Model -> Maybe Framing
 framing model =
     let
         target =
-            { position = model.attributes.position
+            { position = model.puck.position
             , orientation = model.attributes.orientation
             , velocity = vec3 0 0 0
             }
