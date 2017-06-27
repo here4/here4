@@ -286,7 +286,7 @@ renderWorld globalTime world eye windowSize player =
 -}
 perspective : Window.Size -> Model.Player msg -> Mat4
 perspective { width, height } player =
-    M4.makePerspective player.camera.fovy (toFloat width / toFloat height) 0.1 1000
+    M4.makePerspective player.camera.fovy (toFloat width / toFloat height) 0.01 1000
 
 lookAtBody : Window.Size -> Model.Player msg -> Model.Eye -> Mat4
 lookAtBody { width, height } player eye =
