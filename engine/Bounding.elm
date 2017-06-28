@@ -1,6 +1,8 @@
 module Bounding
     exposing
         ( Bounding
+        , Methods
+        , Motion
         , inside
         , outside
         , emplace
@@ -14,7 +16,7 @@ import Body exposing (..)
 type alias Motion =
     { position : Vec3, velocity : Vec3 }
 
-type alias Boundary a =
+type alias Methods a =
     { inside : a -> Vec3 -> Bool
     , emplace : a -> Vec3 -> Vec3
     , bounce : a -> Float -> Motion -> Motion
@@ -22,7 +24,7 @@ type alias Boundary a =
     }
 
 type alias Bounding a =
-    { methods : Boundary a
+    { methods : Methods a
     , model : a
     }
 
