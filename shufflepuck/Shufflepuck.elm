@@ -15,7 +15,7 @@ import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation exposing (Orientation)
-import Primitive.Cube exposing (textureCube)
+import Primitive.Cube exposing (cloudsCube, textureCube)
 import Primitive.Cylinder exposing (cloudsCylinder, textureCylinder)
 
 import Bounding exposing (Bounding, bounce, bump)
@@ -71,7 +71,7 @@ default =
 
 type alias Model =
     { attributes : Attributes
-    , table : Maybe Body
+    , table : Body
     , puck : Massive (Spherical (Moving Body))
     , paddle1 : Massive (Spherical (Moving Body))
     , paddle2 : Massive (Spherical (Moving Body))
@@ -118,7 +118,7 @@ reposition pos0 model =
         setPos pos body = { body | position = pos }
     in
         { model | attributes = { a | position = pos0 }
-                , table = Maybe.map (setPos pos0) model.table
+                , table = setPos pos0 model.table
                 , puck = setPos (V3.add pos0 puckRelPos) model.puck
                 , paddle1 = setPos (V3.add pos0 paddle1RelPos) model.paddle1
                 , paddle2 = setPos (V3.add pos0 paddle2RelPos) model.paddle2
@@ -137,7 +137,13 @@ init a =
     in
         ( reposition a.position
             { attributes = { a | position = vec3 0 0 0 } -- First set up the table at 0 0 0, then reposition it
-            , table = Nothing
+            , table =
+                { anchor = AnchorGround
+                , scale = vec3 a.tableWidth a.tableThickness a.tableLength
+                , position = a.position
+                , orientation = Orientation.initial
+                , appear = cloudsCube
+                }
             , puck =
                   { anchor = AnchorGround
                   , scale = vec3 a.puckRadius (a.puckThickness/2.0) a.puckRadius
@@ -193,16 +199,10 @@ update msg model =
             case textureResult of
                 Ok texture ->
                     let
-                        a = model.attributes
-                        table =
-                            { anchor = AnchorGround
-                            , scale = vec3 a.tableWidth a.tableThickness a.tableLength
-                            , position = a.position
-                            , orientation = Orientation.initial
-                            , appear = textureCube texture
-                            }
+                        t = model.table
+                        table = { t | appear = textureCube texture }
                     in
-                        ( { model | table = Just table }, Cmd.none )
+                        ( { model | table = table }, Cmd.none )
 
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
@@ -311,16 +311,7 @@ animate ground dt model =
 
 bodies : Model -> List Body
 bodies model =
-    let
-        ps = List.map toBody [ model.puck, model.paddle1, model.paddle2 ]
-    in
-        case model.table of
-            Just t ->
-                t :: ps
-
-            Nothing ->
-                ps
-
+    model.table :: List.map toBody [ model.puck, model.paddle1, model.paddle2 ]
 
 framing : Model -> Maybe Framing
 framing model =
@@ -336,7 +327,7 @@ framing model =
 
 focus : Model -> Maybe Focus
 focus model =
-    Maybe.map appToFocus model.table
+    Just <| appToFocus model.table
 
 overlay : Model -> Html msg
 overlay _ =
