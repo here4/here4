@@ -233,11 +233,14 @@ collide dt model =
                          , velocity = vec3 0 0 0
                      }
 
+        goal1 = rz >= V3.getZ box.dimensions - a.puckRadius
+        goal2 = rz <= a.puckRadius
+
         (puck, paddle1, paddle2, score1, score2) =
-            if rz <= a.puckRadius then
-                (recenter model.puck, model.paddle1, model.paddle2, model.score1, model.score2+1)
-            else if rz >= V3.getZ box.dimensions - a.puckRadius then
+            if goal1 then
                 (recenter model.puck, model.paddle1, model.paddle2, model.score1+1, model.score2)
+            else if goal2 then
+                (recenter model.puck, model.paddle1, model.paddle2, model.score1, model.score2+1)
             else
                 let
                     puck_z = V3.getZ model.puck.position 
