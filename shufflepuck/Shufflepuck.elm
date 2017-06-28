@@ -31,9 +31,11 @@ type alias Attributes =
     , tableLength : Float
     , tableThickness : Float
     , tableHeight : Float
+    , puckMass : Float
     , puckRadius : Float
     , puckThickness : Float
     , puckHover : Float
+    , paddleMass : Float
     , paddleRadius : Float
     , paddleThickness : Float
     , paddleHover : Float
@@ -50,9 +52,11 @@ default =
     , tableLength = 7
     , tableHeight = 3.0 -- 0.9
     , tableThickness = 0.2
+    , puckMass = 0.1
     , puckRadius = 0.12
     , puckThickness = 0.03
     , puckHover = 0.2
+    , paddleMass = 1.0
     , paddleRadius = 0.18
     , paddleThickness = 0.07
     , paddleHover = 0.2
@@ -61,9 +65,9 @@ default =
 type alias Model =
     { attributes : Attributes
     , table : Maybe Body
-    , puck : Spherical (Moving Body)
-    , paddle1 : Spherical (Moving Body)
-    , paddle2 : Spherical (Moving Body)
+    , puck : Massive (Spherical (Moving Body))
+    , paddle1 : Massive (Spherical (Moving Body))
+    , paddle2 : Massive (Spherical (Moving Body))
     , bounds : Bounding Box
     }
 
@@ -128,6 +132,7 @@ init a =
                   , position = vec3 0 puckY 0
                   , orientation = Orientation.initial
                   , radius = a.puckRadius
+                  , mass = a.puckMass
                   , appear = cloudsSphere
                   , velocity = vec3 0.2 0 0.2
                   }
@@ -137,6 +142,7 @@ init a =
                   , position = vec3 0 paddleY -paddleZ
                   , orientation = Orientation.initial
                   , radius = a.paddleRadius
+                  , mass = a.paddleMass
                   , appear = cloudsSphere
                   , velocity = vec3 0 0 0
                   }
@@ -146,6 +152,7 @@ init a =
                   , position = vec3 0 paddleY paddleZ
                   , orientation = Orientation.initial
                   , radius = a.paddleRadius
+                  , mass = a.paddleMass
                   , appear = cloudsSphere
                   , velocity = vec3 0 0 0
                   }
