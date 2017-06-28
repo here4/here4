@@ -71,12 +71,12 @@ bounce box radius dt { position, velocity } =
         -- Dimensions of box
         (dx, dy, dz) = V3.toTuple box.dimensions
 
-        -- Reflect a one-dimensional (position, velocity) against walls at 0 and d
+        -- Reflect a one-dimensional (position, velocity) against walls at radius and (d-radius)
         bounce1 d (p, v) =
-            if p < 0 then
-                (-p, -v)
-            else if (p > d) then
-                (2*d - p, -v)
+            if p < radius then
+                (2*radius - p, -v)
+            else if (p > (d-radius)) then
+                (2*(d-radius) - p, -v)
             else
                 (p, v)
 
@@ -102,12 +102,12 @@ bump box radius dt { position, velocity } =
         -- Dimensions of box
         (dx, dy, dz) = V3.toTuple box.dimensions
 
-        -- Bump a one-dimensional (position, velocity) against walls at 0 and d
+        -- Bump a one-dimensional (position, velocity) against walls at radius and (d-radius)
         bump1 d (p, v) =
-            if p < 0 then
-                (0, 0)
-            else if (p > d) then
-                (d, 0)
+            if p < radius then
+                (radius, 0)
+            else if (p > (d - radius)) then
+                (d-radius, 0)
             else
                 (p, v)
 
