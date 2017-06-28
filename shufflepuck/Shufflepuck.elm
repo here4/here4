@@ -36,6 +36,7 @@ type alias Attributes =
     , puckRadius : Float
     , puckThickness : Float
     , puckHover : Float
+    , puckMaxSpeed : Float
     , paddleMass : Float
     , paddleRadius : Float
     , paddleThickness : Float
@@ -57,6 +58,7 @@ default =
     , puckRadius = 0.12
     , puckThickness = 0.03
     , puckHover = 0.3
+    , puckMaxSpeed = 0.7
     , paddleMass = 10.0
     , paddleRadius = 0.18
     , paddleThickness = 0.07
@@ -224,11 +226,19 @@ collide dt model =
         (puck, paddle1, paddle2) = case bodies of
             [b1, b2, b3] -> (b1, b2, b3)
             _ -> (model.puck, model.paddle1, model.paddle2)
+        puck_1 = { puck | velocity = v3_clamp model.attributes.puckMaxSpeed puck.velocity }
     in
-        { model | puck = puck
+        { model | puck = puck_1
                 , paddle1 = paddle1
                 , paddle2 = paddle2
         }
+
+v3_clamp : Float -> Vec3 -> Vec3
+v3_clamp len v =
+    if V3.length v <= len then
+        v
+    else
+        V3.scale len (V3.normalize v)
 
 animate : Ground -> Time -> Model -> Model
 animate ground dt model =
