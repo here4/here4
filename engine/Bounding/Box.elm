@@ -1,6 +1,7 @@
 module Bounding.Box
     exposing
         ( Box
+        , boundingBox
         )
 
 import Math.Vector3 as V3 exposing (Vec3, vec3)
