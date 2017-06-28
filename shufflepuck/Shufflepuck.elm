@@ -129,7 +129,7 @@ init a =
                   , orientation = Orientation.initial
                   , radius = a.puckRadius
                   , appear = cloudsSphere
-                  , velocity = vec3 0 0 0
+                  , velocity = vec3 0.2 0 0.2
                   }
             , paddle1 =
                   { anchor = AnchorGround
@@ -196,11 +196,11 @@ update msg model =
 movePaddle : Inputs -> Model -> Model
 movePaddle inputs model =
     let
-        dx = -2.0 * (inputs.x + inputs.mx) * inputs.dt
-        dy = 2.0 * (inputs.y + inputs.my) * inputs.dt
+        dx = -2.0 * (inputs.x + inputs.mx)
+        dy = 2.0 * (inputs.y + inputs.my)
 
         p = model.paddle1
-        paddle = bump model.bounds { p | velocity = vec3 dx 0 dy }
+        paddle = bump model.bounds inputs.dt { p | velocity = vec3 dx 0 dy }
     in
         { model | paddle1 = paddle }
 
@@ -209,8 +209,9 @@ animate : Ground -> Time -> Model -> Model
 animate ground dt model =
     let
         setElevation pos = V3.setY (model.attributes.tableHeight + ground.elevation pos) pos
+        puck = bounce model.bounds dt model.puck
     in
-        reposition (setElevation model.attributes.position) model
+        reposition (setElevation model.attributes.position) { model | puck = puck }
 
 
 bodies : Model -> List Body

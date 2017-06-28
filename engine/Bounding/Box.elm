@@ -5,6 +5,7 @@ module Bounding.Box
         )
 
 import Math.Vector3 as V3 exposing (Vec3, vec3)
+import Time exposing (Time)
 import Bounding exposing (..)
 
 
@@ -58,11 +59,11 @@ emplace box pos =
         V3.add (vec3 nx ny nz) box.position
 
 
-bounce : Box -> Float -> Motion -> Motion
-bounce box radius { position, velocity } =
+bounce : Box -> Float -> Time -> Motion -> Motion
+bounce box radius dt { position, velocity } =
     let
         -- Unbound relative position
-        (rx, ry, rz) = V3.toTuple <| V3.sub (V3.add position velocity) box.position
+        (rx, ry, rz) = V3.toTuple <| V3.sub (V3.add position (V3.scale dt velocity)) box.position
 
         -- Original velocity
         (vx, vy, vz) = V3.toTuple velocity
@@ -89,11 +90,11 @@ bounce box radius { position, velocity } =
         }
 
 
-bump : Box -> Float -> Motion -> Motion
-bump box radius { position, velocity } =
+bump : Box -> Float -> Time -> Motion -> Motion
+bump box radius dt { position, velocity } =
     let
         -- Unbound relative position
-        (rx, ry, rz) = V3.toTuple <| V3.sub (V3.add position velocity) box.position
+        (rx, ry, rz) = V3.toTuple <| V3.sub (V3.add position (V3.scale dt velocity)) box.position
 
         -- Original velocity
         (vx, vy, vz) = V3.toTuple velocity
