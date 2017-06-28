@@ -300,8 +300,26 @@ collide dt model =
                 let
                     puck_z = V3.getZ model.puck.position 
                     puck_0 = bounce model.bounds dt model.puck
-                    paddle1_0 = bump model.bounds dt model.paddle1
-                    paddle2_0 = bump model.bounds dt model.paddle2
+
+                    box = model.bounds.model
+                    dim = box.dimensions
+                    halfZ = V3.getZ dim / 2.0
+                    halfDim = V3.setZ halfZ dim
+                    box1 = { box | dimensions = halfDim }
+
+                    bounds = model.bounds
+                    bounds1 = { bounds | model = box1 }
+
+                    paddle1_0 = bump bounds1 dt model.paddle1
+
+                    pos = box.position
+                    pos2 = V3.setZ (V3.getZ pos + halfZ) pos
+                    box2 = { box | position = pos2
+                                 , dimensions = halfDim
+                           }
+                    bounds2 = { bounds | model = box2 }
+
+                    paddle2_0 = bump bounds2 dt model.paddle2
                     bodies = collisions dt [ puck_0, paddle1_0, paddle2_0 ]
                     (puck, paddle1, paddle2) = case bodies of
                         [b1, b2, b3] -> (b1, b2, b3)
