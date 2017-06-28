@@ -16,7 +16,7 @@ import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation exposing (Orientation)
 import Primitive.Cube exposing (textureCube)
-import Primitive.Sphere exposing (cloudsSphere, fogMountainsSphere)
+import Primitive.Cylinder exposing (cloudsCylinder, fogMountainsCylinder)
 
 import Bounding exposing (Bounding, bounce, bump)
 import Bounding.Box exposing (Box, boundingBox)
@@ -142,7 +142,7 @@ init a =
                   , orientation = Orientation.initial
                   , radius = a.puckRadius
                   , mass = a.puckMass
-                  , appear = cloudsSphere
+                  , appear = cloudsCylinder
                   , velocity = vec3 0 0 0
                   }
             , paddle1 =
@@ -152,7 +152,7 @@ init a =
                   , orientation = Orientation.initial
                   , radius = a.paddleRadius
                   , mass = a.paddleMass
-                  , appear = cloudsSphere
+                  , appear = cloudsCylinder
                   , velocity = vec3 0 0 0
                   }
             , paddle2 =
@@ -162,7 +162,7 @@ init a =
                   , orientation = Orientation.initial
                   , radius = a.paddleRadius
                   , mass = a.paddleMass
-                  , appear = cloudsSphere
+                  , appear = cloudsCylinder
                   , velocity = vec3 0 0 0
                   }
             , bounds = boundingBox { position = vec3 (-a.tableWidth/2.0) (a.tableThickness/2.0) (-a.tableLength/2.0)
