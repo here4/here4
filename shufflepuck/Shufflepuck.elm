@@ -141,7 +141,7 @@ init a =
                   , radius = a.puckRadius
                   , mass = a.puckMass
                   , appear = cloudsSphere
-                  , velocity = vec3 0.2 0 0.2
+                  , velocity = vec3 0 0 0
                   }
             , paddle1 =
                   { anchor = AnchorGround
