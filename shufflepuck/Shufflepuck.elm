@@ -235,9 +235,9 @@ collide dt model =
 
         (puck, paddle1, paddle2, score1, score2) =
             if rz <= a.puckRadius then
-                (recenter model.puck, model.paddle1, model.paddle2, model.score1+1, model.score2)
-            else if rz >= V3.getZ box.dimensions - a.puckRadius then
                 (recenter model.puck, model.paddle1, model.paddle2, model.score1, model.score2+1)
+            else if rz >= V3.getZ box.dimensions - a.puckRadius then
+                (recenter model.puck, model.paddle1, model.paddle2, model.score1+1, model.score2)
             else
                 let
                     puck_z = V3.getZ model.puck.position 
