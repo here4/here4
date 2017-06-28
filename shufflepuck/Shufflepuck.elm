@@ -39,6 +39,7 @@ type alias Attributes =
     , puckThickness : Float
     , puckHover : Float
     , puckMaxSpeed : Float
+    , paddleTexture : String
     , paddleMass : Float
     , paddleRadius : Float
     , paddleThickness : Float
@@ -63,6 +64,7 @@ default =
     , puckThickness = 0.03
     , puckHover = 0.3
     , puckMaxSpeed = 0.7
+    , paddleTexture = "textures/ring_bottoms.jpg"
     , paddleMass = 10.0
     , paddleRadius = 0.18
     , paddleThickness = 0.07
@@ -84,6 +86,7 @@ type alias Model =
 type Msg
     = TableTextureLoaded (Result Error Texture)
     | PuckTextureLoaded (Result Error Texture)
+    | PaddleTextureLoaded (Result Error Texture)
 
 
 create : Attributes -> ( App, Cmd AppMsg )
@@ -185,6 +188,8 @@ init a =
                   |> Task.attempt (Self << TableTextureLoaded)
               , Texture.load a.puckTexture
                   |> Task.attempt (Self << PuckTextureLoaded)
+              , Texture.load a.paddleTexture
+                  |> Task.attempt (Self << PaddleTextureLoaded)
               ]
         )
 
@@ -216,6 +221,26 @@ update msg model =
                         puck = { p | appear = textureCylinder texture }
                     in
                         ( { model | puck = puck }, Cmd.none )
+
+                Err msg ->
+                    -- ( { model | message = "Error loading texture" }, Cmd.none )
+                    ( model, Cmd.none )
+
+        Self (PaddleTextureLoaded textureResult) ->
+            case textureResult of
+                Ok texture ->
+                    let
+                        p1 = model.paddle1
+                        paddle1 = { p1 | appear = textureCylinder texture }
+
+                        p2 = model.paddle2
+                        paddle2 = { p2 | appear = textureCylinder texture }
+                    in
+                        ( { model | paddle1 = paddle1
+                                  , paddle2 = paddle2
+                          }
+                        , Cmd.none
+                        )
 
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
