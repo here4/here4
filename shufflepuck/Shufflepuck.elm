@@ -72,6 +72,8 @@ type alias Model =
     , paddle1 : Massive (Spherical (Moving Body))
     , paddle2 : Massive (Spherical (Moving Body))
     , bounds : Bounding Box
+    , score1 : Int
+    , score2 : Int
     }
 
 
@@ -82,7 +84,7 @@ type Msg
 create : Attributes -> ( App, Cmd AppMsg )
 create attributes =
     App.create (init attributes)
-        { label = always attributes.label
+        { label = label
         , update = update
         , animate = animate
         , bodies = bodies
@@ -91,6 +93,8 @@ create attributes =
         , overlay = overlay
         }
 
+label : Model -> String
+label model = model.attributes.label ++ " (" ++ toString model.score1 ++ " - " ++ toString model.score2 ++ ")"
 
 -- | Move the entire table, maintaining the relative positions of the paddles and puck
 reposition : Vec3 -> Model -> Model
@@ -162,6 +166,8 @@ init a =
             , bounds = boundingBox { position = vec3 (-a.tableWidth/2.0) (a.tableThickness/2.0) (-a.tableLength/2.0)
                                    , dimensions = vec3 a.tableWidth boundHeight a.tableLength
                                    }
+            , score1 = 0
+            , score2 = 0
             }
         , Texture.load a.tableTexture
             |> Task.attempt (Self << TextureLoaded)
@@ -219,18 +225,38 @@ movePaddle inputs model =
 collide : Time -> Model -> Model
 collide dt model =
     let
-        puck_0 = bounce model.bounds dt model.puck
-        paddle1_0 = bump model.bounds dt model.paddle1
-        paddle2_0 = bump model.bounds dt model.paddle2
-        bodies = collisions dt [ puck_0, paddle1_0, paddle2_0 ]
-        (puck, paddle1, paddle2) = case bodies of
-            [b1, b2, b3] -> (b1, b2, b3)
-            _ -> (model.puck, model.paddle1, model.paddle2)
-        puck_1 = { puck | velocity = v3_clamp model.attributes.puckMaxSpeed puck.velocity }
+        a = model.attributes
+        box = model.bounds.model
+        rz = V3.getZ <| V3.sub (V3.add model.puck.position (V3.scale dt model.puck.velocity)) box.position
+
+        recenter p = { p | position = V3.add (vec3 0 a.puckHover 0) a.position
+                         , velocity = vec3 0 0 0
+                     }
+
+        (puck, paddle1, paddle2, score1, score2) =
+            if rz <= a.puckRadius then
+                (recenter model.puck, model.paddle1, model.paddle2, model.score1+1, model.score2)
+            else if rz >= V3.getZ box.dimensions - a.puckRadius then
+                (recenter model.puck, model.paddle1, model.paddle2, model.score1, model.score2+1)
+            else
+                let
+                    puck_z = V3.getZ model.puck.position 
+                    puck_0 = bounce model.bounds dt model.puck
+                    paddle1_0 = bump model.bounds dt model.paddle1
+                    paddle2_0 = bump model.bounds dt model.paddle2
+                    bodies = collisions dt [ puck_0, paddle1_0, paddle2_0 ]
+                    (puck, paddle1, paddle2) = case bodies of
+                        [b1, b2, b3] -> (b1, b2, b3)
+                        _ -> (model.puck, model.paddle1, model.paddle2)
+                    puck_1 = { puck | velocity = v3_clamp model.attributes.puckMaxSpeed puck.velocity }
+                in
+                    (puck_1, paddle1, paddle2, model.score1, model.score2)
     in
-        { model | puck = puck_1
+        { model | puck = puck
                 , paddle1 = paddle1
                 , paddle2 = paddle2
+                , score1 = score1
+                , score2 = score2
         }
 
 v3_clamp : Float -> Vec3 -> Vec3
