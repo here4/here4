@@ -1,4 +1,4 @@
-module Body.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, cube)
+module Primitive.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, cube)
 
 import Math.Vector3 exposing (..)
 import Math.Matrix4 as M4 exposing (..)

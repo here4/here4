@@ -16,9 +16,9 @@ import StaticGround
 import Suzanne
 import Wedge
 import Body.Terrain as Terrain
-import Body.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
-import Body.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
-import Body.Sphere exposing (skySphere, cloudsSphere)
+import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
+import Primitive.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
+import Primitive.Sphere exposing (skySphere, cloudsSphere)
 import Vehicles.DreamBuggy as DreamBuggy
 
 

@@ -1,4 +1,4 @@
-module Body.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, diamond)
+module Primitive.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, diamond)
 
 import List exposing (map2, repeat)
 import Math.Vector3 exposing (..)

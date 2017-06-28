@@ -15,7 +15,7 @@ import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation
-import Body.Cube exposing (textureCube)
+import Primitive.Cube exposing (textureCube)
 import Vehicles.DreamBuggy as DreamBuggy
 
 
