@@ -20,6 +20,7 @@ import Body.Sphere exposing (cloudsSphere, fogMountainsSphere)
 
 import Bounding exposing (Bounding, bounce, bump)
 import Bounding.Box exposing (Box, boundingBox)
+import Physics.Collisions exposing (collisions)
 
 type alias Attributes =
     { label : String
@@ -216,9 +217,17 @@ animate : Ground -> Time -> Model -> Model
 animate ground dt model =
     let
         setElevation pos = V3.setY (model.attributes.tableHeight + ground.elevation pos) pos
-        puck = bounce model.bounds dt model.puck
+        puck0 = bounce model.bounds dt model.puck
+        bodies = collisions dt [ puck0, model.paddle1, model.paddle2 ]
+        (puck, paddle1, paddle2) = case bodies of
+            [b1, b2, b3] -> (b1, b2, b3)
+            _ -> (model.puck, model.paddle1, model.paddle2)
     in
-        reposition (setElevation model.attributes.position) { model | puck = puck }
+        reposition (setElevation model.attributes.position)
+            { model | puck = puck
+                    , paddle1 = paddle1
+                    , paddle2 = paddle2
+            }
 
 
 bodies : Model -> List Body
