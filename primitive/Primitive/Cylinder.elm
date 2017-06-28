@@ -1,4 +1,4 @@
-module Primitive.Cylinder exposing (skyCylinder, cloudsCylinder, fogMountainsCylinder, cylinder)
+module Primitive.Cylinder exposing (textureCylinder, skyCylinder, cloudsCylinder, fogMountainsCylinder, cylinder)
 
 import List exposing (drop, concat, map, map2)
 import Math.Vector2 exposing (Vec2)
@@ -11,6 +11,7 @@ import Orientation
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
 import Shaders.FogMountains exposing (fogMountains)
+import Shaders.TextureFragment exposing (textureFragment)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 
@@ -59,6 +60,30 @@ appearCylinder vertexShader fragmentShader p =
             { iResolution = resolution
             , iGlobalTime = s
             , iHMD = iHMD
+            , iLensDistort = p.lensDistort
+            , iPerspective = p.perspective
+            , iLookAt = p.lookAt
+            }
+        ]
+
+textureCylinder : WebGL.Texture -> Appearance
+textureCylinder texture p =
+    let
+        resolution =
+            vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+
+        iHMD =
+            if p.cameraVR then
+                1.0
+            else
+                0.0
+    in
+        [ entity worldVertex
+            textureFragment
+            cylinderMesh
+            { iResolution = resolution
+            , iHMD = iHMD
+            , iTexture = texture
             , iLensDistort = p.lensDistort
             , iPerspective = p.perspective
             , iLookAt = p.lookAt
