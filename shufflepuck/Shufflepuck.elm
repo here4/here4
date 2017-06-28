@@ -18,7 +18,7 @@ import Orientation exposing (Orientation)
 import Body.Cube exposing (textureCube)
 import Body.Sphere exposing (cloudsSphere, fogMountainsSphere)
 
-import Bounding exposing (Bounding)
+import Bounding exposing (Bounding, bounce, bump)
 import Bounding.Box exposing (Box, boundingBox)
 
 type alias Attributes =
@@ -61,9 +61,9 @@ default =
 type alias Model =
     { attributes : Attributes
     , table : Maybe Body
-    , puck : Moving Body
-    , paddle1 : Moving Body
-    , paddle2 : Moving Body
+    , puck : Spherical (Moving Body)
+    , paddle1 : Spherical (Moving Body)
+    , paddle2 : Spherical (Moving Body)
     , bounds : Bounding Box
     }
 
@@ -106,8 +106,7 @@ reposition pos0 model =
                 , puck = setPos (V3.add pos0 puckRelPos) model.puck
                 , paddle1 = setPos (V3.add pos0 paddle1RelPos) model.paddle1
                 , paddle2 = setPos (V3.add pos0 paddle2RelPos) model.paddle2
-                , bounds = { bounds | model = setPos (V3.add pos0 boundsRelPos) box
-                }
+                , bounds = { bounds | model = setPos (V3.add pos0 boundsRelPos) box }
         } 
 
 
@@ -128,6 +127,7 @@ init a =
                   , scale = vec3 a.puckRadius (a.puckThickness/2.0) a.puckRadius
                   , position = vec3 0 puckY 0
                   , orientation = Orientation.initial
+                  , radius = a.puckRadius
                   , appear = cloudsSphere
                   , velocity = vec3 0 0 0
                   }
@@ -136,6 +136,7 @@ init a =
                   , scale = vec3 a.paddleRadius (a.paddleThickness/2.0) a.paddleRadius
                   , position = vec3 0 paddleY -paddleZ
                   , orientation = Orientation.initial
+                  , radius = a.paddleRadius
                   , appear = cloudsSphere
                   , velocity = vec3 0 0 0
                   }
@@ -144,6 +145,7 @@ init a =
                   , scale = vec3 a.paddleRadius (a.paddleThickness/2.0) a.paddleRadius
                   , position = vec3 0 paddleY paddleZ
                   , orientation = Orientation.initial
+                  , radius = a.paddleRadius
                   , appear = cloudsSphere
                   , velocity = vec3 0 0 0
                   }
@@ -198,8 +200,7 @@ movePaddle inputs model =
         dy = 2.0 * (inputs.y + inputs.my) * inputs.dt
 
         p = model.paddle1
-        newPosition = V3.add (vec3 dx 0 dy) p.position
-        paddle = { p | position = newPosition }
+        paddle = bump model.bounds { p | velocity = vec3 dx 0 dy }
     in
         { model | paddle1 = paddle }
 
