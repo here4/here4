@@ -16,7 +16,7 @@ import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation exposing (Orientation)
 import Primitive.Cube exposing (textureCube)
-import Primitive.Cylinder exposing (cloudsCylinder, fogMountainsCylinder)
+import Primitive.Cylinder exposing (cloudsCylinder, textureCylinder)
 
 import Bounding exposing (Bounding, bounce, bump)
 import Bounding.Box exposing (Box, boundingBox)
@@ -33,6 +33,7 @@ type alias Attributes =
     , tableThickness : Float
     , tableHeight : Float
     , goalWidth : Float
+    , puckTexture : String
     , puckMass : Float
     , puckRadius : Float
     , puckThickness : Float
@@ -50,12 +51,13 @@ default =
     , position = vec3 0 0 0
     , scale = vec3 1 1 1
     , orientation = Orientation.initial
-    , tableTexture = "resources/woodCrate.jpg"
+    , tableTexture = "textures/decursio_top.jpg"
     , tableWidth = 3
     , tableLength = 7
     , tableHeight = 3.0 -- 0.9
     , tableThickness = 0.2
     , goalWidth = 0.8
+    , puckTexture = "textures/mp_diff_orange.png"
     , puckMass = 5.0
     , puckRadius = 0.12
     , puckThickness = 0.03
@@ -80,7 +82,8 @@ type alias Model =
 
 
 type Msg
-    = TextureLoaded (Result Error Texture)
+    = TableTextureLoaded (Result Error Texture)
+    | PuckTextureLoaded (Result Error Texture)
 
 
 create : Attributes -> ( App, Cmd AppMsg )
@@ -171,8 +174,12 @@ init a =
             , score1 = 0
             , score2 = 0
             }
-        , Texture.load a.tableTexture
-            |> Task.attempt (Self << TextureLoaded)
+        , Cmd.batch
+              [ Texture.load a.tableTexture
+                  |> Task.attempt (Self << TableTextureLoaded)
+              , Texture.load a.puckTexture
+                  |> Task.attempt (Self << PuckTextureLoaded)
+              ]
         )
 
 
@@ -182,7 +189,7 @@ update :
     -> ( Model, Cmd (CtrlMsg Msg) )
 update msg model =
     case msg of
-        Self (TextureLoaded textureResult) ->
+        Self (TableTextureLoaded textureResult) ->
             case textureResult of
                 Ok texture ->
                     let
@@ -196,6 +203,19 @@ update msg model =
                             }
                     in
                         ( { model | table = Just table }, Cmd.none )
+
+                Err msg ->
+                    -- ( { model | message = "Error loading texture" }, Cmd.none )
+                    ( model, Cmd.none )
+
+        Self (PuckTextureLoaded textureResult) ->
+            case textureResult of
+                Ok texture ->
+                    let
+                        p = model.puck
+                        puck = { p | appear = textureCylinder texture }
+                    in
+                        ( { model | puck = puck }, Cmd.none )
 
                 Err msg ->
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
