@@ -32,6 +32,7 @@ type alias Attributes =
     , tableLength : Float
     , tableThickness : Float
     , tableHeight : Float
+    , goalWidth : Float
     , puckMass : Float
     , puckRadius : Float
     , puckThickness : Float
@@ -54,6 +55,7 @@ default =
     , tableLength = 7
     , tableHeight = 3.0 -- 0.9
     , tableThickness = 0.2
+    , goalWidth = 0.8
     , puckMass = 5.0
     , puckRadius = 0.12
     , puckThickness = 0.03
@@ -227,14 +229,22 @@ collide dt model =
     let
         a = model.attributes
         box = model.bounds.model
-        rz = V3.getZ <| V3.sub (V3.add model.puck.position (V3.scale dt model.puck.velocity)) box.position
+        (px, py, pz) = V3.toTuple <| V3.sub model.puck.position box.position
+        (rx, ry, rz) = V3.toTuple <| V3.sub (V3.add model.puck.position (V3.scale dt model.puck.velocity)) box.position
 
         recenter p = { p | position = V3.add (vec3 0 a.puckHover 0) a.position
                          , velocity = vec3 0 0 0
                      }
 
-        goal1 = rz >= V3.getZ box.dimensions - a.puckRadius
-        goal2 = rz <= a.puckRadius
+        z1 = V3.getZ box.dimensions - a.puckRadius
+        over1 = (rz >= z1)
+        x1 = px + (rx - px) * (z1- pz) / (rz - pz)
+        goal1 = over1 && abs (x1 - a.tableWidth/2.0) < (a.goalWidth/2.0)
+
+        z2 = a.puckRadius
+        over2 = (rz <= z2)
+        x2 = px + (rx - px) * (z2- pz) / (rz - pz)
+        goal2 = over2 && abs (x2 - a.tableWidth/2.0) < (a.goalWidth/2.0)
 
         (puck, paddle1, paddle2, score1, score2) =
             if goal1 then
@@ -262,12 +272,14 @@ collide dt model =
                 , score2 = score2
         }
 
+
 v3_clamp : Float -> Vec3 -> Vec3
 v3_clamp len v =
     if V3.length v <= len then
         v
     else
         V3.scale len (V3.normalize v)
+
 
 animate : Ground -> Time -> Model -> Model
 animate ground dt model =
