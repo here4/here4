@@ -53,14 +53,14 @@ default =
     , tableLength = 7
     , tableHeight = 3.0 -- 0.9
     , tableThickness = 0.2
-    , puckMass = 0.1
+    , puckMass = 100.0
     , puckRadius = 0.12
     , puckThickness = 0.03
-    , puckHover = 0.2
-    , paddleMass = 1.0
+    , puckHover = 0.3
+    , paddleMass = 10.0
     , paddleRadius = 0.18
     , paddleThickness = 0.07
-    , paddleHover = 0.2
+    , paddleHover = 0.3
     }
 
 type alias Model =
@@ -118,11 +118,11 @@ reposition pos0 model =
 init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
 init a =
     let
-        puckY = a.puckHover + (a.tableThickness + a.puckThickness) / 2.0
-        paddleY = a.paddleHover + (a.tableThickness + a.paddleThickness) / 2.0
+        puckY = a.puckHover -- + (a.tableThickness + a.puckThickness) / 2.0
+        paddleY = a.paddleHover -- + (a.tableThickness + a.paddleThickness) / 2.0
         paddleZ = a.tableLength / 4.0
 
-        boundHeight = max (a.puckHover + a.puckThickness) (a.paddleThickness + a.paddleHover)
+        boundHeight = a.tableThickness/2 + max (a.puckHover + a.puckThickness) (a.paddleThickness + a.paddleHover)
     in
         ( reposition a.position
             { attributes = { a | position = vec3 0 0 0 } -- First set up the table at 0 0 0, then reposition it
@@ -157,7 +157,7 @@ init a =
                   , appear = cloudsSphere
                   , velocity = vec3 0 0 0
                   }
-            , bounds = boundingBox { position = vec3 (-a.tableWidth/2.0) 0 (-a.tableLength/2.0)
+            , bounds = boundingBox { position = vec3 (-a.tableWidth/2.0) (a.tableThickness/2.0) (-a.tableLength/2.0)
                                    , dimensions = vec3 a.tableWidth boundHeight a.tableLength
                                    }
             }
@@ -208,26 +208,34 @@ movePaddle inputs model =
         dy = 2.0 * (inputs.y + inputs.my)
 
         p = model.paddle1
-        paddle = bump model.bounds inputs.dt { p | velocity = vec3 dx 0 dy }
-    in
-        { model | paddle1 = paddle }
 
+        paddle = { p | velocity = vec3 dx 0 dy }
+    in
+        collide inputs.dt { model | paddle1 = paddle }
+
+
+collide : Time -> Model -> Model
+collide dt model =
+    let
+        puck_0 = bounce model.bounds dt model.puck
+        paddle1_0 = bump model.bounds dt model.paddle1
+        paddle2_0 = bump model.bounds dt model.paddle2
+        bodies = collisions dt [ puck_0, paddle1_0, paddle2_0 ]
+        (puck, paddle1, paddle2) = case bodies of
+            [b1, b2, b3] -> (b1, b2, b3)
+            _ -> (model.puck, model.paddle1, model.paddle2)
+    in
+        { model | puck = puck
+                , paddle1 = paddle1
+                , paddle2 = paddle2
+        }
 
 animate : Ground -> Time -> Model -> Model
 animate ground dt model =
     let
         setElevation pos = V3.setY (model.attributes.tableHeight + ground.elevation pos) pos
-        puck0 = bounce model.bounds dt model.puck
-        bodies = collisions dt [ puck0, model.paddle1, model.paddle2 ]
-        (puck, paddle1, paddle2) = case bodies of
-            [b1, b2, b3] -> (b1, b2, b3)
-            _ -> (model.puck, model.paddle1, model.paddle2)
     in
-        reposition (setElevation model.attributes.position)
-            { model | puck = puck
-                    , paddle1 = paddle1
-                    , paddle2 = paddle2
-            }
+        reposition (setElevation model.attributes.position) (collide dt model)
 
 
 bodies : Model -> List Body
@@ -247,7 +255,7 @@ framing : Model -> Maybe Framing
 framing model =
     let
         target =
-            { position = model.puck.position
+            { position = model.paddle1.position
             , orientation = model.attributes.orientation
             , velocity = vec3 0 0 0
             }
