@@ -220,8 +220,8 @@ timeToInputs dt inputs0 =
 
 
 mouseToInputs : Model.MouseMovement -> Model.Inputs -> Model.Inputs
-mouseToInputs ( mx, my ) inputs0 =
-    { inputs0 | mx = toFloat mx / 500, my = toFloat my / 500 }
+mouseToInputs ( mx, my ) inputs =
+    { inputs | mx = 0.5 * inputs.dt * toFloat mx, my = -0.5 * inputs.dt * toFloat my }
 
 
 clearStationaryInputs : Model.Inputs -> Model.Inputs
