@@ -18,6 +18,8 @@ import Orientation exposing (Orientation)
 import Body.Cube exposing (textureCube)
 import Body.Sphere exposing (cloudsSphere, fogMountainsSphere)
 
+import Bounding exposing (Bounding)
+import Bounding.Box exposing (Box, boundingBox)
 
 type alias Attributes =
     { label : String
@@ -62,6 +64,7 @@ type alias Model =
     , puck : Moving Body
     , paddle1 : Moving Body
     , paddle2 : Moving Body
+    , bounds : Bounding Box
     }
 
 
@@ -92,6 +95,10 @@ reposition pos0 model =
         paddle1RelPos = V3.sub model.paddle1.position a.position
         paddle2RelPos = V3.sub model.paddle2.position a.position
 
+        bounds = model.bounds
+        box = bounds.model
+        boundsRelPos = V3.sub box.position a.position
+
         setPos pos body = { body | position = pos }
     in
         { model | attributes = { a | position = pos0 }
@@ -99,6 +106,8 @@ reposition pos0 model =
                 , puck = setPos (V3.add pos0 puckRelPos) model.puck
                 , paddle1 = setPos (V3.add pos0 paddle1RelPos) model.paddle1
                 , paddle2 = setPos (V3.add pos0 paddle2RelPos) model.paddle2
+                , bounds = { bounds | model = setPos (V3.add pos0 boundsRelPos) box
+                }
         } 
 
 
@@ -108,7 +117,8 @@ init a =
         puckY = a.puckHover + (a.tableThickness + a.puckThickness) / 2.0
         paddleY = a.paddleHover + (a.tableThickness + a.paddleThickness) / 2.0
         paddleZ = a.tableLength / 4.0
-        setPos pos body = { body | position = pos }
+
+        boundHeight = max (a.puckHover + a.puckThickness) (a.paddleThickness + a.paddleHover)
     in
         ( reposition a.position
             { attributes = { a | position = vec3 0 0 0 } -- First set up the table at 0 0 0, then reposition it
@@ -137,6 +147,9 @@ init a =
                   , appear = cloudsSphere
                   , velocity = vec3 0 0 0
                   }
+            , bounds = boundingBox { position = vec3 (-a.tableWidth/2.0) 0 (-a.tableLength/2.0)
+                                   , dimensions = vec3 a.tableWidth boundHeight a.tableLength
+                                   }
             }
         , Texture.load a.tableTexture
             |> Task.attempt (Self << TextureLoaded)
