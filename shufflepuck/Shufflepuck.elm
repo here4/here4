@@ -77,7 +77,9 @@ type alias Model =
     , puck : Massive (Spherical (Moving Body))
     , paddle1 : Massive (Spherical (Moving Body))
     , paddle2 : Massive (Spherical (Moving Body))
-    , bounds : Bounding Box
+    , puckBounds : Bounding Box
+    , paddle1Bounds : Bounding Box
+    , paddle2Bounds : Bounding Box
     , score1 : Int
     , score2 : Int
     }
@@ -114,9 +116,16 @@ reposition pos0 model =
         paddle1RelPos = V3.sub model.paddle1.position a.position
         paddle2RelPos = V3.sub model.paddle2.position a.position
 
-        bounds = model.bounds
+        bounds = model.puckBounds
         box = bounds.model
         boundsRelPos = V3.sub box.position a.position
+
+        updateBounds b =
+            let
+                box = b.model
+                relPos = V3.sub box.position a.position
+            in
+                { b | model = setPos (V3.add pos0 relPos) box }
 
         setPos pos body = { body | position = pos }
     in
@@ -125,7 +134,9 @@ reposition pos0 model =
                 , puck = setPos (V3.add pos0 puckRelPos) model.puck
                 , paddle1 = setPos (V3.add pos0 paddle1RelPos) model.paddle1
                 , paddle2 = setPos (V3.add pos0 paddle2RelPos) model.paddle2
-                , bounds = { bounds | model = setPos (V3.add pos0 boundsRelPos) box }
+                , puckBounds = updateBounds model.puckBounds
+                , paddle1Bounds = updateBounds model.paddle1Bounds
+                , paddle2Bounds = updateBounds model.paddle2Bounds
         } 
 
 
@@ -137,6 +148,25 @@ init a =
         paddleZ = a.tableLength / 4.0
 
         boundHeight = a.tableThickness/2 + max (a.puckHover + a.puckThickness) (a.paddleThickness + a.paddleHover)
+        dimensions = vec3 a.tableWidth boundHeight a.tableLength
+
+        box = { position = vec3 (-a.tableWidth/2.0) (a.tableThickness/2.0) (-a.tableLength/2.0)
+              , dimensions = dimensions
+              }
+
+        halfZ = V3.getZ dimensions / 2.0
+        halfDim = V3.setZ halfZ dimensions
+        box1 = { box | dimensions = halfDim }
+
+        bounds = boundingBox box
+        bounds1 = boundingBox box1
+
+        pos = box.position
+        pos2 = V3.setZ (V3.getZ pos + halfZ) pos
+        box2 = { box | position = pos2
+                     , dimensions = halfDim
+               }
+        bounds2 = boundingBox box2
     in
         ( reposition a.position
             { attributes = { a | position = vec3 0 0 0 } -- First set up the table at 0 0 0, then reposition it
@@ -177,9 +207,9 @@ init a =
                   , appear = cloudsCylinder
                   , velocity = vec3 0 0 0
                   }
-            , bounds = boundingBox { position = vec3 (-a.tableWidth/2.0) (a.tableThickness/2.0) (-a.tableLength/2.0)
-                                   , dimensions = vec3 a.tableWidth boundHeight a.tableLength
-                                   }
+            , puckBounds = bounds
+            , paddle1Bounds = bounds1
+            , paddle2Bounds = bounds2
             , score1 = 0
             , score2 = 0
             }
@@ -273,7 +303,7 @@ collide : Time -> Model -> Model
 collide dt model =
     let
         a = model.attributes
-        box = model.bounds.model
+        box = model.puckBounds.model
         (px, py, pz) = V3.toTuple <| V3.sub model.puck.position box.position
         (rx, ry, rz) = V3.toTuple <| V3.sub (V3.add model.puck.position (V3.scale dt model.puck.velocity)) box.position
 
@@ -298,29 +328,13 @@ collide dt model =
                 (recenter model.puck, model.paddle1, model.paddle2, model.score1, model.score2+1)
             else
                 let
-                    puck_z = V3.getZ model.puck.position 
-                    puck_0 = bounce model.bounds dt model.puck
+                    puck_0 = bounce model.puckBounds dt model.puck
 
-                    box = model.bounds.model
-                    dim = box.dimensions
-                    halfZ = V3.getZ dim / 2.0
-                    halfDim = V3.setZ halfZ dim
-                    box1 = { box | dimensions = halfDim }
+                    paddle1_0 = bump model.paddle1Bounds dt model.paddle1
+                    paddle2_0 = bump model.paddle2Bounds dt model.paddle2
 
-                    bounds = model.bounds
-                    bounds1 = { bounds | model = box1 }
-
-                    paddle1_0 = bump bounds1 dt model.paddle1
-
-                    pos = box.position
-                    pos2 = V3.setZ (V3.getZ pos + halfZ) pos
-                    box2 = { box | position = pos2
-                                 , dimensions = halfDim
-                           }
-                    bounds2 = { bounds | model = box2 }
-
-                    paddle2_0 = bump bounds2 dt model.paddle2
                     bodies = collisions dt [ puck_0, paddle1_0, paddle2_0 ]
+
                     (puck, paddle1, paddle2) = case bodies of
                         [b1, b2, b3] -> (b1, b2, b3)
                         _ -> (model.puck, model.paddle1, model.paddle2)
