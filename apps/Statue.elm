@@ -1,6 +1,7 @@
 module Statue exposing (create)
 
 import Html exposing (Html)
+import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
@@ -18,7 +19,8 @@ import Camera.DollyArc as Camera
 
 
 type alias Model =
-    { body : Moving Body
+    { label : String
+    , body : Moving Body
     , speed : Float
     , camera : Motion
     }
@@ -30,7 +32,7 @@ type alias Msg =
 
 create : Float -> String -> Vec3 -> Appearance -> ( App, Cmd AppMsg )
 create speed label pos appear =
-    App.create (init pos speed appear)
+    App.create (init label pos speed appear)
         { label = always label
         , update = update
         , animate = animate
@@ -41,9 +43,10 @@ create speed label pos appear =
         }
 
 
-init : Vec3 -> Float -> Appearance -> ( Model, Cmd (CtrlMsg Msg) )
-init pos speed appear =
-    ( { body =
+init : String -> Vec3 -> Float -> Appearance -> ( Model, Cmd (CtrlMsg Msg) )
+init label pos speed appear =
+    ( { label = label
+      , body =
             { anchor = AnchorGround
             , scale = vec3 1 1 1
             , position = pos
@@ -96,4 +99,13 @@ focus model =
     Just (appToFocus model.body)
 
 overlay : Model -> Html msg
-overlay _ = Html.text "A statue"
+overlay model =
+    let
+        textLeft =
+            Html.style [ ( "text-align", "left" ) ]
+    in
+        Html.div []
+            [ Html.h2 []
+                [ Html.text model.label ]
+            , Html.text "A statue"
+            ]
