@@ -127,7 +127,17 @@ overlay _ =
                         "the encounter. Perfectly elastic collisions occur only if " ++
                         "there is no net conversion of kinetic energy into other forms " ++
                         "(such as heat or noise) and therefore they do not normally " ++
-                        "occur in reality.")
+                        "occur in reality. ")
+                    ]
+                , Html.p
+                    [ textLeft ]
+                    [ Html.text "("
+                    , Html.a
+                        [ Html.href "https://en.wikipedia.org/wiki/Elastic_collision"
+                        , Html.target "_blank"
+                        ]
+                        [ Html.text "Elastic collision" ]
+                    , Html.text ", WIkipedia)"
                     ]
                 ]
             , Html.p
