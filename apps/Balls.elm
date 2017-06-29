@@ -1,6 +1,7 @@
 module Balls exposing (create)
 
 import Html exposing (Html)
+import Html.Attributes as Html
 import Math.Vector3 exposing (Vec3, add, vec3)
 import Random
 import Time exposing (Time)
@@ -97,4 +98,46 @@ focus balls =
     Nothing
 
 overlay : Balls -> Html msg
-overlay _ = Html.text "Bouncy balls"
+overlay _ =
+    let
+        textLeft =
+            Html.style [ ( "text-align", "left" ) ]
+    in
+        Html.div []
+            [ Html.h2 []
+                [ Html.text "Bouncing Balls" ]
+            , Html.text "A model of elastic collisions"
+            , Html.div
+                [ Html.style
+                    [ ( "padding-left", "3em" )
+                    , ( "padding-right", "3em" )
+                    ]
+                ]
+                [ Html.p
+                    [ textLeft ]
+                    [ Html.text
+                        "This models elastic collision between spheres of varying radius and mass."
+                    ]
+                , Html.p
+                    [ textLeft ]
+                    [ Html.text (
+                        "An elastic collision is an encounter between two bodies " ++
+                        "in which the total kinetic energy of the two bodies after " ++
+                        "the encounter is equal to their total kinetic energy before " ++
+                        "the encounter. Perfectly elastic collisions occur only if " ++
+                        "there is no net conversion of kinetic energy into other forms " ++
+                        "(such as heat or noise) and therefore they do not normally " ++
+                        "occur in reality.")
+                    ]
+                ]
+            , Html.p
+                [ textLeft
+                , Html.style [ ( "bottom", "0px" ) ]
+                ]
+                [ Html.a
+                    [ Html.href "https://github.com/kfish/dreambuggy/blob/master/engine/Physics/Collisions.elm"
+                    , Html.target "_blank"
+                    ]
+                    [ Html.text "View source on GitHub" ]
+                ]
+            ]
