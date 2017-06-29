@@ -48,25 +48,29 @@ type alias Attributes =
 
 default : Attributes
 default =
+    let golden = (1 + sqrt 5) / 2.0
+        width = 2.0
+        length = width * golden
+    in
     { label = "Shufflepuck"
     , position = vec3 0 0 0
     , scale = vec3 1 1 1
     , orientation = Orientation.initial
     , tableTexture = "textures/decursio_top.jpg"
-    , tableWidth = 3
-    , tableLength = 7
+    , tableWidth = width
+    , tableLength = length
     , tableHeight = 3.0 -- 0.9
     , tableThickness = 0.2
-    , goalWidth = 0.8
+    , goalWidth = width * 0.2
     , puckTexture = "textures/mp_diff_orange.png"
     , puckMass = 5.0
-    , puckRadius = 0.12
+    , puckRadius = width * 0.03
     , puckThickness = 0.03
     , puckHover = 0.3
-    , puckMaxSpeed = 0.7
+    , puckMaxSpeed = width * 0.35
     , paddleTexture = "textures/ring_bottoms.jpg"
     , paddleMass = 10.0
-    , paddleRadius = 0.18
+    , paddleRadius = width * 0.045
     , paddleThickness = 0.07
     , paddleHover = 0.3
     }
