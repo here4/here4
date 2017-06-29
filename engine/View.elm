@@ -33,14 +33,25 @@ view :
 view worldView model =
     case ( model.maybeWindowSize, worldView model.worldModel ) of
         ( Nothing, _ ) ->
-            text ""
+            text "Starting ..."
 
-        ( _, Nothing ) ->
-            text ""
+        ( Just windowSize, Nothing ) ->
+            loading windowSize
 
         ( Just windowSize, Just world ) ->
             layoutScene windowSize model world
 
+loading : Window.Size -> Html (Msg worldMsg)
+loading windowSize =
+    let
+        left = 0
+        right = 0
+        helpHMargin = windowSize.width//10
+        helpVMargin = windowSize.height//10
+
+        overlayContent = text "Loading ..."
+    in
+        overlay left right helpHMargin helpVMargin overlayContent
 
 layoutScene : Window.Size -> Model worldModel worldMsg -> Model.World -> Html (Msg worldMsg)
 layoutScene windowSize model world =
