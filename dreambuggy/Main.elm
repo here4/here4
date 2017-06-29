@@ -31,12 +31,12 @@ main =
             , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
             , let s = Shufflepuck.default in Shufflepuck.create { s | position = vec3 53 0 18 }
             , Wedge.create "Wedge" (vec3 23 0 12)
-            , Statue.create 3.0 "Clouds Sphere" (vec3 3 10 5) cloudsSphere
-            , Statue.create 2.0 "Landscape Diamond" (vec3 0 1.5 0) fogMountainsDiamond
-            , Statue.create 4.0 "Sky Diamond" (vec3 5 1.5 1) cloudsDiamond
-            , Statue.create 7.0 "Voronoi Cube" (vec3 10 0 10) voronoiCube
-            , Statue.create 3.0 "Fire Cube" (vec3 -10 0 -10) fireCube
-            , Statue.create 4.0 "Landscape Cube" (vec3 10 1.5 -10) fogMountainsCube
+            , Statue.create "Clouds Sphere" (vec3 3 10 5) cloudsSphere
+            , Statue.create "Landscape Diamond" (vec3 0 1.5 0) fogMountainsDiamond
+            , Statue.create "Sky Diamond" (vec3 5 1.5 1) cloudsDiamond
+            , Statue.create "Voronoi Cube" (vec3 10 0 10) voronoiCube
+            , Statue.create "Fire Cube" (vec3 -10 0 -10) fireCube
+            , Statue.create "Landscape Cube" (vec3 10 1.5 -10) fogMountainsCube
             , Boids.create 100
             , Balls.create 30
             , StaticGround.create Terrain.generate

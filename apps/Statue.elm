@@ -21,7 +21,6 @@ import Camera.DollyArc as Camera
 type alias Model =
     { label : String
     , body : Moving Body
-    , speed : Float
     , camera : Motion
     }
 
@@ -30,9 +29,9 @@ type alias Msg =
     ()
 
 
-create : Float -> String -> Vec3 -> Appearance -> ( App, Cmd AppMsg )
-create speed label pos appear =
-    App.create (init label pos speed appear)
+create : String -> Vec3 -> Appearance -> ( App, Cmd AppMsg )
+create label pos appear =
+    App.create (init label pos appear)
         { label = always label
         , update = update
         , animate = animate
@@ -43,8 +42,8 @@ create speed label pos appear =
         }
 
 
-init : String -> Vec3 -> Float -> Appearance -> ( Model, Cmd (CtrlMsg Msg) )
-init label pos speed appear =
+init : String -> Vec3 -> Appearance -> ( Model, Cmd (CtrlMsg Msg) )
+init label pos appear =
     ( { label = label
       , body =
             { anchor = AnchorGround
@@ -54,7 +53,6 @@ init label pos speed appear =
             , appear = appear
             , velocity = vec3 0 0 0
             }
-      , speed = speed
       , camera =
             { position = V3.add pos (vec3 0 0 -5)
             , velocity = vec3 0 0 0
