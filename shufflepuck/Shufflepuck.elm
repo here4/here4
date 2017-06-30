@@ -94,8 +94,36 @@ type alias Model =
     , paddle2Bounds : Bounding Box
     , score1 : Int
     , score2 : Int
+    , robotPaddle2 : RobotPaddle
     }
 
+type alias RobotPaddle =
+    { elapsedTime : Time
+    }
+
+initRobotPaddle : RobotPaddle
+initRobotPaddle =
+    { elapsedTime = 0
+    }
+
+updateRobotPaddle : Time -> RobotPaddle -> RobotPaddle
+updateRobotPaddle dt rp =
+    { elapsedTime = rp.elapsedTime + dt }
+
+applyRobotPaddle : RobotPaddle -> Moving a -> Massive (Spherical (Moving Body)) -> Massive (Spherical (Moving Body))
+applyRobotPaddle robot puck paddle =
+    let
+        t = robot.elapsedTime
+
+        toPuck =
+            V3.sub puck.position paddle.position
+            |> V3.normalize
+            |> V3.scale 0.3
+
+        dx = 0.1 * cos (20 * t) + 0.3 * sin (5.0 * t)
+        dy = 0.2 * sin (15 * t) + 0.15 * cos (10.0 * t)
+    in
+        { paddle | velocity = V3.add toPuck (vec3 dx 0 dy) }
 
 type Msg
     = TableTextureLoaded (Result Error Texture)
@@ -180,11 +208,9 @@ init a =
         puckY =
             a.puckHover
 
-        -- + (a.tableThickness + a.puckThickness) / 2.0
         paddleY =
             a.paddleHover
 
-        -- + (a.tableThickness + a.paddleThickness) / 2.0
         paddleZ =
             a.tableLength / 4.0
 
@@ -273,6 +299,7 @@ init a =
             , paddle2Bounds = bounds2
             , score1 = 0
             , score2 = 0
+            , robotPaddle2 = initRobotPaddle
             }
         , Cmd.batch
             [ Texture.load a.tableTexture
@@ -477,8 +504,15 @@ animate ground dt model =
     let
         setElevation pos =
             V3.setY (model.attributes.tableHeight + ground.elevation pos) pos
+
+        robot = updateRobotPaddle dt model.robotPaddle2
+        paddle2 = applyRobotPaddle robot model.puck model.paddle2
+
+        newModel = { model | paddle2 = paddle2
+                           , robotPaddle2 = robot
+                   }
     in
-        reposition (setElevation model.attributes.position) (collide dt model)
+        reposition (setElevation model.attributes.position) (collide dt newModel)
 
 
 bodies : Model -> List Body
