@@ -74,7 +74,7 @@ default =
         , puckRadius = width * 0.03
         , puckThickness = 0.03
         , puckHover = 0.3
-        , puckMaxSpeed = width * 0.35
+        , puckMaxSpeed = width * 0.25
         , paddleTexture = "textures/ring_bottoms.jpg"
         , paddleMass = 10.0
         , paddleRadius = width * 0.045
@@ -118,7 +118,7 @@ applyRobotPaddle robot puck paddle =
         toPuck =
             V3.sub puck.position paddle.position
             |> V3.normalize
-            |> V3.scale 0.3
+            |> V3.scale 0.2
 
         dx = 0.1 * cos (20 * t) + 0.3 * sin (5.0 * t)
         dy = 0.2 * sin (15 * t) + 0.15 * cos (10.0 * t)
