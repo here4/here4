@@ -1,7 +1,7 @@
 module Wedge exposing (create)
 
 import Html exposing (Html)
-import Math.Vector3 exposing (Vec3, vec3)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
 import App exposing (App, AppMsg, Focus, appToFocus)
@@ -86,7 +86,16 @@ bodies model =
 
 framing : Model -> Maybe Framing
 framing model =
-    Just (Camera.framing model.body)
+    let
+        framing = Camera.framing model.body
+        pov0 = framing.pov
+        position =
+            V3.add model.body.position
+            <| V3.scale 1.0
+               (Orientation.rotateLabV model.body.orientation V3.k)
+        pov = { pov0 | position = position }
+    in
+        Just { framing | pov = pov }
 
 
 focus : Model -> Maybe Focus

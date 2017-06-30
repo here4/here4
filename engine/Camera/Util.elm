@@ -33,7 +33,10 @@ framing thing =
     let
         target = toTarget thing
 
-        ahead = V3.add thing.position (Orientation.rotateBodyV thing.orientation V3.k)
+        ahead =
+            V3.add thing.position
+            <| V3.scale 10.0
+            <| Orientation.rotateBodyV thing.orientation V3.k
     in
         { target = target
         , pov =
