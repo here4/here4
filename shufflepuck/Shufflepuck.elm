@@ -267,7 +267,7 @@ init a =
             , puck =
                 { anchor = AnchorGround
                 , scale = vec3 a.puckRadius (a.puckThickness / 2.0) a.puckRadius
-                , position = vec3 0 puckY 0
+                , position = vec3 0 puckY (-0.4 * a.tableLength / 2.0)
                 , orientation = Orientation.initial
                 , radius = a.puckRadius
                 , mass = a.puckMass
@@ -420,9 +420,9 @@ collide dt model =
         ( rx, ry, rz ) =
             V3.toTuple <| V3.sub (V3.add model.puck.position (V3.scale dt model.puck.velocity)) box.position
 
-        recenter p =
+        recenter offset p =
             { p
-                | position = V3.add (vec3 0 a.puckHover 0) a.position
+                | position = V3.add (vec3 0 a.puckHover (offset * a.tableLength/2.0)) a.position
                 , velocity = vec3 0 0 0
             }
 
@@ -452,9 +452,9 @@ collide dt model =
 
         ( puck, paddle1, paddle2, score1, score2 ) =
             if goal1 then
-                ( recenter model.puck, model.paddle1, model.paddle2, model.score1 + 1, model.score2 )
+                ( recenter 0.4 model.puck, model.paddle1, model.paddle2, model.score1 + 1, model.score2 )
             else if goal2 then
-                ( recenter model.puck, model.paddle1, model.paddle2, model.score1, model.score2 + 1 )
+                ( recenter -0.4 model.puck, model.paddle1, model.paddle2, model.score1, model.score2 + 1 )
             else
                 let
                     puck_0 =
