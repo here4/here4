@@ -16,5 +16,5 @@ povInit : Ground -> Camera -> Camera
 povInit ground camera =
     { camera | position = camera.target.position }
 
-povShoot : Ground -> Input -> Moving a -> Camera -> Camera
-povShoot ground input target camera = toCamera target
+povShoot : Ground -> Input -> Framing -> Camera -> Camera
+povShoot ground input framing camera = framing.pov

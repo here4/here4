@@ -325,7 +325,7 @@ shoot ground inputs dt shot framing camera =
             , dt = dt
             }
     in
-        shot.shoot ground cameraInput framing.target camera
+        shot.shoot ground cameraInput framing camera
 
 updatePlayer : Ground -> Model.Inputs -> Float -> String -> Html msg -> Maybe Shot -> Maybe Framing -> Model.Player msg -> Model.Player msg
 updatePlayer terrain inputs dt label overlayContent mshot framing player0 =

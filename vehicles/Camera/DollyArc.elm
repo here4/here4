@@ -41,8 +41,8 @@ dollyInit ground camera =
         |> Camera.retarget camera.target
         |> Camera.rollUpright
 
-dollyShoot : Float -> Ground -> Input -> Target -> Camera -> Camera
-dollyShoot minDistance ground input target camera =
+dollyShoot : Float -> Ground -> Input -> Framing -> Camera -> Camera
+dollyShoot minDistance ground input framing camera =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
@@ -53,6 +53,8 @@ dollyShoot minDistance ground input target camera =
 
         inputYaw =
             -input.x * 1 * input.dt
+
+        target = framing.target
 
         -- The original displacement of the camera, relative to where the target was
         originalDisplacement =
@@ -90,13 +92,13 @@ dollyShoot minDistance ground input target camera =
         |> Camera.rollUpright
 
 
-dollyZoomShoot : Float -> Ground -> Input -> Target -> Camera -> Camera
-dollyZoomShoot minDistance ground input target camera =
+dollyZoomShoot : Float -> Ground -> Input -> Framing -> Camera -> Camera
+dollyZoomShoot minDistance ground input framing camera =
     let
-        dollyCamera = dollyShoot minDistance ground input target camera
+        dollyCamera = dollyShoot minDistance ground input framing camera
 
         finalDistance =
-            V3.length (V3.sub dollyCamera.position target.position)
+            V3.length (V3.sub dollyCamera.position framing.target.position)
 
         fovy =
             clamp 1 89 (10 * (10 - sqrt (finalDistance-minDistance)))
@@ -105,8 +107,8 @@ dollyZoomShoot minDistance ground input target camera =
         { dollyCamera | fovy = fovy }
 
 
-arcShoot : Ground -> Input -> Target -> Camera -> Camera
-arcShoot ground input target camera =
+arcShoot : Ground -> Input -> Framing -> Camera -> Camera
+arcShoot ground input framing camera =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos
@@ -124,10 +126,10 @@ arcShoot ground input target camera =
         newDisplacement =
             moveAroundSphere inputPitch inputYaw originalDisplacement
 
-        position = V3.add target.position newDisplacement
+        position = V3.add framing.target.position newDisplacement
     in
         { camera | position = position }
-        |> Camera.retarget target
+        |> Camera.retarget framing.target
         |> Camera.rollUpright
 
 

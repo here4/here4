@@ -19,7 +19,7 @@ type alias Input =
 type alias Shot =
     { label : String
     , init : Ground -> Camera -> Camera
-    , shoot : Ground -> Input -> Target -> Camera -> Camera
+    , shoot : Ground -> Input -> Framing -> Camera -> Camera
     }
 
 type alias Target =

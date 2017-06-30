@@ -24,8 +24,8 @@ trackingInit direction ground camera =
             sub target.position (V3.scale 23 (direction target))
     in Camera.retarget camera.target { camera | position = position }
 
-trackingShoot : (Moving a -> Vec3) -> Ground -> Input -> Moving a -> Camera -> Camera
-trackingShoot direction ground input target camera =
+trackingShoot : (Target -> Vec3) -> Ground -> Input -> Framing -> Camera -> Camera
+trackingShoot direction ground input framing camera =
     let
         eyeLevel pos =
             Model.eyeLevel + ground.elevation pos
@@ -33,6 +33,8 @@ trackingShoot direction ground input target camera =
         -- input
         inputNearFar =
             -input.y * 30 * input.dt
+
+        target = framing.target
 
         above = vec3 0 6 0
 
