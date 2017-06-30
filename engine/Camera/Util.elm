@@ -30,12 +30,22 @@ toCamera thing =
 
 framing : Moving a -> Framing
 framing thing =
-    { target =
-        { position = thing.position
-        , orientation = thing.orientation
-        , velocity = thing.velocity
+    let
+        target =
+            { position = thing.position
+            , orientation = thing.orientation
+            , velocity = thing.velocity
+            }
+        ahead = V3.add thing.position (Orientation.rotateBodyV thing.orientation V3.k)
+    in
+        { target = target
+        , pov =
+            { position = thing.position
+            , orientation = thing.orientation
+            , target = { target | position = ahead }
+            , fovy = 45
+            }
         }
-    }
 
 
 cameraUp : { a | orientation : Orientation } -> Vec3

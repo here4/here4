@@ -30,6 +30,7 @@ type alias Target =
 
 type alias Framing =
     { target : Target
+    , pov : Camera
     }
 
 type alias Camera =

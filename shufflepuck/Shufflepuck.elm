@@ -526,10 +526,24 @@ framing model =
         target =
             { position = model.paddle1.position
             , orientation = model.attributes.orientation
-            , velocity = vec3 0 0 0
+            , velocity = model.paddle1.velocity
             }
+        puckTarget = Camera.toTarget model.puck
+        pov = Camera.rollUpright <| Camera.retarget puckTarget
+                { position =
+                    V3.add (vec3 0 (model.attributes.tableWidth/2.0) 0)
+                    <| V3.sub model.table.position
+                    <| V3.scale (1.3 * model.attributes.tableLength / 2.0)
+                           (Orientation.rotateLabV model.attributes.orientation V3.k)
+                , orientation = Orientation.initial
+                , target = puckTarget
+                , fovy = 45
+                }
+
     in
-        Just { target = target }
+        Just { target = target
+             , pov = pov
+             }
 
 
 focus : Model -> Maybe Focus
