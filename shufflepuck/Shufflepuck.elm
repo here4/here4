@@ -528,15 +528,22 @@ framing model =
             , orientation = model.attributes.orientation
             , velocity = model.paddle1.velocity
             }
-        puckTarget = Camera.toTarget model.puck
-        pov = Camera.rollUpright <| Camera.retarget puckTarget
+
+        povTargetPos =
+            V3.add model.table.position <|
+            V3.scale (0.3 * V3.dot (V3.sub model.puck.position model.table.position) V3.k) V3.k
+
+        puck = model.puck
+        povTarget = Camera.toTarget { puck | position = povTargetPos }
+
+        pov = Camera.rollUpright <| Camera.retarget povTarget
                 { position =
-                    V3.add (vec3 0 (model.attributes.tableWidth/2.0) 0)
+                    V3.add (vec3 0 (model.attributes.tableWidth/1.2) 0)
                     <| V3.sub model.table.position
-                    <| V3.scale (1.3 * model.attributes.tableLength / 2.0)
+                    <| V3.scale (1.8 * model.attributes.tableLength / 2.0)
                            (Orientation.rotateLabV model.attributes.orientation V3.k)
                 , orientation = Orientation.initial
-                , target = puckTarget
+                , target = povTarget
                 , fovy = 45
                 }
 
