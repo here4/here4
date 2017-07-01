@@ -198,15 +198,15 @@ worldLabel mkey model =
     let
         none =
             "<>"
-    in
-        case mkey of
-            Just key ->
-                case Bag.get key model.apps of
-                    Just app ->
-                        App.label app
 
-                    Nothing ->
-                        none
+        mApp =
+            Maybe.andThen (\k -> Bag.get k model.participants) mkey
+            |> Maybe.andThen .rideKey mPart
+            |> Maybe.andThen (\k -> Bag.get k model.apps)
+    in
+        case mApp of
+            Just app ->
+                App.label app
 
             Nothing ->
                 none
@@ -216,15 +216,15 @@ worldOverlay mkey model =
     let
         none =
             Html.text "Welcome to DreamBuggy"
-    in
-        case mkey of
-            Just key ->
-                case Bag.get key model.apps of
-                    Just app ->
-                        Html.map (Send key) (App.overlay app)
 
-                    Nothing ->
-                        none
+        mApp =
+            Maybe.andThen (\k -> Bag.get k model.participants) mkey
+            |> Maybe.andThen .rideKey mPart
+            |> Maybe.andThen (\k -> Bag.get k model.apps)
+    in
+        case mApp of
+            Just app ->
+                Html.map (Send key) (App.overlay app)
 
             Nothing ->
                 none

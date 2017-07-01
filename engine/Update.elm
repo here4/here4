@@ -189,16 +189,16 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
                                     selectCamera terrain hasFraming keyLimit inputs2 model.player2
 
                                 label1 =
-                                    worldLabel (player1.rideKey) wm
+                                    worldLabel (player1.participation.participantKey) wm
 
                                 overlay1 =
-                                    worldOverlay (player1.rideKey) wm
+                                    worldOverlay (player1.participation.participantKey) wm
 
                                 label2 =
-                                    worldLabel (player2.rideKey) wm
+                                    worldLabel (player2.participation.participantKey) wm
 
                                 overlay2 =
-                                    worldOverlay (player2.rideKey) wm
+                                    worldOverlay (player2.participation.participantKey) wm
 
                                 ( wm1, wm1Msg ) =
                                     case player1.rideKey of
@@ -238,10 +238,10 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
 
                                 -- Camera
                                 framing1 =
-                                    worldFraming player1.rideKey wmF
+                                    worldFraming player1.participation.participantKey wmF
 
                                 framing2 =
-                                    worldFraming player2.rideKey wmF
+                                    worldFraming player2.participation.participantKey wmF
 
                                 newModel =
                                     { model
