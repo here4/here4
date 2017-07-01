@@ -14,6 +14,7 @@ import Camera.Util exposing (toCamera)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 
+type alias PlayerKey = Bag.Key
 
 type Msg worldMsg
     = KeyChange (Keys -> Keys)
@@ -21,6 +22,8 @@ type Msg worldMsg
     | GamepadUpdate (List Gamepad)
     | LockRequest Bool
     | LockUpdate Bool
+    | JoinWorld PlayerKey
+    | LeaveWorld PlayerKey
     | Animate Time
     | Resize Window.Size
     | WorldMessage worldMsg
@@ -38,12 +41,18 @@ type alias Motion =
     , orientation : Orientation
     }
 
+type alias Participation =
+    { participantKey : Maybe Bag.Key
+    -- , worldKey : Bag.Key
+    }
+
 type alias Player msg =
-    { camera : Camera
-    , shot : Maybe Shot
+    { participation : Participation
     , rideKey : Maybe Bag.Key
     , rideLabel : String
     , focusKey : Bag.Key
+    , camera : Camera
+    , shot : Maybe Shot
     , cameraVR : Bool
     , overlayVisible : Bool
     , overlayContent : Html msg
@@ -80,7 +89,8 @@ defaultCamera = toCamera
 
 defaultPlayer : Player msg
 defaultPlayer =
-    { camera = defaultCamera
+    { participation = { participantKey = Nothing }
+    , camera = defaultCamera
     , shot = Nothing
     , rideKey = Nothing
     , rideLabel = ""

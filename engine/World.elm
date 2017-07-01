@@ -18,8 +18,13 @@ type alias WorldModel a =
     { worldModel : a
     , maybeGround : Maybe Ground
     , apps : Bag App
+    , participants : Bag Participant
+    }
 
-    -- , focusKey : Maybe Bag.Key
+
+type alias Participant =
+    { rideKey : Maybe Bag.Key
+    -- , focusKey : Bag.Key
     }
 
 
@@ -37,6 +42,8 @@ create hubInit hubUpdate details =
         , overlay = worldOverlay
         , keyLimit = worldKeyLimit
         , animate = worldAnimate
+        , join = worldJoin
+        , leave = worldLeave
         , framing = worldFraming
         , focus = worldFocus
         , ground = worldGround
@@ -74,8 +81,7 @@ worldInit hubInit details =
         ( { worldModel = hubModel
           , maybeGround = Nothing
           , apps = appsBag
-
-          -- , focusKey = List.head (Bag.keys appsBag)
+          , participants = Bag.empty
           }
         , Cmd.batch
             [ Cmd.map Hub hubCmd
@@ -166,6 +172,26 @@ worldAnimate : Ground -> Time -> WorldModel a -> WorldModel a
 worldAnimate ground dt model =
     { model | apps = Bag.map (App.animate ground dt) model.apps }
 
+
+worldJoin : WorldModel a -> (WorldModel a, Bag.Key)
+worldJoin model =
+    let
+        freshParticipant = { rideKey = Nothing }
+
+        ( key, newParticipants ) =
+            Bag.insert freshParticipant model.participants
+
+    in
+        ( { model | participants = newParticipants }, key )
+
+
+worldLeave : Bag.Key -> WorldModel a -> WorldModel a
+worldLeave key model =
+    let
+        newParticipants = Bag.remove key model.participants
+    in
+        { model | participants = newParticipants }
+    
 
 worldLabel : Maybe Bag.Key -> WorldModel a -> String
 worldLabel mkey model =

@@ -1,4 +1,4 @@
-module Bag exposing (Bag, Key, size, empty, insert, replace, get, keys, items, map)
+module Bag exposing (Bag, Key, size, empty, insert, remove, replace, get, keys, items, map)
 
 import Dict exposing (Dict)
 
@@ -26,6 +26,11 @@ insert v (Bag n dict) =
     ( n, Bag (n + 1) (Dict.insert n v dict) )
 
 
+-- If you do Bag.replace with a key that you didn't get from an insert, then you will corrupt
+-- the bag
+remove : Key -> Bag v -> Bag v
+remove key (Bag n dict) =
+    Bag (n-1) (Dict.remove key dict)
 
 -- If you do Bag.replace with a key that you didn't get from an insert, then you might lose this
 -- item on a subsequent insert

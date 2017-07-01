@@ -34,12 +34,14 @@ update :
     -> (worldModel -> Int)
     -> (worldModel -> Maybe Ground)
     -> (Ground -> Time -> worldModel -> worldModel)
+    -> (worldModel -> (worldModel, Bag.Key))
+    -> (Bag.Key -> worldModel -> worldModel)
     -> (Maybe Bag.Key -> worldModel -> Maybe Framing)
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel (WorldMsg worldMsg)
     -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
-update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnimate worldFraming worldFocus msg model =
+update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnimate worldJoin worldLeave worldFraming worldFocus msg model =
     case msg of
         Model.WorldMessage worldMsg ->
             let
@@ -94,6 +96,59 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
 
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
+
+        Model.JoinWorld playerKey {- worldKey -} ->
+            let
+                (wm, pKey) = worldJoin model.worldModel
+                p1 = model.player1
+                p2 = model.player2
+                (player1, player2) =
+                    case playerKey of
+                        0 -> ( { p1 | participation = { participantKey = Just pKey } }, p2 )
+                        1 -> ( p1, { p2 | participation = { participantKey = Just pKey } } )
+                        _ -> ( p1, p2 )
+                newModel =
+                    { model
+                        | player1 = player1
+                        , player2 = player2
+                        , worldModel = wm
+                    }
+
+            in
+                ( newModel, Cmd.none )
+                        
+            
+        Model.LeaveWorld playerKey {- worldKey -} ->
+            let
+                leave mKey =
+                    case mKey of
+                        Nothing -> model.worldModel
+                        Just k -> worldLeave k model.worldModel
+
+                p1 = model.player1
+                p2 = model.player2
+
+                (wm, player1, player2) =
+                    case playerKey of
+                        0 -> ( leave p1.participation.participantKey
+                             , { p1 | participation = { participantKey = Nothing } }
+                             , p2
+                             )
+                        1 -> ( leave p2.participation.participantKey
+                             , p1
+                             , { p2 | participation = { participantKey = Nothing } }
+                             )
+                        _ -> ( model.worldModel, p1, p2 )
+
+                newModel =
+                    { model
+                        | player1 = player1
+                        , player2 = player2
+                        , worldModel = wm
+                    }
+
+            in
+                ( newModel, Cmd.none )
 
         Model.Animate dt0 ->
             let
