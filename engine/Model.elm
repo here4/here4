@@ -48,7 +48,6 @@ type alias Participation =
 
 type alias Player msg =
     { participation : Participation
-    , rideKey : Maybe Bag.Key
     , rideLabel : String
     , focusKey : Bag.Key
     , camera : Camera
@@ -92,7 +91,6 @@ defaultPlayer =
     { participation = { participantKey = Nothing }
     , camera = defaultCamera
     , shot = Nothing
-    , rideKey = Nothing
     , rideLabel = ""
     , focusKey = 0
     , cameraVR = False
@@ -242,6 +240,7 @@ init worldInit { movement, isLocked } =
     let
         ( worldModel, worldCmdMsg ) =
             worldInit
+        playerJoin = Task.succeed >> Task.perform JoinWorld
     in
         ( { numPlayers = 1
           , player1 = defaultPlayer
@@ -259,9 +258,10 @@ init worldInit { movement, isLocked } =
           , worldModel = worldModel
           }
         , Cmd.batch
-            -- [ Window.size |> Task.perform (always Resize (0, 0)) Resize
             [ Window.size |> Task.perform Resize
             , gamepads GamepadUpdate
+            , playerJoin 0
+            , playerJoin 1
             , Cmd.map WorldMessage worldCmdMsg
             ]
         )

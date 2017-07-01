@@ -5,6 +5,7 @@ import Bag exposing (Bag)
 import Time exposing (Time)
 import Space
 import Control exposing (WorldMsg)
+import Maybe.Extra exposing (isJust)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Model exposing (Args)
@@ -12,7 +13,6 @@ import Body exposing (Body)
 import Camera exposing (Framing, Shot)
 import App exposing (..)
 import Ground exposing (Ground)
-
 
 type alias WorldModel a =
     { worldModel : a
@@ -44,6 +44,7 @@ create hubInit hubUpdate details =
         , animate = worldAnimate
         , join = worldJoin
         , leave = worldLeave
+        , changeRide = worldChangeRide
         , framing = worldFraming
         , focus = worldFocus
         , ground = worldGround
@@ -151,8 +152,8 @@ worldUpdate hubUpdate msg model =
         Forward key fwdMsg ->
             let
                 mApp =
-                    Maybe.andThen (\k -> Bag.get k model.participants) mkey
-                    |> Maybe.andThen .rideKey mPart
+                    Bag.get key model.participants
+                    |> Maybe.andThen .rideKey
                     |> Maybe.andThen (\k -> Bag.get k model.apps)
             in
                 case mApp of
@@ -200,6 +201,46 @@ worldLeave key model =
         { model | participants = newParticipants }
     
 
+worldChangeRide : Bag.Key -> WorldModel a -> WorldModel a
+worldChangeRide partiKey model =
+    let
+        keyLimit =
+            worldKeyLimit model
+
+        hasFraming key =
+            isJust (worldFraming (Just key) model)
+
+        nextKey key =
+            (key + 1) % keyLimit
+
+        findCameraHelp origKey key =
+            if hasFraming key then
+                key
+            else
+                let
+                    next =
+                        nextKey key
+                in
+                    if next == origKey then
+                        origKey
+                    else
+                        findCameraHelp origKey next
+
+        findCamera key =
+            findCameraHelp key key
+
+        rideKey =
+            Bag.get partiKey model.participants
+            |> Maybe.andThen .rideKey
+
+        key =
+            findCamera (Maybe.withDefault 0 rideKey)
+
+        newKey =
+            Just (findCamera (nextKey key))
+    in
+        { model | participants = Bag.replace partiKey { rideKey = newKey } model.participants }
+
 worldLabel : Maybe Bag.Key -> WorldModel a -> String
 worldLabel mkey model =
     let
@@ -208,7 +249,7 @@ worldLabel mkey model =
 
         mApp =
             Maybe.andThen (\k -> Bag.get k model.participants) mkey
-            |> Maybe.andThen .rideKey mPart
+            |> Maybe.andThen .rideKey
             |> Maybe.andThen (\k -> Bag.get k model.apps)
     in
         case mApp of
@@ -219,22 +260,38 @@ worldLabel mkey model =
                 none
 
 worldOverlay : Maybe Bag.Key -> WorldModel a -> Html (WorldMsg msg)
-worldOverlay mkey model =
+worldOverlay mPartiKey model =
     let
         none =
             Html.text "Welcome to DreamBuggy"
 
-        mApp =
-            Maybe.andThen (\k -> Bag.get k model.participants) mkey
-            |> Maybe.andThen .rideKey mPart
-            |> Maybe.andThen (\k -> Bag.get k model.apps)
+{-
+        rideKey =
+            Maybe.andThen (\k -> Bag.get k model.participants) mPartiKey
+            |> Maybe.andThen .rideKey
+-}
     in
-        case mApp of
-            Just app ->
-                Html.map (Send key) (App.overlay app)
+        case mPartiKey of
+            Just partiKey ->
+                case Bag.get partiKey model.participants of
+                    Just parti ->
+                        case parti.rideKey of
+                            Just key ->
+                                case Bag.get key model.apps of
+                                    Just app ->
+                                        Html.map (Send key) (App.overlay app)
+
+                                    Nothing ->
+                                        Html.text "App not found"
+
+                            Nothing ->
+                                Html.text ("No ride for participant " ++ toString partiKey)
+
+                    Nothing ->
+                        Html.text "Participant not found"
 
             Nothing ->
-                none
+                Html.text "No participant"
 
 
 worldFraming : Maybe Bag.Key -> WorldModel a -> Maybe Framing

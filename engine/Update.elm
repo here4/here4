@@ -3,7 +3,6 @@ module Update exposing (update)
 import Html exposing (Html)
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
-import Maybe.Extra exposing (isJust)
 import Time exposing (Time)
 
 import App exposing (Focus)
@@ -36,12 +35,13 @@ update :
     -> (Ground -> Time -> worldModel -> worldModel)
     -> (worldModel -> (worldModel, Bag.Key))
     -> (Bag.Key -> worldModel -> worldModel)
+    -> (Bag.Key -> worldModel -> worldModel)
     -> (Maybe Bag.Key -> worldModel -> Maybe Framing)
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel (WorldMsg worldMsg)
     -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
-update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnimate worldJoin worldLeave worldFraming worldFocus msg model =
+update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnimate worldJoin worldLeave worldChangeRide worldFraming worldFocus msg model =
     case msg of
         Model.WorldMessage worldMsg ->
             let
@@ -171,22 +171,15 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
                                 inputs2 =
                                     timeToInputs dt model.inputs2
 
-                                keyLimit =
-                                    worldKeyLimit model.worldModel
-
                                 -- Animate
                                 wm =
                                     worldAnimate terrain dt model.worldModel
 
-                                -- Change ride?
-                                hasFraming key =
-                                    isJust (worldFraming (Just key) wm)
-
                                 player1 =
-                                    selectCamera terrain hasFraming keyLimit inputs1 model.player1
+                                    selectCamera terrain inputs1 model.player1
 
                                 player2 =
-                                    selectCamera terrain hasFraming keyLimit inputs2 model.player2
+                                    selectCamera terrain inputs2 model.player2
 
                                 label1 =
                                     worldLabel (player1.participation.participantKey) wm
@@ -203,7 +196,14 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
                                 ( wm1, wm1Msg ) =
                                     case player1.participation.participantKey of
                                         Just key ->
-                                            worldUpdate (Forward key (Control.Drive terrain inputs1)) wm
+                                            let
+                                                wmRide =
+                                                    if inputs1.button_X then
+                                                        worldChangeRide key wm
+                                                    else
+                                                        wm
+                                            in
+                                                worldUpdate (Forward key (Control.Drive terrain inputs1)) wmRide
 
                                         Nothing ->
                                             ( wm, Cmd.none )
@@ -211,7 +211,14 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
                                 ( wm2, wm2Msg ) =
                                     case player2.participation.participantKey of
                                         Just key ->
-                                            worldUpdate (Forward key (Control.Drive terrain inputs2)) wm1
+                                            let
+                                                wmRide =
+                                                    if inputs2.button_X then
+                                                        worldChangeRide key wm
+                                                    else
+                                                        wm
+                                            in
+                                                worldUpdate (Forward key (Control.Drive terrain inputs2)) wmRide
 
                                         Nothing ->
                                             ( wm1, Cmd.none )
@@ -499,9 +506,10 @@ nextShot shot =
     else
         tracking
 
-selectCamera : Ground -> (Bag.Key -> Bool) -> Bag.Key -> Model.Inputs -> Model.Player msg -> Model.Player msg
-selectCamera ground hasFraming keyLimit inputs player =
+selectCamera : Ground -> Model.Inputs -> Model.Player msg -> Model.Player msg
+selectCamera ground inputs player =
     let
+{-
         nextKey key =
             (key + 1) % keyLimit
 
@@ -529,7 +537,7 @@ selectCamera ground hasFraming keyLimit inputs player =
                 Just (findCamera (nextKey key))
             else
                 Just key
-
+-}
         ensureShot =
             Maybe.withDefault tracking player.shot
 
@@ -558,8 +566,7 @@ selectCamera ground hasFraming keyLimit inputs player =
                 player.overlayVisible
 
     in
-        { player | rideKey = newKey
-                 , shot = newShot
+        { player | shot = newShot
                  , cameraVR = newVR
                  , overlayVisible = newOverlayVisible
         }
