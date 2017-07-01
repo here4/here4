@@ -201,7 +201,7 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
                                     worldOverlay (player2.participation.participantKey) wm
 
                                 ( wm1, wm1Msg ) =
-                                    case player1.rideKey of
+                                    case player1.participation.participantKey of
                                         Just key ->
                                             worldUpdate (Forward key (Control.Drive terrain inputs1)) wm
 
@@ -209,7 +209,7 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
                                             ( wm, Cmd.none )
 
                                 ( wm2, wm2Msg ) =
-                                    case player2.rideKey of
+                                    case player2.participation.participantKey of
                                         Just key ->
                                             worldUpdate (Forward key (Control.Drive terrain inputs2)) wm1
 
