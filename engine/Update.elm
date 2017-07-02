@@ -181,18 +181,6 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
                                 player2 =
                                     selectCamera terrain inputs2 model.player2
 
-                                label1 =
-                                    worldLabel (player1.participation.participantKey) wm
-
-                                overlay1 =
-                                    worldOverlay (player1.participation.participantKey) wm
-
-                                label2 =
-                                    worldLabel (player2.participation.participantKey) wm
-
-                                overlay2 =
-                                    worldOverlay (player2.participation.participantKey) wm
-
                                 ( wm1, wm1Msg ) =
                                     case player1.participation.participantKey of
                                         Just key ->
@@ -242,6 +230,18 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
 
                                             _ ->
                                                 ( wm2, Cmd.none, Nothing )
+
+                                label1 =
+                                    worldLabel (player1.participation.participantKey) wmF
+
+                                overlay1 =
+                                    worldOverlay (player1.participation.participantKey) wmF
+
+                                label2 =
+                                    worldLabel (player2.participation.participantKey) wmF
+
+                                overlay2 =
+                                    worldOverlay (player2.participation.participantKey) wmF
 
                                 -- Camera
                                 framing1 =
