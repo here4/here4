@@ -151,21 +151,24 @@ worldUpdate hubUpdate msg model =
 
         Forward key fwdMsg ->
             let
-                mApp =
+                mRideKey =
                     Bag.get key model.participants
                     |> Maybe.andThen .rideKey
-                    |> Maybe.andThen (\k -> Bag.get k model.apps)
             in
-                case mApp of
-                    Just t ->
-                        let
-                            ( appModel, appCmdMsg ) =
-                                App.update (Ctrl fwdMsg) t
-                        in
-                            ( { model | apps = Bag.replace key appModel model.apps }
-                            , Cmd.map (Send key) appCmdMsg
-                            )
+                case mRideKey of
+                    Just rideKey ->
+                        case Bag.get rideKey model.apps of
+                            Just t ->
+                                let
+                                    ( appModel, appCmdMsg ) =
+                                        App.update (Ctrl fwdMsg) t
+                                in
+                                    ( { model | apps = Bag.replace rideKey appModel model.apps }
+                                    , Cmd.map (Send rideKey) appCmdMsg
+                                    )
 
+                            Nothing ->
+                                ( model, Cmd.none )
                     Nothing ->
                         ( model, Cmd.none )
 
