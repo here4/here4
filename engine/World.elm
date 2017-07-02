@@ -40,7 +40,6 @@ create hubInit hubUpdate details =
         , update = worldUpdate hubUpdate
         , label = worldLabel
         , overlay = worldOverlay
-        , keyLimit = worldKeyLimit
         , animate = worldAnimate
         , join = worldJoin
         , leave = worldLeave
@@ -173,12 +172,6 @@ worldUpdate hubUpdate msg model =
                         ( model, Cmd.none )
 
 
-
-worldKeyLimit : WorldModel a -> Int
-worldKeyLimit model =
-    Bag.size model.apps
-
-
 worldAnimate : Ground -> Time -> WorldModel a -> WorldModel a
 worldAnimate ground dt model =
     { model | apps = Bag.map (App.animate ground dt) model.apps }
@@ -208,7 +201,7 @@ worldChangeRide : Bag.Key -> WorldModel a -> WorldModel a
 worldChangeRide partiKey model =
     let
         keyLimit =
-            worldKeyLimit model
+            Bag.size model.apps
 
         hasFraming key =
             isJust (Maybe.andThen App.framing (Bag.get key model.apps))

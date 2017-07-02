@@ -37,7 +37,6 @@ programWithFlags :
     , join : model -> (model, Bag.Key)
     , leave : Bag.Key -> model -> model
     , changeRide : Bag.Key -> model -> model
-    , keyLimit : model -> Int
     , ground : model -> Maybe Ground
     , framing : Maybe Bag.Key -> model -> Maybe Framing
     , focus : Bag.Key -> model -> Maybe Focus
@@ -46,7 +45,7 @@ programWithFlags :
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.label world.overlay world.keyLimit world.ground world.animate world.join world.leave world.changeRide world.framing world.focus
+        , update = Update.update world.update world.label world.overlay world.ground world.animate world.join world.leave world.changeRide world.framing world.focus
         , subscriptions = subscriptions
         , view = View.view world.view
         }

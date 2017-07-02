@@ -30,7 +30,6 @@ update :
     (WorldMsg worldMsg -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg) ))
     -> (Maybe Bag.Key -> worldModel -> String)
     -> (Maybe Bag.Key -> worldModel -> Html (WorldMsg worldMsg))
-    -> (worldModel -> Int)
     -> (worldModel -> Maybe Ground)
     -> (Ground -> Time -> worldModel -> worldModel)
     -> (worldModel -> (worldModel, Bag.Key))
@@ -41,7 +40,7 @@ update :
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel (WorldMsg worldMsg)
     -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
-update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnimate worldJoin worldLeave worldChangeRide worldFraming worldFocus msg model =
+update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin worldLeave worldChangeRide worldFraming worldFocus msg model =
     case msg of
         Model.WorldMessage worldMsg ->
             let
