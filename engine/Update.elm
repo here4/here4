@@ -508,35 +508,6 @@ nextShot shot =
 selectCamera : Ground -> Model.Inputs -> Model.Player msg -> Model.Player msg
 selectCamera ground inputs player =
     let
-{-
-        nextKey key =
-            (key + 1) % keyLimit
-
-        findCameraHelp origKey key =
-            if hasFraming key then
-                key
-            else
-                let
-                    next =
-                        nextKey key
-                in
-                    if next == origKey then
-                        origKey
-                    else
-                        findCameraHelp origKey next
-
-        findCamera key =
-            findCameraHelp key key
-
-        key =
-            findCamera (Maybe.withDefault 0 player.rideKey)
-
-        newKey =
-            if inputs.button_X then
-                Just (findCamera (nextKey key))
-            else
-                Just key
--}
         ensureShot =
             Maybe.withDefault tracking player.shot
 
