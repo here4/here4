@@ -211,7 +211,7 @@ worldChangeRide partiKey model =
             worldKeyLimit model
 
         hasFraming key =
-            isJust (worldFraming (Just key) model)
+            isJust (Maybe.andThen App.framing (Bag.get key model.apps))
 
         nextKey key =
             (key + 1) % keyLimit
@@ -299,17 +299,13 @@ worldOverlay mPartiKey model =
 
 worldFraming : Maybe Bag.Key -> WorldModel a -> Maybe Framing
 worldFraming mkey model =
-    case mkey of
-        Just key ->
-            case Bag.get key model.apps of
-                Just app ->
-                    App.framing app
-
-                Nothing ->
-                    Nothing
-
-        Nothing ->
-            Nothing
+    let
+        mApp =
+            Maybe.andThen (\k -> Bag.get k model.participants) mkey
+            |> Maybe.andThen .rideKey
+            |> Maybe.andThen (\k -> Bag.get k model.apps)
+    in
+        Maybe.andThen App.framing mApp
 
 
 worldFocus : Bag.Key -> WorldModel a -> Maybe Focus
