@@ -214,9 +214,9 @@ update worldUpdate worldLabel worldOverlay worldKeyLimit worldTerrain worldAnima
                                             let
                                                 wmRide =
                                                     if inputs2.button_X then
-                                                        worldChangeRide key wm
+                                                        worldChangeRide key wm1
                                                     else
-                                                        wm
+                                                        wm1
                                             in
                                                 worldUpdate (Forward key (Control.Drive terrain inputs2)) wmRide
 
