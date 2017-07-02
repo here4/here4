@@ -41,13 +41,13 @@ type alias Motion =
     , orientation : Orientation
     }
 
-type alias Participation =
-    { participantKey : Maybe Bag.Key
+type alias Party =
+    { partyKey : Maybe Bag.Key
     -- , worldKey : Bag.Key
     }
 
 type alias Player msg =
-    { participation : Participation
+    { party : Party
     , rideLabel : String
     , focusKey : Bag.Key
     , camera : Camera
@@ -88,7 +88,7 @@ defaultCamera = toCamera
 
 defaultPlayer : Player msg
 defaultPlayer =
-    { participation = { participantKey = Nothing }
+    { party = { partyKey = Nothing }
     , camera = defaultCamera
     , shot = Nothing
     , rideLabel = ""

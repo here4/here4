@@ -18,11 +18,11 @@ type alias WorldModel a =
     { worldModel : a
     , maybeGround : Maybe Ground
     , apps : Bag App
-    , participants : Bag Participant
+    , parties : Bag Party
     }
 
 
-type alias Participant =
+type alias Party =
     { rideKey : Maybe Bag.Key
     -- , focusKey : Bag.Key
     }
@@ -81,7 +81,7 @@ worldInit hubInit details =
         ( { worldModel = hubModel
           , maybeGround = Nothing
           , apps = appsBag
-          , participants = Bag.empty
+          , parties = Bag.empty
           }
         , Cmd.batch
             [ Cmd.map Hub hubCmd
@@ -151,7 +151,7 @@ worldUpdate hubUpdate msg model =
         Forward key fwdMsg ->
             let
                 mRideKey =
-                    Bag.get key model.participants
+                    Bag.get key model.parties
                     |> Maybe.andThen .rideKey
             in
                 case mRideKey of
@@ -180,25 +180,25 @@ worldAnimate ground dt model =
 worldJoin : WorldModel a -> (WorldModel a, Bag.Key)
 worldJoin model =
     let
-        freshParticipant = { rideKey = Nothing }
+        freshParty = { rideKey = Nothing }
 
-        ( key, newParticipants ) =
-            Bag.insert freshParticipant model.participants
+        ( key, newPartys ) =
+            Bag.insert freshParty model.parties
 
     in
-        ( { model | participants = newParticipants }, key )
+        ( { model | parties = newPartys }, key )
 
 
 worldLeave : Bag.Key -> WorldModel a -> WorldModel a
 worldLeave key model =
     let
-        newParticipants = Bag.remove key model.participants
+        newPartys = Bag.remove key model.parties
     in
-        { model | participants = newParticipants }
+        { model | parties = newPartys }
     
 
 worldChangeRide : Bag.Key -> WorldModel a -> WorldModel a
-worldChangeRide partiKey model =
+worldChangeRide partyKey model =
     let
         keyLimit =
             Bag.size model.apps
@@ -226,7 +226,7 @@ worldChangeRide partiKey model =
             findCameraHelp key key
 
         rideKey =
-            Bag.get partiKey model.participants
+            Bag.get partyKey model.parties
             |> Maybe.andThen .rideKey
 
         key =
@@ -235,7 +235,7 @@ worldChangeRide partiKey model =
         newKey =
             Just (findCamera (nextKey key))
     in
-        { model | participants = Bag.replace partiKey { rideKey = newKey } model.participants }
+        { model | parties = Bag.replace partyKey { rideKey = newKey } model.parties }
 
 worldLabel : Maybe Bag.Key -> WorldModel a -> String
 worldLabel mkey model =
@@ -244,7 +244,7 @@ worldLabel mkey model =
             "<>"
 
         mApp =
-            Maybe.andThen (\k -> Bag.get k model.participants) mkey
+            Maybe.andThen (\k -> Bag.get k model.parties) mkey
             |> Maybe.andThen .rideKey
             |> Maybe.andThen (\k -> Bag.get k model.apps)
     in
@@ -263,15 +263,15 @@ worldOverlay mPartiKey model =
 
 {-
         rideKey =
-            Maybe.andThen (\k -> Bag.get k model.participants) mPartiKey
+            Maybe.andThen (\k -> Bag.get k model.parties) mPartiKey
             |> Maybe.andThen .rideKey
 -}
     in
         case mPartiKey of
-            Just partiKey ->
-                case Bag.get partiKey model.participants of
-                    Just parti ->
-                        case parti.rideKey of
+            Just partyKey ->
+                case Bag.get partyKey model.parties of
+                    Just party ->
+                        case party.rideKey of
                             Just key ->
                                 case Bag.get key model.apps of
                                     Just app ->
@@ -281,20 +281,20 @@ worldOverlay mPartiKey model =
                                         Html.text "App not found"
 
                             Nothing ->
-                                Html.text ("No ride for participant " ++ toString partiKey)
+                                Html.text ("No ride for party " ++ toString partyKey)
 
                     Nothing ->
-                        Html.text "Participant not found"
+                        Html.text "Party not found"
 
             Nothing ->
-                Html.text "No participant"
+                Html.text "No party"
 
 
 worldFraming : Maybe Bag.Key -> WorldModel a -> Maybe Framing
 worldFraming mkey model =
     let
         mApp =
-            Maybe.andThen (\k -> Bag.get k model.participants) mkey
+            Maybe.andThen (\k -> Bag.get k model.parties) mkey
             |> Maybe.andThen .rideKey
             |> Maybe.andThen (\k -> Bag.get k model.apps)
     in

@@ -103,8 +103,8 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                 p2 = model.player2
                 (player1, player2) =
                     case playerKey of
-                        0 -> ( { p1 | participation = { participantKey = Just pKey } }, p2 )
-                        1 -> ( p1, { p2 | participation = { participantKey = Just pKey } } )
+                        0 -> ( { p1 | party = { partyKey = Just pKey } }, p2 )
+                        1 -> ( p1, { p2 | party = { partyKey = Just pKey } } )
                         _ -> ( p1, p2 )
                 newModel =
                     { model
@@ -129,13 +129,13 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
 
                 (wm, player1, player2) =
                     case playerKey of
-                        0 -> ( leave p1.participation.participantKey
-                             , { p1 | participation = { participantKey = Nothing } }
+                        0 -> ( leave p1.party.partyKey
+                             , { p1 | party = { partyKey = Nothing } }
                              , p2
                              )
-                        1 -> ( leave p2.participation.participantKey
+                        1 -> ( leave p2.party.partyKey
                              , p1
-                             , { p2 | participation = { participantKey = Nothing } }
+                             , { p2 | party = { partyKey = Nothing } }
                              )
                         _ -> ( model.worldModel, p1, p2 )
 
@@ -181,7 +181,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                     selectCamera terrain inputs2 model.player2
 
                                 ( wm1, wm1Msg ) =
-                                    case player1.participation.participantKey of
+                                    case player1.party.partyKey of
                                         Just key ->
                                             let
                                                 wmRide =
@@ -196,7 +196,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                             ( wm, Cmd.none )
 
                                 ( wm2, wm2Msg ) =
-                                    case player2.participation.participantKey of
+                                    case player2.party.partyKey of
                                         Just key ->
                                             let
                                                 wmRide =
@@ -231,23 +231,23 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                                 ( wm2, Cmd.none, Nothing )
 
                                 label1 =
-                                    worldLabel (player1.participation.participantKey) wmF
+                                    worldLabel (player1.party.partyKey) wmF
 
                                 overlay1 =
-                                    worldOverlay (player1.participation.participantKey) wmF
+                                    worldOverlay (player1.party.partyKey) wmF
 
                                 label2 =
-                                    worldLabel (player2.participation.participantKey) wmF
+                                    worldLabel (player2.party.partyKey) wmF
 
                                 overlay2 =
-                                    worldOverlay (player2.participation.participantKey) wmF
+                                    worldOverlay (player2.party.partyKey) wmF
 
                                 -- Camera
                                 framing1 =
-                                    worldFraming player1.participation.participantKey wmF
+                                    worldFraming player1.party.partyKey wmF
 
                                 framing2 =
-                                    worldFraming player2.participation.participantKey wmF
+                                    worldFraming player2.party.partyKey wmF
 
                                 newModel =
                                     { model
