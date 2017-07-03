@@ -16,7 +16,7 @@ import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation
 import Body.Obj exposing (obj)
-import Vehicles.DreamBuggy as DreamBuggy
+import Vehicles.Walking as Walking
 
 import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
@@ -106,7 +106,7 @@ update msg model =
             ( model, Cmd.none )
 
         Ctrl (Control.Drive ground inputs) ->
-            ( mapBody (DreamBuggy.drive { speed = 8.0 } ground inputs), Cmd.none )
+            ( mapBody (Walking.drive { speed = 8.0 } ground inputs), Cmd.none )
 
         Effect _ ->
             ( model, Cmd.none )
@@ -143,5 +143,5 @@ overlay _ =
         , Html.text "From Blender."
         , Html.br [] []
         , Html.hr [] []
-        , DreamBuggy.overlay
+        , Walking.overlay
         ]
