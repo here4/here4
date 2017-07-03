@@ -13,7 +13,7 @@ import Camera.POV exposing (pov)
 import Camera.DollyArc exposing (dollyZoom, dolly, arc)
 import Camera.Tracking exposing (tracking)
 import Camera.Util as Camera
-import Control exposing (WorldMsg)
+import Control exposing (WorldMsg, WorldKey(..))
 import Dispatch exposing (..)
 import Gamepad
 import GamepadInputs
@@ -190,7 +190,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                                     else
                                                         wm
                                             in
-                                                worldUpdate (Forward key (Control.Drive terrain inputs1)) wmRide
+                                                worldUpdate (Forward (ToParty key) (Control.Drive terrain inputs1)) wmRide
 
                                         Nothing ->
                                             ( wm, Cmd.none )
@@ -205,7 +205,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                                     else
                                                         wm1
                                             in
-                                                worldUpdate (Forward key (Control.Drive terrain inputs2)) wmRide
+                                                worldUpdate (Forward (ToParty key) (Control.Drive terrain inputs2)) wmRide
 
                                         Nothing ->
                                             ( wm1, Cmd.none )
@@ -223,7 +223,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                                         inputsToMove inputs1 player1
 
                                                     ( wmF, wmFMsg ) =
-                                                        worldUpdate (Forward key (Control.Move dp)) wm2
+                                                        worldUpdate (Forward (ToParty key) (Control.Move dp)) wm2
                                                 in
                                                     ( wmF, wmFMsg, Just focus.position )
 

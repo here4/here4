@@ -11,9 +11,13 @@ import Model exposing (Inputs)
 type alias CtrlMsg a =
     Dispatch EffectMsg Msg a
 
+type WorldKey
+    = ToApp Bag.Key
+    | ToParty Bag.Key
+    | ToDefaultSelf
 
 type alias WorldMsg a =
-    DispatchHub Bag.Key EffectMsg Msg Dynamic a
+    DispatchHub WorldKey EffectMsg Msg Dynamic a
 
 
 type Msg

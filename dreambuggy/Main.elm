@@ -27,7 +27,6 @@ main =
     NewWorld.create
         { apps =
             [ elmLogo
-            , Suzanne.create "Suzanne"
             , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
             , let s = Shufflepuck.default in Shufflepuck.create { s | position = vec3 53 0 18 }
             , Wedge.create "Wedge" (vec3 23 0 12)
@@ -42,6 +41,7 @@ main =
             , StaticGround.create Terrain.generate
             , Sky.create skySphere
             ]
+        , defaultSelf = Suzanne.create "Suzanne"
         }
 
 elmLogo : (App, Cmd AppMsg)

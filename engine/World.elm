@@ -4,7 +4,7 @@ import Html exposing (Html)
 import Bag exposing (Bag)
 import Time exposing (Time)
 import Space
-import Control exposing (WorldMsg)
+import Control exposing (WorldMsg, WorldKey(..))
 import Maybe.Extra exposing (isJust)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
@@ -14,16 +14,19 @@ import Camera exposing (Framing, Shot)
 import App exposing (..)
 import Ground exposing (Ground)
 
+
 type alias WorldModel a =
     { worldModel : a
     , maybeGround : Maybe Ground
     , apps : Bag App
     , parties : Bag Party
+    , defaultSelf : App
     }
 
 
 type alias Party =
     { rideKey : Maybe Bag.Key
+    , self : App -- App to be when not riding
     -- , focusKey : Bag.Key
     }
 
@@ -31,7 +34,7 @@ type alias Party =
 create :
     ( model, Cmd msg )
     -> (msg -> model -> ( model, Cmd msg ))
-    -> { apps : List ( App, Cmd AppMsg ) }
+    -> { apps : List ( App, Cmd AppMsg ), defaultSelf : ( App, Cmd AppMsg ) }
     -> Program Args (Model.Model (WorldModel model) (WorldMsg msg)) (Model.Msg (WorldMsg msg))
 create hubInit hubUpdate details =
     Space.programWithFlags
@@ -50,6 +53,7 @@ create hubInit hubUpdate details =
         }
 
 
+
 worldApps : List ( App, Cmd AppMsg ) -> ( Bag App, Cmd (WorldMsg a) )
 worldApps appsList =
     let
@@ -58,7 +62,7 @@ worldApps appsList =
                 ( key, newBag ) =
                     Bag.insert newApps oldBag
             in
-                ( newBag, oldCmdMsgs ++ [ Cmd.map (Send key) newCmdMsg ] )
+                ( newBag, oldCmdMsgs ++ [ Cmd.map (Send (ToApp key)) newCmdMsg ] )
 
         ( appsBag, unbatched ) =
             List.foldl f ( Bag.empty, [] ) appsList
@@ -66,9 +70,14 @@ worldApps appsList =
         ( appsBag, Cmd.batch unbatched )
 
 
+worldDefaultSelf : ( App, Cmd AppMsg ) -> ( App, Cmd (WorldMsg a) )
+worldDefaultSelf ( app, cmd )
+    = ( app, Cmd.map (Send ToDefaultSelf) cmd )
+
+
 worldInit :
     ( model, Cmd msg )
-    -> { apps : List ( App, Cmd AppMsg ) }
+    -> { apps : List ( App, Cmd AppMsg ), defaultSelf : ( App, Cmd AppMsg ) }
     -> ( WorldModel model, Cmd (WorldMsg msg) )
 worldInit hubInit details =
     let
@@ -77,15 +86,20 @@ worldInit hubInit details =
 
         ( appsBag, appCmds ) =
             worldApps details.apps
+
+        ( defaultSelfApp, defaultSelfCmd ) =
+            worldDefaultSelf details.defaultSelf
     in
         ( { worldModel = hubModel
           , maybeGround = Nothing
           , apps = appsBag
           , parties = Bag.empty
+          , defaultSelf = defaultSelfApp
           }
         , Cmd.batch
             [ Cmd.map Hub hubCmd
             , appCmds
+            , defaultSelfCmd
             ]
         )
 
@@ -127,28 +141,51 @@ worldUpdate hubUpdate msg model =
             ( { model | maybeGround = Just ground }, Cmd.none )
 
         Send key appMsg ->
-            case Bag.get key model.apps of
-                Nothing ->
-                    ( model, Cmd.none )
-
-                Just t ->
-                    let
-                        ( appModel, appCmdMsg ) =
-                            App.update appMsg t
-
-                        foo x =
-                            case x of
-                                Effect e ->
-                                    HubEff e
-
-                                m ->
-                                    Send key m
-                    in
-                        ( { model | apps = Bag.replace key appModel model.apps }
-                        , Cmd.map foo appCmdMsg
+            let
+                (mApp, updateModel) = case key of
+                    ToDefaultSelf ->
+                        ( Just model.defaultSelf
+                        , \newDefaultSelf -> { model | defaultSelf = newDefaultSelf }
                         )
 
-        Forward key fwdMsg ->
+                    ToApp appKey ->
+                        ( Bag.get appKey model.apps
+                        , \newApp -> { model | apps = Bag.replace appKey newApp model.apps }
+                        )
+
+                    ToParty partyKey ->
+                        let
+                            u newSelf party = { party | self = newSelf }
+                        in
+                            ( Maybe.map .self <| Bag.get partyKey model.parties
+                            , \newSelf -> { model | parties = Bag.update partyKey (Maybe.map (u newSelf)) model.parties }
+                            )
+
+                response x =
+                    case x of
+                        Effect e ->
+                            HubEff e
+
+                        m ->
+                            Send key m
+
+            in
+                case mApp of
+                    Nothing ->
+                        ( model, Cmd.none )
+
+                    Just app ->
+                        let
+                            ( appModel, appCmdMsg ) =
+                                App.update appMsg app
+
+                        in
+                            ( updateModel appModel
+                            , Cmd.map response appCmdMsg
+                            )
+
+
+        Forward (ToParty key) fwdMsg ->
             let
                 mRideKey =
                     Bag.get key model.parties
@@ -163,13 +200,16 @@ worldUpdate hubUpdate msg model =
                                         App.update (Ctrl fwdMsg) t
                                 in
                                     ( { model | apps = Bag.replace rideKey appModel model.apps }
-                                    , Cmd.map (Send rideKey) appCmdMsg
+                                    , Cmd.map (Send (ToApp rideKey)) appCmdMsg
                                     )
 
                             Nothing ->
                                 ( model, Cmd.none )
                     Nothing ->
                         ( model, Cmd.none )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 worldAnimate : Ground -> Time -> WorldModel a -> WorldModel a
@@ -180,7 +220,10 @@ worldAnimate ground dt model =
 worldJoin : WorldModel a -> (WorldModel a, Bag.Key)
 worldJoin model =
     let
-        freshParty = { rideKey = Nothing }
+        freshParty =
+            { rideKey = Nothing
+            , self = model.defaultSelf
+            }
 
         ( key, newPartys ) =
             Bag.insert freshParty model.parties
@@ -234,8 +277,11 @@ worldChangeRide partyKey model =
 
         newKey =
             Just (findCamera (nextKey key))
+
+        updateRide party =
+            { party | rideKey = newKey }
     in
-        { model | parties = Bag.replace partyKey { rideKey = newKey } model.parties }
+        { model | parties = Bag.update partyKey (Maybe.map updateRide) model.parties }
 
 worldLabel : Maybe Bag.Key -> WorldModel a -> String
 worldLabel mkey model =
@@ -275,7 +321,7 @@ worldOverlay mPartiKey model =
                             Just key ->
                                 case Bag.get key model.apps of
                                     Just app ->
-                                        Html.map (Send key) (App.overlay app)
+                                        Html.map (Send (ToApp key)) (App.overlay app)
 
                                     Nothing ->
                                         Html.text "App not found"
