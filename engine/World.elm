@@ -201,7 +201,7 @@ worldChangeRide : Bag.Key -> WorldModel a -> WorldModel a
 worldChangeRide partyKey model =
     let
         keyLimit =
-            Bag.size model.apps
+            Bag.maxKey model.apps
 
         hasFraming key =
             isJust (Maybe.andThen App.framing (Bag.get key model.apps))
