@@ -117,8 +117,14 @@ worldView model =
 makeWorld : Ground -> WorldModel a -> Model.World
 makeWorld ground model =
     let
+        partyBodies party =
+            case party.rideKey of
+                Just _ -> []
+                Nothing -> bodies party.self
+
         worldBodies =
-            List.concatMap bodies (Bag.items model.apps)
+            List.concatMap bodies (Bag.items model.apps) ++
+            List.concatMap partyBodies (Bag.items model.parties)
     in
         { bodies = worldBodies, ground = ground }
 
@@ -186,27 +192,33 @@ worldUpdate hubUpdate msg model =
 
 
         Forward (ToParty key) fwdMsg ->
-            let
-                mRideKey =
-                    Bag.get key model.parties
-                    |> Maybe.andThen .rideKey
-            in
-                case mRideKey of
-                    Just rideKey ->
-                        case Bag.get rideKey model.apps of
-                            Just t ->
-                                let
-                                    ( appModel, appCmdMsg ) =
-                                        App.update (Ctrl fwdMsg) t
-                                in
-                                    ( { model | apps = Bag.replace rideKey appModel model.apps }
-                                    , Cmd.map (Send (ToApp rideKey)) appCmdMsg
-                                    )
+            case Bag.get key model.parties of
+                Just party ->
+                    case party.rideKey of
+                        Just rideKey ->
+                            case Bag.get rideKey model.apps of
+                                Just t ->
+                                    let
+                                        ( appModel, appCmdMsg ) =
+                                            App.update (Ctrl fwdMsg) t
+                                    in
+                                        ( { model | apps = Bag.replace rideKey appModel model.apps }
+                                        , Cmd.map (Send (ToApp rideKey)) appCmdMsg
+                                        )
+                                Nothing ->
+                                    ( model, Cmd.none )
 
-                            Nothing ->
-                                ( model, Cmd.none )
-                    Nothing ->
-                        ( model, Cmd.none )
+                        Nothing ->
+                            let
+                                ( appModel, appCmdMsg ) =
+                                    App.update (Ctrl fwdMsg) party.self
+                                u newSelf party = { party | self = newSelf }
+                            in
+                                ( { model | parties = Bag.update key (Maybe.map (u appModel)) model.parties }
+                                , Cmd.map (Send (ToParty key)) appCmdMsg
+                                )
+                Nothing ->
+                    ( model, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
@@ -284,36 +296,41 @@ worldChangeRide partyKey model =
         { model | parties = Bag.update partyKey (Maybe.map updateRide) model.parties }
 
 worldLabel : Maybe Bag.Key -> WorldModel a -> String
-worldLabel mkey model =
+worldLabel mPartyKey model =
     let
         none =
             "<>"
-
-        mApp =
-            Maybe.andThen (\k -> Bag.get k model.parties) mkey
-            |> Maybe.andThen .rideKey
-            |> Maybe.andThen (\k -> Bag.get k model.apps)
     in
-        case mApp of
-            Just app ->
-                App.label app
+        case mPartyKey of
+            Just partyKey ->
+                case Bag.get partyKey model.parties of
+                    Just party ->
+                        case party.rideKey of
+                            Just key ->
+                                case Bag.get key model.apps of
+                                    Just app ->
+                                        App.label app
+
+                                    Nothing ->
+                                        "Ride not found"
+
+                            Nothing ->
+                                App.label party.self
+
+                    Nothing ->
+                        "Party not found"
 
             Nothing ->
-                none
+                "No party"
+
 
 worldOverlay : Maybe Bag.Key -> WorldModel a -> Html (WorldMsg msg)
-worldOverlay mPartiKey model =
+worldOverlay mPartyKey model =
     let
         none =
             Html.text "Welcome to DreamBuggy"
-
-{-
-        rideKey =
-            Maybe.andThen (\k -> Bag.get k model.parties) mPartiKey
-            |> Maybe.andThen .rideKey
--}
     in
-        case mPartiKey of
+        case mPartyKey of
             Just partyKey ->
                 case Bag.get partyKey model.parties of
                     Just party ->
@@ -327,7 +344,7 @@ worldOverlay mPartiKey model =
                                         Html.text "App not found"
 
                             Nothing ->
-                                Html.text ("No ride for party " ++ toString partyKey)
+                                Html.map (Send (ToParty partyKey)) (App.overlay party.self)
 
                     Nothing ->
                         Html.text "Party not found"
@@ -337,14 +354,28 @@ worldOverlay mPartiKey model =
 
 
 worldFraming : Maybe Bag.Key -> WorldModel a -> Maybe Framing
-worldFraming mkey model =
-    let
-        mApp =
-            Maybe.andThen (\k -> Bag.get k model.parties) mkey
-            |> Maybe.andThen .rideKey
-            |> Maybe.andThen (\k -> Bag.get k model.apps)
-    in
-        Maybe.andThen App.framing mApp
+worldFraming mPartyKey model =
+    case mPartyKey of
+        Just partyKey ->
+            case Bag.get partyKey model.parties of
+                Just party ->
+                    case party.rideKey of
+                        Just key ->
+                            case Bag.get key model.apps of
+                                Just app ->
+                                    App.framing app
+
+                                Nothing ->
+                                    Nothing
+
+                        Nothing ->
+                            App.framing party.self
+
+                Nothing ->
+                    Nothing
+
+        Nothing ->
+            Nothing
 
 
 worldFocus : Bag.Key -> WorldModel a -> Maybe Focus
