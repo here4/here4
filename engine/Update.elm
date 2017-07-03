@@ -32,7 +32,7 @@ update :
     -> (Maybe Bag.Key -> worldModel -> Html (WorldMsg worldMsg))
     -> (worldModel -> Maybe Ground)
     -> (Ground -> Time -> worldModel -> worldModel)
-    -> (worldModel -> (worldModel, Bag.Key))
+    -> (worldModel -> (Bag.Key, worldModel, Cmd (WorldMsg worldMsg)))
     -> (Bag.Key -> worldModel -> worldModel)
     -> (Bag.Key -> worldModel -> worldModel)
     -> (Maybe Bag.Key -> worldModel -> Maybe Framing)
@@ -98,7 +98,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
 
         Model.JoinWorld playerKey {- worldKey -} ->
             let
-                (wm, pKey) = worldJoin model.worldModel
+                (pKey, wm, cmdMsg) = worldJoin model.worldModel
                 p1 = model.player1
                 p2 = model.player2
                 (player1, player2) =
@@ -114,7 +114,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                     }
 
             in
-                ( newModel, Cmd.none )
+                ( newModel, Cmd.map Model.WorldMessage cmdMsg )
                         
             
         Model.LeaveWorld playerKey {- worldKey -} ->

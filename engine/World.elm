@@ -14,13 +14,12 @@ import Camera exposing (Framing, Shot)
 import App exposing (..)
 import Ground exposing (Ground)
 
-
 type alias WorldModel a =
     { worldModel : a
     , maybeGround : Maybe Ground
     , apps : Bag App
     , parties : Bag Party
-    , defaultSelf : App
+    , defaultSelf : ( App, Cmd AppMsg )
     }
 
 
@@ -70,11 +69,6 @@ worldApps appsList =
         ( appsBag, Cmd.batch unbatched )
 
 
-worldDefaultSelf : ( App, Cmd AppMsg ) -> ( App, Cmd (WorldMsg a) )
-worldDefaultSelf ( app, cmd )
-    = ( app, Cmd.map (Send ToDefaultSelf) cmd )
-
-
 worldInit :
     ( model, Cmd msg )
     -> { apps : List ( App, Cmd AppMsg ), defaultSelf : ( App, Cmd AppMsg ) }
@@ -86,20 +80,16 @@ worldInit hubInit details =
 
         ( appsBag, appCmds ) =
             worldApps details.apps
-
-        ( defaultSelfApp, defaultSelfCmd ) =
-            worldDefaultSelf details.defaultSelf
     in
         ( { worldModel = hubModel
           , maybeGround = Nothing
           , apps = appsBag
           , parties = Bag.empty
-          , defaultSelf = defaultSelfApp
+          , defaultSelf = details.defaultSelf
           }
         , Cmd.batch
             [ Cmd.map Hub hubCmd
             , appCmds
-            , defaultSelfCmd
             ]
         )
 
@@ -149,11 +139,6 @@ worldUpdate hubUpdate msg model =
         Send key appMsg ->
             let
                 (mApp, updateModel) = case key of
-                    ToDefaultSelf ->
-                        ( Just model.defaultSelf
-                        , \newDefaultSelf -> { model | defaultSelf = newDefaultSelf }
-                        )
-
                     ToApp appKey ->
                         ( Bag.get appKey model.apps
                         , \newApp -> { model | apps = Bag.replace appKey newApp model.apps }
@@ -229,19 +214,22 @@ worldAnimate ground dt model =
     { model | apps = Bag.map (App.animate ground dt) model.apps }
 
 
-worldJoin : WorldModel a -> (WorldModel a, Bag.Key)
+worldJoin : WorldModel model -> (Bag.Key, WorldModel model, Cmd (WorldMsg msg))
 worldJoin model =
     let
+        ( defaultSelfApp, defaultSelfCmd ) =
+            model.defaultSelf
+
         freshParty =
             { rideKey = Nothing
-            , self = model.defaultSelf
+            , self = defaultSelfApp
             }
 
-        ( key, newPartys ) =
+        ( key, newParties ) =
             Bag.insert freshParty model.parties
 
     in
-        ( { model | parties = newPartys }, key )
+        ( key, { model | parties = newParties }, Cmd.map (Send (ToParty key)) defaultSelfCmd )
 
 
 worldLeave : Bag.Key -> WorldModel a -> WorldModel a

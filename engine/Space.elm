@@ -34,7 +34,7 @@ programWithFlags :
     , overlay : Maybe Bag.Key -> model -> Html (WorldMsg msg)
     , view : model -> Maybe Model.World
     , animate : Ground -> Time -> model -> model
-    , join : model -> (model, Bag.Key)
+    , join : model -> (Bag.Key, model, Cmd (WorldMsg msg))
     , leave : Bag.Key -> model -> model
     , changeRide : Bag.Key -> model -> model
     , ground : model -> Maybe Ground

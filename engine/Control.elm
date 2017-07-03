@@ -14,7 +14,6 @@ type alias CtrlMsg a =
 type WorldKey
     = ToApp Bag.Key
     | ToParty Bag.Key
-    | ToDefaultSelf
 
 type alias WorldMsg a =
     DispatchHub WorldKey EffectMsg Msg Dynamic a
