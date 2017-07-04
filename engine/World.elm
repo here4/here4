@@ -13,7 +13,7 @@ import Body exposing (Body)
 import Camera exposing (Framing, Shot)
 import App exposing (..)
 import Ground exposing (Ground)
-import Math.Vector3 exposing (vec3)
+import Math.Vector3 as V3 exposing (vec3)
 
 
 type alias WorldModel a =
@@ -270,10 +270,6 @@ worldChangeRide partyKey model =
         findCamera key =
             findCameraHelp key key
 
-        mRideKey =
-            Bag.get partyKey model.parties
-            |> Maybe.andThen .rideKey
-
         key =
             -- findCamera (Maybe.withDefault 0 mRideKey)
             findCamera 0
@@ -281,19 +277,57 @@ worldChangeRide partyKey model =
         newKey =
             Just (findCamera (nextKey key))
 
+
+        mRideKey =
+            Bag.get partyKey model.parties
+            |> Maybe.andThen .rideKey
+
+
         updateRide party =
-            case mRideKey of
-                Just rideKey ->
+            case (party.rideKey, App.framing party.self) of
+                (Just rideKey, _) ->
                     let
-                        ridePos = Maybe.withDefault (vec3 0 0 0) <| 
-                                  (Maybe.map App.getPosition (Bag.get rideKey model.apps))
+                        ridePos =
+                            Maybe.andThen App.framing (Bag.get rideKey model.apps)
+                            -- |> Maybe.map (.target >> .position)
+                            |> Maybe.map (.pov >> .position)
+                            |> Maybe.withDefault (vec3 0 0 0)
                     in
                         { party | rideKey = Nothing
                                 , self = App.setPosition ridePos party.self
                         }
 
-                Nothing -> 
-                    { party | rideKey = newKey }
+                (Nothing, Just myFraming) ->
+                    let
+                        myPos = myFraming.pov.position
+                        myDir = Model.direction myFraming.pov
+
+                        secondPosition (k, app) =
+                            case App.framing app of
+                                Just framing -> Just (k, framing.target.position)
+                                Nothing -> Nothing
+
+                        relativePosition appPos =
+                            V3.sub appPos myPos
+
+                        inFrontOf relPos =
+                            V3.dot relPos myDir > 0
+
+                        mClosestKey =
+                            Bag.toList model.apps
+                            |> List.filterMap secondPosition
+                            |> List.map (Tuple.mapSecond relativePosition)
+                            |> List.filter (Tuple.second >> inFrontOf)
+                            |> List.map (Tuple.mapSecond V3.lengthSquared)
+                            |> List.filter (Tuple.second >> (\d -> d < 10*10))
+                            |> List.sortBy Tuple.second
+                            |> List.head
+                            |> Maybe.map Tuple.first
+                    in
+                        { party | rideKey = mClosestKey }
+
+                _ ->
+                        party
     in
         { model | parties = Bag.update partyKey (Maybe.map updateRide) model.parties }
 

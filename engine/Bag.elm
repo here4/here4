@@ -1,4 +1,4 @@
-module Bag exposing (Bag, Key, size, maxKey, empty, insert, remove, replace, update, get, keys, items, map)
+module Bag exposing (Bag, Key, size, maxKey, empty, insert, remove, replace, update, get, keys, items, map, toList)
 
 import Dict exposing (Dict)
 
@@ -62,3 +62,7 @@ items (Bag _ dict) =
 map : (a -> b) -> Bag a -> Bag b
 map f (Bag n dict) =
     Bag n (Dict.map (\_ -> f) dict)
+
+toList : Bag a -> List (Key, a)
+toList (Bag _ dict) = Dict.toList dict
+
