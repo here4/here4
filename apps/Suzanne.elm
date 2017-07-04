@@ -43,6 +43,8 @@ create label =
         , framing = framing
         , focus = focus
         , overlay = overlay
+        , getPosition = getPosition
+        , setPosition = setPosition
         }
 
 
@@ -125,6 +127,19 @@ bodies model_ =
 
         Nothing ->
             []
+
+
+getPosition : Model -> Vec3
+getPosition model = Maybe.withDefault (vec3 0 0 0) (Maybe.map .position model.body)
+
+
+setPosition : Vec3 -> Model -> Model
+setPosition pos model =
+    let mapBody f =
+            (\m -> { m | body = Maybe.map f m.body } ) model
+        setPos body = { body | position = pos }
+    in
+        mapBody setPos
 
 
 framing : Model -> Maybe Framing

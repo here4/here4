@@ -4,7 +4,7 @@ import Html exposing (Html)
 import Html.Attributes as Html
 import FontAwesome
 import Color exposing (white)
-import Math.Vector3 exposing (add, vec3)
+import Math.Vector3 exposing (Vec3, add, vec3)
 import Random
 import Time exposing (Time)
 import App exposing (..)
@@ -36,6 +36,8 @@ create n =
         , framing = framing
         , focus = focus
         , overlay = overlay
+        , getPosition = getPosition
+        , setPosition = setPosition
         }
 
 
@@ -78,6 +80,14 @@ animate ground dt boids =
 bodies : Boids -> List Body
 bodies =
     List.map toBody
+
+
+getPosition : Boids -> Vec3
+getPosition boids = Maybe.withDefault (vec3 0 0 0) (Maybe.map .position (List.head boids))
+
+
+setPosition : Vec3 -> Boids -> Boids
+setPosition _ = identity
 
 
 framing : Boids -> Maybe Framing

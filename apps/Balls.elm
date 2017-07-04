@@ -38,6 +38,8 @@ create n =
         , framing = framing
         , focus = focus
         , overlay = overlay
+        , getPosition = getPosition
+        , setPosition = setPosition
         }
 
 
@@ -86,6 +88,14 @@ animate ground dt balls =
 bodies : Balls -> List Body
 bodies =
     List.map toBody
+
+
+getPosition : Balls -> Vec3
+getPosition balls = Maybe.withDefault (vec3 0 0 0) (Maybe.map .position (List.head balls))
+
+
+setPosition : Vec3 -> Balls -> Balls
+setPosition _ = identity
 
 
 framing : Balls -> Maybe Framing

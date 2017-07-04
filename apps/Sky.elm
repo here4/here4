@@ -30,6 +30,8 @@ create appear =
         , framing = noFraming
         , focus = always Nothing
         , overlay = overlay
+        , getPosition = always (vec3 0 0 0)
+        , setPosition = always identity
         }
 
 

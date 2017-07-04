@@ -42,6 +42,7 @@ main =
             , Sky.create skySphere
             ]
         , defaultSelf = Suzanne.create "Suzanne"
+        -- , defaultSelf = Statue.create "Hippy actualization" (vec3 30 50 6) cloudsSphere
         }
 
 elmLogo : (App, Cmd AppMsg)

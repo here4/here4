@@ -8,6 +8,7 @@ import Body exposing (Body)
 import Control exposing (..)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
+import Math.Vector3 exposing (vec3)
 
 
 type alias Model =
@@ -30,6 +31,8 @@ create makeGround =
         , framing = noFraming
         , focus = always Nothing
         , overlay = overlay
+        , getPosition = always (vec3 0 0 0)
+        , setPosition = always identity
         }
 
 

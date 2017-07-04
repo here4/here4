@@ -13,6 +13,8 @@ import Body exposing (Body)
 import Camera exposing (Framing, Shot)
 import App exposing (..)
 import Ground exposing (Ground)
+import Math.Vector3 exposing (vec3)
+
 
 type alias WorldModel a =
     { worldModel : a
@@ -268,18 +270,30 @@ worldChangeRide partyKey model =
         findCamera key =
             findCameraHelp key key
 
-        rideKey =
+        mRideKey =
             Bag.get partyKey model.parties
             |> Maybe.andThen .rideKey
 
         key =
-            findCamera (Maybe.withDefault 0 rideKey)
+            -- findCamera (Maybe.withDefault 0 mRideKey)
+            findCamera 0
 
         newKey =
             Just (findCamera (nextKey key))
 
         updateRide party =
-            { party | rideKey = newKey }
+            case mRideKey of
+                Just rideKey ->
+                    let
+                        ridePos = Maybe.withDefault (vec3 0 0 0) <| 
+                                  (Maybe.map App.getPosition (Bag.get rideKey model.apps))
+                    in
+                        { party | rideKey = Nothing
+                                , self = App.setPosition ridePos party.self
+                        }
+
+                Nothing -> 
+                    { party | rideKey = newKey }
     in
         { model | parties = Bag.update partyKey (Maybe.map updateRide) model.parties }
 

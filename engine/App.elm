@@ -1,4 +1,4 @@
-module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, label, overlay, framing, noFraming, focus, update, appToFocus, orientedToFocus)
+module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, getPosition, setPosition, label, overlay, framing, noFraming, focus, update, appToFocus, orientedToFocus)
 
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
@@ -23,6 +23,8 @@ type alias Animated model msg =
     , framing : model -> Maybe Framing
     , focus : model -> Maybe Focus
     , overlay : model -> Html msg
+    , getPosition : model -> Vec3
+    , setPosition : Vec3 -> model -> model
     }
 
 
@@ -108,8 +110,16 @@ packOverlay : (a -> Html (CtrlMsg msg)) -> AppModel -> Html AppMsg
 packOverlay f dyn =
     Html.map msgPack <| f (Dynamic.unpack dyn)
 
+packGetPosition : (model -> Vec3) -> AppModel -> Vec3
+packGetPosition f dyn =
+    f (Dynamic.unpack dyn)
+
+packSetPosition : (Vec3 -> model -> modek) -> Vec3 -> AppModel -> AppModel
+packSetPosition f pos dyn =
+    Dynamic.pack (f pos (Dynamic.unpack dyn))
+
 packMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
-packMethods { label, update, animate, bodies, framing, focus, overlay } =
+packMethods { label, update, animate, bodies, framing, focus, overlay, getPosition, setPosition } =
     { label = packLabel label
     , update = packUpdate update
     , animate = packAnimate animate
@@ -117,6 +127,8 @@ packMethods { label, update, animate, bodies, framing, focus, overlay } =
     , framing = packFraming framing
     , focus = packFocus focus
     , overlay = packOverlay overlay
+    , getPosition = packGetPosition getPosition
+    , setPosition = packSetPosition setPosition
     }
 
 
@@ -220,6 +232,13 @@ bodies : App -> List Body
 bodies { methods, model } =
     methods.bodies model
 
+getPosition : App -> Vec3
+getPosition { methods, model } =
+    methods.getPosition model
+
+setPosition : Vec3 -> App -> App
+setPosition pos { methods, model } =
+    { methods = methods, model = methods.setPosition pos model }
 
 framing : App -> Maybe Framing
 framing { methods, model } =

@@ -39,6 +39,8 @@ create label pos appear =
         , framing = framing
         , focus = focus
         , overlay = overlay
+        , getPosition = getPosition
+        , setPosition = setPosition
         }
 
 
@@ -86,6 +88,18 @@ bodies : Model -> List Body
 bodies model =
     [ toBody model.body ]
 
+getPosition : Model -> Vec3
+getPosition model = model.body.position
+
+setPosition : Vec3 -> Model -> Model
+setPosition pos model =
+    let
+        setPos pos x = { x | position = pos }
+        behind = Orientation.rotateLabV model.camera.orientation (V3.negate V3.k)
+    in
+        { model | body = setPos pos model.body
+                , camera = setPos (V3.add pos behind) model.camera
+        }
 
 framing : Model -> Maybe Framing
 framing model =

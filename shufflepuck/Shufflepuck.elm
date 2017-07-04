@@ -141,6 +141,8 @@ create attributes =
         , framing = framing
         , focus = focus
         , overlay = overlay
+        , getPosition = getPosition
+        , setPosition = setPosition
         }
 
 
@@ -149,12 +151,15 @@ label model =
     model.attributes.label ++ " (" ++ toString model.score1 ++ " - " ++ toString model.score2 ++ ")"
 
 
+getPosition : Model -> Vec3
+getPosition model = model.attributes.position
+
 
 -- | Move the entire table, maintaining the relative positions of the paddles and puck
 
 
-reposition : Vec3 -> Model -> Model
-reposition pos0 model =
+setPosition : Vec3 -> Model -> Model
+setPosition pos0 model =
     let
         a =
             model.attributes
@@ -255,7 +260,7 @@ init a =
         bounds2 =
             boundingBox box2
     in
-        ( reposition a.position
+        ( setPosition a.position
             { attributes = { a | position = vec3 0 0 0 } -- First set up the table at 0 0 0, then reposition it
             , table =
                 { anchor = AnchorGround
@@ -512,7 +517,7 @@ animate ground dt model =
                            , robotPaddle2 = robot
                    }
     in
-        reposition (setElevation model.attributes.position) (collide dt newModel)
+        setPosition (setElevation model.attributes.position) (collide dt newModel)
 
 
 bodies : Model -> List Body
