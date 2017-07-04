@@ -141,7 +141,6 @@ create attributes =
         , framing = framing
         , focus = focus
         , overlay = overlay
-        , getPosition = getPosition
         , setPosition = setPosition
         }
 
@@ -149,10 +148,6 @@ create attributes =
 label : Model -> String
 label model =
     model.attributes.label ++ " (" ++ toString model.score1 ++ " - " ++ toString model.score2 ++ ")"
-
-
-getPosition : Model -> Vec3
-getPosition model = model.attributes.position
 
 
 -- | Move the entire table, maintaining the relative positions of the paddles and puck

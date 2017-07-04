@@ -1,4 +1,4 @@
-module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, getPosition, setPosition, label, overlay, framing, noFraming, focus, update, appToFocus, orientedToFocus)
+module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, setPosition, label, overlay, framing, noFraming, focus, update, appToFocus, orientedToFocus)
 
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
@@ -23,7 +23,6 @@ type alias Animated model msg =
     , framing : model -> Maybe Framing
     , focus : model -> Maybe Focus
     , overlay : model -> Html msg
-    , getPosition : model -> Vec3
     , setPosition : Vec3 -> model -> model
     }
 
@@ -119,7 +118,7 @@ packSetPosition f pos dyn =
     Dynamic.pack (f pos (Dynamic.unpack dyn))
 
 packMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
-packMethods { label, update, animate, bodies, framing, focus, overlay, getPosition, setPosition } =
+packMethods { label, update, animate, bodies, framing, focus, overlay, setPosition } =
     { label = packLabel label
     , update = packUpdate update
     , animate = packAnimate animate
@@ -127,7 +126,6 @@ packMethods { label, update, animate, bodies, framing, focus, overlay, getPositi
     , framing = packFraming framing
     , focus = packFocus focus
     , overlay = packOverlay overlay
-    , getPosition = packGetPosition getPosition
     , setPosition = packSetPosition setPosition
     }
 
@@ -231,10 +229,6 @@ animate ground dt { methods, model } =
 bodies : App -> List Body
 bodies { methods, model } =
     methods.bodies model
-
-getPosition : App -> Vec3
-getPosition { methods, model } =
-    methods.getPosition model
 
 setPosition : Vec3 -> App -> App
 setPosition pos { methods, model } =

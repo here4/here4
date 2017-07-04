@@ -39,7 +39,6 @@ create label pos appear =
         , framing = framing
         , focus = focus
         , overlay = overlay
-        , getPosition = getPosition
         , setPosition = setPosition
         }
 
@@ -87,9 +86,6 @@ animate ground dt model =
 bodies : Model -> List Body
 bodies model =
     [ toBody model.body ]
-
-getPosition : Model -> Vec3
-getPosition model = model.body.position
 
 setPosition : Vec3 -> Model -> Model
 setPosition pos model =
