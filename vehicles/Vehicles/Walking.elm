@@ -19,6 +19,7 @@ import Debug
 
 type alias Attributes =
     { speed : Float
+    , height : Float
     }
 
 
@@ -26,7 +27,7 @@ drive : Attributes -> Ground -> Model.Inputs -> Moving a -> Moving a
 drive attributes ground inputs thing =
     let
         eyeLevel pos =
-            ground.elevation pos
+            ground.elevation pos + attributes.height
     in
         move attributes ground eyeLevel inputs thing
 

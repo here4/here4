@@ -21,6 +21,12 @@ import Vehicles.Walking as Walking
 import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
 
+type alias Attributes =
+    { label : String
+    , height : Float
+    , speed : Float
+    }
+
 type alias Model =
     { body : Maybe (Moving Body)
     , mesh : Result String (MeshWith VertexWithTexture)
@@ -33,11 +39,11 @@ type Msg
     | LoadObj (Result String (MeshWith VertexWithTexture))
 
 
-create : String -> ( App, Cmd AppMsg )
-create label =
+create : Attributes -> ( App, Cmd AppMsg )
+create attributes =
     App.create init
-        { label = always label
-        , update = update
+        { label = always attributes.label
+        , update = update attributes
         , animate = animate
         , bodies = bodies
         , framing = framing
@@ -75,10 +81,11 @@ loadTexture url msg =
             )
 
 update :
-    CtrlMsg Msg
+    Attributes
+    -> CtrlMsg Msg
     -> Model
     -> ( Model, Cmd (CtrlMsg Msg) )
-update msg model =
+update attributes msg model =
     let mapBody f =
             (\m -> { m | body = Maybe.map f m.body } ) model
 
@@ -108,7 +115,7 @@ update msg model =
             ( model, Cmd.none )
 
         Ctrl (Control.Drive ground inputs) ->
-            ( mapBody (Walking.drive { speed = 8.0 } ground inputs), Cmd.none )
+            ( mapBody (Walking.drive { speed = attributes.speed, height = attributes.height } ground inputs), Cmd.none )
 
         Effect _ ->
             ( model, Cmd.none )

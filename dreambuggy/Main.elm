@@ -41,7 +41,7 @@ main =
             , StaticGround.create Terrain.generate
             , Sky.create skySphere
             ]
-        , defaultSelf = Suzanne.create "Suzanne"
+        , defaultSelf = Suzanne.create { label = "Walking", height = 1.4, speed = 8.0 }
         -- , defaultSelf = Statue.create "Hippy actualization" (vec3 30 50 6) cloudsSphere
         }
 
