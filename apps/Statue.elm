@@ -1,4 +1,4 @@
-module Statue exposing (create)
+module Statue exposing (create, portal)
 
 import Html exposing (Html)
 import Html.Attributes as Html
@@ -13,7 +13,7 @@ import Camera.Util as Camera
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
-import Model exposing (Motion)
+import Model exposing (Location)
 import Orientation
 import Camera.DollyArc as Camera
 
@@ -26,6 +26,7 @@ type alias Attributes =
 type alias Model =
     { label : String
     , body : Moving Body
+    , destination : Maybe Location
     }
 
 
@@ -34,8 +35,14 @@ type alias Msg =
 
 
 create : Attributes -> ( App, Cmd AppMsg )
-create attributes =
-    App.create (init attributes)
+create = createHelp Nothing
+
+portal : Location -> Attributes -> ( App, Cmd AppMsg )
+portal location = createHelp (Just location)
+
+createHelp : Maybe Location -> Attributes -> ( App, Cmd AppMsg )
+createHelp destination attributes =
+    App.create (init destination attributes)
         { label = always attributes.label
         , update = update
         , animate = animate
@@ -47,8 +54,8 @@ create attributes =
         }
 
 
-init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
-init attributes =
+init : Maybe Location -> Attributes -> ( Model, Cmd (CtrlMsg Msg) )
+init destination attributes =
     ( { label = attributes.label
       , body =
             { anchor = AnchorGround
@@ -58,6 +65,7 @@ init attributes =
             , appear = attributes.appear
             , velocity = vec3 0 0 0
             }
+      , destination = destination
       }
     , Cmd.none
     )
@@ -104,9 +112,14 @@ reposition mPos model =
             Nothing ->
                 model
 
+
 framing : Model -> Maybe Framing
 framing model =
-    Just (Camera.framing model.body)
+    case model.destination of
+        Just destination ->
+            Just (Camera.framing (Camera.toStationaryTarget destination))
+        Nothing ->
+            Just (Camera.framing model.body)
 
 
 focus : Model -> Maybe Focus
