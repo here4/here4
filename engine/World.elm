@@ -245,44 +245,6 @@ worldLeave key model =
 worldChangeRide : Bag.Key -> WorldModel a -> WorldModel a
 worldChangeRide partyKey model =
     let
-        keyLimit =
-            Bag.maxKey model.apps
-
-        hasFraming key =
-            isJust (Maybe.andThen App.framing (Bag.get key model.apps))
-
-        nextKey key =
-            (key + 1) % keyLimit
-
-        findCameraHelp origKey key =
-            if hasFraming key then
-                key
-            else
-                let
-                    next =
-                        nextKey key
-                in
-                    if next == origKey then
-                        origKey
-                    else
-                        findCameraHelp origKey next
-
-        findCamera key =
-            findCameraHelp key key
-
-        key =
-            -- findCamera (Maybe.withDefault 0 mRideKey)
-            findCamera 0
-
-        newKey =
-            Just (findCamera (nextKey key))
-
-
-        mRideKey =
-            Bag.get partyKey model.parties
-            |> Maybe.andThen .rideKey
-
-
         updateRide party =
             case (party.rideKey, App.framing party.self) of
                 (Just rideKey, _) ->
