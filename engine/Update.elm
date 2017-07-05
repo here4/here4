@@ -19,7 +19,7 @@ import Gamepad
 import GamepadInputs
 import KeyboardInput
 import Ground exposing (Ground)
-import Model exposing (Model, Msg, PlayerKey(..))
+import Model exposing (Model, Msg, PartyKey(..), PlayerKey(..))
 import Orientation exposing (fromVec3)
 import Ports
 
@@ -28,14 +28,14 @@ import Ports
 -}
 update :
     (WorldMsg worldMsg -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg) ))
-    -> (Maybe Bag.Key -> worldModel -> String)
-    -> (Maybe Bag.Key -> worldModel -> Html (WorldMsg worldMsg))
+    -> (Maybe PartyKey -> worldModel -> String)
+    -> (Maybe PartyKey -> worldModel -> Html (WorldMsg worldMsg))
     -> (worldModel -> Maybe Ground)
     -> (Ground -> Time -> worldModel -> worldModel)
-    -> (worldModel -> (Bag.Key, worldModel, Cmd (WorldMsg worldMsg)))
-    -> (Bag.Key -> worldModel -> worldModel)
-    -> (Bag.Key -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg)))
-    -> (Maybe Bag.Key -> worldModel -> Maybe Framing)
+    -> (worldModel -> (PartyKey, worldModel, Cmd (WorldMsg worldMsg)))
+    -> (PartyKey -> worldModel -> worldModel)
+    -> (PartyKey -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg)))
+    -> (Maybe PartyKey -> worldModel -> Maybe Framing)
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel (WorldMsg worldMsg)
@@ -227,7 +227,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                                         inputsToMove inputs1 player1
 
                                                     ( wmF, wmFMsg ) =
-                                                        worldUpdate (Forward (ToParty key) (Control.Move dp)) wm2
+                                                        worldUpdate (Forward (ToApp key) (Control.Move dp)) wm2
                                                 in
                                                     ( wmF, wmFMsg, Just focus.position )
 
