@@ -21,7 +21,6 @@ import Camera.DollyArc as Camera
 type alias Model =
     { label : String
     , body : Moving Body
-    , camera : Motion
     }
 
 
@@ -53,11 +52,6 @@ init label pos appear =
             , orientation = Orientation.initial
             , appear = appear
             , velocity = vec3 0 0 0
-            }
-      , camera =
-            { position = V3.add pos (vec3 0 0 -5)
-            , velocity = vec3 0 0 0
-            , orientation = Orientation.initial
             }
       }
     , Cmd.none
@@ -101,7 +95,6 @@ reposition mPos model =
         case mPos of
             Just pos ->
                 { model | body = setPos pos model.body
-                        , camera = setPos (behind pos) model.camera
                 }
             Nothing ->
                 model
