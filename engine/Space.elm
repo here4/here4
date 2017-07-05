@@ -29,15 +29,15 @@ import Ground exposing (Ground)
 programWithFlags :
     { init : ( model, Cmd (WorldMsg msg) )
     , update : WorldMsg msg -> model -> ( model, Cmd (WorldMsg msg) )
-    , label : Maybe PartyKey -> model -> String
-    , overlay : Maybe PartyKey -> model -> Html (WorldMsg msg)
+    , label : PartyKey -> model -> String
+    , overlay : PartyKey -> model -> Html (WorldMsg msg)
     , view : model -> Maybe Model.World
     , animate : Ground -> Time -> model -> model
     , join : model -> (PartyKey, model, Cmd (WorldMsg msg))
     , leave : PartyKey -> model -> model
     , changeRide : PartyKey -> model -> ( model, Cmd (WorldMsg msg) )
     , ground : model -> Maybe Ground
-    , framing : Maybe PartyKey -> model -> Maybe Framing
+    , framing : PartyKey -> model -> Maybe Framing
     , focus : AppKey -> model -> Maybe Focus
     }
     -> Program Model.Args (Model.Model model (WorldMsg msg)) (Model.Msg (WorldMsg msg))

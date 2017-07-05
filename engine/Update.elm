@@ -27,14 +27,14 @@ import Ports
 -}
 update :
     (WorldMsg worldMsg -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg) ))
-    -> (Maybe PartyKey -> worldModel -> String)
-    -> (Maybe PartyKey -> worldModel -> Html (WorldMsg worldMsg))
+    -> (PartyKey -> worldModel -> String)
+    -> (PartyKey -> worldModel -> Html (WorldMsg worldMsg))
     -> (worldModel -> Maybe Ground)
     -> (Ground -> Time -> worldModel -> worldModel)
     -> (worldModel -> (PartyKey, worldModel, Cmd (WorldMsg worldMsg)))
     -> (PartyKey -> worldModel -> worldModel)
     -> (PartyKey -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg)))
-    -> (Maybe PartyKey -> worldModel -> Maybe Framing)
+    -> (PartyKey -> worldModel -> Maybe Framing)
     -> (AppKey -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel (WorldMsg worldMsg)
@@ -232,25 +232,35 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
 
                                             _ ->
                                                 ( wm2, Cmd.none, Nothing )
+                                findLabel mPartyKey =
+                                    Maybe.map (\k -> worldLabel k wmF) mPartyKey
+                                    |> Maybe.withDefault "Nowhere"
+
+                                findOverlay mPartyKey =
+                                    Maybe.map (\k -> worldOverlay k wmF) mPartyKey
+                                    |> Maybe.withDefault (Html.h1 [] [ Html.text  "Nowhere" ])
 
                                 label1 =
-                                    worldLabel (player1.party.partyKey) wmF
+                                    findLabel player1.party.partyKey
 
                                 overlay1 =
-                                    worldOverlay (player1.party.partyKey) wmF
+                                    findOverlay player1.party.partyKey
 
                                 label2 =
-                                    worldLabel (player2.party.partyKey) wmF
+                                    findLabel player2.party.partyKey
 
                                 overlay2 =
-                                    worldOverlay (player2.party.partyKey) wmF
+                                    findOverlay player2.party.partyKey
 
                                 -- Camera
+                                findFraming mPartyKey =
+                                    Maybe.andThen (\k -> worldFraming k wmF) mPartyKey
+
                                 framing1 =
-                                    worldFraming player1.party.partyKey wmF
+                                    findFraming player1.party.partyKey
 
                                 framing2 =
-                                    worldFraming player2.party.partyKey wmF
+                                    findFraming player2.party.partyKey
 
                                 newModel =
                                     { model

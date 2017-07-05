@@ -329,84 +329,69 @@ worldChangeRide (PartyKey partyKey) model =
             , newCmds
             )
 
-worldLabel : Maybe PartyKey -> WorldModel a -> String
-worldLabel mPartyKey model =
+worldLabel : PartyKey -> WorldModel a -> String
+worldLabel (PartyKey partyKey) model =
     let
         none =
             "<>"
     in
-        case mPartyKey of
-            Just (PartyKey partyKey) ->
-                case Bag.get partyKey model.parties of
-                    Just party ->
-                        case party.rideKey of
-                            Just (AppKey key) ->
-                                case Bag.get key model.apps of
-                                    Just app ->
-                                        App.label app
-
-                                    Nothing ->
-                                        "Ride not found"
+        case Bag.get partyKey model.parties of
+            Just party ->
+                case party.rideKey of
+                    Just (AppKey key) ->
+                        case Bag.get key model.apps of
+                            Just app ->
+                                App.label app
 
                             Nothing ->
-                                App.label party.self
+                                "Ride not found"
 
                     Nothing ->
-                        "Party not found"
+                        App.label party.self
 
             Nothing ->
-                "No party"
+                "Party not found"
 
 
-worldOverlay : Maybe PartyKey -> WorldModel a -> Html (WorldMsg msg)
-worldOverlay mPartyKey model =
+worldOverlay : PartyKey -> WorldModel a -> Html (WorldMsg msg)
+worldOverlay (PartyKey partyKey) model =
     let
         none =
             Html.text "Welcome to DreamBuggy"
     in
-        case mPartyKey of
-            Just (PartyKey partyKey) ->
-                case Bag.get partyKey model.parties of
-                    Just party ->
-                        case party.rideKey of
-                            Just (AppKey key) ->
-                                case Bag.get key model.apps of
-                                    Just app ->
-                                        Html.map (Send (ToApp (AppKey key))) (App.overlay app)
-
-                                    Nothing ->
-                                        Html.text "App not found"
+        case Bag.get partyKey model.parties of
+            Just party ->
+                case party.rideKey of
+                    Just (AppKey key) ->
+                        case Bag.get key model.apps of
+                            Just app ->
+                                Html.map (Send (ToApp (AppKey key))) (App.overlay app)
 
                             Nothing ->
-                                Html.map (Send (ToParty (PartyKey partyKey))) (App.overlay party.self)
+                                Html.text "App not found"
 
                     Nothing ->
-                        Html.text "Party not found"
+                        Html.map (Send (ToParty (PartyKey partyKey))) (App.overlay party.self)
 
             Nothing ->
-                Html.text "No party"
+                Html.text "Party not found"
 
 
-worldFraming : Maybe PartyKey -> WorldModel a -> Maybe Framing
-worldFraming mPartyKey model =
-    case mPartyKey of
-        Just (PartyKey partyKey) ->
-            case Bag.get partyKey model.parties of
-                Just party ->
-                    case party.rideKey of
-                        Just (AppKey key) ->
-                            case Bag.get key model.apps of
-                                Just app ->
-                                    App.framing app
-
-                                Nothing ->
-                                    Nothing
+worldFraming : PartyKey -> WorldModel a -> Maybe Framing
+worldFraming (PartyKey partyKey) model =
+    case Bag.get partyKey model.parties of
+        Just party ->
+            case party.rideKey of
+                Just (AppKey key) ->
+                    case Bag.get key model.apps of
+                        Just app ->
+                            App.framing app
 
                         Nothing ->
-                            App.framing party.self
+                            Nothing
 
                 Nothing ->
-                    Nothing
+                    App.framing party.self
 
         Nothing ->
             Nothing
