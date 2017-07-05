@@ -24,9 +24,10 @@ type alias WorldModel a =
     , defaultSelf : ( App, Cmd AppMsg )
     }
 
+type AppKey = AppKey Bag.Key
 
 type alias Party =
-    { rideKey : Maybe Bag.Key
+    { rideKey : Maybe AppKey
     , self : App -- App to be when not riding
     -- , focusKey : Bag.Key
     }
@@ -193,7 +194,7 @@ worldUpdate hubUpdate msg model =
             case Bag.get key model.parties of
                 Just party ->
                     case party.rideKey of
-                        Just rideKey ->
+                        Just (AppKey rideKey) ->
                             case Bag.get rideKey model.apps of
                                 Just t ->
                                     let
@@ -258,7 +259,7 @@ worldChangeRide partyKey model =
     let
         updateRide party =
             case (party.rideKey, App.framing party.self) of
-                (Just rideKey, _) ->
+                (Just (AppKey rideKey), _) ->
                     let
                         positioning x = { position = x.position, orientation = x.orientation }
                         ridePos =
@@ -300,10 +301,11 @@ worldChangeRide partyKey model =
                             |> List.sortBy Tuple.second
                             |> List.head
                             |> Maybe.map Tuple.first
+                            |> Maybe.map AppKey
 
                         cmd =
                             case mClosestKey of
-                                Just rideKey ->
+                                Just (AppKey rideKey) ->
                                     Cmd.map (Send (ToApp rideKey))
                                     (Task.succeed 1 |> Task.perform (Ctrl << Enter))
                                 Nothing ->
@@ -338,7 +340,7 @@ worldLabel mPartyKey model =
                 case Bag.get partyKey model.parties of
                     Just party ->
                         case party.rideKey of
-                            Just key ->
+                            Just (AppKey key) ->
                                 case Bag.get key model.apps of
                                     Just app ->
                                         App.label app
@@ -367,7 +369,7 @@ worldOverlay mPartyKey model =
                 case Bag.get partyKey model.parties of
                     Just party ->
                         case party.rideKey of
-                            Just key ->
+                            Just (AppKey key) ->
                                 case Bag.get key model.apps of
                                     Just app ->
                                         Html.map (Send (ToApp key)) (App.overlay app)
@@ -392,7 +394,7 @@ worldFraming mPartyKey model =
             case Bag.get partyKey model.parties of
                 Just party ->
                     case party.rideKey of
-                        Just key ->
+                        Just (AppKey key) ->
                             case Bag.get key model.apps of
                                 Just app ->
                                     App.framing app
