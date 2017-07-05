@@ -14,7 +14,7 @@ import Camera.Util exposing (toCamera)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 
-type alias PlayerKey = Bag.Key
+type PlayerKey = PlayerKey Bag.Key
 
 type Msg worldMsg
     = KeyChange (Keys -> Keys)
@@ -264,8 +264,8 @@ init worldInit { movement, isLocked } =
         , Cmd.batch
             [ Window.size |> Task.perform Resize
             , gamepads GamepadUpdate
-            , playerJoin 0
-            , playerJoin 1
+            , playerJoin (PlayerKey 0)
+            , playerJoin (PlayerKey 1)
             , Cmd.map WorldMessage worldCmdMsg
             ]
         )

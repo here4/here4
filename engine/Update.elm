@@ -19,7 +19,7 @@ import Gamepad
 import GamepadInputs
 import KeyboardInput
 import Ground exposing (Ground)
-import Model exposing (Model, Msg)
+import Model exposing (Model, Msg, PlayerKey(..))
 import Orientation exposing (fromVec3)
 import Ports
 
@@ -103,8 +103,8 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                 p2 = model.player2
                 (player1, player2) =
                     case playerKey of
-                        0 -> ( { p1 | party = { partyKey = Just pKey } }, p2 )
-                        1 -> ( p1, { p2 | party = { partyKey = Just pKey } } )
+                        PlayerKey 0 -> ( { p1 | party = { partyKey = Just pKey } }, p2 )
+                        PlayerKey 1 -> ( p1, { p2 | party = { partyKey = Just pKey } } )
                         _ -> ( p1, p2 )
                 newModel =
                     { model
@@ -129,11 +129,13 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
 
                 (wm, player1, player2) =
                     case playerKey of
-                        0 -> ( leave p1.party.partyKey
+                        PlayerKey 0 ->
+                             ( leave p1.party.partyKey
                              , { p1 | party = { partyKey = Nothing } }
                              , p2
                              )
-                        1 -> ( leave p2.party.partyKey
+                        PlayerKey 1 ->
+                             ( leave p2.party.partyKey
                              , p1
                              , { p2 | party = { partyKey = Nothing } }
                              )
