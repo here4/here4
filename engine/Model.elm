@@ -14,6 +14,8 @@ import Camera.Util exposing (toCamera)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 
+type AppKey = AppKey Bag.Key
+
 type PartyKey = PartyKey Bag.Key
 
 type PlayerKey = PlayerKey Bag.Key

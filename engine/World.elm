@@ -8,7 +8,7 @@ import Control exposing (WorldMsg, WorldKey(..), Msg(..))
 import Maybe.Extra exposing (isJust)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
-import Model exposing (Args, PartyKey(..))
+import Model exposing (Args, AppKey(..), PartyKey(..))
 import Body exposing (Body)
 import Camera exposing (Framing, Shot)
 import App exposing (..)
@@ -23,8 +23,6 @@ type alias WorldModel a =
     , parties : Bag Party
     , defaultSelf : ( App, Cmd AppMsg )
     }
-
-type AppKey = AppKey Bag.Key
 
 type alias Party =
     { rideKey : Maybe AppKey
