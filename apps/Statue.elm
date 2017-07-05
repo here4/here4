@@ -17,6 +17,11 @@ import Model exposing (Motion)
 import Orientation
 import Camera.DollyArc as Camera
 
+type alias Attributes =
+    { label : String
+    , position : Vec3
+    , appear : Appearance
+    }
 
 type alias Model =
     { label : String
@@ -28,10 +33,10 @@ type alias Msg =
     ()
 
 
-create : String -> Vec3 -> Appearance -> ( App, Cmd AppMsg )
-create label pos appear =
-    App.create (init label pos appear)
-        { label = always label
+create : Attributes -> ( App, Cmd AppMsg )
+create attributes =
+    App.create (init attributes)
+        { label = always attributes.label
         , update = update
         , animate = animate
         , bodies = bodies
@@ -42,15 +47,15 @@ create label pos appear =
         }
 
 
-init : String -> Vec3 -> Appearance -> ( Model, Cmd (CtrlMsg Msg) )
-init label pos appear =
-    ( { label = label
+init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
+init attributes =
+    ( { label = attributes.label
       , body =
             { anchor = AnchorGround
             , scale = vec3 1 1 1
-            , position = pos
+            , position = attributes.position
             , orientation = Orientation.initial
-            , appear = appear
+            , appear = attributes.appear
             , velocity = vec3 0 0 0
             }
       }
