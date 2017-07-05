@@ -4,7 +4,7 @@ import App exposing (App, AppMsg)
 import Html exposing (Html)
 import Math.Vector3 exposing (vec3)
 import Model exposing (Args)
-import NewWorld
+import MultiWorld
 import Boids
 import Balls
 import Obj
@@ -22,9 +22,9 @@ import Primitive.Sphere exposing (skySphere, cloudsSphere)
 import Vehicles.DreamBuggy as DreamBuggy
 
 
-main : Program Args (Model.Model NewWorld.Model NewWorld.Msg) (Model.Msg NewWorld.Msg)
+main : Program Args (Model.Model MultiWorld.Model MultiWorld.Msg) (Model.Msg MultiWorld.Msg)
 main =
-    NewWorld.create
+    MultiWorld.create
         { apps =
             [ elmLogo
             , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
