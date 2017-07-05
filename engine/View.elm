@@ -20,18 +20,18 @@ import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
 import Camera exposing (Camera)
 import Camera.Util exposing (cameraUp)
-import Model exposing (Model, Msg(..))
+import Model exposing (Model, Msg(..), WorldKey(..))
 import Orientation
 
 
 {-| Generate a View from a Model
 -}
 view :
-    (worldModel -> Maybe Model.World)
+    (WorldKey () -> worldModel -> Maybe Model.World)
     -> Model worldModel worldMsg
     -> Html (Msg worldMsg)
 view worldView model =
-    case ( model.maybeWindowSize, worldView model.worldModel ) of
+    case ( model.maybeWindowSize, worldView (WorldKey 0 ()) model.worldModel ) of
         ( Nothing, _ ) ->
             text "Starting ..."
 

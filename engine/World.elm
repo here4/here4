@@ -8,7 +8,7 @@ import Control exposing (WorldMsg, Route(..), Msg(..))
 import Maybe.Extra exposing (isJust)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
-import Model exposing (Args, AppKey(..), PartyKey(..))
+import Model exposing (Args, WorldKey(..), AppKey(..), PartyKey(..))
 import Body exposing (Body)
 import Camera exposing (Framing, Shot)
 import App exposing (..)
@@ -54,15 +54,15 @@ create hubInit hubUpdate details =
 
 
 
-worldApps : List ( App, Cmd AppMsg ) -> ( Bag App, Cmd (WorldMsg a) )
-worldApps appsList =
+worldApps : WorldKey () -> List ( App, Cmd AppMsg ) -> ( Bag App, Cmd (WorldMsg a) )
+worldApps (WorldKey worldKey ()) appsList =
     let
         f ( newApps, newCmdMsg ) ( oldBag, oldCmdMsgs ) =
             let
                 ( key, newBag ) =
                     Bag.insert newApps oldBag
             in
-                ( newBag, oldCmdMsgs ++ [ Cmd.map (Send (ToApp (AppKey key))) newCmdMsg ] )
+                ( newBag, oldCmdMsgs ++ [ Cmd.map (Send (ToApp (WorldKey worldKey (AppKey key)))) newCmdMsg ] )
 
         ( appsBag, unbatched ) =
             List.foldl f ( Bag.empty, [] ) appsList
@@ -80,7 +80,7 @@ worldInit hubInit details =
             hubInit
 
         ( appsBag, appCmds ) =
-            worldApps details.apps
+            worldApps (WorldKey 0 ()) details.apps
     in
         ( { worldModel = hubModel
           , maybeGround = Nothing
@@ -95,8 +95,8 @@ worldInit hubInit details =
         )
 
 
-worldView : WorldModel model -> Maybe Model.World
-worldView model =
+worldView : WorldKey () -> WorldModel model -> Maybe Model.World
+worldView (WorldKey worldKey ()) model =
     case model.maybeGround of
         Nothing ->
             Nothing
@@ -151,12 +151,12 @@ worldUpdate hubUpdate msg model =
         Send key appMsg ->
             let
                 (mApp, updateModel) = case key of
-                    ToApp (AppKey appKey) ->
+                    ToApp (WorldKey worldKey (AppKey appKey)) ->
                         ( Bag.get appKey model.apps
                         , \newApp -> { model | apps = Bag.replace appKey newApp model.apps }
                         )
 
-                    ToParty (PartyKey partyKey) ->
+                    ToParty (WorldKey worldKey (PartyKey partyKey)) ->
                         let
                             u newSelf party = { party | self = newSelf }
                         in
@@ -188,7 +188,7 @@ worldUpdate hubUpdate msg model =
                             )
 
 
-        Forward (ToParty (PartyKey key)) fwdMsg ->
+        Forward (ToParty (WorldKey worldKey (PartyKey key))) fwdMsg ->
             case Bag.get key model.parties of
                 Just party ->
                     case party.rideKey of
@@ -200,7 +200,7 @@ worldUpdate hubUpdate msg model =
                                             App.update (Ctrl fwdMsg) t
                                     in
                                         ( { model | apps = Bag.replace rideKey appModel model.apps }
-                                        , Cmd.map (Send (ToApp (AppKey rideKey))) appCmdMsg
+                                        , Cmd.map (Send (ToApp (WorldKey worldKey (AppKey rideKey)))) appCmdMsg
                                         )
                                 Nothing ->
                                     ( model, Cmd.none )
@@ -212,7 +212,7 @@ worldUpdate hubUpdate msg model =
                                 u newSelf party = { party | self = newSelf }
                             in
                                 ( { model | parties = Bag.update key (Maybe.map (u appModel)) model.parties }
-                                , Cmd.map (Send (ToParty (PartyKey key))) appCmdMsg
+                                , Cmd.map (Send (ToParty (WorldKey worldKey (PartyKey key)))) appCmdMsg
                                 )
                 Nothing ->
                     ( model, Cmd.none )
@@ -221,13 +221,13 @@ worldUpdate hubUpdate msg model =
             ( model, Cmd.none )
 
 
-worldAnimate : Ground -> Time -> WorldModel a -> WorldModel a
-worldAnimate ground dt model =
+worldAnimate : WorldKey () -> Ground -> Time -> WorldModel a -> WorldModel a
+worldAnimate _ ground dt model =
     { model | apps = Bag.map (App.animate ground dt) model.apps }
 
 
-worldJoin : WorldModel model -> (PartyKey, WorldModel model, Cmd (WorldMsg msg))
-worldJoin model =
+worldJoin : WorldKey () -> WorldModel model -> (WorldKey PartyKey, WorldModel model, Cmd (WorldMsg msg))
+worldJoin (WorldKey worldKey ()) model =
     let
         ( defaultSelfApp, defaultSelfCmd ) =
             model.defaultSelf
@@ -240,22 +240,22 @@ worldJoin model =
         ( key, newParties ) =
             Bag.insert freshParty model.parties
 
-        partyKey = PartyKey key
+        partyKey = WorldKey worldKey (PartyKey key)
 
     in
         ( partyKey, { model | parties = newParties }, Cmd.map (Send (ToParty partyKey)) defaultSelfCmd )
 
 
-worldLeave : PartyKey -> WorldModel a -> WorldModel a
-worldLeave (PartyKey key) model =
+worldLeave : WorldKey PartyKey -> WorldModel a -> WorldModel a
+worldLeave (WorldKey _ (PartyKey key)) model =
     let
         newPartys = Bag.remove key model.parties
     in
         { model | parties = newPartys }
     
 
-worldChangeRide : PartyKey -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
-worldChangeRide (PartyKey partyKey) model =
+worldChangeRide : WorldKey PartyKey -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
+worldChangeRide (WorldKey worldKey (PartyKey partyKey)) model =
     let
         updateRide party =
             case (party.rideKey, App.framing party.self) of
@@ -266,7 +266,7 @@ worldChangeRide (PartyKey partyKey) model =
                             Maybe.andThen App.framing (Bag.get rideKey model.apps)
                             |> Maybe.map (.pov >> positioning)
 
-                        cmd = Cmd.map (Send (ToApp (AppKey rideKey)))
+                        cmd = Cmd.map (Send (ToApp ((WorldKey worldKey (AppKey rideKey)))))
                               (Task.succeed 1 |> Task.perform (Ctrl << Leave))
                     in
                         ( { party | rideKey = Nothing
@@ -306,7 +306,7 @@ worldChangeRide (PartyKey partyKey) model =
                         cmd =
                             case mClosestKey of
                                 Just (AppKey rideKey) ->
-                                    Cmd.map (Send (ToApp (AppKey rideKey)))
+                                    Cmd.map (Send (ToApp (WorldKey worldKey (AppKey rideKey))))
                                     (Task.succeed 1 |> Task.perform (Ctrl << Enter))
                                 Nothing ->
                                     Cmd.none
@@ -329,8 +329,8 @@ worldChangeRide (PartyKey partyKey) model =
             , newCmds
             )
 
-worldLabel : PartyKey -> WorldModel a -> String
-worldLabel (PartyKey partyKey) model =
+worldLabel : WorldKey PartyKey -> WorldModel a -> String
+worldLabel (WorldKey _ (PartyKey partyKey)) model =
     let
         none =
             "<>"
@@ -353,8 +353,8 @@ worldLabel (PartyKey partyKey) model =
                 "Party not found"
 
 
-worldOverlay : PartyKey -> WorldModel a -> Html (WorldMsg msg)
-worldOverlay (PartyKey partyKey) model =
+worldOverlay : WorldKey PartyKey -> WorldModel a -> Html (WorldMsg msg)
+worldOverlay (WorldKey worldKey (PartyKey partyKey)) model =
     let
         none =
             Html.text "Welcome to DreamBuggy"
@@ -365,20 +365,20 @@ worldOverlay (PartyKey partyKey) model =
                     Just (AppKey key) ->
                         case Bag.get key model.apps of
                             Just app ->
-                                Html.map (Send (ToApp (AppKey key))) (App.overlay app)
+                                Html.map (Send (ToApp (WorldKey worldKey (AppKey key)))) (App.overlay app)
 
                             Nothing ->
                                 Html.text "App not found"
 
                     Nothing ->
-                        Html.map (Send (ToParty (PartyKey partyKey))) (App.overlay party.self)
+                        Html.map (Send (ToParty (WorldKey worldKey (PartyKey partyKey)))) (App.overlay party.self)
 
             Nothing ->
                 Html.text "Party not found"
 
 
-worldFraming : PartyKey -> WorldModel a -> Maybe Framing
-worldFraming (PartyKey partyKey) model =
+worldFraming : WorldKey PartyKey -> WorldModel a -> Maybe Framing
+worldFraming (WorldKey _ (PartyKey partyKey)) model =
     case Bag.get partyKey model.parties of
         Just party ->
             case party.rideKey of
@@ -397,8 +397,8 @@ worldFraming (PartyKey partyKey) model =
             Nothing
 
 
-worldFocus : AppKey -> WorldModel a -> Maybe Focus
-worldFocus (AppKey key) model =
+worldFocus : WorldKey AppKey -> WorldModel a -> Maybe Focus
+worldFocus (WorldKey _ (AppKey key)) model =
     case Bag.get key model.apps of
         Just app ->
             App.focus app
@@ -407,6 +407,6 @@ worldFocus (AppKey key) model =
             Nothing
 
 
-worldGround : WorldModel model -> Maybe Ground
-worldGround model =
+worldGround : WorldKey () -> WorldModel model -> Maybe Ground
+worldGround _ model =
     model.maybeGround

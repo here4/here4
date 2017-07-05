@@ -14,6 +14,8 @@ import Camera.Util exposing (toCamera)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 
+type WorldKey a = WorldKey Bag.Key a
+
 type AppKey = AppKey Bag.Key
 
 type PartyKey = PartyKey Bag.Key
@@ -26,8 +28,8 @@ type Msg worldMsg
     | GamepadUpdate (List Gamepad)
     | LockRequest Bool
     | LockUpdate Bool
-    | JoinWorld PlayerKey
-    | LeaveWorld PlayerKey
+    | JoinWorld (WorldKey ()) PlayerKey -- should these be multiworld hub messages?
+    | LeaveWorld (WorldKey PlayerKey) -- should these be multiworld hub messages?
     | Animate Time
     | Resize Window.Size
     | WorldMessage worldMsg
@@ -45,15 +47,10 @@ type alias Motion =
     , orientation : Orientation
     }
 
-type alias Party =
-    { partyKey : Maybe PartyKey
-    -- , worldKey : Bag.Key
-    }
-
 type alias Player msg =
-    { party : Party
+    { partyKey : Maybe (WorldKey PartyKey)
     , rideLabel : String
-    , focusKey : AppKey
+    , focusKey : WorldKey AppKey
     , camera : Camera
     , shot : Maybe Shot
     , cameraVR : Bool
@@ -96,11 +93,11 @@ defaultCamera = toCamera
 
 defaultPlayer : Player msg
 defaultPlayer =
-    { party = { partyKey = Nothing }
+    { partyKey = Nothing
     , camera = defaultCamera
     , shot = Nothing
     , rideLabel = ""
-    , focusKey = AppKey 0
+    , focusKey = WorldKey 0 (AppKey 0)
     , cameraVR = False
     , overlayVisible = False
     , overlayContent = Html.text ""
@@ -248,7 +245,7 @@ init worldInit { movement, isLocked } =
     let
         ( worldModel, worldCmdMsg ) =
             worldInit
-        playerJoin = Task.succeed >> Task.perform JoinWorld
+        playerJoin = Task.succeed >> Task.perform (JoinWorld (WorldKey 0 ()))
     in
         ( { numPlayers = 1
           , player1 = defaultPlayer

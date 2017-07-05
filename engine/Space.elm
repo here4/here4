@@ -19,7 +19,7 @@ import Window
 import Ports
 import Control exposing (WorldMsg)
 import Dispatch exposing (..)
-import Model exposing (AppKey, PartyKey)
+import Model exposing (AppKey, PartyKey, WorldKey)
 import Update
 import View
 import App exposing (Focus)
@@ -29,16 +29,16 @@ import Ground exposing (Ground)
 programWithFlags :
     { init : ( model, Cmd (WorldMsg msg) )
     , update : WorldMsg msg -> model -> ( model, Cmd (WorldMsg msg) )
-    , label : PartyKey -> model -> String
-    , overlay : PartyKey -> model -> Html (WorldMsg msg)
-    , view : model -> Maybe Model.World
-    , animate : Ground -> Time -> model -> model
-    , join : model -> (PartyKey, model, Cmd (WorldMsg msg))
-    , leave : PartyKey -> model -> model
-    , changeRide : PartyKey -> model -> ( model, Cmd (WorldMsg msg) )
-    , ground : model -> Maybe Ground
-    , framing : PartyKey -> model -> Maybe Framing
-    , focus : AppKey -> model -> Maybe Focus
+    , label : WorldKey PartyKey -> model -> String
+    , overlay : WorldKey PartyKey -> model -> Html (WorldMsg msg)
+    , view : WorldKey () -> model -> Maybe Model.World
+    , animate : WorldKey () -> Ground -> Time -> model -> model
+    , join : WorldKey () -> model -> (WorldKey PartyKey, model, Cmd (WorldMsg msg))
+    , leave : WorldKey PartyKey -> model -> model
+    , changeRide : WorldKey PartyKey -> model -> ( model, Cmd (WorldMsg msg) )
+    , ground : WorldKey () -> model -> Maybe Ground
+    , framing : WorldKey PartyKey -> model -> Maybe Framing
+    , focus : WorldKey AppKey -> model -> Maybe Focus
     }
     -> Program Model.Args (Model.Model model (WorldMsg msg)) (Model.Msg (WorldMsg msg))
 programWithFlags world =

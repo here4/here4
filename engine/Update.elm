@@ -18,7 +18,7 @@ import Gamepad
 import GamepadInputs
 import KeyboardInput
 import Ground exposing (Ground)
-import Model exposing (Model, Msg, AppKey(..), PartyKey(..), PlayerKey(..))
+import Model exposing (Model, Msg, WorldKey(..), AppKey(..), PartyKey(..), PlayerKey(..))
 import Orientation exposing (fromVec3)
 import Ports
 
@@ -27,15 +27,15 @@ import Ports
 -}
 update :
     (WorldMsg worldMsg -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg) ))
-    -> (PartyKey -> worldModel -> String)
-    -> (PartyKey -> worldModel -> Html (WorldMsg worldMsg))
-    -> (worldModel -> Maybe Ground)
-    -> (Ground -> Time -> worldModel -> worldModel)
-    -> (worldModel -> (PartyKey, worldModel, Cmd (WorldMsg worldMsg)))
-    -> (PartyKey -> worldModel -> worldModel)
-    -> (PartyKey -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg)))
-    -> (PartyKey -> worldModel -> Maybe Framing)
-    -> (AppKey -> worldModel -> Maybe Focus)
+    -> (WorldKey PartyKey -> worldModel -> String)
+    -> (WorldKey PartyKey -> worldModel -> Html (WorldMsg worldMsg))
+    -> (WorldKey () -> worldModel -> Maybe Ground)
+    -> (WorldKey () -> Ground -> Time -> worldModel -> worldModel)
+    -> (WorldKey () -> worldModel -> (WorldKey PartyKey, worldModel, Cmd (WorldMsg worldMsg)))
+    -> (WorldKey PartyKey -> worldModel -> worldModel)
+    -> (WorldKey PartyKey -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg)))
+    -> (WorldKey PartyKey -> worldModel -> Maybe Framing)
+    -> (WorldKey AppKey -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel (WorldMsg worldMsg)
     -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
@@ -95,15 +95,15 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
 
-        Model.JoinWorld playerKey {- worldKey -} ->
+        Model.JoinWorld worldKey playerKey ->
             let
-                (pKey, wm, cmdMsg) = worldJoin model.worldModel
+                (partyKey, wm, cmdMsg) = worldJoin worldKey model.worldModel
                 p1 = model.player1
                 p2 = model.player2
                 (player1, player2) =
                     case playerKey of
-                        PlayerKey 0 -> ( { p1 | party = { partyKey = Just pKey } }, p2 )
-                        PlayerKey 1 -> ( p1, { p2 | party = { partyKey = Just pKey } } )
+                        PlayerKey 0 -> ( { p1 | partyKey = Just partyKey }, p2 )
+                        PlayerKey 1 -> ( p1, { p2 | partyKey = Just partyKey } )
                         _ -> ( p1, p2 )
                 newModel =
                     { model
@@ -116,12 +116,12 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                 ( newModel, Cmd.map Model.WorldMessage cmdMsg )
                         
             
-        Model.LeaveWorld playerKey {- worldKey -} ->
+        Model.LeaveWorld (WorldKey worldKey playerKey) ->
             let
                 leave mKey =
                     case mKey of
                         Nothing -> model.worldModel
-                        Just k -> worldLeave k model.worldModel
+                        Just partyKey -> worldLeave partyKey model.worldModel
 
                 p1 = model.player1
                 p2 = model.player2
@@ -129,14 +129,14 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                 (wm, player1, player2) =
                     case playerKey of
                         PlayerKey 0 ->
-                             ( leave p1.party.partyKey
-                             , { p1 | party = { partyKey = Nothing } }
+                             ( leave p1.partyKey
+                             , { p1 | partyKey = Nothing }
                              , p2
                              )
                         PlayerKey 1 ->
-                             ( leave p2.party.partyKey
+                             ( leave p2.partyKey
                              , p1
-                             , { p2 | party = { partyKey = Nothing } }
+                             , { p2 | partyKey = Nothing }
                              )
                         _ -> ( model.worldModel, p1, p2 )
 
@@ -151,9 +151,27 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                 ( newModel, Cmd.none )
 
         Model.Animate dt0 ->
+            animate
+                worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin worldLeave worldChangeRide worldFraming worldFocus model
+                (WorldKey 0 ()) dt0
+
+animate :
+    (WorldMsg worldMsg -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg) ))
+    -> (WorldKey PartyKey -> worldModel -> String)
+    -> (WorldKey PartyKey -> worldModel -> Html (WorldMsg worldMsg))
+    -> (WorldKey () -> worldModel -> Maybe Ground)
+    -> (WorldKey () -> Ground -> Time -> worldModel -> worldModel)
+    -> (WorldKey () -> worldModel -> (WorldKey PartyKey, worldModel, Cmd (WorldMsg worldMsg)))
+    -> (WorldKey PartyKey -> worldModel -> worldModel)
+    -> (WorldKey PartyKey -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg)))
+    -> (WorldKey PartyKey -> worldModel -> Maybe Framing)
+    -> (WorldKey AppKey -> worldModel -> Maybe Focus)
+    -> Model worldModel (WorldMsg worldMsg)
+    -> WorldKey () -> Time -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
+animate worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin worldLeave worldChangeRide worldFraming worldFocus model worldKey dt0 =
             let
                 ( model_, newCmdMsg ) =
-                    case worldTerrain model.worldModel of
+                    case worldTerrain worldKey model.worldModel of
                         Nothing ->
                             ( model, Cmd.none )
 
@@ -173,7 +191,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
 
                                 -- Animate
                                 wm =
-                                    worldAnimate terrain dt model.worldModel
+                                    worldAnimate worldKey terrain dt model.worldModel
 
                                 player1 =
                                     selectCamera terrain inputs1 model.player1
@@ -182,7 +200,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                     selectCamera terrain inputs2 model.player2
 
                                 ( wm1, wm1Msg ) =
-                                    case player1.party.partyKey of
+                                    case player1.partyKey of
                                         Just key ->
                                             let
                                                 (wmRide, rideMsg) =
@@ -198,7 +216,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                             ( wm, Cmd.none )
 
                                 ( wm2, wm2Msg ) =
-                                    case player2.party.partyKey of
+                                    case player2.partyKey of
                                         Just key ->
                                             let
                                                 (wmRide, rideMsg) =
@@ -241,26 +259,26 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                     |> Maybe.withDefault (Html.h1 [] [ Html.text  "Nowhere" ])
 
                                 label1 =
-                                    findLabel player1.party.partyKey
+                                    findLabel player1.partyKey
 
                                 overlay1 =
-                                    findOverlay player1.party.partyKey
+                                    findOverlay player1.partyKey
 
                                 label2 =
-                                    findLabel player2.party.partyKey
+                                    findLabel player2.partyKey
 
                                 overlay2 =
-                                    findOverlay player2.party.partyKey
+                                    findOverlay player2.partyKey
 
                                 -- Camera
                                 findFraming mPartyKey =
                                     Maybe.andThen (\k -> worldFraming k wmF) mPartyKey
 
                                 framing1 =
-                                    findFraming player1.party.partyKey
+                                    findFraming player1.partyKey
 
                                 framing2 =
-                                    findFraming player2.party.partyKey
+                                    findFraming player2.partyKey
 
                                 newModel =
                                     { model
