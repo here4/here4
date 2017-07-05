@@ -53,7 +53,7 @@ type alias Party =
 type alias Player msg =
     { party : Party
     , rideLabel : String
-    , focusKey : Bag.Key
+    , focusKey : AppKey
     , camera : Camera
     , shot : Maybe Shot
     , cameraVR : Bool
@@ -100,7 +100,7 @@ defaultPlayer =
     , camera = defaultCamera
     , shot = Nothing
     , rideLabel = ""
-    , focusKey = 0
+    , focusKey = AppKey 0
     , cameraVR = False
     , overlayVisible = False
     , overlayContent = Html.text ""

@@ -5,14 +5,14 @@ import Bag exposing (Bag)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Ground exposing (Ground)
-import Model exposing (Inputs, Location, PartyKey)
+import Model exposing (Inputs, Location, AppKey, PartyKey)
 
 
 type alias CtrlMsg a =
     Dispatch EffectMsg Msg a
 
 type WorldKey
-    = ToApp Bag.Key
+    = ToApp AppKey
     | ToParty PartyKey
 
 type alias WorldMsg a =

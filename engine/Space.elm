@@ -17,10 +17,9 @@ import Mouse
 import Time exposing (Time)
 import Window
 import Ports
-import Bag
 import Control exposing (WorldMsg)
 import Dispatch exposing (..)
-import Model exposing (PartyKey)
+import Model exposing (AppKey, PartyKey)
 import Update
 import View
 import App exposing (Focus)
@@ -39,7 +38,7 @@ programWithFlags :
     , changeRide : PartyKey -> model -> ( model, Cmd (WorldMsg msg) )
     , ground : model -> Maybe Ground
     , framing : Maybe PartyKey -> model -> Maybe Framing
-    , focus : Bag.Key -> model -> Maybe Focus
+    , focus : AppKey -> model -> Maybe Focus
     }
     -> Program Model.Args (Model.Model model (WorldMsg msg)) (Model.Msg (WorldMsg msg))
 programWithFlags world =

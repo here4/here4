@@ -6,7 +6,6 @@ import Math.Vector3 as V3
 import Time exposing (Time)
 
 import App exposing (Focus)
-import Bag
 import Body exposing (reposition)
 import Camera exposing (..)
 import Camera.POV exposing (pov)
@@ -19,7 +18,7 @@ import Gamepad
 import GamepadInputs
 import KeyboardInput
 import Ground exposing (Ground)
-import Model exposing (Model, Msg, PartyKey(..), PlayerKey(..))
+import Model exposing (Model, Msg, AppKey(..), PartyKey(..), PlayerKey(..))
 import Orientation exposing (fromVec3)
 import Ports
 
@@ -36,7 +35,7 @@ update :
     -> (PartyKey -> worldModel -> worldModel)
     -> (PartyKey -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg)))
     -> (Maybe PartyKey -> worldModel -> Maybe Framing)
-    -> (Bag.Key -> worldModel -> Maybe Focus)
+    -> (AppKey -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
     -> Model worldModel (WorldMsg worldMsg)
     -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )

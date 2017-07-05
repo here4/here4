@@ -62,7 +62,7 @@ worldApps appsList =
                 ( key, newBag ) =
                     Bag.insert newApps oldBag
             in
-                ( newBag, oldCmdMsgs ++ [ Cmd.map (Send (ToApp key)) newCmdMsg ] )
+                ( newBag, oldCmdMsgs ++ [ Cmd.map (Send (ToApp (AppKey key))) newCmdMsg ] )
 
         ( appsBag, unbatched ) =
             List.foldl f ( Bag.empty, [] ) appsList
@@ -151,7 +151,7 @@ worldUpdate hubUpdate msg model =
         Send key appMsg ->
             let
                 (mApp, updateModel) = case key of
-                    ToApp appKey ->
+                    ToApp (AppKey appKey) ->
                         ( Bag.get appKey model.apps
                         , \newApp -> { model | apps = Bag.replace appKey newApp model.apps }
                         )
@@ -200,7 +200,7 @@ worldUpdate hubUpdate msg model =
                                             App.update (Ctrl fwdMsg) t
                                     in
                                         ( { model | apps = Bag.replace rideKey appModel model.apps }
-                                        , Cmd.map (Send (ToApp rideKey)) appCmdMsg
+                                        , Cmd.map (Send (ToApp (AppKey rideKey))) appCmdMsg
                                         )
                                 Nothing ->
                                     ( model, Cmd.none )
@@ -266,7 +266,7 @@ worldChangeRide (PartyKey partyKey) model =
                             Maybe.andThen App.framing (Bag.get rideKey model.apps)
                             |> Maybe.map (.pov >> positioning)
 
-                        cmd = Cmd.map (Send (ToApp rideKey))
+                        cmd = Cmd.map (Send (ToApp (AppKey rideKey)))
                               (Task.succeed 1 |> Task.perform (Ctrl << Leave))
                     in
                         ( { party | rideKey = Nothing
@@ -306,7 +306,7 @@ worldChangeRide (PartyKey partyKey) model =
                         cmd =
                             case mClosestKey of
                                 Just (AppKey rideKey) ->
-                                    Cmd.map (Send (ToApp rideKey))
+                                    Cmd.map (Send (ToApp (AppKey rideKey)))
                                     (Task.succeed 1 |> Task.perform (Ctrl << Enter))
                                 Nothing ->
                                     Cmd.none
@@ -372,7 +372,7 @@ worldOverlay mPartyKey model =
                             Just (AppKey key) ->
                                 case Bag.get key model.apps of
                                     Just app ->
-                                        Html.map (Send (ToApp key)) (App.overlay app)
+                                        Html.map (Send (ToApp (AppKey key))) (App.overlay app)
 
                                     Nothing ->
                                         Html.text "App not found"
@@ -412,8 +412,8 @@ worldFraming mPartyKey model =
             Nothing
 
 
-worldFocus : Bag.Key -> WorldModel a -> Maybe Focus
-worldFocus key model =
+worldFocus : AppKey -> WorldModel a -> Maybe Focus
+worldFocus (AppKey key) model =
     case Bag.get key model.apps of
         Just app ->
             App.focus app
