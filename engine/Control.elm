@@ -11,12 +11,12 @@ import Model exposing (Inputs, Location, AppKey, PartyKey)
 type alias CtrlMsg a =
     Dispatch EffectMsg Msg a
 
-type WorldKey
+type Route
     = ToApp AppKey
     | ToParty PartyKey
 
 type alias WorldMsg a =
-    DispatchHub WorldKey EffectMsg Msg Dynamic a
+    DispatchHub Route EffectMsg Msg Dynamic a
 
 
 type Msg

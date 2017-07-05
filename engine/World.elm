@@ -4,7 +4,7 @@ import Html exposing (Html)
 import Bag exposing (Bag)
 import Time exposing (Time)
 import Space
-import Control exposing (WorldMsg, WorldKey(..), Msg(..))
+import Control exposing (WorldMsg, Route(..), Msg(..))
 import Maybe.Extra exposing (isJust)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
