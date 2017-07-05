@@ -36,7 +36,7 @@ create n =
         , framing = framing
         , focus = focus
         , overlay = overlay
-        , setPosition = setPosition
+        , reposition = reposition
         }
 
 
@@ -81,8 +81,8 @@ bodies =
     List.map toBody
 
 
-setPosition : Vec3 -> Boids -> Boids
-setPosition _ = identity
+reposition : Maybe AppPosition -> Boids -> Boids
+reposition _ = identity
 
 
 framing : Boids -> Maybe Framing

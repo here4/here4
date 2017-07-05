@@ -287,14 +287,13 @@ worldChangeRide partyKey model =
             case (party.rideKey, App.framing party.self) of
                 (Just rideKey, _) ->
                     let
+                        positioning x = { position = x.position, orientation = x.orientation }
                         ridePos =
                             Maybe.andThen App.framing (Bag.get rideKey model.apps)
-                            -- |> Maybe.map (.target >> .position)
-                            |> Maybe.map (.pov >> .position)
-                            |> Maybe.withDefault (vec3 0 0 0)
+                            |> Maybe.map (.pov >> positioning)
                     in
                         { party | rideKey = Nothing
-                                , self = App.setPosition ridePos party.self
+                                , self = App.reposition ridePos party.self
                         }
 
                 (Nothing, Just myFraming) ->

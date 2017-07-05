@@ -4,7 +4,7 @@ import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
-import App exposing (App, AppMsg, Focus, appToFocus)
+import App exposing (App, AppMsg, AppPosition, Focus, appToFocus)
 import Body exposing (..)
 import Camera exposing (..)
 import Camera.Util as Camera
@@ -36,7 +36,7 @@ create label pos =
         , framing = framing
         , focus = focus
         , overlay = overlay
-        , setPosition = setPosition
+        , reposition = reposition
         }
 
 
@@ -85,13 +85,16 @@ bodies model =
     [ toBody model.body ]
 
 
-setPosition : Vec3 -> Model -> Model
-setPosition pos model =
+reposition : Maybe AppPosition -> Model -> Model
+reposition mPos model =
     let
-        setPos pos x = { x | position = pos }
+        setPos pos body = { body | position = pos.position, orientation = pos.orientation }
     in
-        { model | body = setPos pos model.body
-        }
+        case mPos of
+            Just pos ->
+                { model | body = setPos pos model.body }
+            Nothing ->
+                model
 
 
 framing : Model -> Maybe Framing

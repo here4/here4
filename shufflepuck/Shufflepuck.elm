@@ -6,7 +6,7 @@ import Task exposing (Task)
 import Time exposing (Time)
 import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
-import App exposing (App, AppMsg, Focus, appToFocus)
+import App exposing (App, AppMsg, AppPosition, Focus, appToFocus)
 import Body exposing (..)
 import Camera exposing (..)
 import Camera.Util as Camera
@@ -141,7 +141,7 @@ create attributes =
         , framing = framing
         , focus = focus
         , overlay = overlay
-        , setPosition = setPosition
+        , reposition = reposition
         }
 
 
@@ -150,9 +150,15 @@ label model =
     model.attributes.label ++ " (" ++ toString model.score1 ++ " - " ++ toString model.score2 ++ ")"
 
 
+-- | TODO: Handle orientation
+reposition : Maybe AppPosition -> Model -> Model
+reposition mPos model =
+    case mPos of
+        Just pos -> setPosition pos.position model
+        Nothing -> model
+
+
 -- | Move the entire table, maintaining the relative positions of the paddles and puck
-
-
 setPosition : Vec3 -> Model -> Model
 setPosition pos0 model =
     let

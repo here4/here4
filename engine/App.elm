@@ -1,9 +1,10 @@
-module App exposing (App, AppMsg, create, createUncontrolled, Focus, animate, bodies, setPosition, label, overlay, framing, noFraming, focus, update, appToFocus, orientedToFocus)
+module App exposing (App, AppMsg, AppPosition, create, createUncontrolled, Focus, animate, bodies, reposition, label, overlay, framing, noFraming, focus, update, appToFocus, orientedToFocus)
 
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (Mat4)
+import Orientation exposing (Orientation)
 import Time exposing (Time)
 import WebGL exposing (Entity)
 import Appearance exposing (..)
@@ -23,9 +24,13 @@ type alias Animated model msg =
     , framing : model -> Maybe Framing
     , focus : model -> Maybe Focus
     , overlay : model -> Html msg
-    , setPosition : Vec3 -> model -> model
+    , reposition : Maybe AppPosition -> model -> model
     }
 
+type alias AppPosition =
+    { position : Vec3
+    , orientation : Orientation
+    }
 
 type alias AppModel =
     Dynamic
@@ -109,16 +114,12 @@ packOverlay : (a -> Html (CtrlMsg msg)) -> AppModel -> Html AppMsg
 packOverlay f dyn =
     Html.map msgPack <| f (Dynamic.unpack dyn)
 
-packGetPosition : (model -> Vec3) -> AppModel -> Vec3
-packGetPosition f dyn =
-    f (Dynamic.unpack dyn)
-
-packSetPosition : (Vec3 -> model -> modek) -> Vec3 -> AppModel -> AppModel
-packSetPosition f pos dyn =
+packReposition : (Maybe AppPosition -> model -> model) -> Maybe AppPosition -> AppModel -> AppModel
+packReposition f pos dyn =
     Dynamic.pack (f pos (Dynamic.unpack dyn))
 
 packMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
-packMethods { label, update, animate, bodies, framing, focus, overlay, setPosition } =
+packMethods { label, update, animate, bodies, framing, focus, overlay, reposition } =
     { label = packLabel label
     , update = packUpdate update
     , animate = packAnimate animate
@@ -126,7 +127,7 @@ packMethods { label, update, animate, bodies, framing, focus, overlay, setPositi
     , framing = packFraming framing
     , focus = packFocus focus
     , overlay = packOverlay overlay
-    , setPosition = packSetPosition setPosition
+    , reposition = packReposition reposition
     }
 
 
@@ -230,9 +231,9 @@ bodies : App -> List Body
 bodies { methods, model } =
     methods.bodies model
 
-setPosition : Vec3 -> App -> App
-setPosition pos { methods, model } =
-    { methods = methods, model = methods.setPosition pos model }
+reposition : Maybe AppPosition -> App -> App
+reposition pos { methods, model } =
+    { methods = methods, model = methods.reposition pos model }
 
 framing : App -> Maybe Framing
 framing { methods, model } =

@@ -30,7 +30,7 @@ create appear =
         , framing = noFraming
         , focus = always Nothing
         , overlay = overlay
-        , setPosition = always identity
+        , reposition = always identity
         }
 
 

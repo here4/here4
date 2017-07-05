@@ -6,7 +6,7 @@ import Task exposing (Task)
 import Time exposing (Time)
 import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
-import App exposing (App, AppMsg, Focus, appToFocus)
+import App exposing (App, AppMsg, AppPosition, Focus, appToFocus)
 import Body exposing (..)
 import Camera exposing (..)
 import Camera.Util as Camera
@@ -38,7 +38,7 @@ create label path =
         , framing = framing
         , focus = focus
         , overlay = overlay
-        , setPosition = setPosition
+        , reposition = reposition
         }
 
 
@@ -104,13 +104,18 @@ bodies model_ =
             []
 
 
-setPosition : Vec3 -> Model -> Model
-setPosition pos model =
+reposition : Maybe AppPosition -> Model -> Model
+reposition mPos model =
     let mapBody f =
             Maybe.map (\m -> { m | body = f m.body } ) model
-        setPos body = { body | position = pos }
+        setPos pos body = { body | position = pos.position, orientation = pos.orientation }
     in
-        mapBody setPos
+        case mPos of
+            Just pos ->
+                mapBody (setPos pos)
+            Nothing ->
+                model
+
 
 framing : Model -> Maybe Framing
 framing model_ =

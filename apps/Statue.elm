@@ -5,7 +5,7 @@ import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import Time exposing (Time)
-import App exposing (App, AppMsg, Focus, appToFocus)
+import App exposing (App, AppMsg, AppPosition, Focus, appToFocus)
 import Appearance exposing (Appearance)
 import Body exposing (..)
 import Camera exposing (..)
@@ -39,7 +39,7 @@ create label pos appear =
         , framing = framing
         , focus = focus
         , overlay = overlay
-        , setPosition = setPosition
+        , reposition = reposition
         }
 
 
@@ -87,15 +87,24 @@ bodies : Model -> List Body
 bodies model =
     [ toBody model.body ]
 
-setPosition : Vec3 -> Model -> Model
-setPosition pos model =
+reposition : Maybe AppPosition -> Model -> Model
+reposition mPos model =
     let
-        setPos pos x = { x | position = pos }
-        behind = Orientation.rotateLabV model.camera.orientation (V3.negate V3.k)
+        setPos pos x = { x | position = pos.position, orientation = pos.orientation }
+
+        behind pos =
+            let
+                dir = Orientation.rotateLabV pos.orientation V3.k
+            in
+                { pos | position = V3.sub pos.position dir }
     in
-        { model | body = setPos pos model.body
-                , camera = setPos (V3.add pos behind) model.camera
-        }
+        case mPos of
+            Just pos ->
+                { model | body = setPos pos model.body
+                        , camera = setPos (behind pos) model.camera
+                }
+            Nothing ->
+                model
 
 framing : Model -> Maybe Framing
 framing model =
