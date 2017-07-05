@@ -33,11 +33,11 @@ main =
             , Statue.create { label = "Clouds Sphere", position = vec3 3 10 5, appear = cloudsSphere }
             , Statue.create { label = "Landscape Diamond", position = vec3 0 1.5 0, appear = fogMountainsDiamond }
             , Statue.portal (vec3 -30 14 31) { label = "Sky Diamond", position = vec3 5 1.5 1, appear = cloudsDiamond }
-            , Statue.create { label = "Fire Cube", position = vec3 -10 0 -10, appear = fireCube }
             , Statue.create { label = "Landscape Cube", position = vec3 10 1.5 -10, appear = fogMountainsCube }
 
             , Statue.portal ( vec3 120 17 -261 )
                 { label = "Voronoi Cube", position = vec3 10 0 10, appear = voronoiCube }
+            , Statue.create { label = "Fire Cube", position = vec3 121 0 -253, appear = fireCube }
 
             , Boids.create 100
             , Balls.create 30
