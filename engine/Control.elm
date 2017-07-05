@@ -5,7 +5,7 @@ import Bag exposing (Bag)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Ground exposing (Ground)
-import Model exposing (Inputs)
+import Model exposing (Inputs, Location)
 
 
 type alias CtrlMsg a =
@@ -21,8 +21,11 @@ type alias WorldMsg a =
 
 type Msg
     = Move Vec3
+    | Enter Bag.Key -- Player @key enters the receiving app
+    | Leave Bag.Key -- Player @key leaves the receiving app
     | Drive Ground Inputs
 
 
 type EffectMsg
     = UpdateGround Ground
+    | RelocateParty Bag.Key Location

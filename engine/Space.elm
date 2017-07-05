@@ -36,7 +36,7 @@ programWithFlags :
     , animate : Ground -> Time -> model -> model
     , join : model -> (Bag.Key, model, Cmd (WorldMsg msg))
     , leave : Bag.Key -> model -> model
-    , changeRide : Bag.Key -> model -> model
+    , changeRide : Bag.Key -> model -> ( model, Cmd (WorldMsg msg) )
     , ground : model -> Maybe Ground
     , framing : Maybe Bag.Key -> model -> Maybe Framing
     , focus : Bag.Key -> model -> Maybe Focus

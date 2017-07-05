@@ -116,7 +116,7 @@ update attributes msg model =
         Ctrl (Control.Drive ground inputs) ->
             ( mapBody (Walking.drive { speed = attributes.speed, height = attributes.height } ground inputs), Cmd.none )
 
-        Effect _ ->
+        _ ->
             ( model, Cmd.none )
 
 

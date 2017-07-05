@@ -85,7 +85,7 @@ update msg model =
             ( mapBody (DreamBuggy.drive { speed = 8.0 } ground inputs), Cmd.none )
             -- ( Maybe.map (\m -> { m | body = DreamBuggy.drive ground 8.0 inputs) m.body } model, Cmd.none )
 
-        Effect _ ->
+        _ ->
             ( model, Cmd.none )
 
 

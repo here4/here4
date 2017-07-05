@@ -10,7 +10,7 @@ import Appearance exposing (Appearance)
 import Body exposing (..)
 import Camera exposing (..)
 import Camera.Util as Camera
-import Control exposing (CtrlMsg)
+import Control exposing (CtrlMsg, EffectMsg(..))
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Location)
@@ -37,8 +37,8 @@ type alias Msg =
 create : Attributes -> ( App, Cmd AppMsg )
 create = createHelp Nothing
 
-portal : Location -> Attributes -> ( App, Cmd AppMsg )
-portal location = createHelp (Just location)
+portal : Vec3 -> Attributes -> ( App, Cmd AppMsg )
+portal position = createHelp (Just { position = position, orientation = Orientation.initial })
 
 createHelp : Maybe Location -> Attributes -> ( App, Cmd AppMsg )
 createHelp destination attributes =
@@ -74,6 +74,13 @@ init destination attributes =
 update : CtrlMsg Msg -> Model -> ( Model, Cmd (CtrlMsg Msg) )
 update msg model =
     case msg of
+        Ctrl (Control.Enter partyKey) ->
+            case model.destination of
+                Just dest ->
+                    ( model, Task.succeed dest |> Task.perform (Effect << RelocateParty partyKey) )
+                Nothing ->
+                    ( model, Cmd.none )
+
         Ctrl (Control.Move dp) ->
             ( { model | body = translate dp model.body }, Cmd.none )
 
@@ -115,11 +122,7 @@ reposition mPos model =
 
 framing : Model -> Maybe Framing
 framing model =
-    case model.destination of
-        Just destination ->
-            Just (Camera.framing (Camera.toStationaryTarget destination))
-        Nothing ->
-            Just (Camera.framing model.body)
+    Just (Camera.framing model.body)
 
 
 focus : Model -> Maybe Focus

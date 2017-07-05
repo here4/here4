@@ -389,7 +389,7 @@ update msg model =
         Ctrl (Control.Drive ground inputs) ->
             ( movePaddle inputs model, Cmd.none )
 
-        Effect _ ->
+        _ ->
             ( model, Cmd.none )
 
 

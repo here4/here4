@@ -4,7 +4,7 @@ import Html exposing (Html)
 import Bag exposing (Bag)
 import Time exposing (Time)
 import Space
-import Control exposing (WorldMsg, WorldKey(..))
+import Control exposing (WorldMsg, WorldKey(..), Msg(..))
 import Maybe.Extra exposing (isJust)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
@@ -14,7 +14,7 @@ import Camera exposing (Framing, Shot)
 import App exposing (..)
 import Ground exposing (Ground)
 import Math.Vector3 as V3 exposing (vec3)
-
+import Task
 
 type alias WorldModel a =
     { worldModel : a
@@ -138,6 +138,17 @@ worldUpdate hubUpdate msg model =
         HubEff (Control.UpdateGround ground) ->
             ( { model | maybeGround = Just ground }, Cmd.none )
 
+        HubEff (Control.RelocateParty partyKey location) ->
+            let
+                leaveRide party =
+                    { party | rideKey = Nothing
+                            , self = App.reposition (Just location) party.self
+                    }
+            in
+                ( { model | parties = Bag.update partyKey (Maybe.map leaveRide) model.parties }
+                , Cmd.none
+                )
+
         Send key appMsg ->
             let
                 (mApp, updateModel) = case key of
@@ -242,7 +253,7 @@ worldLeave key model =
         { model | parties = newPartys }
     
 
-worldChangeRide : Bag.Key -> WorldModel a -> WorldModel a
+worldChangeRide : Bag.Key -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
 worldChangeRide partyKey model =
     let
         updateRide party =
@@ -253,10 +264,15 @@ worldChangeRide partyKey model =
                         ridePos =
                             Maybe.andThen App.framing (Bag.get rideKey model.apps)
                             |> Maybe.map (.pov >> positioning)
+
+                        cmd = Cmd.map (Send (ToApp rideKey))
+                              (Task.succeed 1 |> Task.perform (Ctrl << Leave))
                     in
-                        { party | rideKey = Nothing
+                        ( { party | rideKey = Nothing
                                 , self = App.reposition ridePos party.self
-                        }
+                          }
+                        , cmd
+                        )
 
                 (Nothing, Just myFraming) ->
                     let
@@ -284,13 +300,32 @@ worldChangeRide partyKey model =
                             |> List.sortBy Tuple.second
                             |> List.head
                             |> Maybe.map Tuple.first
+
+                        cmd =
+                            case mClosestKey of
+                                Just rideKey ->
+                                    Cmd.map (Send (ToApp rideKey))
+                                    (Task.succeed 1 |> Task.perform (Ctrl << Enter))
+                                Nothing ->
+                                    Cmd.none
                     in
-                        { party | rideKey = mClosestKey }
+                        ( { party | rideKey = mClosestKey }
+                        , cmd
+                        )
 
                 _ ->
-                        party
+                        ( party, Cmd.none )
     in
-        { model | parties = Bag.update partyKey (Maybe.map updateRide) model.parties }
+        let mNewPartyCmds = Maybe.map updateRide <| Bag.get partyKey model.parties
+            mNewParty = Maybe.map Tuple.first mNewPartyCmds
+            newParties = Bag.update partyKey (always mNewParty) model.parties
+            newCmds =
+                Maybe.map Tuple.second mNewPartyCmds
+                |> Maybe.withDefault Cmd.none
+        in
+            ( { model | parties = newParties }
+            , newCmds
+            )
 
 worldLabel : Maybe Bag.Key -> WorldModel a -> String
 worldLabel mPartyKey model =

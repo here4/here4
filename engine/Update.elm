@@ -34,7 +34,7 @@ update :
     -> (Ground -> Time -> worldModel -> worldModel)
     -> (worldModel -> (Bag.Key, worldModel, Cmd (WorldMsg worldMsg)))
     -> (Bag.Key -> worldModel -> worldModel)
-    -> (Bag.Key -> worldModel -> worldModel)
+    -> (Bag.Key -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg)))
     -> (Maybe Bag.Key -> worldModel -> Maybe Framing)
     -> (Bag.Key -> worldModel -> Maybe Focus)
     -> Model.Msg (WorldMsg worldMsg)
@@ -184,13 +184,14 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                     case player1.party.partyKey of
                                         Just key ->
                                             let
-                                                wmRide =
+                                                (wmRide, rideMsg) =
                                                     if inputs1.button_X then
                                                         worldChangeRide key wm
                                                     else
-                                                        wm
+                                                        (wm, Cmd.none)
                                             in
-                                                worldUpdate (Forward (ToParty key) (Control.Drive terrain inputs1)) wmRide
+                                                let (wmFwd, fwdMsg) = worldUpdate (Forward (ToParty key) (Control.Drive terrain inputs1)) wmRide
+                                                in ( wmFwd, Cmd.batch [rideMsg, fwdMsg] )
 
                                         Nothing ->
                                             ( wm, Cmd.none )
@@ -199,13 +200,14 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                     case player2.party.partyKey of
                                         Just key ->
                                             let
-                                                wmRide =
+                                                (wmRide, rideMsg) =
                                                     if inputs2.button_X then
                                                         worldChangeRide key wm1
                                                     else
-                                                        wm1
+                                                        (wm1, Cmd.none)
                                             in
-                                                worldUpdate (Forward (ToParty key) (Control.Drive terrain inputs2)) wmRide
+                                                let (wmFwd, fwdMsg) = worldUpdate (Forward (ToParty key) (Control.Drive terrain inputs2)) wmRide
+                                                in ( wmFwd, Cmd.batch [rideMsg, fwdMsg] )
 
                                         Nothing ->
                                             ( wm1, Cmd.none )
@@ -259,7 +261,7 @@ update worldUpdate worldLabel worldOverlay worldTerrain worldAnimate worldJoin w
                                     }
 
                                 gamepadUpdateMsg = Gamepad.gamepads Model.GamepadUpdate
-                                wMsg = Cmd.map Model.WorldMessage wmFMsg
+                                wMsg = Cmd.map Model.WorldMessage (Cmd.batch [wm1Msg, wm2Msg, wmFMsg])
                             in
                                 ( newModel, Cmd.batch [ gamepadUpdateMsg, wMsg ] )
             in
