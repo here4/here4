@@ -10,7 +10,7 @@ module Space exposing (programWithFlags)
 -}
 
 import AnimationFrame
-import Html exposing (Html)
+import Html
 import Keyboard.Extra
 import KeyboardInput
 import Mouse
@@ -19,27 +19,14 @@ import Window
 import Ports
 import Control exposing (WorldMsg)
 import Dispatch exposing (..)
-import Model exposing (AppKey, PartyKey, WorldKey)
+import Methods exposing (..)
+import Model
 import Update
 import View
-import App exposing (Focus)
-import Camera exposing (Framing, Shot)
-import Ground exposing (Ground)
+
 
 programWithFlags :
-    { init : ( model, Cmd (WorldMsg msg) )
-    , update : WorldMsg msg -> model -> ( model, Cmd (WorldMsg msg) )
-    , label : WorldKey PartyKey -> model -> String
-    , overlay : WorldKey PartyKey -> model -> Html (WorldMsg msg)
-    , view : WorldKey () -> model -> Maybe Model.World
-    , animate : WorldKey () -> Ground -> Time -> model -> model
-    , join : WorldKey () -> model -> (WorldKey PartyKey, model, Cmd (WorldMsg msg))
-    , leave : WorldKey PartyKey -> model -> model
-    , changeRide : WorldKey PartyKey -> model -> ( model, Cmd (WorldMsg msg) )
-    , ground : WorldKey () -> model -> Maybe Ground
-    , framing : WorldKey PartyKey -> model -> Maybe Framing
-    , focus : WorldKey AppKey -> model -> Maybe Focus
-    }
+    Methods model msg
     -> Program Model.Args (Model.Model model (WorldMsg msg)) (Model.Msg (WorldMsg msg))
 programWithFlags world =
     Html.programWithFlags
