@@ -31,7 +31,7 @@ programWithFlags :
 programWithFlags world =
     Html.programWithFlags
         { init = Model.init world.init
-        , update = Update.update world.update world.label world.overlay world.ground world.animate world.join world.leave world.changeRide world.framing world.focus
+        , update = Update.update world
         , subscriptions = subscriptions
         , view = View.view world.view
         }
