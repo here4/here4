@@ -1,6 +1,7 @@
 module Update exposing (update)
 
 import Html exposing (Html)
+import List.Extra as List
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Time exposing (Time)
@@ -142,16 +143,40 @@ update world msg model =
             in
                 ( newModel, Cmd.none )
 
-        Model.Animate dt0 ->
-            animate world (WorldKey 0 ()) model dt0
+        Model.Animate dt ->
+            let
+                toUnit (WorldKey n _) = WorldKey n ()
+                worldKeys =
+                    List.filterMap identity [model.player1.partyKey, model.player2.partyKey]
+                    |> List.map toUnit
+                    |> List.uniqueBy (\(WorldKey n ()) -> n)
+
+                -- updates : List (model -> (model, msg))
+                updates = List.map (animate world dt) worldKeys
+            in
+                sequenceUpdates updates model
+
+sequenceUpdates : List (model -> (model, Cmd msg)) -> model -> (model, Cmd msg)
+sequenceUpdates =
+    let
+        s msgs updates model =
+            case updates of
+                [] ->
+                    (model, Cmd.batch msgs)
+
+                (f :: fs) ->
+                    let (newModel, newMsg) = f model
+                    in s (newMsg :: msgs) fs newModel
+    in
+        s []
 
 animate :
     Methods worldModel worldMsg
+    -> Time
     -> WorldKey ()
     -> Model worldModel (WorldMsg worldMsg)
-    -> Time
     -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
-animate world worldKey model dt0 =
+animate world dt0 worldKey model =
             let
                 ( model_, newCmdMsg ) =
                     case world.ground worldKey model.worldModel of
