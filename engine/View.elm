@@ -8,6 +8,7 @@ import FontAwesome
 
 import Html exposing (Html, text, div, p, span)
 import Html.Attributes exposing (width, height, style)
+import List.Extra as List
 import Math.Matrix4 as M4
 import Math.Matrix4 exposing (Mat4)
 import Math.Vector3 as V3
@@ -31,15 +32,49 @@ view :
     -> Model worldModel worldMsg
     -> Html (Msg worldMsg)
 view worldView model =
-    case ( model.maybeWindowSize, worldView (WorldKey 0 ()) model.worldModel ) of
-        ( Nothing, _ ) ->
+    case model.maybeWindowSize of
+        Nothing ->
             text "Starting ..."
 
-        ( Just windowSize, Nothing ) ->
-            loading windowSize
+        Just windowSize ->
+            layoutScene windowSize worldView model
 
-        ( Just windowSize, Just world ) ->
-            layoutScene windowSize model world
+
+layoutScene :
+    Window.Size
+    -> (WorldKey () -> worldModel -> Maybe Model.World)
+    -> Model worldModel worldMsg
+    -> Html (Msg worldMsg)
+layoutScene windowSize worldView model =
+    let
+        toUnit (WorldKey n _) = WorldKey n ()
+
+        mRender player =
+            Maybe.map toUnit player.partyKey
+            |> Maybe.andThen (\worldKey -> worldView worldKey model.worldModel)
+            |> Maybe.map (renderWorld model.globalTime)
+
+        mRender1 =
+            mRender model.player1
+
+        mRender2 =
+            mRender model.player2
+
+        orLoading f m =
+            Maybe.withDefault (loading windowSize) (Maybe.map f m)
+
+    in
+        if model.player1.cameraVR then
+            orLoading (layoutSceneVR windowSize model) mRender1
+        else if model.numPlayers == 2 then
+            case (mRender1, mRender2) of
+                (Just render1, Just render2) ->
+                    layoutScene2 windowSize model render1 render2
+                _ ->
+                    loading windowSize
+        else
+            orLoading (layoutScene1 windowSize model) mRender1
+
 
 loading : Window.Size -> Html (Msg worldMsg)
 loading windowSize =
@@ -52,19 +87,6 @@ loading windowSize =
         overlayContent = text "Loading ..."
     in
         overlay left right helpHMargin helpVMargin overlayContent
-
-layoutScene : Window.Size -> Model worldModel worldMsg -> Model.World -> Html (Msg worldMsg)
-layoutScene windowSize model world =
-    let
-        render =
-            renderWorld model.globalTime world
-    in
-        if model.player1.cameraVR then
-            layoutSceneVR windowSize model render
-        else if model.numPlayers == 2 then
-            layoutScene2 windowSize model render
-        else
-            layoutScene1 windowSize model render
 
 
 type alias RenderWorld msg =
@@ -95,8 +117,8 @@ layoutScene1 windowSize model render =
         ]
 
 
-layoutScene2 : Window.Size -> Model worldModel worldMsg -> RenderWorld worldMsg -> Html (Msg worldMsg)
-layoutScene2 windowSize model render =
+layoutScene2 : Window.Size -> Model worldModel worldMsg -> RenderWorld worldMsg -> RenderWorld worldMsg -> Html (Msg worldMsg)
+layoutScene2 windowSize model render1 render2 =
     let
         w2 =
             windowSize.width // 2
@@ -127,7 +149,7 @@ layoutScene2 windowSize model render =
                             , ( "padding", "0px" )
                             ]
                         ]
-                        (render Model.OneEye ws2 model.player1)
+                        (render1 Model.OneEye ws2 model.player1)
                     , hud model.paused model.player1 0 w2 (windowSize.width//20) (windowSize.height//10)
                     ]
                 , div []
@@ -145,7 +167,7 @@ layoutScene2 windowSize model render =
                             , ( "padding", "0px" )
                             ]
                         ]
-                        (render Model.OneEye ws2 model.player2)
+                        (render2 Model.OneEye ws2 model.player2)
                     , hud model.paused model.player2 w2 0 (windowSize.width//20) (windowSize.height//10)
                     ]
                 ]
