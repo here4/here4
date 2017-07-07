@@ -15,7 +15,7 @@ type alias Methods worldModel worldMsg =
     , overlay : WorldKey PartyKey -> worldModel -> Html (WorldMsg worldMsg)
     , view : WorldKey () -> worldModel -> Maybe Model.World
     , animate : WorldKey () -> Ground -> Time -> worldModel -> worldModel
-    , join : WorldKey () -> worldModel -> (WorldKey PartyKey, worldModel, Cmd (WorldMsg worldMsg))
+    , join : WorldKey () -> worldModel -> (Maybe (WorldKey PartyKey), worldModel, Cmd (WorldMsg worldMsg))
     , leave : WorldKey PartyKey -> worldModel -> worldModel
     , changeRide : WorldKey PartyKey -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg) )
     , ground : WorldKey () -> worldModel -> Maybe Ground

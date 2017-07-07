@@ -25,7 +25,7 @@ import Vehicles.DreamBuggy as DreamBuggy
 main : Program Args (Model.Model MultiWorld.Model MultiWorld.Msg) (Model.Msg MultiWorld.Msg)
 main =
     MultiWorld.create
-        { apps =
+        [ { apps =
             [ elmLogo
             , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
             , let s = Shufflepuck.default in Shufflepuck.create { s | position = vec3 53 0 18 }
@@ -44,9 +44,10 @@ main =
             , StaticGround.create Terrain.generate
             , Sky.create skySphere
             ]
-        , defaultSelf = Suzanne.create { label = "Walking", height = 1.4, speed = 2.0 }
-        -- , defaultSelf = Statue.create "Hippy actualization" (vec3 30 50 6) cloudsSphere
-        }
+          , defaultSelf = Suzanne.create { label = "Walking", height = 1.4, speed = 2.0 }
+          -- , defaultSelf = Statue.create "Hippy actualization" (vec3 30 50 6) cloudsSphere
+          }
+        ]
 
 elmLogo : (App, Cmd AppMsg)
 elmLogo =

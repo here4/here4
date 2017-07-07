@@ -53,7 +53,7 @@ update msg model =
         Self (GroundGenerated ( ground, bodies )) ->
             ( bodies
             , Task.succeed ground
-                |> Task.perform (Effect << UpdateGround)
+                |> Task.perform (Effect << UpdateGround ())
             )
 
         _ ->

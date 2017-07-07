@@ -95,8 +95,8 @@ update world msg model =
                 p2 = model.player2
                 (player1, player2) =
                     case playerKey of
-                        PlayerKey 0 -> ( { p1 | partyKey = Just partyKey }, p2 )
-                        PlayerKey 1 -> ( p1, { p2 | partyKey = Just partyKey } )
+                        PlayerKey 0 -> ( { p1 | partyKey = partyKey }, p2 )
+                        PlayerKey 1 -> ( p1, { p2 | partyKey = partyKey } )
                         _ -> ( p1, p2 )
                 newModel =
                     { model

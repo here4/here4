@@ -77,7 +77,7 @@ update msg model =
         Ctrl (Control.Enter partyKey) ->
             case model.destination of
                 Just dest ->
-                    ( model, Task.succeed dest |> Task.perform (Effect << RelocateParty partyKey) )
+                    ( model, Task.succeed dest |> Task.perform (Effect << RelocateParty () partyKey) )
                 Nothing ->
                     ( model, Cmd.none )
 
