@@ -69,7 +69,8 @@ worldParty (WorldKey worldKey (PartyKey partyKey)) model =
     |> Maybe.map .parties
     |> Maybe.andThen (Bag.get partyKey)
 
-worldApps : WorldKey () -> List ( App, Cmd AppMsg ) -> ( Bag App, Cmd (WorldMsg a) )
+
+worldApps : WorldKey () -> List ( App, Cmd AppMsg ) -> ( Bag App, List (Cmd (WorldMsg msg)) )
 worldApps (WorldKey worldKey ()) appsList =
     let
         f ( newApps, newCmdMsg ) ( oldBag, oldCmdMsgs ) =
@@ -85,23 +86,34 @@ worldApps (WorldKey worldKey ()) appsList =
         worldCmds =
             List.map (Cmd.map (toWorldMsg (WorldKey worldKey ()))) unbatched
     in
-        ( appsBag, Cmd.batch worldCmds )
+        ( appsBag, worldCmds )
+
 
 oneWorldInit :
     { apps : List ( App, Cmd AppMsg ), defaultSelf : ( App, Cmd AppMsg ) }
-    -> ( Stuff, Cmd (WorldMsg msg) )
-oneWorldInit detail =
+    -> ( Bag Stuff, List (Cmd (WorldMsg msg)) )
+    -> ( Bag Stuff, List (Cmd (WorldMsg msg)) )
+oneWorldInit detail ( oldWorlds, oldCmds ) =
     let
+        emptyStuff =
+            { maybeGround = Nothing
+            , apps = Bag.empty
+            , parties = Bag.empty
+            , defaultSelf = detail.defaultSelf
+            }
+
+        ( worldKey, oneWorlds ) =
+            Bag.insert emptyStuff oldWorlds
+
         ( appsBag, appCmds ) =
-            worldApps (WorldKey 0 ()) detail.apps
+            worldApps (WorldKey worldKey ()) detail.apps
+
+        updateApps stuff = { stuff | apps = appsBag }
+
+        newWorlds = Bag.update worldKey (Maybe.map updateApps) oneWorlds
     in
-        ( { maybeGround = Nothing
-          , apps = appsBag
-          , parties = Bag.empty
-          , defaultSelf = detail.defaultSelf
-          }
-        , appCmds
-        )
+        ( newWorlds, oldCmds ++ appCmds )
+
 
 worldInit :
     ( model, Cmd msg )
@@ -113,22 +125,12 @@ worldInit hubInit details =
             hubInit
 
         ( worldsBag, worldsCmds ) =
-            case details of
-                [] ->
-                    ( Bag.empty, Cmd.none )
-
-                ( detail :: _ ) ->
-                    let (stuff, cmd) = oneWorldInit detail
-                        (_, bag) = Bag.insert stuff Bag.empty
-                    in ( bag, cmd)
+            List.foldl oneWorldInit ( Bag.empty, [] ) details
     in
         ( { worldModel = hubModel
           , worlds = worldsBag
           }
-        , Cmd.batch
-            [ Cmd.map Hub hubCmd
-            , worldsCmds
-            ]
+        , Cmd.batch (Cmd.map Hub hubCmd :: worldsCmds)
         )
 
 
