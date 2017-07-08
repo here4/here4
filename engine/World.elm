@@ -225,8 +225,8 @@ toAppMsg dispatch =
             Ctrl ctrlMsg -> Ctrl ctrlMsg
             Effect e -> Effect (toAppEffect e)
 
-relativeRelocate : WorldKey () -> Relative -> WorldModel model -> (Maybe AppKey, Maybe AppPosition)
-relativeRelocate (WorldKey worldKey ()) relative model =
+relativeAppPosition : WorldKey () -> Relative -> WorldModel model -> (Maybe AppKey, Maybe AppPosition)
+relativeAppPosition (WorldKey worldKey ()) relative model =
     let
         -- lookup : AppId -> (AppKey, App)
         lookup appId =
@@ -284,8 +284,47 @@ relativeRelocate (WorldKey worldKey ()) relative model =
             Become appId ->
                 ( mAppKey appId, Nothing)
 
-remoteRelocate : WorldKey () -> WorldId -> Relative -> WorldModel model -> (Maybe AppKey, Maybe AppPosition)
-remoteRelocate (WorldKey worldKey ()) remoteWorldId relative model =
+
+relativeRelocate : WorldKey PartyKey -> Relative -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
+relativeRelocate (WorldKey worldKey (PartyKey partyKey)) relative model =
+    let
+        updateRide party =
+            case relativeAppPosition (WorldKey worldKey ()) relative model of
+                (Just rideKey, _) ->
+                    ( { party | rideKey = Just rideKey }
+                    , Cmd.map (Send (ToApp (WorldKey worldKey rideKey)))
+                          (Task.succeed (PartyKey partyKey) |> Task.perform (Ctrl << Enter))
+                    )
+
+                (_, Just appPosition) ->
+                    ( { party | rideKey = Nothing
+                              , self = App.reposition (Just appPosition) party.self
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( party, Cmd.none )
+
+        mNewPartyCmds =
+            Maybe.map updateRide <| worldParty (WorldKey worldKey (PartyKey partyKey)) model
+
+        mNewParty =
+            Maybe.map Tuple.first mNewPartyCmds
+
+        newCmds =
+            Maybe.map Tuple.second mNewPartyCmds
+            |> Maybe.withDefault Cmd.none
+
+        updateParties stuff =
+            { stuff | parties = Bag.update partyKey (always mNewParty) stuff.parties }
+    in
+        ( { model | worlds = Bag.update worldKey (Maybe.map updateParties) model.worlds }
+        , newCmds
+        )
+
+remoteRelocate : WorldKey PartyKey -> WorldId -> Relative -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
+remoteRelocate (WorldKey worldKey (PartyKey partyKey)) remoteWorldId relative model =
     let
         mRemote =
             Bag.find (\world -> world.id == remoteWorldId) model.worlds
@@ -297,19 +336,20 @@ remoteRelocate (WorldKey worldKey ()) remoteWorldId relative model =
                 -- enter next world
                 -- relocate relative
 
-                (Nothing, Nothing)
+                (model, Cmd.none)
 
             Nothing ->
-                (Nothing, Nothing)
+                (model, Cmd.none)
 
-relocate : WorldKey () -> Location -> WorldModel model -> (Maybe AppKey, Maybe AppPosition)
-relocate (WorldKey worldKey ()) location model =
+
+relocate : WorldKey PartyKey -> Location -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
+relocate worldPartyKey location model =
     case location of
         Local relative ->
-            relativeRelocate (WorldKey worldKey ()) relative model
+            relativeRelocate worldPartyKey relative model
 
         World remote relative ->
-            remoteRelocate (WorldKey worldKey ()) remote relative model
+            remoteRelocate worldPartyKey remote relative model
 
 worldUpdate :
     (msg -> model -> ( model, Cmd msg ))
@@ -335,41 +375,7 @@ worldUpdate hubUpdate msg model =
                 )
 
         HubEff (Control.RelocateParty (WorldKey worldKey ()) (PartyKey partyKey) location) ->
-            let
-                updateRide party =
-                    case relocate (WorldKey worldKey ()) location model of
-                        (Just rideKey, _) ->
-                            ( { party | rideKey = Just rideKey }
-                            , Cmd.map (Send (ToApp (WorldKey worldKey rideKey)))
-                                  (Task.succeed (PartyKey partyKey) |> Task.perform (Ctrl << Enter))
-                            )
-
-                        (_, Just appPosition) ->
-                            ( { party | rideKey = Nothing
-                                      , self = App.reposition (Just appPosition) party.self
-                              }
-                            , Cmd.none
-                            )
-
-                        _ ->
-                            ( party, Cmd.none )
-
-                mNewPartyCmds =
-                    Maybe.map updateRide <| worldParty (WorldKey worldKey (PartyKey partyKey)) model
-
-                mNewParty =
-                    Maybe.map Tuple.first mNewPartyCmds
-
-                newCmds =
-                    Maybe.map Tuple.second mNewPartyCmds
-                    |> Maybe.withDefault Cmd.none
-
-                updateParties stuff =
-                    { stuff | parties = Bag.update partyKey (always mNewParty) stuff.parties }
-            in
-                ( { model | worlds = Bag.update worldKey (Maybe.map updateParties) model.worlds }
-                , newCmds
-                )
+            relocate (WorldKey worldKey (PartyKey partyKey)) location model
 
         Send key appMsg ->
             let
