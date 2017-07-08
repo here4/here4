@@ -245,7 +245,7 @@ init worldInit { movement, isLocked } =
     let
         ( worldModel, worldCmdMsg ) =
             worldInit
-        playerJoin = Task.succeed >> Task.perform (JoinWorld (WorldKey 0 ()))
+        playerJoin = Task.succeed >> Task.perform (JoinWorld (WorldKey 1 ()))
     in
         ( { numPlayers = 1
           , player1 = defaultPlayer
@@ -266,7 +266,7 @@ init worldInit { movement, isLocked } =
             [ Window.size |> Task.perform Resize
             , gamepads GamepadUpdate
             , playerJoin (PlayerKey 0)
-            , playerJoin (PlayerKey 1)
+            -- , playerJoin (PlayerKey 1)
             , Cmd.map WorldMessage worldCmdMsg
             ]
         )
