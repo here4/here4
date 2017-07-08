@@ -341,6 +341,11 @@ hud paused player left right helpHMargin helpVMargin =
         shotLabel = Maybe.map .label player.shot
                     |> Maybe.withDefault ""
         pausedLabel = if paused then " (Paused)" else ""
+        worldLabel =
+            player.partyKey
+            |> Maybe.map ( (\(WorldKey n _) -> n) >> toString >> \s -> "World " ++ s ++ " ")
+            |> Maybe.withDefault "(Nowhere) "
+
         showOverlay =
             if player.overlayVisible then
                 overlay left right helpHMargin helpVMargin player.overlayContent
@@ -366,7 +371,8 @@ hud paused player left right helpHMargin helpVMargin =
                 ]
             ]
             [ span []
-                [ Html.text player.rideLabel
+                [ Html.text worldLabel
+                , Html.text player.rideLabel
                 , Html.text " "
                 , FontAwesome.diamond white 20
                 , Html.text " "
