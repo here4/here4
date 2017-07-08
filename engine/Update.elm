@@ -259,7 +259,7 @@ animate world dt0 worldKey model =
                                             _ ->
                                                 ( wm2, Cmd.none, Nothing )
                                 findLabel mPartyKey =
-                                    Maybe.map (\k -> world.label k wmF) mPartyKey
+                                    Maybe.map (\k -> world.partyLabel k wmF) mPartyKey
                                     |> Maybe.withDefault "Nowhere"
 
                                 findOverlay mPartyKey =

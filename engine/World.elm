@@ -54,7 +54,7 @@ create hubInit hubUpdate attributes =
         { init = worldInit hubInit attributes
         , view = worldView
         , update = worldUpdate hubUpdate
-        , label = worldLabel
+        , partyLabel = worldPartyLabel
         , overlay = worldOverlay
         , animate = worldAnimate
         , join = worldJoin
@@ -494,8 +494,8 @@ worldChangeRide (WorldKey worldKey (PartyKey partyKey)) model =
             , newCmds
             )
 
-worldLabel : WorldKey PartyKey -> WorldModel a -> String
-worldLabel worldPartyKey model =
+worldPartyLabel : WorldKey PartyKey -> WorldModel a -> String
+worldPartyLabel worldPartyKey model =
     let
         (WorldKey worldKey (PartyKey _)) = worldPartyKey
 
