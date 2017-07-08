@@ -4,7 +4,7 @@ import App exposing (App, AppMsg)
 import Html exposing (Html)
 import Math.Vector3 exposing (vec3)
 import Model exposing (Args)
-import MultiWorld
+import RAM
 import Boids
 import Balls
 import Obj
@@ -23,9 +23,9 @@ import Primitive.Sphere exposing (skySphere, cloudsSphere)
 import Vehicles.DreamBuggy as DreamBuggy
 
 
-main : Program Args (Model.Model MultiWorld.Model MultiWorld.Msg) (Model.Msg MultiWorld.Msg)
+main : Program Args (Model.Model RAM.Model RAM.Msg) (Model.Msg RAM.Msg)
 main =
-    MultiWorld.create
+    RAM.create
         [ { id = "world1"
           , label = "Balls World"
           , apps =

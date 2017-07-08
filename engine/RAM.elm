@@ -1,4 +1,4 @@
-module MultiWorld exposing (create, Model, Msg)
+module RAM exposing (create, Model, Msg)
 
 import Control exposing (..)
 import Dispatch exposing (..)
@@ -7,20 +7,20 @@ import World exposing (..)
 import App exposing (..)
 
 
-type alias MultiWorldMsg =
+type alias RAMMsg =
     ()
 
 
 type alias Msg =
-    WorldMsg MultiWorldMsg
+    WorldMsg RAMMsg
 
 
-type alias MultiWorldModel =
+type alias RAMModel =
     ()
 
 
 type alias Model =
-    WorldModel MultiWorldModel
+    WorldModel RAMModel
 
 
 create :
@@ -30,11 +30,11 @@ create attributes =
     World.create init update attributes
 
 
-init : ( MultiWorldModel, Cmd MultiWorldMsg )
+init : ( RAMModel, Cmd RAMMsg )
 init =
     ( (), Cmd.none )
 
 
-update : MultiWorldMsg -> MultiWorldModel -> ( MultiWorldModel, Cmd MultiWorldMsg )
+update : RAMMsg -> RAMModel -> ( RAMModel, Cmd RAMMsg )
 update msg model =
     ( model, Cmd.none )
