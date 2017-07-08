@@ -16,6 +16,7 @@ import StaticGround
 import Suzanne
 import Wedge
 import Body.Terrain as Terrain
+import Location exposing (..)
 import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
 import Primitive.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Primitive.Sphere exposing (skySphere, cloudsSphere)
@@ -54,7 +55,7 @@ main =
                   , appear = fogMountainsDiamond
                   }
 
-              , Statue.portal ( vec3 120 17 -261 )
+              , Statue.portal (At (vec3 120 17 -261) FacingNorth)
                   { id = "voronoi-cube"
                   , label = "Voronoi Cube"
                   , position = vec3 10 0 10
@@ -97,9 +98,12 @@ main =
               , let
                     s = Shufflepuck.default
                 in
-                    Shufflepuck.create { s | position = vec3 53 0 18 }
+                    Shufflepuck.create
+                        { s | id = "shufflepuck"
+                            , position = vec3 53 0 18
+                        }
 
-              , Statue.portal (vec3 50 14 11)
+              , Statue.portal (Near "shufflepuck")
                   { id = "sky-diamond"
                   , label = "Sky Diamond"
                   , position = vec3 5 1.5 1

@@ -231,6 +231,12 @@ toAppPosition (WorldKey worldKey ()) model location =
 
         At position o ->
             case o of
+                FacingNorth ->
+                    Just
+                        { position = position
+                        , orientation = Orientation.initial
+                        }
+
                 WithOrientation orientation ->
                     Just
                         { position = position

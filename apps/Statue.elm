@@ -38,8 +38,8 @@ type alias Msg =
 create : Attributes -> ( App, Cmd AppMsg )
 create = createHelp Nothing
 
-portal : Vec3 -> Attributes -> ( App, Cmd AppMsg )
-portal position = createHelp (Just (At position (WithOrientation Orientation.initial)))
+portal : Location -> Attributes -> ( App, Cmd AppMsg )
+portal location = createHelp (Just location)
 
 createHelp : Maybe Location -> Attributes -> ( App, Cmd AppMsg )
 createHelp destination attributes =
