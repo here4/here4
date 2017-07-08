@@ -27,8 +27,8 @@ type alias Attributes =
     }
 
 
-type alias Multiverse a =
-    { worldModel : a
+type alias Multiverse state =
+    { state  : state
     , worlds : Bag Stuff
     }
 
@@ -150,7 +150,7 @@ worldInit hubInit attributes =
         ( worldsBag, worldsCmds ) =
             List.foldl oneWorldInit ( Bag.empty, [] ) attributes
     in
-        ( { worldModel = hubModel
+        ( { state = hubModel
           , worlds = worldsBag
           }
         , Cmd.batch (Cmd.map Hub hubCmd :: worldsCmds)
@@ -426,9 +426,9 @@ worldUpdate hubUpdate msg model =
         Hub hubMsg ->
             let
                 ( hubModel, hubCmd ) =
-                    hubUpdate hubMsg model.worldModel
+                    hubUpdate hubMsg model.state
             in
-                ( { model | worldModel = hubModel }, Cmd.map Hub hubCmd )
+                ( { model | state = hubModel }, Cmd.map Hub hubCmd )
 
         HubEff (Control.UpdateGround (WorldKey worldKey ()) ground) ->
             let
