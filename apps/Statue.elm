@@ -13,6 +13,7 @@ import Control exposing (CtrlMsg, EffectMsg(..), teleport)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Location exposing (..)
+import Model exposing (PartyKey)
 import Orientation
 import Camera.DollyArc as Camera
 
@@ -136,8 +137,8 @@ reposition mPos model =
                 model
 
 
-framing : Model -> Maybe Framing
-framing model =
+framing : PartyKey -> Model -> Maybe Framing
+framing _ model =
     Just (Camera.framing model.body)
 
 

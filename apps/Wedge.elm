@@ -11,7 +11,7 @@ import Camera.Util as Camera
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
-import Model exposing (Inputs)
+import Model exposing (Inputs, PartyKey)
 import Orientation
 import Body.Wedge exposing (wedge)
 import Vehicles.DreamBird as DreamBird
@@ -100,8 +100,8 @@ reposition mPos model =
                 model
 
 
-framing : Model -> Maybe Framing
-framing model =
+framing : PartyKey -> Model -> Maybe Framing
+framing partyKey model =
     let
         framing =
             Camera.framing model.body

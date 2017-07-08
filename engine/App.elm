@@ -14,6 +14,7 @@ import Control exposing (..)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Ground exposing (Ground)
+import Model exposing (PartyKey)
 
 
 type alias Animated model msg =
@@ -22,7 +23,7 @@ type alias Animated model msg =
     , update : msg -> model -> ( model, Cmd msg )
     , bodies : model -> List Body
     , animate : Ground -> Time -> model -> model
-    , framing : model -> Maybe Framing
+    , framing : PartyKey -> model -> Maybe Framing
     , focus : model -> Maybe Focus
     , overlay : model -> Html msg
     , reposition : Maybe AppPosition -> model -> model
@@ -109,9 +110,9 @@ packBodies f dyn =
     f (Dynamic.unpack dyn)
 
 
-packFraming : (a -> Maybe Framing) -> AppModel -> Maybe Framing
-packFraming f dyn =
-    f (Dynamic.unpack dyn)
+packFraming : (PartyKey -> a -> Maybe Framing) -> PartyKey -> AppModel -> Maybe Framing
+packFraming f partyKey dyn =
+    f partyKey (Dynamic.unpack dyn)
 
 
 packFocus : (a -> Maybe Focus) -> AppModel -> Maybe Focus
@@ -258,9 +259,9 @@ reposition pos { methods, model } =
     { methods = methods, model = methods.reposition pos model }
 
 
-framing : App -> Maybe Framing
-framing { methods, model } =
-    methods.framing model
+framing : PartyKey -> App -> Maybe Framing
+framing partyKey { methods, model } =
+    methods.framing partyKey model
 
 
 focus : App -> Maybe Focus
@@ -292,6 +293,6 @@ orientedToFocus x =
     { position = x.position }
 
 
-noFraming : model -> Maybe Framing
-noFraming _ =
+noFraming : PartyKey -> model -> Maybe Framing
+noFraming _ _ =
     Nothing

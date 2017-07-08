@@ -13,7 +13,7 @@ import Camera.Util as Camera
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
-import Model exposing (Inputs)
+import Model exposing (Inputs, PartyKey)
 import Orientation
 import Body.Obj exposing (obj)
 import Vehicles.Walking as Walking
@@ -161,8 +161,8 @@ reposition mPos model =
                 model
 
 
-framing : Model -> Maybe Framing
-framing model =
+framing : PartyKey -> Model -> Maybe Framing
+framing _ model =
     Maybe.map (Camera.framing) model.body
 
 

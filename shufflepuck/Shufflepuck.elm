@@ -13,7 +13,7 @@ import Camera.Util as Camera
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
-import Model exposing (Inputs)
+import Model exposing (Inputs, PartyKey)
 import Orientation exposing (Orientation)
 import Primitive.Cube exposing (cloudsCube, textureCube)
 import Primitive.Cylinder exposing (cloudsCylinder, textureCylinder)
@@ -552,8 +552,8 @@ bodies model =
     model.table :: List.map toBody [ model.puck, model.paddle1, model.paddle2 ]
 
 
-framing : Model -> Maybe Framing
-framing model =
+framing : PartyKey -> Model -> Maybe Framing
+framing partyKey model =
     let
         target =
             { position = model.paddle1.position

@@ -13,7 +13,7 @@ import Camera.Util as Camera
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
-import Model exposing (Inputs)
+import Model exposing (Inputs, PartyKey)
 import Orientation
 import Primitive.Cube exposing (textureCube)
 import Vehicles.DreamBuggy as DreamBuggy
@@ -125,8 +125,8 @@ reposition mPos model =
                 model
 
 
-framing : Model -> Maybe Framing
-framing model_ =
+framing : PartyKey -> Model -> Maybe Framing
+framing _ model_ =
     case model_ of
         Just model ->
             Just (Camera.framing model.body)

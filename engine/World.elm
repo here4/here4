@@ -255,8 +255,8 @@ toAppMsg dispatch =
                 Effect (toAppEffect e)
 
 
-relativeAppPosition : WorldKey () -> Relative -> WorldModel model -> ( Maybe AppKey, Maybe AppPosition )
-relativeAppPosition (WorldKey worldKey ()) relative model =
+relativeAppPosition : WorldKey PartyKey -> Relative -> WorldModel model -> ( Maybe AppKey, Maybe AppPosition )
+relativeAppPosition (WorldKey worldKey (PartyKey partyKey)) relative model =
     let
         -- lookup : AppId -> (AppKey, App)
         lookup appId =
@@ -267,7 +267,7 @@ relativeAppPosition (WorldKey worldKey ()) relative model =
         mTarget appId =
             lookup appId
                 |> Maybe.map Tuple.second
-                |> Maybe.andThen App.framing
+                |> Maybe.andThen (App.framing (PartyKey partyKey))
                 |> Maybe.map .target
 
         mAppKey appId =
@@ -319,10 +319,12 @@ relativeAppPosition (WorldKey worldKey ()) relative model =
 
 
 relativeRelocate : WorldKey PartyKey -> Relative -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
-relativeRelocate (WorldKey worldKey (PartyKey partyKey)) relative model =
+relativeRelocate worldPartyKey relative model =
     let
+        (WorldKey worldKey (PartyKey partyKey)) = worldPartyKey
+
         updateRide party =
-            case relativeAppPosition (WorldKey worldKey ()) relative model of
+            case relativeAppPosition worldPartyKey relative model of
                 ( Just rideKey, _ ) ->
                     ( { party | rideKey = Just rideKey }
                     , Cmd.map (Send (ToApp (WorldKey worldKey rideKey)))
@@ -624,14 +626,14 @@ worldChangeRide : WorldKey PartyKey -> WorldModel model -> ( WorldModel model, C
 worldChangeRide (WorldKey worldKey (PartyKey partyKey)) model =
     let
         updateRide party =
-            case ( party.rideKey, App.framing party.self ) of
+            case ( party.rideKey, App.framing (PartyKey partyKey) party.self ) of
                 ( Just (AppKey rideKey), _ ) ->
                     let
                         positioning x =
                             { position = x.position, orientation = x.orientation }
 
                         ridePos =
-                            Maybe.andThen App.framing (worldApp (WorldKey worldKey (AppKey rideKey)) model)
+                            Maybe.andThen (App.framing (PartyKey partyKey)) (worldApp (WorldKey worldKey (AppKey rideKey)) model)
                                 |> Maybe.map (.pov >> positioning)
 
                         cmd =
@@ -654,7 +656,7 @@ worldChangeRide (WorldKey worldKey (PartyKey partyKey)) model =
                             Model.direction myFraming.pov
 
                         secondPosition ( k, app ) =
-                            case App.framing app of
+                            case App.framing (PartyKey partyKey) app of
                                 Just framing ->
                                     Just ( k, framing.target.position )
 
@@ -790,7 +792,7 @@ worldOverlay worldPartyKey model =
 worldFraming : WorldKey PartyKey -> WorldModel a -> Maybe Framing
 worldFraming worldPartyKey model =
     let
-        (WorldKey worldKey (PartyKey _)) =
+        (WorldKey worldKey partyKey) =
             worldPartyKey
     in
         case worldParty worldPartyKey model of
@@ -799,13 +801,13 @@ worldFraming worldPartyKey model =
                     Just (AppKey appKey) ->
                         case worldApp (WorldKey worldKey (AppKey appKey)) model of
                             Just app ->
-                                App.framing app
+                                App.framing partyKey app
 
                             Nothing ->
                                 Nothing
 
                     Nothing ->
-                        App.framing party.self
+                        App.framing partyKey party.self
 
             Nothing ->
                 Nothing
