@@ -196,8 +196,15 @@ update world msg model =
                 -- updates : List (model -> (model, msg))
                 updates =
                     List.map (animate world dt) worldKeys
+
+                ( newModel, sequenceMsg ) =
+                    sequenceUpdates updates model
+
+                gamepadUpdateMsg =
+                    Gamepad.gamepads Model.GamepadUpdate
+
             in
-                sequenceUpdates updates model
+                ( newModel, Cmd.batch [ gamepadUpdateMsg, sequenceMsg ] )
 
 
 sequenceUpdates : List (model -> ( model, Cmd msg )) -> model -> ( model, Cmd msg )
@@ -224,143 +231,122 @@ animate :
     -> WorldKey ()
     -> Model worldModel (WorldMsg worldMsg)
     -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
-animate world dt0 worldKey model =
-    let
-        ( model_, newCmdMsg ) =
-            case world.ground worldKey model.worldModel of
-                Nothing ->
-                    ( model, Cmd.none )
+animate world dt0 worldKey model0 =
+    case world.ground worldKey model0.worldModel of
+        Nothing ->
+            ( model0, Cmd.none )
 
-                Just terrain ->
+        Just terrain ->
+            let
+                dt =
+                    if model0.paused then
+                        0
+                    else
+                        dt0
+
+                -- Animate
+                wm =
+                    world.animate worldKey terrain dt model0.worldModel
+
+{-
+                -- Focus
+                ( wmF, wmFMsg, focPos ) =
                     let
-                        dt =
-                            if model.paused then
-                                0
-                            else
-                                dt0
-
-                        inputs1 =
-                            timeToInputs dt model.inputs
-
-                        inputs2 =
-                            timeToInputs dt model.inputs2
-
-                        -- Animate
-                        wm =
-                            world.animate worldKey terrain dt model.worldModel
-
-                        player1 =
-                            selectCamera terrain inputs1 model.player1
-
-                        player2 =
-                            selectCamera terrain inputs2 model.player2
-
-                        ( wm1, wm1Msg ) =
-                            case player1.partyKey of
-                                Just key ->
-                                    let
-                                        ( wmRide, rideMsg ) =
-                                            if inputs1.button_X then
-                                                world.changeRide key wm
-                                            else
-                                                ( wm, Cmd.none )
-                                    in
-                                        let
-                                            ( wmFwd, fwdMsg ) =
-                                                world.update (Forward (ToParty key) (Control.Drive terrain inputs1)) wmRide
-                                        in
-                                            ( wmFwd, Cmd.batch [ rideMsg, fwdMsg ] )
-
-                                Nothing ->
-                                    ( wm, Cmd.none )
-
-                        ( wm2, wm2Msg ) =
-                            case player2.partyKey of
-                                Just key ->
-                                    let
-                                        ( wmRide, rideMsg ) =
-                                            if inputs2.button_X then
-                                                world.changeRide key wm1
-                                            else
-                                                ( wm1, Cmd.none )
-                                    in
-                                        let
-                                            ( wmFwd, fwdMsg ) =
-                                                world.update (Forward (ToParty key) (Control.Drive terrain inputs2)) wmRide
-                                        in
-                                            ( wmFwd, Cmd.batch [ rideMsg, fwdMsg ] )
-
-                                Nothing ->
-                                    ( wm1, Cmd.none )
-
-                        -- Focus
-                        ( wmF, wmFMsg, focPos ) =
-                            let
-                                key =
-                                    player1.focusKey
-                            in
-                                case world.focus key model.worldModel of
-                                    Just focus ->
-                                        let
-                                            dp =
-                                                inputsToMove inputs1 player1
-
-                                            ( wmF, wmFMsg ) =
-                                                world.update (Forward (ToApp key) (Control.Move dp)) wm2
-                                        in
-                                            ( wmF, wmFMsg, Just focus.position )
-
-                                    _ ->
-                                        ( wm2, Cmd.none, Nothing )
-
-                        findLabel mPartyKey =
-                            Maybe.map (\k -> world.partyLabel k wmF) mPartyKey
-                                |> Maybe.withDefault "Nowhere"
-
-                        findOverlay mPartyKey =
-                            Maybe.map (\k -> world.overlay k wmF) mPartyKey
-                                |> Maybe.withDefault (Html.h1 [] [ Html.text "Nowhere" ])
-
-                        label1 =
-                            findLabel player1.partyKey
-
-                        overlay1 =
-                            findOverlay player1.partyKey
-
-                        label2 =
-                            findLabel player2.partyKey
-
-                        overlay2 =
-                            findOverlay player2.partyKey
-
-                        -- Camera
-                        findFraming mPartyKey =
-                            Maybe.andThen (\k -> world.framing k wmF) mPartyKey
-
-                        framing1 =
-                            findFraming player1.partyKey
-
-                        framing2 =
-                            findFraming player2.partyKey
-
-                        newModel =
-                            { model
-                                | globalTime = model.globalTime + dt
-                                , player1 = updatePlayer terrain inputs1 dt0 label1 overlay1 player1.shot framing1 player1
-                                , player2 = updatePlayer terrain inputs2 dt0 label2 overlay2 player2.shot framing2 player2
-                                , inputs = clearStationaryInputs inputs1
-                                , worldModel = wmF
-                            }
-
-                        gamepadUpdateMsg =
-                            Gamepad.gamepads Model.GamepadUpdate
-
-                        wMsg =
-                            Cmd.map Model.WorldMessage (Cmd.batch [ wm1Msg, wm2Msg, wmFMsg ])
+                        key =
+                            player1.focusKey
                     in
-                        ( newModel, Cmd.batch [ gamepadUpdateMsg, wMsg ] )
+                        case world.focus key model.worldModel of
+                            Just focus ->
+                                let
+                                    dp =
+                                        inputsToMove inputs1 player1
+
+                                    ( wmF, wmFMsg ) =
+                                        world.update (Forward (ToApp key) (Control.Move dp)) wm2
+                                in
+                                    ( wmF, wmFMsg, Just focus.position )
+
+                            _ ->
+                                ( wm2, Cmd.none, Nothing )
+-}
+
+                (clearedInputs1, player1, wm1, wm1Msg) =
+                    animatePlayer world worldKey terrain dt0 model0.inputs model0.player1 wm
+
+                (clearedInputs2, player2, wm2, wm2Msg) =
+                    animatePlayer world worldKey terrain dt0 model0.inputs2 model0.player2 wm1
+
+                newModel =
+                    { model0
+                        | globalTime = model0.globalTime + dt
+                        , player1 = player1
+                        , player2 = player2
+                        , inputs = clearedInputs1
+                        , inputs2 = clearedInputs2
+                        , worldModel = wm2
+                    }
+            in
+                ( newModel
+                , Cmd.map Model.WorldMessage (Cmd.batch [ wm1Msg, wm2Msg ])
+                )
+
+animatePlayer :
+    Methods worldModel worldMsg
+    -> WorldKey ()
+    -> Ground
+    -> Time
+    -> Model.Inputs
+    -> Model.Player (WorldMsg worldMsg)
+    -> worldModel
+    -> (Model.Inputs, Model.Player (WorldMsg worldMsg), worldModel, Cmd (WorldMsg worldMsg))
+animatePlayer world (WorldKey worldKey ()) terrain dt0 inputs0 player0 model =
+    let
+        inputs = timeToInputs dt0 inputs0
+
+        justIfThisWorld (WorldKey wk p) =
+            if wk == worldKey then
+                Just (WorldKey wk p)
+            else
+                Nothing
+
+        player = selectCamera terrain inputs player0
+
     in
-        ( model_, newCmdMsg )
+        case Maybe.andThen justIfThisWorld player.partyKey of
+            Just worldPartyKey ->
+                let
+                    ( rideModel, rideMsg ) =
+                        if inputs.button_X then
+                            world.changeRide worldPartyKey model
+                        else
+                            ( model, Cmd.none )
+
+                    ( fwdModel, fwdMsg ) =
+                        world.update
+                            (Forward (ToParty worldPartyKey) (Control.Drive terrain inputs))
+                            rideModel
+
+                    label = world.partyLabel worldPartyKey fwdModel
+
+                    overlay = world.overlay worldPartyKey fwdModel
+
+                    framing = world.framing worldPartyKey fwdModel
+
+                    newPlayer = updatePlayer terrain inputs dt0 label overlay player.shot framing player
+
+                in
+                    ( clearStationaryInputs inputs
+                    , newPlayer
+                    , fwdModel
+                    , Cmd.batch [ rideMsg, fwdMsg ]
+                    )
+
+            Nothing ->
+                ( inputs0
+                , player0
+                , model
+                , Cmd.none
+                )
 
 
 inputsToMove : Model.Inputs -> Model.Player msg -> Vec3
@@ -634,11 +620,13 @@ nextShot shot =
 selectCamera : Ground -> Model.Inputs -> Model.Player msg -> Model.Player msg
 selectCamera ground inputs player =
     let
+        i = Debug.log "selectCamera inputs" inputs
+
         ensureShot =
             Maybe.withDefault tracking player.shot
 
         ( newShot, newCamera ) =
-            if inputs.prevCamera then
+            if i.prevCamera then
                 let
                     shot =
                         prevShot ensureShot
@@ -648,12 +636,13 @@ selectCamera ground inputs player =
                 let
                     shot =
                         nextShot ensureShot
+                            |> Debug.log "Changing to next shot"
                 in
                     ( Just shot, shot.init ground player.camera )
             else if inputs.button_X then
-                ( Just ensureShot, ensureShot.init ground player.camera )
+                ( Just (ensureShot |> Debug.log "Re-init shot"), ensureShot.init ground player.camera )
             else
-                ( Just ensureShot, player.camera )
+                ( Just (ensureShot |> Debug.log "No change in shot"), player.camera )
 
         newVR =
             if inputs.changeVR then
