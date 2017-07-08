@@ -13,7 +13,7 @@ import Camera.Util as Camera
 import Control exposing (CtrlMsg, EffectMsg(..))
 import Dispatch exposing (..)
 import Ground exposing (Ground)
-import Model exposing (Location)
+import Location exposing (..)
 import Orientation
 import Camera.DollyArc as Camera
 
@@ -38,7 +38,7 @@ create : Attributes -> ( App, Cmd AppMsg )
 create = createHelp Nothing
 
 portal : Vec3 -> Attributes -> ( App, Cmd AppMsg )
-portal position = createHelp (Just { position = position, orientation = Orientation.initial })
+portal position = createHelp (Just (At position (WithOrientation Orientation.initial)))
 
 createHelp : Maybe Location -> Attributes -> ( App, Cmd AppMsg )
 createHelp destination attributes =

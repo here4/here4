@@ -9,6 +9,7 @@ import Maybe.Extra exposing (isJust)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Model exposing (Args, WorldKey(..), AppKey(..), PartyKey(..))
+import Location exposing (..)
 import Body exposing (Body)
 import Camera exposing (Framing, Shot)
 import App exposing (..)
@@ -223,6 +224,16 @@ toAppMsg dispatch =
             Ctrl ctrlMsg -> Ctrl ctrlMsg
             Effect e -> Effect (toAppEffect e)
 
+toAppPosition : Location -> AppPosition
+toAppPosition location =
+    case location of
+        At position o ->
+            case o of
+                WithOrientation orientation ->
+                    { position = position
+                    , orientation = orientation
+                    }
+
 worldUpdate :
     (msg -> model -> ( model, Cmd msg ))
     -> WorldMsg msg
@@ -250,7 +261,7 @@ worldUpdate hubUpdate msg model =
             let
                 leaveRide party =
                     { party | rideKey = Nothing
-                            , self = App.reposition (Just location) party.self
+                            , self = App.reposition (Just (toAppPosition location)) party.self
                     }
 
                 updateParties stuff =

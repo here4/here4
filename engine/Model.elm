@@ -58,11 +58,6 @@ type alias Player msg =
     , overlayContent : Html msg
     }
 
-type alias Location =
-    { position : Vec3
-    , orientation : Orientation
-    }
-
 type Eye
     = OneEye
     | LeftEye

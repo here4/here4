@@ -5,7 +5,8 @@ import Bag exposing (Bag)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Ground exposing (Ground)
-import Model exposing (Inputs, Location, WorldKey(..), AppKey, PartyKey)
+import Location exposing (..)
+import Model exposing (Inputs, WorldKey(..), AppKey, PartyKey)
 
 
 type alias CtrlMsg a =
