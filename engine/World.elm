@@ -225,8 +225,8 @@ toAppMsg dispatch =
             Ctrl ctrlMsg -> Ctrl ctrlMsg
             Effect e -> Effect (toAppEffect e)
 
-relativeToAppPosition : WorldKey () -> WorldModel model -> Relative -> (Maybe AppKey, Maybe AppPosition)
-relativeToAppPosition (WorldKey worldKey ()) model relative =
+relativeRelocate : WorldKey () -> Relative -> WorldModel model -> (Maybe AppKey, Maybe AppPosition)
+relativeRelocate (WorldKey worldKey ()) relative model =
     let
         -- lookup : AppId -> (AppKey, App)
         lookup appId =
@@ -284,27 +284,32 @@ relativeToAppPosition (WorldKey worldKey ()) model relative =
             Become appId ->
                 ( mAppKey appId, Nothing)
 
-remoteToAppPosition : WorldKey () -> WorldModel model -> WorldId -> Relative -> (Maybe AppKey, Maybe AppPosition)
-remoteToAppPosition (WorldKey worldKey ()) model remoteWorldId relative =
+remoteRelocate : WorldKey () -> WorldId -> Relative -> WorldModel model -> (Maybe AppKey, Maybe AppPosition)
+remoteRelocate (WorldKey worldKey ()) remoteWorldId relative model =
     let
         mRemote =
             Bag.find (\world -> world.id == remoteWorldId) model.worlds
     in
         case mRemote of
             Just (remoteWorldKey, remoteWorld) ->
+
+                -- leave this world
+                -- enter next world
+                -- relocate relative
+
                 (Nothing, Nothing)
 
             Nothing ->
                 (Nothing, Nothing)
 
-toAppPosition : WorldKey () -> WorldModel model -> Location -> (Maybe AppKey, Maybe AppPosition)
-toAppPosition (WorldKey worldKey ()) model location =
+relocate : WorldKey () -> Location -> WorldModel model -> (Maybe AppKey, Maybe AppPosition)
+relocate (WorldKey worldKey ()) location model =
     case location of
         Local relative ->
-            relativeToAppPosition (WorldKey worldKey ()) model relative
+            relativeRelocate (WorldKey worldKey ()) relative model
 
         World remote relative ->
-            remoteToAppPosition (WorldKey worldKey ()) model remote relative
+            remoteRelocate (WorldKey worldKey ()) remote relative model
 
 worldUpdate :
     (msg -> model -> ( model, Cmd msg ))
@@ -332,7 +337,7 @@ worldUpdate hubUpdate msg model =
         HubEff (Control.RelocateParty (WorldKey worldKey ()) (PartyKey partyKey) location) ->
             let
                 updateRide party =
-                    case toAppPosition (WorldKey worldKey ()) model location of
+                    case relocate (WorldKey worldKey ()) location model of
                         (Just rideKey, _) ->
                             ( { party | rideKey = Just rideKey }
                             , Cmd.map (Send (ToApp (WorldKey worldKey rideKey)))
