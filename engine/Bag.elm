@@ -1,4 +1,4 @@
-module Bag exposing (Bag, Key, size, maxKey, empty, insert, remove, replace, update, get, keys, items, map, toList)
+module Bag exposing (Bag, Key, size, maxKey, empty, insert, remove, replace, update, get, keys, items, map, toList, find)
 
 import Dict exposing (Dict)
 
@@ -66,3 +66,9 @@ map f (Bag n dict) =
 toList : Bag a -> List (Key, a)
 toList (Bag _ dict) = Dict.toList dict
 
+
+find : (a -> Bool) -> Bag a -> Maybe (Key, a)
+find pred (Bag _ dict) =
+    Dict.filter (always pred) dict
+    |> Dict.toList
+    |> List.head

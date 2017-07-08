@@ -15,6 +15,7 @@ import Camera exposing (Framing, Shot)
 import App exposing (..)
 import Ground exposing (Ground)
 import Math.Vector3 as V3 exposing (vec3)
+import Orientation exposing (Orientation)
 import Task
 
 type alias Attributes =
@@ -224,15 +225,41 @@ toAppMsg dispatch =
             Ctrl ctrlMsg -> Ctrl ctrlMsg
             Effect e -> Effect (toAppEffect e)
 
-toAppPosition : Location -> AppPosition
-toAppPosition location =
+toAppPosition : WorldKey () -> WorldModel model -> Location -> Maybe AppPosition
+toAppPosition (WorldKey worldKey ()) model location =
     case location of
+
         At position o ->
             case o of
                 WithOrientation orientation ->
-                    { position = position
-                    , orientation = orientation
-                    }
+                    Just
+                        { position = position
+                        , orientation = orientation
+                        }
+
+        Near appId ->
+            let
+                mTarget =
+                    Bag.get worldKey model.worlds
+                    |> Maybe.map .apps
+                    |> Maybe.andThen (Bag.find (\app -> App.id app == appId))
+                    |> Maybe.map Tuple.second
+                    |> Maybe.andThen App.framing
+                    |> Maybe.map .target
+
+                inFrontOf target =
+                    let
+                        position = V3.add target.position (V3.scale 7 (Model.direction target))
+
+                        displacement = V3.sub target.position position
+                        orientation = Orientation.fromTo V3.k displacement
+                    in
+                        { position = position
+                        , orientation = orientation
+                        }
+            in
+                Maybe.map inFrontOf mTarget
+
 
 worldUpdate :
     (msg -> model -> ( model, Cmd msg ))
@@ -261,7 +288,7 @@ worldUpdate hubUpdate msg model =
             let
                 leaveRide party =
                     { party | rideKey = Nothing
-                            , self = App.reposition (Just (toAppPosition location)) party.self
+                            , self = App.reposition (toAppPosition (WorldKey worldKey ()) model location) party.self
                     }
 
                 updateParties stuff =
