@@ -55,13 +55,6 @@ main =
                   , appear = fogMountainsDiamond
                   }
 
-              , Statue.portal (At (vec3 120 17 -261) FacingNorth)
-                  { id = "voronoi-cube"
-                  , label = "Voronoi Cube"
-                  , position = vec3 10 0 10
-                  , appear = voronoiCube
-                  }
-
               , Statue.create
                   { id = "fire-cube"
                   , label = "Fire Cube"
@@ -87,6 +80,13 @@ main =
               , Sky.create skySphere
 
               , Boids.create 100
+
+              , Statue.portal (Become "boids")
+                  { id = "voronoi-cube"
+                  , label = "Voronoi Cube"
+                  , position = vec3 10 0 10
+                  , appear = voronoiCube
+                  }
 
               , Statue.create
                   { id = "landscape-cube"

@@ -9,6 +9,7 @@ type Location
     = At Vec3 OrientationSpec
     | Facing AppId
     | Behind AppId
+    | Become AppId
 
 
 type OrientationSpec

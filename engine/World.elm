@@ -225,16 +225,24 @@ toAppMsg dispatch =
             Ctrl ctrlMsg -> Ctrl ctrlMsg
             Effect e -> Effect (toAppEffect e)
 
-toAppPosition : WorldKey () -> WorldModel model -> Location -> Maybe AppPosition
+toAppPosition : WorldKey () -> WorldModel model -> Location -> (Maybe AppKey, Maybe AppPosition)
 toAppPosition (WorldKey worldKey ()) model location =
     let
-        mTarget appId =
+        -- lookup : AppId -> (AppKey, App)
+        lookup appId =
             Bag.get worldKey model.worlds
             |> Maybe.map .apps
             |> Maybe.andThen (Bag.find (\app -> App.id app == appId))
+
+        mTarget appId =
+            lookup appId
             |> Maybe.map Tuple.second
             |> Maybe.andThen App.framing
             |> Maybe.map .target
+
+        mAppKey appId =
+            lookup appId
+            |> Maybe.map (Tuple.first >> AppKey)
 
         near d target =
             let
@@ -252,22 +260,29 @@ toAppPosition (WorldKey worldKey ()) model location =
             At position o ->
                 case o of
                     FacingNorth ->
-                        Just
+                        ( Nothing
+                        , Just
                             { position = position
                             , orientation = Orientation.initial
                             }
+                        )
 
                     WithOrientation orientation ->
-                        Just
+                        ( Nothing
+                        , Just
                             { position = position
                             , orientation = orientation
                             }
+                        )
 
             Facing appId ->
-                Maybe.map (near 7) (mTarget appId)
+                (Nothing, Maybe.map (near 7) (mTarget appId))
 
             Behind appId ->
-                Maybe.map (near -7) (mTarget appId)
+                (Nothing, Maybe.map (near -7) (mTarget appId))
+
+            Become appId ->
+                ( mAppKey appId, Nothing)
 
 
 worldUpdate :
@@ -296,9 +311,17 @@ worldUpdate hubUpdate msg model =
         HubEff (Control.RelocateParty (WorldKey worldKey ()) (PartyKey partyKey) location) ->
             let
                 leaveRide party =
-                    { party | rideKey = Nothing
-                            , self = App.reposition (toAppPosition (WorldKey worldKey ()) model location) party.self
-                    }
+                    case toAppPosition (WorldKey worldKey ()) model location of
+                        (Just rideKey, _) ->
+                            { party | rideKey = Just rideKey }
+
+                        (_, Just appPosition) ->
+                            { party | rideKey = Nothing
+                                    , self = App.reposition (Just appPosition) party.self
+                            }
+
+                        _ ->
+                            party
 
                 updateParties stuff =
                     { stuff | parties = Bag.update partyKey (Maybe.map leaveRide) stuff.parties }
