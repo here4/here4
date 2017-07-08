@@ -162,25 +162,27 @@ makeWorld ground stuff =
         { bodies = worldBodies, ground = ground }
 
 
+toWorldEffect : WorldKey () -> EffectMsg () -> EffectMsg (WorldKey ())
+toWorldEffect worldKey e =
+    case e of
+        UpdateGround () ground ->
+            UpdateGround worldKey ground
+
+        RelocateParty () partyKey location ->
+            RelocateParty worldKey partyKey location
+
+
 toWorldMsg :
     WorldKey ()
     -> DispatchHub Route (EffectMsg ()) Msg Dynamic a
     -> DispatchHub Route (EffectMsg (WorldKey ())) Msg Dynamic a
 toWorldMsg worldKey msg =
     let
-        toWorldEffect e =
-            case e of
-                UpdateGround () ground ->
-                    UpdateGround worldKey ground
-
-                RelocateParty () partyKey location ->
-                    RelocateParty worldKey partyKey location
-
         toWorldDispatch d =
             case d of
                 Self nodeMsg -> Self nodeMsg
                 Ctrl ctrlMsg -> Ctrl ctrlMsg
-                Effect e -> Effect (toWorldEffect e)
+                Effect e -> Effect (toWorldEffect worldKey e)
     in
         case msg of
             Hub hubMsg ->
@@ -190,7 +192,7 @@ toWorldMsg worldKey msg =
             Forward key ctrlMsg ->
                 Forward key ctrlMsg
             HubEff e ->
-                HubEff (toWorldEffect e)
+                HubEff (toWorldEffect worldKey e)
 
 toAppMsg : Dispatch (EffectMsg (WorldKey ())) Msg Dynamic -> AppMsg
 toAppMsg dispatch =
@@ -274,12 +276,7 @@ worldUpdate hubUpdate msg model =
                 response x =
                     case x of
                         Effect e ->
-                            case e of
-                                UpdateGround () ground ->
-                                    HubEff (UpdateGround (WorldKey worldKey ()) ground)
-
-                                RelocateParty () partyKey location ->
-                                    HubEff (RelocateParty (WorldKey worldKey ()) partyKey location)
+                            HubEff (toWorldEffect (WorldKey worldKey ()) e)
 
                         m ->
                             toWorldMsg (WorldKey worldKey ()) (Send key m)
