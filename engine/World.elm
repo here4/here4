@@ -225,8 +225,8 @@ toAppMsg dispatch =
             Ctrl ctrlMsg -> Ctrl ctrlMsg
             Effect e -> Effect (toAppEffect e)
 
-toAppPosition : WorldKey () -> WorldModel model -> Location -> (Maybe AppKey, Maybe AppPosition)
-toAppPosition (WorldKey worldKey ()) model location =
+relativeToAppPosition : WorldKey () -> WorldModel model -> Relative -> (Maybe AppKey, Maybe AppPosition)
+relativeToAppPosition (WorldKey worldKey ()) model relative =
     let
         -- lookup : AppId -> (AppKey, App)
         lookup appId =
@@ -255,7 +255,7 @@ toAppPosition (WorldKey worldKey ()) model location =
                 , orientation = orientation
                 }
     in
-        case location of
+        case relative of
 
             At position o ->
                 case o of
@@ -284,6 +284,11 @@ toAppPosition (WorldKey worldKey ()) model location =
             Become appId ->
                 ( mAppKey appId, Nothing)
 
+toAppPosition : WorldKey () -> WorldModel model -> Location -> (Maybe AppKey, Maybe AppPosition)
+toAppPosition (WorldKey worldKey ()) model location =
+    case location of
+        Local relative ->
+            relativeToAppPosition (WorldKey worldKey ()) model relative
 
 worldUpdate :
     (msg -> model -> ( model, Cmd msg ))

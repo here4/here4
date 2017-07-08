@@ -81,7 +81,7 @@ main =
 
               , Boids.create 100
 
-              , Statue.portal (Become "boids")
+              , Statue.portal (Local (Become "boids"))
                   { id = "voronoi-cube"
                   , label = "Voronoi Cube"
                   , position = vec3 10 0 10
@@ -103,7 +103,7 @@ main =
                             , position = vec3 53 0 18
                         }
 
-              , Statue.portal (Behind "shufflepuck")
+              , Statue.portal (Local (Behind "shufflepuck"))
                   { id = "sky-diamond"
                   , label = "Sky Diamond"
                   , position = vec3 5 1.5 1
