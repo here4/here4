@@ -56,6 +56,17 @@ layoutScene windowSize methods model =
             |> Maybe.andThen (\worldKey -> methods.view worldKey model.worldModel)
             |> Maybe.map (renderWorld model.globalTime)
 
+        worldLabel player =
+            Maybe.map toUnit player.partyKey
+            |> Maybe.andThen (\worldKey -> methods.worldLabel worldKey model.worldModel)
+            |> Maybe.withDefault "(Nowhere)"
+
+        worldLabel1 =
+            worldLabel model.player1
+
+        worldLabel2 =
+            worldLabel model.player2
+
         mRender1 =
             mRender model.player1
 
@@ -71,11 +82,13 @@ layoutScene windowSize methods model =
         else if model.numPlayers == 2 then
             case (mRender1, mRender2) of
                 (Just render1, Just render2) ->
-                    layoutScene2 windowSize model render1 render2
+                    layoutScene2 windowSize model
+                        worldLabel1 render1
+                        worldLabel2 render2
                 _ ->
                     loading windowSize
         else
-            orLoading (layoutScene1 windowSize model) mRender1
+            orLoading (layoutScene1 windowSize model worldLabel1) mRender1
 
 
 loading : Window.Size -> Html (Msg worldMsg)
@@ -94,8 +107,8 @@ loading windowSize =
 type alias RenderWorld msg =
     Model.Eye -> Window.Size -> Model.Player msg -> List WebGL.Entity
 
-layoutScene1 : Window.Size -> Model worldModel worldMsg -> RenderWorld worldMsg -> Html (Msg worldMsg)
-layoutScene1 windowSize model render =
+layoutScene1 : Window.Size -> Model worldModel worldMsg -> String -> RenderWorld worldMsg -> Html (Msg worldMsg)
+layoutScene1 windowSize model worldLabel render =
     div
         [ style
             [ ( "width", toString windowSize.width ++ "px" )
@@ -115,12 +128,12 @@ layoutScene1 windowSize model render =
                 ]
             ]
             (render Model.OneEye windowSize model.player1)
-        , hud model.paused model.player1 0 0 (windowSize.width//10) (windowSize.height//10)
+        , hud worldLabel model.paused model.player1 0 0 (windowSize.width//10) (windowSize.height//10)
         ]
 
 
-layoutScene2 : Window.Size -> Model worldModel worldMsg -> RenderWorld worldMsg -> RenderWorld worldMsg -> Html (Msg worldMsg)
-layoutScene2 windowSize model render1 render2 =
+layoutScene2 : Window.Size -> Model worldModel worldMsg -> String -> RenderWorld worldMsg -> String -> RenderWorld worldMsg -> Html (Msg worldMsg)
+layoutScene2 windowSize model worldLabel1 render1 worldLabel2 render2 =
     let
         w2 =
             windowSize.width // 2
@@ -152,7 +165,7 @@ layoutScene2 windowSize model render1 render2 =
                             ]
                         ]
                         (render1 Model.OneEye ws2 model.player1)
-                    , hud model.paused model.player1 0 w2 (windowSize.width//20) (windowSize.height//10)
+                    , hud worldLabel1 model.paused model.player1 0 w2 (windowSize.width//20) (windowSize.height//10)
                     ]
                 , div []
                     [ WebGL.toHtml
@@ -170,7 +183,7 @@ layoutScene2 windowSize model render1 render2 =
                             ]
                         ]
                         (render2 Model.OneEye ws2 model.player2)
-                    , hud model.paused model.player2 w2 0 (windowSize.width//20) (windowSize.height//10)
+                    , hud worldLabel2 model.paused model.player2 w2 0 (windowSize.width//20) (windowSize.height//10)
                     ]
                 ]
             ]
@@ -337,16 +350,12 @@ lookAtSky { width, height } player =
         (cameraUp player.camera)
 
 
-hud : Bool -> Model.Player worldMsg -> Int -> Int -> Int -> Int -> Html (Msg worldMsg)
-hud paused player left right helpHMargin helpVMargin =
+hud : String -> Bool -> Model.Player worldMsg -> Int -> Int -> Int -> Int -> Html (Msg worldMsg)
+hud worldLabel paused player left right helpHMargin helpVMargin =
     let
         shotLabel = Maybe.map .label player.shot
                     |> Maybe.withDefault ""
         pausedLabel = if paused then " (Paused)" else ""
-        worldLabel =
-            player.partyKey
-            |> Maybe.map ( (\(WorldKey n _) -> n) >> toString >> \s -> "World " ++ s ++ " ")
-            |> Maybe.withDefault "(Nowhere) "
 
         showOverlay =
             if player.overlayVisible then
@@ -374,11 +383,15 @@ hud paused player left right helpHMargin helpVMargin =
             ]
             [ span []
                 [ Html.text worldLabel
+                , Html.text " "
+                , FontAwesome.globe white 20
+                , Html.text " "
                 , Html.text player.rideLabel
                 , Html.text " "
                 , FontAwesome.diamond white 20
                 , Html.text " "
                 , Html.text shotLabel
+                , Html.text " Camera"
                 , Html.text pausedLabel
                 ]
             ]
