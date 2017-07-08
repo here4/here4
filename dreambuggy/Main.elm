@@ -103,7 +103,7 @@ main =
                             , position = vec3 53 0 18
                         }
 
-              , Statue.portal (Near "shufflepuck")
+              , Statue.portal (Behind "shufflepuck")
                   { id = "sky-diamond"
                   , label = "Sky Diamond"
                   , position = vec3 5 1.5 1

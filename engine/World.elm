@@ -227,44 +227,47 @@ toAppMsg dispatch =
 
 toAppPosition : WorldKey () -> WorldModel model -> Location -> Maybe AppPosition
 toAppPosition (WorldKey worldKey ()) model location =
-    case location of
+    let
+        mTarget appId =
+            Bag.get worldKey model.worlds
+            |> Maybe.map .apps
+            |> Maybe.andThen (Bag.find (\app -> App.id app == appId))
+            |> Maybe.map Tuple.second
+            |> Maybe.andThen App.framing
+            |> Maybe.map .target
 
-        At position o ->
-            case o of
-                FacingNorth ->
-                    Just
-                        { position = position
-                        , orientation = Orientation.initial
-                        }
-
-                WithOrientation orientation ->
-                    Just
-                        { position = position
-                        , orientation = orientation
-                        }
-
-        Near appId ->
+        near d target =
             let
-                mTarget =
-                    Bag.get worldKey model.worlds
-                    |> Maybe.map .apps
-                    |> Maybe.andThen (Bag.find (\app -> App.id app == appId))
-                    |> Maybe.map Tuple.second
-                    |> Maybe.andThen App.framing
-                    |> Maybe.map .target
+                position = V3.add target.position (V3.scale d (Model.direction target))
 
-                inFrontOf target =
-                    let
-                        position = V3.add target.position (V3.scale 7 (Model.direction target))
-
-                        displacement = V3.sub target.position position
-                        orientation = Orientation.fromTo V3.k displacement
-                    in
-                        { position = position
-                        , orientation = orientation
-                        }
+                displacement = V3.sub target.position position
+                orientation = Orientation.fromTo V3.k displacement
             in
-                Maybe.map inFrontOf mTarget
+                { position = position
+                , orientation = orientation
+                }
+    in
+        case location of
+
+            At position o ->
+                case o of
+                    FacingNorth ->
+                        Just
+                            { position = position
+                            , orientation = Orientation.initial
+                            }
+
+                    WithOrientation orientation ->
+                        Just
+                            { position = position
+                            , orientation = orientation
+                            }
+
+            Facing appId ->
+                Maybe.map (near 7) (mTarget appId)
+
+            Behind appId ->
+                Maybe.map (near -7) (mTarget appId)
 
 
 worldUpdate :
