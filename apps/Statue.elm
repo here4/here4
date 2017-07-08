@@ -17,12 +17,14 @@ import Location exposing (..)
 import Orientation
 import Camera.DollyArc as Camera
 
+
 type alias Attributes =
     { id : String
     , label : String
     , position : Vec3
     , appear : Appearance
     }
+
 
 type alias Model =
     { label : String
@@ -36,10 +38,14 @@ type alias Msg =
 
 
 create : Attributes -> ( App, Cmd AppMsg )
-create = createHelp Nothing
+create =
+    createHelp Nothing
+
 
 portal : Location -> Attributes -> ( App, Cmd AppMsg )
-portal location = createHelp (Just location)
+portal location =
+    createHelp (Just location)
+
 
 createHelp : Maybe Location -> Attributes -> ( App, Cmd AppMsg )
 createHelp destination attributes =
@@ -80,6 +86,7 @@ update msg model =
             case model.destination of
                 Just dest ->
                     ( model, Task.succeed dest |> Task.perform (Effect << RelocateParty () partyKey) )
+
                 Nothing ->
                     ( model, Cmd.none )
 
@@ -93,8 +100,11 @@ update msg model =
 animate : Ground -> Time -> Model -> Model
 animate ground dt model =
     let
-        setElevation pos = V3.setY (1.8 + ground.elevation pos) pos
-        onGround body = { body | position = setElevation body.position }
+        setElevation pos =
+            V3.setY (1.8 + ground.elevation pos) pos
+
+        onGround body =
+            { body | position = setElevation body.position }
     in
         { model | body = onGround model.body }
 
@@ -103,21 +113,26 @@ bodies : Model -> List Body
 bodies model =
     [ toBody model.body ]
 
+
 reposition : Maybe AppPosition -> Model -> Model
 reposition mPos model =
     let
-        setPos pos x = { x | position = pos.position, orientation = pos.orientation }
+        setPos pos x =
+            { x | position = pos.position, orientation = pos.orientation }
 
         behind pos =
             let
-                dir = Orientation.rotateLabV pos.orientation V3.k
+                dir =
+                    Orientation.rotateLabV pos.orientation V3.k
             in
                 { pos | position = V3.sub pos.position dir }
     in
         case mPos of
             Just pos ->
-                { model | body = setPos pos model.body
+                { model
+                    | body = setPos pos model.body
                 }
+
             Nothing ->
                 model
 
@@ -130,6 +145,7 @@ framing model =
 focus : Model -> Maybe Focus
 focus model =
     Just (appToFocus model.body)
+
 
 overlay : Model -> Html msg
 overlay model =

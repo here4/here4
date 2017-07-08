@@ -28,7 +28,6 @@ gamepadToArrows gamepad =
 
                 deadzone =
                     u 0.2
-
             in
                 { x = deadzone g.rightStick.x
                 , y = deadzone (-1.0 * g.rightStick.y)
@@ -41,7 +40,12 @@ gamepadToArrows gamepad =
                 }
 
         RawGamepad g ->
-            { x = 0, y = 0, mx = 0, my = 0, cx = 0, cy = 0
+            { x = 0
+            , y = 0
+            , mx = 0
+            , my = 0
+            , cx = 0
+            , cy = 0
             , rightTrigger = 0
             , leftTrigger = 0
             }

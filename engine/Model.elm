@@ -14,13 +14,22 @@ import Camera.Util exposing (toCamera)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 
-type WorldKey a = WorldKey Bag.Key a
 
-type AppKey = AppKey Bag.Key
+type WorldKey a
+    = WorldKey Bag.Key a
 
-type PartyKey = PartyKey Bag.Key
 
-type PlayerKey = PlayerKey Bag.Key
+type AppKey
+    = AppKey Bag.Key
+
+
+type PartyKey
+    = PartyKey Bag.Key
+
+
+type PlayerKey
+    = PlayerKey Bag.Key
+
 
 type Msg worldMsg
     = KeyChange (Keys -> Keys)
@@ -35,8 +44,10 @@ type Msg worldMsg
     | WorldMessage worldMsg
     | WorldEffect GlobalMsg
 
+
 type GlobalMsg
     = PlayerUpdate (WorldKey PartyKey) (WorldKey PartyKey)
+
 
 type alias World =
     { bodies : List Body
@@ -50,6 +61,7 @@ type alias Motion =
     , orientation : Orientation
     }
 
+
 type alias Player msg =
     { partyKey : Maybe (WorldKey PartyKey)
     , rideLabel : String
@@ -60,6 +72,7 @@ type alias Player msg =
     , overlayVisible : Bool
     , overlayContent : Html msg
     }
+
 
 type Eye
     = OneEye
@@ -83,11 +96,14 @@ defaultMotion =
     , orientation = Orientation.initial
     }
 
+
 defaultCamera : Camera
-defaultCamera = toCamera
-    { position = vec3 0 eyeLevel 0
-    , orientation = Orientation.initial
-    }
+defaultCamera =
+    toCamera
+        { position = vec3 0 eyeLevel 0
+        , orientation = Orientation.initial
+        }
+
 
 defaultPlayer : Player msg
 defaultPlayer =
@@ -126,6 +142,7 @@ type alias Keys =
     , kComma : Bool
     , kPeriod : Bool
     }
+
 
 noKeys : Keys
 noKeys =
@@ -243,7 +260,9 @@ init worldInit { movement, isLocked } =
     let
         ( worldModel, worldCmdMsg ) =
             worldInit
-        playerJoin = Task.succeed >> Task.perform (JoinWorld (WorldKey 1 ()))
+
+        playerJoin =
+            Task.succeed >> Task.perform (JoinWorld (WorldKey 1 ()))
     in
         ( { numPlayers = 1
           , player1 = defaultPlayer
@@ -264,6 +283,7 @@ init worldInit { movement, isLocked } =
             [ Window.size |> Task.perform Resize
             , gamepads GamepadUpdate
             , playerJoin (PlayerKey 0)
+
             -- , playerJoin (PlayerKey 1)
             , Cmd.map WorldMessage worldCmdMsg
             ]
@@ -278,5 +298,3 @@ orient motion =
 direction : Oriented a -> Vec3
 direction motion =
     Orientation.rotateBodyV motion.orientation V3.k
-
-

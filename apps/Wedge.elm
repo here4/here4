@@ -89,11 +89,13 @@ bodies model =
 reposition : Maybe AppPosition -> Model -> Model
 reposition mPos model =
     let
-        setPos pos body = { body | position = pos.position, orientation = pos.orientation }
+        setPos pos body =
+            { body | position = pos.position, orientation = pos.orientation }
     in
         case mPos of
             Just pos ->
                 { model | body = setPos pos model.body }
+
             Nothing ->
                 model
 
@@ -101,13 +103,19 @@ reposition mPos model =
 framing : Model -> Maybe Framing
 framing model =
     let
-        framing = Camera.framing model.body
-        pov0 = framing.pov
+        framing =
+            Camera.framing model.body
+
+        pov0 =
+            framing.pov
+
         position =
-            V3.add model.body.position
-            <| V3.scale 1.0
-               (Orientation.rotateLabV model.body.orientation V3.k)
-        pov = { pov0 | position = position }
+            V3.add model.body.position <|
+                V3.scale 1.0
+                    (Orientation.rotateLabV model.body.orientation V3.k)
+
+        pov =
+            { pov0 | position = position }
     in
         Just { framing | pov = pov }
 
@@ -116,11 +124,12 @@ focus : Model -> Maybe Focus
 focus model =
     Just (appToFocus model.body)
 
+
 overlay : Model -> Html msg
 overlay _ =
     Html.div []
         [ Html.h2 []
-              [ Html.text "Delta Wedge" ]
+            [ Html.text "Delta Wedge" ]
         , Html.text "A manoueverable delta wing with solid plasma anti-gravity thrusters and zero-friction flight surfaces."
         , Html.br [] []
         , Html.hr [] []

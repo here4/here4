@@ -66,6 +66,7 @@ appearCylinder vertexShader fragmentShader p =
             }
         ]
 
+
 textureCylinder : WebGL.Texture -> Appearance
 textureCylinder texture p =
     let
@@ -173,14 +174,15 @@ cylinderMesh =
         white =
             vec3 1 1 1
 
-        yOffset = 0.5
+        yOffset =
+            0.5
 
         -- Vertices
         top0 =
             { pos = vec3 0 0.5 0, color = white, coord = vec3 0 (0.0 - yOffset) 0 }
 
         topV =
-            { pos = vec3 1 0.5 0, color = white, coord = vec3 0 (1.0- yOffset) 0 }
+            { pos = vec3 1 0.5 0, color = white, coord = vec3 0 (1.0 - yOffset) 0 }
 
         ( topVS0, topVS1 ) =
             circlePair topV
@@ -189,7 +191,7 @@ cylinderMesh =
             { pos = vec3 0 -0.5 0, color = white, coord = vec3 0 (0.0 - yOffset) 0 }
 
         bottomV =
-            { pos = vec3 1 -0.5 0, color = white, coord = vec3 0 (1.0- yOffset) 0 }
+            { pos = vec3 1 -0.5 0, color = white, coord = vec3 0 (1.0 - yOffset) 0 }
 
         ( bottomVS0, bottomVS1 ) =
             circlePair bottomV
@@ -212,7 +214,9 @@ cylinderMesh =
 
         sideR =
             zip3 bottomVS0 topVS1 bottomVS1
-
     in
         triangles <|
-            top ++ bottom ++ sideL ++ sideR 
+            top
+                ++ bottom
+                ++ sideL
+                ++ sideR

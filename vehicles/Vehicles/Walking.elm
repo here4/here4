@@ -11,11 +11,12 @@ import Orientation exposing (..)
 import Body exposing (..)
 import Model
 import Ground exposing (Ground)
-
 import Debug
+
 
 ----------------------------------------------------------------------
 -- DreamBuggy
+
 
 type alias Attributes =
     { speed : Float
@@ -45,13 +46,14 @@ move attributes terrain eyeLevel inputs motion =
 turn : Model.EyeLevel -> Float -> Float -> Float -> Moving a -> Moving a
 turn eyeLevel speed dx dt motion =
     let
-        steer = 0.1 * speed * dx * dt
+        steer =
+            0.1 * speed * dx * dt
 
         orientation =
             motion.orientation
-            |> rollUpright
-            |> pitchUpright
-            |> followedBy (fromAngleAxis steer V3.j)
+                |> rollUpright
+                |> pitchUpright
+                |> followedBy (fromAngleAxis steer V3.j)
     in
         { motion | orientation = orientation }
 
@@ -61,7 +63,9 @@ goForward eyeLevel speed inputs motion =
     let
         accel =
             clamp -1.0 1.0 <|
-            inputs.y + inputs.rightTrigger - inputs.leftTrigger
+                inputs.y
+                    + inputs.rightTrigger
+                    - inputs.leftTrigger
 
         move =
             V3.scale (speed * accel) V3.k
@@ -97,7 +101,7 @@ goForward eyeLevel speed inputs motion =
             else
                 20
     in
-        { motion | velocity = adjustVelocity maxSpeed (8.0*friction) (add move strafe) inputs.dt motion.velocity }
+        { motion | velocity = adjustVelocity maxSpeed (8.0 * friction) (add move strafe) inputs.dt motion.velocity }
 
 
 adjustVelocity : Float -> Float -> Vec3 -> Float -> Vec3 -> Vec3
@@ -175,6 +179,7 @@ overlay =
                 , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
                 , ( "z-index", "1" )
                 ]
+
         textLeft =
             Html.style [ ( "text-align", "left" ) ]
 
@@ -211,10 +216,10 @@ overlay =
                         [ Html.th [ textLeft ] [ Html.text "Accelerate / Brake" ]
                         , Html.td [] [ Html.text "W, S" ]
                         , Html.td []
-                              [ Html.text "Right,left triggers"
-                              , Html.br [] []
-                              , Html.text "Right stick up, down"
-                              ]
+                            [ Html.text "Right,left triggers"
+                            , Html.br [] []
+                            , Html.text "Right stick up, down"
+                            ]
                         ]
                     , Html.tr []
                         [ Html.th [ textLeft ] [ Html.text "Steer left, right" ]

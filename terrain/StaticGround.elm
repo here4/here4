@@ -70,5 +70,7 @@ bodies : Model -> List Body
 bodies =
     identity
 
+
 overlay : Model -> Html msg
-overlay _ = Html.text "Generated terrain"
+overlay _ =
+    Html.text "Generated terrain"

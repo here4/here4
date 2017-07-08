@@ -83,7 +83,8 @@ bodies =
 
 
 reposition : Maybe AppPosition -> Boids -> Boids
-reposition _ = identity
+reposition _ =
+    identity
 
 
 framing : Boids -> Maybe Framing
@@ -94,6 +95,7 @@ framing boids =
 focus : Boids -> Maybe Focus
 focus boids =
     Maybe.map orientedToFocus (List.head boids)
+
 
 overlay : Boids -> Html msg
 overlay _ =
@@ -113,9 +115,10 @@ overlay _ =
                 ]
                 [ Html.p
                     [ textLeft ]
-                    [ Html.text (
-                          "The algorithm models the behavior of flocking animals (eg. birds) " ++
-                          "by simple rules which describe only the behavior of individuals.")
+                    [ Html.text
+                        ("The algorithm models the behavior of flocking animals (eg. birds) "
+                            ++ "by simple rules which describe only the behavior of individuals."
+                        )
                     ]
                 , Html.p
                     [ textLeft ]
@@ -140,22 +143,22 @@ overlay _ =
                 , Html.p
                     [ textLeft ]
                     [ Html.text
-                          "If you would like to learn more about how these rules are implemented see "
+                        "If you would like to learn more about how these rules are implemented see "
                     , Html.a
-                          [ Html.href "http://www.kfish.org/boids/pseudocode.html"
-                          , Html.target "_blank"
-                          ]
-                          [ Html.text "Conrad Parker's boids pseudocode." ]
+                        [ Html.href "http://www.kfish.org/boids/pseudocode.html"
+                        , Html.target "_blank"
+                        ]
+                        [ Html.text "Conrad Parker's boids pseudocode." ]
                     ]
                 , Html.p
                     [ textLeft ]
                     [ Html.text
-                          "For a full explanation and an informative history see "
+                        "For a full explanation and an informative history see "
                     , Html.a
-                          [ Html.href "http://www.red3d.com/cwr/boids/"
-                          , Html.target "_blank"
-                          ]
-                          [ Html.text "Craig Reynolds' boids page." ]
+                        [ Html.href "http://www.red3d.com/cwr/boids/"
+                        , Html.target "_blank"
+                        ]
+                        [ Html.text "Craig Reynolds' boids page." ]
                     ]
                 ]
             , Html.p

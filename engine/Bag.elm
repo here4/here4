@@ -15,9 +15,11 @@ size : Bag v -> Int
 size (Bag _ dict) =
     Dict.size dict
 
+
 maxKey : Bag v -> Int
 maxKey (Bag n _) =
     n
+
 
 empty : Bag v
 empty =
@@ -33,8 +35,12 @@ remove : Key -> Bag v -> Bag v
 remove key (Bag n dict) =
     Bag n (Dict.remove key dict)
 
+
+
 -- If you do Bag.replace with a key that you didn't get from an insert, then you might lose this
 -- item on a subsequent insert
+
+
 replace : Key -> v -> Bag v -> Bag v
 replace key v (Bag n dict) =
     Bag n (Dict.insert key v dict)
@@ -43,6 +49,7 @@ replace key v (Bag n dict) =
 update : Key -> (Maybe v -> Maybe v) -> Bag v -> Bag v
 update key f (Bag n dict) =
     Bag n (Dict.update key f dict)
+
 
 get : Key -> Bag v -> Maybe v
 get key (Bag _ dict) =
@@ -63,12 +70,14 @@ map : (a -> b) -> Bag a -> Bag b
 map f (Bag n dict) =
     Bag n (Dict.map (\_ -> f) dict)
 
-toList : Bag a -> List (Key, a)
-toList (Bag _ dict) = Dict.toList dict
+
+toList : Bag a -> List ( Key, a )
+toList (Bag _ dict) =
+    Dict.toList dict
 
 
-find : (a -> Bool) -> Bag a -> Maybe (Key, a)
+find : (a -> Bool) -> Bag a -> Maybe ( Key, a )
 find pred (Bag _ dict) =
     Dict.filter (always pred) dict
-    |> Dict.toList
-    |> List.head
+        |> Dict.toList
+        |> List.head

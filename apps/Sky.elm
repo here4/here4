@@ -59,5 +59,7 @@ bodies : Model -> List Body
 bodies body =
     [ body ]
 
+
 overlay : Model -> Html msg
-overlay _ = Html.text "A clear blue sky"
+overlay _ =
+    Html.text "A clear blue sky"

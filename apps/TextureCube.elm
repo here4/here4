@@ -20,8 +20,9 @@ import Vehicles.DreamBuggy as DreamBuggy
 
 
 type alias Model =
-    Maybe { body : Moving Body
-          }
+    Maybe
+        { body : Moving Body
+        }
 
 
 type Msg
@@ -56,38 +57,40 @@ update :
     -> Model
     -> ( Model, Cmd (CtrlMsg Msg) )
 update msg model =
-    let mapBody f =
-            Maybe.map (\m -> { m | body = f m.body } ) model
+    let
+        mapBody f =
+            Maybe.map (\m -> { m | body = f m.body }) model
     in
-    case msg of
-        Self (TextureLoaded textureResult) ->
-            case textureResult of
-                Ok texture ->
-                    let
-                        body =
-                            { anchor = AnchorGround
-                            , scale = vec3 1 1 1
-                            , position = vec3 -2 0 -17
-                            , orientation = Orientation.initial
-                            , appear = textureCube texture
-                            , velocity = vec3 0 0 0
-                            }
-                    in
-                        ( Just { body = body }, Cmd.none )
+        case msg of
+            Self (TextureLoaded textureResult) ->
+                case textureResult of
+                    Ok texture ->
+                        let
+                            body =
+                                { anchor = AnchorGround
+                                , scale = vec3 1 1 1
+                                , position = vec3 -2 0 -17
+                                , orientation = Orientation.initial
+                                , appear = textureCube texture
+                                , velocity = vec3 0 0 0
+                                }
+                        in
+                            ( Just { body = body }, Cmd.none )
 
-                Err msg ->
-                    -- ( { model | message = "Error loading texture" }, Cmd.none )
-                    ( model, Cmd.none )
-        Ctrl (Control.Move dp) ->
-            -- ( mapBody (translate dp), Cmd.none)
-            ( model, Cmd.none )
+                    Err msg ->
+                        -- ( { model | message = "Error loading texture" }, Cmd.none )
+                        ( model, Cmd.none )
 
-        Ctrl (Control.Drive ground inputs) ->
-            ( mapBody (DreamBuggy.drive { speed = 8.0 } ground inputs), Cmd.none )
+            Ctrl (Control.Move dp) ->
+                -- ( mapBody (translate dp), Cmd.none)
+                ( model, Cmd.none )
+
+            Ctrl (Control.Drive ground inputs) ->
+                ( mapBody (DreamBuggy.drive { speed = 8.0 } ground inputs), Cmd.none )
+
             -- ( Maybe.map (\m -> { m | body = DreamBuggy.drive ground 8.0 inputs) m.body } model, Cmd.none )
-
-        _ ->
-            ( model, Cmd.none )
+            _ ->
+                ( model, Cmd.none )
 
 
 animate : ground -> Time -> Model -> Model
@@ -107,13 +110,17 @@ bodies model_ =
 
 reposition : Maybe AppPosition -> Model -> Model
 reposition mPos model =
-    let mapBody f =
-            Maybe.map (\m -> { m | body = f m.body } ) model
-        setPos pos body = { body | position = pos.position, orientation = pos.orientation }
+    let
+        mapBody f =
+            Maybe.map (\m -> { m | body = f m.body }) model
+
+        setPos pos body =
+            { body | position = pos.position, orientation = pos.orientation }
     in
         case mPos of
             Just pos ->
                 mapBody (setPos pos)
+
             Nothing ->
                 model
 
@@ -126,17 +133,18 @@ framing model_ =
 
         Nothing ->
             Nothing
-    
+
 
 focus : Model -> Maybe Focus
 focus model =
     Maybe.map (.body >> appToFocus) model
 
+
 overlay : Model -> Html msg
 overlay _ =
     Html.div []
         [ Html.h2 []
-              [ Html.text "A wooden box" ]
+            [ Html.text "A wooden box" ]
         , Html.text "This highly attractive wooden box doubles as a secret vehicle."
         , Html.br [] []
         , Html.hr [] []

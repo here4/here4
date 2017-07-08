@@ -119,7 +119,7 @@ rotatedFace ( angleX, angleY, coordX ) =
 
         t =
             M4.transform (mul x (mul y (makeTranslate (vec3 0 0 0.5))))
-            >> add (vec3 0 0.5 0)
+                >> add (vec3 0 0.5 0)
 
         each f ( a, b, c ) =
             ( f a, f b, f c )

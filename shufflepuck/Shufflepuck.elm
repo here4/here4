@@ -99,33 +99,42 @@ type alias Model =
     , robotPaddle2 : RobotPaddle
     }
 
+
 type alias RobotPaddle =
     { elapsedTime : Time
     }
+
 
 initRobotPaddle : RobotPaddle
 initRobotPaddle =
     { elapsedTime = 0
     }
 
+
 updateRobotPaddle : Time -> RobotPaddle -> RobotPaddle
 updateRobotPaddle dt rp =
     { elapsedTime = rp.elapsedTime + dt }
 
+
 applyRobotPaddle : RobotPaddle -> Moving a -> Massive (Spherical (Moving Body)) -> Massive (Spherical (Moving Body))
 applyRobotPaddle robot puck paddle =
     let
-        t = robot.elapsedTime
+        t =
+            robot.elapsedTime
 
         toPuck =
             V3.sub puck.position paddle.position
-            |> V3.normalize
-            |> V3.scale 0.2
+                |> V3.normalize
+                |> V3.scale 0.2
 
-        dx = 0.1 * cos (20 * t) + 0.3 * sin (5.0 * t)
-        dy = 0.2 * sin (15 * t) + 0.15 * cos (10.0 * t)
+        dx =
+            0.1 * cos (20 * t) + 0.3 * sin (5.0 * t)
+
+        dy =
+            0.2 * sin (15 * t) + 0.15 * cos (10.0 * t)
     in
         { paddle | velocity = V3.add toPuck (vec3 dx 0 dy) }
+
 
 type Msg
     = TableTextureLoaded (Result Error Texture)
@@ -153,15 +162,24 @@ label model =
     model.attributes.label ++ " (" ++ toString model.score1 ++ " - " ++ toString model.score2 ++ ")"
 
 
+
 -- | TODO: Handle orientation
+
+
 reposition : Maybe AppPosition -> Model -> Model
 reposition mPos model =
     case mPos of
-        Just pos -> setPosition pos.position model
-        Nothing -> model
+        Just pos ->
+            setPosition pos.position model
+
+        Nothing ->
+            model
+
 
 
 -- | Move the entire table, maintaining the relative positions of the paddles and puck
+
+
 setPosition : Vec3 -> Model -> Model
 setPosition pos0 model =
     let
@@ -431,7 +449,7 @@ collide dt model =
 
         recenter offset p =
             { p
-                | position = V3.add (vec3 0 a.puckHover (offset * a.tableLength/2.0)) a.position
+                | position = V3.add (vec3 0 a.puckHover (offset * a.tableLength / 2.0)) a.position
                 , velocity = vec3 0 0 0
             }
 
@@ -514,12 +532,17 @@ animate ground dt model =
         setElevation pos =
             V3.setY (model.attributes.tableHeight + ground.elevation pos) pos
 
-        robot = updateRobotPaddle dt model.robotPaddle2
-        paddle2 = applyRobotPaddle robot model.puck model.paddle2
+        robot =
+            updateRobotPaddle dt model.robotPaddle2
 
-        newModel = { model | paddle2 = paddle2
-                           , robotPaddle2 = robot
-                   }
+        paddle2 =
+            applyRobotPaddle robot model.puck model.paddle2
+
+        newModel =
+            { model
+                | paddle2 = paddle2
+                , robotPaddle2 = robot
+            }
     in
         setPosition (setElevation model.attributes.position) (collide dt newModel)
 
@@ -540,26 +563,31 @@ framing model =
 
         povTargetPos =
             V3.add model.table.position <|
-            V3.scale (0.3 * V3.dot (V3.sub model.puck.position model.table.position) V3.k) V3.k
+                V3.scale (0.3 * V3.dot (V3.sub model.puck.position model.table.position) V3.k) V3.k
 
-        puck = model.puck
-        povTarget = Camera.toTarget { puck | position = povTargetPos }
+        puck =
+            model.puck
 
-        pov = Camera.rollUpright <| Camera.retarget povTarget
-                { position =
-                    V3.add (vec3 0 (model.attributes.tableWidth/1.2) 0)
-                    <| V3.sub model.table.position
-                    <| V3.scale (1.8 * model.attributes.tableLength / 2.0)
-                           (Orientation.rotateLabV model.attributes.orientation V3.k)
-                , orientation = Orientation.initial
-                , target = povTarget
-                , fovy = 45
-                }
+        povTarget =
+            Camera.toTarget { puck | position = povTargetPos }
 
+        pov =
+            Camera.rollUpright <|
+                Camera.retarget povTarget
+                    { position =
+                        V3.add (vec3 0 (model.attributes.tableWidth / 1.2) 0) <|
+                            V3.sub model.table.position <|
+                                V3.scale (1.8 * model.attributes.tableLength / 2.0)
+                                    (Orientation.rotateLabV model.attributes.orientation V3.k)
+                    , orientation = Orientation.initial
+                    , target = povTarget
+                    , fovy = 45
+                    }
     in
-        Just { target = target
-             , pov = pov
-             }
+        Just
+            { target = target
+            , pov = pov
+            }
 
 
 focus : Model -> Maybe Focus

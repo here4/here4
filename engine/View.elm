@@ -49,17 +49,18 @@ layoutScene :
     -> Html (Msg (WorldMsg msg))
 layoutScene windowSize methods model =
     let
-        toUnit (WorldKey n _) = WorldKey n ()
+        toUnit (WorldKey n _) =
+            WorldKey n ()
 
         mRender player =
             Maybe.map toUnit player.partyKey
-            |> Maybe.andThen (\worldKey -> methods.view worldKey model.worldModel)
-            |> Maybe.map (renderWorld model.globalTime)
+                |> Maybe.andThen (\worldKey -> methods.view worldKey model.worldModel)
+                |> Maybe.map (renderWorld model.globalTime)
 
         worldLabel player =
             Maybe.map toUnit player.partyKey
-            |> Maybe.andThen (\worldKey -> methods.worldLabel worldKey model.worldModel)
-            |> Maybe.withDefault "(Nowhere)"
+                |> Maybe.andThen (\worldKey -> methods.worldLabel worldKey model.worldModel)
+                |> Maybe.withDefault "(Nowhere)"
 
         worldLabel1 =
             worldLabel model.player1
@@ -75,16 +76,19 @@ layoutScene windowSize methods model =
 
         orLoading f m =
             Maybe.withDefault (loading windowSize) (Maybe.map f m)
-
     in
         if model.player1.cameraVR then
             orLoading (layoutSceneVR windowSize model) mRender1
         else if model.numPlayers == 2 then
-            case (mRender1, mRender2) of
-                (Just render1, Just render2) ->
-                    layoutScene2 windowSize model
-                        worldLabel1 render1
-                        worldLabel2 render2
+            case ( mRender1, mRender2 ) of
+                ( Just render1, Just render2 ) ->
+                    layoutScene2 windowSize
+                        model
+                        worldLabel1
+                        render1
+                        worldLabel2
+                        render2
+
                 _ ->
                     loading windowSize
         else
@@ -94,18 +98,27 @@ layoutScene windowSize methods model =
 loading : Window.Size -> Html (Msg worldMsg)
 loading windowSize =
     let
-        left = 0
-        right = 0
-        helpHMargin = windowSize.width//10
-        helpVMargin = windowSize.height//10
+        left =
+            0
 
-        overlayContent = text "Loading ..."
+        right =
+            0
+
+        helpHMargin =
+            windowSize.width // 10
+
+        helpVMargin =
+            windowSize.height // 10
+
+        overlayContent =
+            text "Loading ..."
     in
         overlay left right helpHMargin helpVMargin overlayContent
 
 
 type alias RenderWorld msg =
     Model.Eye -> Window.Size -> Model.Player msg -> List WebGL.Entity
+
 
 layoutScene1 : Window.Size -> Model worldModel worldMsg -> String -> RenderWorld worldMsg -> Html (Msg worldMsg)
 layoutScene1 windowSize model worldLabel render =
@@ -128,7 +141,7 @@ layoutScene1 windowSize model worldLabel render =
                 ]
             ]
             (render Model.OneEye windowSize model.player1)
-        , hud worldLabel model.paused model.player1 0 0 (windowSize.width//10) (windowSize.height//10)
+        , hud worldLabel model.paused model.player1 0 0 (windowSize.width // 10) (windowSize.height // 10)
         ]
 
 
@@ -165,7 +178,7 @@ layoutScene2 windowSize model worldLabel1 render1 worldLabel2 render2 =
                             ]
                         ]
                         (render1 Model.OneEye ws2 model.player1)
-                    , hud worldLabel1 model.paused model.player1 0 w2 (windowSize.width//20) (windowSize.height//10)
+                    , hud worldLabel1 model.paused model.player1 0 w2 (windowSize.width // 20) (windowSize.height // 10)
                     ]
                 , div []
                     [ WebGL.toHtml
@@ -183,7 +196,7 @@ layoutScene2 windowSize model worldLabel1 render1 worldLabel2 render2 =
                             ]
                         ]
                         (render2 Model.OneEye ws2 model.player2)
-                    , hud worldLabel2 model.paused model.player2 w2 0 (windowSize.width//20) (windowSize.height//10)
+                    , hud worldLabel2 model.paused model.player2 w2 0 (windowSize.width // 20) (windowSize.height // 10)
                     ]
                 ]
             ]
@@ -336,6 +349,7 @@ perspective : Window.Size -> Model.Player msg -> Mat4
 perspective { width, height } player =
     M4.makePerspective player.camera.fovy (toFloat width / toFloat height) 0.01 1000
 
+
 lookAtBody : Window.Size -> Model.Player msg -> Model.Eye -> Mat4
 lookAtBody { width, height } player eye =
     M4.makeLookAt (add player.camera.position (eyeOffset eye player.camera))
@@ -353,9 +367,15 @@ lookAtSky { width, height } player =
 hud : String -> Bool -> Model.Player worldMsg -> Int -> Int -> Int -> Int -> Html (Msg worldMsg)
 hud worldLabel paused player left right helpHMargin helpVMargin =
     let
-        shotLabel = Maybe.map .label player.shot
-                    |> Maybe.withDefault ""
-        pausedLabel = if paused then " (Paused)" else ""
+        shotLabel =
+            Maybe.map .label player.shot
+                |> Maybe.withDefault ""
+
+        pausedLabel =
+            if paused then
+                " (Paused)"
+            else
+                ""
 
         showOverlay =
             if player.overlayVisible then
@@ -363,65 +383,64 @@ hud worldLabel paused player left right helpHMargin helpVMargin =
             else
                 Html.text ""
     in
-        div [] [
-          div
-            [ style
-                [ ( "position", "absolute" )
-                , ( "font-family", "Verdana, Geneva, sans-serif" )
-                , ( "text-align", "center" )
-                , ( "left", toString left ++ "px" )
-                , ( "right", toString right ++ "px" )
-                , ( "top", "0px" )
-                , ( "border", "0px" )
-                , ( "padding", "0px" )
-                , ( "background-color", "rgba(0,0,0,0.5)" )
-                , ( "color", "#fff" )
-                , ( "font-size", "xx-large" )
-                , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
-                , ( "z-index", "1" )
+        div []
+            [ div
+                [ style
+                    [ ( "position", "absolute" )
+                    , ( "font-family", "Verdana, Geneva, sans-serif" )
+                    , ( "text-align", "center" )
+                    , ( "left", toString left ++ "px" )
+                    , ( "right", toString right ++ "px" )
+                    , ( "top", "0px" )
+                    , ( "border", "0px" )
+                    , ( "padding", "0px" )
+                    , ( "background-color", "rgba(0,0,0,0.5)" )
+                    , ( "color", "#fff" )
+                    , ( "font-size", "xx-large" )
+                    , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
+                    , ( "z-index", "1" )
+                    ]
                 ]
-            ]
-            [ span []
-                [ Html.text worldLabel
-                , Html.text " "
-                , FontAwesome.globe white 20
-                , Html.text " "
-                , Html.text player.rideLabel
-                , Html.text " "
-                , FontAwesome.diamond white 20
-                , Html.text " "
-                , Html.text shotLabel
-                , Html.text " Camera"
-                , Html.text pausedLabel
+                [ span []
+                    [ Html.text worldLabel
+                    , Html.text " "
+                    , FontAwesome.globe white 20
+                    , Html.text " "
+                    , Html.text player.rideLabel
+                    , Html.text " "
+                    , FontAwesome.diamond white 20
+                    , Html.text " "
+                    , Html.text shotLabel
+                    , Html.text " Camera"
+                    , Html.text pausedLabel
+                    ]
                 ]
+            , showOverlay
             ]
-          ,
-          showOverlay
-        ]
+
 
 overlay : Int -> Int -> Int -> Int -> Html worldMsg -> Html (Msg worldMsg)
 overlay left right hMargin vMargin content =
-        div
-            [ style
-                [ ( "position", "absolute" )
-                , ( "font-family", "Verdana, Geneva, sans-serif" )
-                , ( "text-align", "center" )
-                , ( "left", toString (left + hMargin) ++ "px" )
-                , ( "right", toString (right + hMargin) ++ "px" )
-                , ( "top", toString vMargin ++ "px" )
-                , ( "bottom", toString vMargin ++ "px" )
-                , ( "border", "0px" )
-                , ( "padding", "0px" )
-                , ( "background-color", "rgba(0,0,0,0.5)" )
-                , ( "color", "#fff" )
-                , ( "font-size", "xx-large" )
-                , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
-                , ( "z-index", "1" )
-                ]
+    div
+        [ style
+            [ ( "position", "absolute" )
+            , ( "font-family", "Verdana, Geneva, sans-serif" )
+            , ( "text-align", "center" )
+            , ( "left", toString (left + hMargin) ++ "px" )
+            , ( "right", toString (right + hMargin) ++ "px" )
+            , ( "top", toString vMargin ++ "px" )
+            , ( "bottom", toString vMargin ++ "px" )
+            , ( "border", "0px" )
+            , ( "padding", "0px" )
+            , ( "background-color", "rgba(0,0,0,0.5)" )
+            , ( "color", "#fff" )
+            , ( "font-size", "xx-large" )
+            , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
+            , ( "z-index", "1" )
             ]
-            [ Html.map WorldMessage content
-            ]
-
+        ]
+        [ Html.map WorldMessage content
+        ]
 
 
 enterMsg : List (Html Msg)

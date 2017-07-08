@@ -3,8 +3,14 @@ module Location exposing (..)
 import Math.Vector3 exposing (Vec3)
 import Orientation exposing (Orientation)
 
-type alias AppId = String
-type alias WorldId = String
+
+type alias AppId =
+    String
+
+
+type alias WorldId =
+    String
+
 
 type Location
     = Local Relative

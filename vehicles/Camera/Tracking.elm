@@ -2,12 +2,12 @@ module Camera.Tracking exposing (tracking)
 
 import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
-
 import Body exposing (Moving, Oriented)
 import Camera exposing (..)
 import Camera.Util as Camera
 import Ground exposing (Ground)
 import Model
+
 
 tracking : Shot
 tracking =
@@ -16,13 +16,18 @@ tracking =
     , shoot = trackingShoot Model.direction
     }
 
+
 trackingInit : (Target -> Vec3) -> Ground -> Camera -> Camera
 trackingInit direction ground camera =
     let
-        target = camera.target
+        target =
+            camera.target
+
         position =
             sub target.position (V3.scale 23 (direction target))
-    in Camera.retarget camera.target { camera | position = position }
+    in
+        Camera.retarget camera.target { camera | position = position }
+
 
 trackingShoot : (Target -> Vec3) -> Ground -> Input -> Framing -> Camera -> Camera
 trackingShoot direction ground input framing camera =
@@ -34,12 +39,17 @@ trackingShoot direction ground input framing camera =
         inputNearFar =
             -input.y * 30 * input.dt
 
-        target = framing.target
+        target =
+            framing.target
 
-        above = vec3 0 6 0
+        above =
+            vec3 0 6 0
 
-        originalAbove = Orientation.rotateBodyV camera.target.orientation above
-        newAbove = Orientation.rotateBodyV target.orientation above
+        originalAbove =
+            Orientation.rotateBodyV camera.target.orientation above
+
+        newAbove =
+            Orientation.rotateBodyV target.orientation above
 
         originalCameraBehind =
             if getY camera.target.position < Model.eyeLevel then
@@ -72,9 +82,9 @@ trackingShoot direction ground input framing camera =
 
         cameraOrientation =
             target.orientation
-
     in
-        { camera | position = cameraPos
-                 , orientation = target.orientation
-                 , target = Camera.toTarget target
-                 }
+        { camera
+            | position = cameraPos
+            , orientation = target.orientation
+            , target = Camera.toTarget target
+        }

@@ -17,9 +17,9 @@ import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation
 import Body.Obj exposing (obj2)
-
 import OBJ
 import OBJ.Types exposing (ObjFile, Mesh(..))
+
 
 type alias Attributes =
     { id : String
@@ -30,6 +30,7 @@ type alias Attributes =
     , normalTexturePath : String
     , drive : Maybe (Ground -> Inputs -> Moving Body -> Moving Body)
     }
+
 
 type alias Model =
     { body : Maybe (Moving Body)
@@ -69,10 +70,11 @@ init attributes =
       }
     , Cmd.batch
         [ loadTexture attributes.diffuseTexturePath (Self << DiffTextureLoaded)
-        , loadTexture attributes.normalTexturePath(Self << NormTextureLoaded)
+        , loadTexture attributes.normalTexturePath (Self << NormTextureLoaded)
         , loadModel True attributes.meshPath
         ]
     )
+
 
 loadModel : Bool -> String -> Cmd (CtrlMsg Msg)
 loadModel withTangents url =
@@ -92,58 +94,65 @@ loadTexture url msg =
                         msg (Err ("Failed to load texture: " ++ toString e))
             )
 
+
 update :
     Maybe (Ground -> Inputs -> Moving Body -> Moving Body)
     -> CtrlMsg Msg
     -> Model
     -> ( Model, Cmd (CtrlMsg Msg) )
 update mDrive msg model =
-    let mapBody f =
-            (\m -> { m | body = Maybe.map f m.body } ) model
+    let
+        mapBody f =
+            (\m -> { m | body = Maybe.map f m.body }) model
 
         loadBody m =
-            case (m.mesh, m.diffTexture, m.normTexture) of
-                (Ok mesh, Ok diffTexture, Ok normTexture) ->
-                    let 
+            case ( m.mesh, m.diffTexture, m.normTexture ) of
+                ( Ok mesh, Ok diffTexture, Ok normTexture ) ->
+                    let
                         appear p =
                             Dict.values mesh
-                                |> List.concatMap Dict.values 
+                                |> List.concatMap Dict.values
                                 |> List.concatMap (\m -> obj2 diffTexture normTexture m p)
                     in
-                        { m | body = Just
-                                { anchor = AnchorGround
-                                , scale = vec3 1 1 1
-                                , position = vec3 38 0 12
-                                , orientation = Orientation.initial
-                                , appear = appear
-                                , velocity = vec3 0 0 0
-                                }
+                        { m
+                            | body =
+                                Just
+                                    { anchor = AnchorGround
+                                    , scale = vec3 1 1 1
+                                    , position = vec3 38 0 12
+                                    , orientation = Orientation.initial
+                                    , appear = appear
+                                    , velocity = vec3 0 0 0
+                                    }
                         }
-                _ -> m
+
+                _ ->
+                    m
     in
-    case msg of
-        Self (DiffTextureLoaded textureResult) ->
-            ( loadBody { model | diffTexture = textureResult }, Cmd.none )
+        case msg of
+            Self (DiffTextureLoaded textureResult) ->
+                ( loadBody { model | diffTexture = textureResult }, Cmd.none )
 
-        Self (NormTextureLoaded textureResult) ->
-            ( loadBody { model | normTexture = textureResult }, Cmd.none )
+            Self (NormTextureLoaded textureResult) ->
+                ( loadBody { model | normTexture = textureResult }, Cmd.none )
 
-        Self (LoadObj url meshResult) ->
-            ( loadBody { model | mesh = meshResult }, Cmd.none )
+            Self (LoadObj url meshResult) ->
+                ( loadBody { model | mesh = meshResult }, Cmd.none )
 
-        Ctrl (Control.Move dp) ->
-            -- ( mapBody (translate dp), Cmd.none)
-            ( model, Cmd.none )
+            Ctrl (Control.Move dp) ->
+                -- ( mapBody (translate dp), Cmd.none)
+                ( model, Cmd.none )
 
-        Ctrl (Control.Drive ground inputs) ->
-            case mDrive of
-                Just drive ->
-                    ( mapBody (drive ground inputs), Cmd.none )
-                Nothing ->
-                    ( model, Cmd.none )
+            Ctrl (Control.Drive ground inputs) ->
+                case mDrive of
+                    Just drive ->
+                        ( mapBody (drive ground inputs), Cmd.none )
 
-        _ ->
-            ( model, Cmd.none )
+                    Nothing ->
+                        ( model, Cmd.none )
+
+            _ ->
+                ( model, Cmd.none )
 
 
 animate : ground -> Time -> Model -> Model
@@ -161,22 +170,27 @@ bodies model_ =
             []
 
 
-
 reposition : Maybe AppPosition -> Model -> Model
 reposition mPos model =
-    let mapBody f =
-            (\m -> { m | body = Maybe.map f m.body } ) model
+    let
+        mapBody f =
+            (\m -> { m | body = Maybe.map f m.body }) model
+
         setPos body =
             case mPos of
-                Just pos -> { body | position = pos.position, orientation = pos.orientation }
-                Nothing -> body
+                Just pos ->
+                    { body | position = pos.position, orientation = pos.orientation }
+
+                Nothing ->
+                    body
     in
         mapBody setPos
 
 
 framing : Model -> Maybe Framing
-framing model = Maybe.map (Camera.framing) model.body
-    
+framing model =
+    Maybe.map (Camera.framing) model.body
+
 
 focus : Model -> Maybe Focus
 focus model =

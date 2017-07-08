@@ -91,7 +91,8 @@ bodies =
 
 
 reposition : Maybe AppPosition -> Balls -> Balls
-reposition _ = identity
+reposition _ =
+    identity
 
 
 framing : Balls -> Maybe Framing
@@ -102,6 +103,7 @@ framing balls =
 focus : Balls -> Maybe Focus
 focus balls =
     Nothing
+
 
 overlay : Balls -> Html msg
 overlay _ =
@@ -126,14 +128,15 @@ overlay _ =
                     ]
                 , Html.p
                     [ textLeft ]
-                    [ Html.text (
-                        "An elastic collision is an encounter between two bodies " ++
-                        "in which the total kinetic energy of the two bodies after " ++
-                        "the encounter is equal to their total kinetic energy before " ++
-                        "the encounter. Perfectly elastic collisions occur only if " ++
-                        "there is no net conversion of kinetic energy into other forms " ++
-                        "(such as heat or noise) and therefore they do not normally " ++
-                        "occur in reality. ")
+                    [ Html.text
+                        ("An elastic collision is an encounter between two bodies "
+                            ++ "in which the total kinetic energy of the two bodies after "
+                            ++ "the encounter is equal to their total kinetic energy before "
+                            ++ "the encounter. Perfectly elastic collisions occur only if "
+                            ++ "there is no net conversion of kinetic energy into other forms "
+                            ++ "(such as heat or noise) and therefore they do not normally "
+                            ++ "occur in reality. "
+                        )
                     ]
                 , Html.p
                     [ textLeft ]

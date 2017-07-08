@@ -8,11 +8,10 @@ import WebGL.Settings.DepthTest as DepthTest
 import Appearance exposing (..)
 import Shaders.TextureFragment exposing (textureFragment)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
-
 import Shaders.Reflection as Shaders
-
 import OBJ
 import OBJ.Types as Obj exposing (VertexWithTexture)
+
 
 obj : Obj.MeshWith VertexWithTexture -> WebGL.Texture -> Appearance
 obj { vertices, indices } texture p =
@@ -26,23 +25,26 @@ obj { vertices, indices } texture p =
             else
                 0.0
 
-        mesh = indexedTriangles vertices indices
+        mesh =
+            indexedTriangles vertices indices
     in
         [ entityWith [ DepthTest.default, cullFace front ]
             Shaders.reflectionVert
             Shaders.reflectionFrag
             mesh
             { camera = p.perspective, mvMat = p.lookAt, texture = texture }
-{-
-            { iResolution = resolution
-            , iHMD = iHMD
-            , iTexture = texture
-            , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
-            }
--}
+
+        {-
+           { iResolution = resolution
+           , iHMD = iHMD
+           , iTexture = texture
+           , iLensDistort = p.lensDistort
+           , iPerspective = p.perspective
+           , iLookAt = p.lookAt
+           }
+        -}
         ]
+
 
 obj2 : WebGL.Texture -> WebGL.Texture -> Obj.Mesh -> Appearance
 obj2 textureDiff textureNorm mesh p =
@@ -57,7 +59,9 @@ obj2 textureDiff textureNorm mesh p =
                 0.0
 
         -- some random lightpos, get this from the environment instead
-        t = pi/4
+        t =
+            pi / 4
+
         lightPos =
             vec3 (0.5 * cos (2 * t)) (1 + 0.5 * sin (2 * t)) 0.5
 
@@ -82,23 +86,26 @@ obj2 textureDiff textureNorm mesh p =
             Obj.WithTextureAndTangent { vertices, indices } ->
                 [ renderCullFace Shaders.normalVert Shaders.normalFrag (indexedTriangles vertices indices) uniforms ]
 
+
+
 {-
-        [ entityWith [ DepthTest.default, cullFace front ]
-            reflectionVert
-            reflectionFrag
-            mesh
-            { camera = p.perspective, mvMat = p.lookAt, texture = texture }
-{-
-            { iResolution = resolution
-            , iHMD = iHMD
-            , iTexture = texture
-            , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
-            }
+           [ entityWith [ DepthTest.default, cullFace front ]
+               reflectionVert
+               reflectionFrag
+               mesh
+               { camera = p.perspective, mvMat = p.lookAt, texture = texture }
+   {-
+               { iResolution = resolution
+               , iHMD = iHMD
+               , iTexture = texture
+               , iLensDistort = p.lensDistort
+               , iPerspective = p.perspective
+               , iLookAt = p.lookAt
+               }
+   -}
+           ]
 -}
-        ]
--}
+
 
 renderCullFace : Shader a u v -> Shader {} u v -> WebGL.Mesh a -> u -> Entity
 renderCullFace =

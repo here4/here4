@@ -12,12 +12,15 @@ import Model exposing (GlobalMsg, Inputs, WorldKey(..), AppKey, PartyKey)
 type alias CtrlMsg a =
     Dispatch (EffectMsg ()) Msg a
 
+
 type Route
     = ToApp (WorldKey AppKey)
     | ToParty (WorldKey PartyKey)
 
+
 type alias WorldMsg a =
     DispatchHub Route (EffectMsg (WorldKey ())) Msg Dynamic GlobalMsg a
+
 
 type Msg
     = Move Vec3
@@ -29,4 +32,3 @@ type Msg
 type EffectMsg worldKey
     = UpdateGround worldKey Ground
     | RelocateParty worldKey PartyKey Location
-

@@ -3,7 +3,9 @@ module KeyboardInput exposing (..)
 import Keyboard.Extra exposing (Key(..))
 import Model
 
+
 {- Subscribe to keychange events. -}
+
 
 keyChange : Bool -> Key -> Model.Msg worldMsg
 keyChange on key =
@@ -96,6 +98,7 @@ keysToInputs keys inputs0 =
                 v
             else
                 0
+
         unshifted x =
             x && not keys.shift
 
@@ -115,7 +118,6 @@ keysToInputs keys inputs0 =
             , toggleOverlay = risingEdge inputs0.toggleOverlay keys.kI
             , prevOverlay = risingEdge inputs0.prevOverlay keys.pageUp
             , nextOverlay = risingEdge inputs0.nextOverlay keys.pageDown
+
             -- , mx = minusPlus keys.kComma keys.kPeriod
         }
-
-

@@ -17,9 +17,9 @@ import Model exposing (Inputs)
 import Orientation
 import Body.Obj exposing (obj)
 import Vehicles.Walking as Walking
-
 import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
+
 
 type alias Attributes =
     { id : String
@@ -27,6 +27,7 @@ type alias Attributes =
     , height : Float
     , speed : Float
     }
+
 
 type alias Model =
     { body : Maybe (Moving Body)
@@ -81,45 +82,51 @@ loadTexture url msg =
                         msg (Err ("Failed to load texture: " ++ toString e))
             )
 
+
 update :
     Attributes
     -> CtrlMsg Msg
     -> Model
     -> ( Model, Cmd (CtrlMsg Msg) )
 update attributes msg model =
-    let mapBody f =
-            (\m -> { m | body = Maybe.map f m.body } ) model
+    let
+        mapBody f =
+            (\m -> { m | body = Maybe.map f m.body }) model
 
         loadBody m =
-            case (m.mesh, m.reflectionTexture) of
-                (Ok mesh, Ok texture) ->
-                    { m | body = Just
-                            { anchor = AnchorGround
-                            , scale = vec3 1 1 1
-                            , position = vec3 13 0 38
-                            , orientation = Orientation.initial
-                            , appear = obj mesh texture
-                            , velocity = vec3 0 0 0
-                            }
+            case ( m.mesh, m.reflectionTexture ) of
+                ( Ok mesh, Ok texture ) ->
+                    { m
+                        | body =
+                            Just
+                                { anchor = AnchorGround
+                                , scale = vec3 1 1 1
+                                , position = vec3 13 0 38
+                                , orientation = Orientation.initial
+                                , appear = obj mesh texture
+                                , velocity = vec3 0 0 0
+                                }
                     }
-                _ -> m
+
+                _ ->
+                    m
     in
-    case msg of
-        Self (TextureLoaded textureResult) ->
-            ( loadBody { model | reflectionTexture = textureResult }, Cmd.none )
+        case msg of
+            Self (TextureLoaded textureResult) ->
+                ( loadBody { model | reflectionTexture = textureResult }, Cmd.none )
 
-        Self (LoadObj meshResult) ->
-            ( loadBody { model | mesh = meshResult }, Cmd.none )
+            Self (LoadObj meshResult) ->
+                ( loadBody { model | mesh = meshResult }, Cmd.none )
 
-        Ctrl (Control.Move dp) ->
-            -- ( mapBody (translate dp), Cmd.none)
-            ( model, Cmd.none )
+            Ctrl (Control.Move dp) ->
+                -- ( mapBody (translate dp), Cmd.none)
+                ( model, Cmd.none )
 
-        Ctrl (Control.Drive ground inputs) ->
-            ( mapBody (Walking.drive { speed = attributes.speed, height = attributes.height } ground inputs), Cmd.none )
+            Ctrl (Control.Drive ground inputs) ->
+                ( mapBody (Walking.drive { speed = attributes.speed, height = attributes.height } ground inputs), Cmd.none )
 
-        _ ->
-            ( model, Cmd.none )
+            _ ->
+                ( model, Cmd.none )
 
 
 animate : ground -> Time -> Model -> Model
@@ -139,30 +146,36 @@ bodies model_ =
 
 reposition : Maybe AppPosition -> Model -> Model
 reposition mPos model =
-    let mapBody f =
-            (\m -> { m | body = Maybe.map f m.body } ) model
-        setPos pos body = { body | position = pos.position, orientation = pos.orientation }
+    let
+        mapBody f =
+            (\m -> { m | body = Maybe.map f m.body }) model
+
+        setPos pos body =
+            { body | position = pos.position, orientation = pos.orientation }
     in
         case mPos of
             Just pos ->
                 mapBody (setPos pos)
+
             Nothing ->
                 model
 
 
 framing : Model -> Maybe Framing
-framing model = Maybe.map (Camera.framing) model.body
-    
+framing model =
+    Maybe.map (Camera.framing) model.body
+
 
 focus : Model -> Maybe Focus
 focus model =
     Maybe.map appToFocus model.body
 
+
 overlay : Model -> Html msg
 overlay _ =
     Html.div []
         [ Html.h2 []
-              [ Html.text "Suzanne" ]
+            [ Html.text "Suzanne" ]
         , Html.text "From Blender."
         , Html.br [] []
         , Html.hr [] []

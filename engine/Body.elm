@@ -58,9 +58,6 @@ type alias Body =
 
 
 
-
-
-
 -- | Use anything Oriented and Visible as a Body
 
 

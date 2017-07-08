@@ -37,7 +37,6 @@ programWithFlags methods =
         }
 
 
-
 subscriptions : Model.Model worldModel worldMsg -> Sub (Model.Msg worldMsg)
 subscriptions model =
     [ AnimationFrame.diffs (Model.Animate << Time.inSeconds)

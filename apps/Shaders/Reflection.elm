@@ -3,12 +3,11 @@ module Shaders.Reflection exposing (..)
 import WebGL
 
 
-{-|
-This shader uses Spherical Environment Mapping (SEM).
+{-| This shader uses Spherical Environment Mapping (SEM).
 Here are some relevant links:
-    * [very cool demo](https://www.clicktorelease.com/code/spherical-normal-mapping/#)
-    * https://www.clicktorelease.com/blog/creating-spherical-environment-mapping-shader
-    * http://www.ozone3d.net/tutorials/glsl_texturing_p04.php
+* [very cool demo](https://www.clicktorelease.com/code/spherical-normal-mapping/#)
+* <https://www.clicktorelease.com/blog/creating-spherical-environment-mapping-shader>
+* <http://www.ozone3d.net/tutorials/glsl_texturing_p04.php>
 -}
 reflectionVert =
     [glsl|
@@ -54,7 +53,7 @@ void main()
 
 
 {-| normal mapping according to:
-http://www.gamasutra.com/blogs/RobertBasler/20131122/205462/Three_Normal_Mapping_Techniques_Explained_For_the_Mathematically_Uninclined.php?print=1
+<http://www.gamasutra.com/blogs/RobertBasler/20131122/205462/Three_Normal_Mapping_Techniques_Explained_For_the_Mathematically_Uninclined.php?print=1>
 -}
 normalVert =
     [glsl|

@@ -46,17 +46,26 @@ fromVec3 : V3.Vec3 -> Orientation
 fromVec3 =
     wToQ >> Qn.fromVec3
 
+
 fromAngleAxis : Float -> V3.Vec3 -> Orientation
-fromAngleAxis angle axis = Qn.fromAngleAxis angle (wToQ axis)
+fromAngleAxis angle axis =
+    Qn.fromAngleAxis angle (wToQ axis)
+
 
 getAxis : Orientation -> V3.Vec3
-getAxis = Qn.getAxis >> qToW
+getAxis =
+    Qn.getAxis >> qToW
+
 
 getAngle : Orientation -> Float
-getAngle = Qn.getAngle
+getAngle =
+    Qn.getAngle
+
 
 fromTo : V3.Vec3 -> V3.Vec3 -> Orientation
-fromTo u v = Qn.fromTo (wToQ u) (wToQ v)
+fromTo u v =
+    Qn.fromTo (wToQ u) (wToQ v)
+
 
 fromRollPitchYaw : ( Float, Float, Float ) -> Orientation
 fromRollPitchYaw ( roll, pitch, yaw ) =
@@ -125,68 +134,105 @@ toMat4 =
         Qn.toMat4
 
 
+
 -- | Projection onto the plane containing vectors v1, v2
+
+
 v3_projectPlane v1 v2 u =
     let
         -- normal vector to the plane containing v1, v2
-        n = V3.normalize <| V3.cross v1 v2
+        n =
+            V3.normalize <| V3.cross v1 v2
     in
         -- u, without its component that is not in the plane
         V3.sub u (V3.scale (V3.dot u n) n)
 
 
+
 -- | Roll to upright
+
+
 rollUpright : Orientation -> Orientation
-rollUpright = rollTo V3.j
+rollUpright =
+    rollTo V3.j
+
+
 
 -- | Project rotated V3.j onto plane formed by V3.j and rotated V3.k
+
+
 rollTo : V3.Vec3 -> Orientation -> Orientation
 rollTo targetUp o =
     let
         -- Camera forward vector of the original orientation
-        fwd = rotateBodyV o V3.k
+        fwd =
+            rotateBodyV o V3.k
 
         -- Camera up vector of the original orientation
-        up = rotateBodyV o V3.j
+        up =
+            rotateBodyV o V3.j
 
         -- Projection of the up vector onto the plane formed by
         -- the forward vector and the Y axis
-        upProj = v3_projectPlane targetUp fwd up
+        upProj =
+            v3_projectPlane targetUp fwd up
 
         -- Helper function to flip a vector if it is pointing downwards
         -- We use this to ensure we don't end up with an upside-down camera
-        positiveY v = if V3.getY v >= 0 then v else V3.negate v
+        positiveY v =
+            if V3.getY v >= 0 then
+                v
+            else
+                V3.negate v
 
         -- Orientation that rolls the camera back to an upright position
-        roll = fromTo up (positiveY upProj)
+        roll =
+            fromTo up (positiveY upProj)
     in
         -- Apply the uprighting roll to the original orientation
         followedBy roll o
 
+
+
 -- | Pitch to upright
+
+
 pitchUpright : Orientation -> Orientation
-pitchUpright = pitchTo V3.j
+pitchUpright =
+    pitchTo V3.j
+
+
 
 -- | Project rotated V3.j onto plane formed by V3.j and rotated V3.i
+
+
 pitchTo : V3.Vec3 -> Orientation -> Orientation
 pitchTo targetUp o =
     let
         -- Camera forward vector of the original orientation
-        right = rotateBodyV o V3.i
+        right =
+            rotateBodyV o V3.i
 
         -- Camera up vector of the original orientation
-        up = rotateBodyV o V3.j
+        up =
+            rotateBodyV o V3.j
 
         -- Projection of the up vector onto the plane formed by
         -- the forward vector and the Y axis
-        upProj = v3_projectPlane targetUp right up
+        upProj =
+            v3_projectPlane targetUp right up
 
         -- Helper function to flip a vector if it is pointing downwards
         -- We use this to ensure we don't end up with an upside-down camera
-        positiveY v = if V3.getY v >= 0 then v else V3.negate v
+        positiveY v =
+            if V3.getY v >= 0 then
+                v
+            else
+                V3.negate v
 
         -- Orientation that rolls the camera back to an upright position
-        pitch = fromTo up (positiveY upProj)
+        pitch =
+            fromTo up (positiveY upProj)
     in
         -- Apply the uprighting roll to the original orientation
         followedBy pitch o

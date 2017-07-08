@@ -11,15 +11,17 @@ import Orientation exposing (..)
 import Body exposing (..)
 import Model
 import Ground exposing (Ground)
-
 import Debug
+
 
 ----------------------------------------------------------------------
 -- DreamBuggy
 
+
 type alias Attributes =
     { speed : Float
     }
+
 
 welcome : Model.Motion -> Model.Motion
 welcome motion =
@@ -48,6 +50,9 @@ move attributes terrain eyeLevel inputs motion =
 clampBuggy : Orientation -> Orientation
 clampBuggy o =
     o
+
+
+
 {-
    let (roll, pitch, yaw) = Orientation.toRollPitchYaw o
        roll_ = clamp (degrees -10) (degrees 10) (roll/2)
@@ -83,46 +88,59 @@ turn eyeLevel speed dx dt motion =
         rearLeftTireY =
             eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -0.5 0 -0.5)))
 
-        frontTireY = max frontLeftTireY frontRightTireY
+        frontTireY =
+            max frontLeftTireY frontRightTireY
 
-        rearTireY = max rearLeftTireY rearRightTireY
+        rearTireY =
+            max rearLeftTireY rearRightTireY
 
-        rightTireY = max frontRightTireY rearRightTireY
+        rightTireY =
+            max frontRightTireY rearRightTireY
 
-        leftTireY = max frontRightTireY rearRightTireY
+        leftTireY =
+            max frontRightTireY rearRightTireY
 
-        perp2dCCW x y = (-y, x)
+        perp2dCCW x y =
+            ( -y, x )
 
         targetUpRoll =
             let
-                vehicleWidth = 1.0
-                (x, y) = perp2dCCW vehicleWidth (rightTireY - leftTireY)
+                vehicleWidth =
+                    1.0
+
+                ( x, y ) =
+                    perp2dCCW vehicleWidth (rightTireY - leftTireY)
             in
                 vec3 x y 0
 
         targetUpPitch =
             let
-                vehicleFwdLength = 1.0
-                (z, y) = perp2dCCW vehicleFwdLength (frontTireY - rearTireY)
+                vehicleFwdLength =
+                    1.0
+
+                ( z, y ) =
+                    perp2dCCW vehicleFwdLength (frontTireY - rearTireY)
             in
                 vec3 0 y z
 
-        steer = 0.1 * speed * dx * dt
+        steer =
+            0.1 * speed * dx * dt
 
-        
         targetOrientation =
-            if getY motion.position > (eyeLevel motion.position) + 5 then -- spin if in the air
+            if getY motion.position > (eyeLevel motion.position) + 5 then
+                -- spin if in the air
                 motion.orientation
-                |> rollUpright
-                |> pitchUpright
-                |> followedBy (fromAngleAxis steer V3.j)
+                    |> rollUpright
+                    |> pitchUpright
+                    |> followedBy (fromAngleAxis steer V3.j)
             else
                 motion.orientation
-                |> rollTo targetUpRoll
-                |> pitchTo targetUpPitch
-                |> followedBy (fromAngleAxis steer V3.j)
+                    |> rollTo targetUpRoll
+                    |> pitchTo targetUpPitch
+                    |> followedBy (fromAngleAxis steer V3.j)
 
-        orientation = targetOrientation
+        orientation =
+            targetOrientation
     in
         { motion | orientation = orientation }
 
@@ -133,7 +151,9 @@ goForward eyeLevel speed inputs motion =
     let
         accel =
             clamp -1.0 1.0 <|
-            inputs.y + inputs.rightTrigger - inputs.leftTrigger
+                inputs.y
+                    + inputs.rightTrigger
+                    - inputs.leftTrigger
 
         move =
             V3.scale (speed * accel) V3.k
@@ -247,6 +267,7 @@ overlay =
                 , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
                 , ( "z-index", "1" )
                 ]
+
         textLeft =
             Html.style [ ( "text-align", "left" ) ]
 
@@ -284,10 +305,10 @@ overlay =
                         [ Html.th [ textLeft ] [ Html.text "Accelerate / Brake" ]
                         , Html.td [] [ Html.text "W, S" ]
                         , Html.td []
-                              [ Html.text "Right,left triggers"
-                              , Html.br [] []
-                              , Html.text "Right stick up, down"
-                              ]
+                            [ Html.text "Right,left triggers"
+                            , Html.br [] []
+                            , Html.text "Right stick up, down"
+                            ]
                         ]
                     , Html.tr []
                         [ Html.th [ textLeft ] [ Html.text "Steer left, right" ]

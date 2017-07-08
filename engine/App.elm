@@ -28,10 +28,12 @@ type alias Animated model msg =
     , reposition : Maybe AppPosition -> model -> model
     }
 
+
 type alias AppPosition =
     { position : Vec3
     , orientation : Orientation
     }
+
 
 type alias AppModel =
     Dynamic
@@ -116,13 +118,16 @@ packFocus : (a -> Maybe Focus) -> AppModel -> Maybe Focus
 packFocus f dyn =
     f (Dynamic.unpack dyn)
 
+
 packOverlay : (a -> Html (CtrlMsg msg)) -> AppModel -> Html AppMsg
 packOverlay f dyn =
     Html.map msgPack <| f (Dynamic.unpack dyn)
 
+
 packReposition : (Maybe AppPosition -> model -> model) -> Maybe AppPosition -> AppModel -> AppModel
 packReposition f pos dyn =
     Dynamic.pack (f pos (Dynamic.unpack dyn))
+
 
 packMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
 packMethods { id, label, update, animate, bodies, framing, focus, overlay, reposition } =
@@ -159,12 +164,16 @@ createUncontrolled : ( model, Cmd msg ) -> Animated model msg -> ( App, Cmd AppM
 createUncontrolled ( model, msg ) methods =
     create
         ( model, Cmd.map Self msg )
-        { methods | update = updateSelf methods.update
-                  , overlay = overlaySelf methods.overlay
+        { methods
+            | update = updateSelf methods.update
+            , overlay = overlaySelf methods.overlay
         }
 
+
 overlaySelf : (a -> Html msg) -> a -> Html (CtrlMsg msg)
-overlaySelf f model = Html.map Self (f model)
+overlaySelf f model =
+    Html.map Self (f model)
+
 
 
 -- | Update helper for apps with no children
@@ -211,6 +220,7 @@ id : App -> String
 id { methods, model } =
     methods.id model
 
+
 label : App -> String
 label { methods, model } =
     methods.label model
@@ -242,9 +252,11 @@ bodies : App -> List Body
 bodies { methods, model } =
     methods.bodies model
 
+
 reposition : Maybe AppPosition -> App -> App
 reposition pos { methods, model } =
     { methods = methods, model = methods.reposition pos model }
+
 
 framing : App -> Maybe Framing
 framing { methods, model } =
@@ -255,9 +267,11 @@ focus : App -> Maybe Focus
 focus { methods, model } =
     methods.focus model
 
+
 overlay : App -> Html AppMsg
 overlay { methods, model } =
     methods.overlay model
+
 
 
 -- TODO: focus on a plane/surface/controls
@@ -277,5 +291,7 @@ orientedToFocus : Oriented a -> Focus
 orientedToFocus x =
     { position = x.position }
 
+
 noFraming : model -> Maybe Framing
-noFraming _ = Nothing
+noFraming _ =
+    Nothing

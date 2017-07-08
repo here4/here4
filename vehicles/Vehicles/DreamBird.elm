@@ -15,6 +15,7 @@ import Ground exposing (Ground)
 ----------------------------------------------------------------------
 -- DreamBird
 
+
 type alias Attributes =
     { speed : Float
     }
@@ -56,7 +57,9 @@ fly speed eyeLevel inputs motion =
     let
         thrust =
             clamp -1.0 1.0 <|
-            inputs.my + inputs.rightTrigger - inputs.leftTrigger
+                inputs.my
+                    + inputs.rightTrigger
+                    - inputs.leftTrigger
 
         yaw =
             0.5 * inputs.mx * inputs.dt
@@ -130,6 +133,7 @@ overlay =
                 , ( "text-shadow", "1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000" )
                 , ( "z-index", "1" )
                 ]
+
         textLeft =
             Html.style [ ( "text-align", "left" ) ]
 
@@ -167,10 +171,10 @@ overlay =
                         [ Html.th [ textLeft ] [ Html.text "Thrust +/-" ]
                         , Html.td [] [ Html.text "Arrow up, down" ]
                         , Html.td []
-                              [ Html.text "Right,left triggers"
-                              , Html.br [] []
-                              , Html.text "Left stick up, down"
-                              ]
+                            [ Html.text "Right,left triggers"
+                            , Html.br [] []
+                            , Html.text "Left stick up, down"
+                            ]
                         ]
                     , Html.tr []
                         [ Html.th [ textLeft ] [ Html.text "Yaw left, right" ]
