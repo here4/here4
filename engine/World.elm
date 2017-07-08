@@ -284,11 +284,27 @@ relativeToAppPosition (WorldKey worldKey ()) model relative =
             Become appId ->
                 ( mAppKey appId, Nothing)
 
+remoteToAppPosition : WorldKey () -> WorldModel model -> WorldId -> Relative -> (Maybe AppKey, Maybe AppPosition)
+remoteToAppPosition (WorldKey worldKey ()) model remoteWorldId relative =
+    let
+        mRemote =
+            Bag.find (\world -> world.id == remoteWorldId) model.worlds
+    in
+        case mRemote of
+            Just (remoteWorldKey, remoteWorld) ->
+                (Nothing, Nothing)
+
+            Nothing ->
+                (Nothing, Nothing)
+
 toAppPosition : WorldKey () -> WorldModel model -> Location -> (Maybe AppKey, Maybe AppPosition)
 toAppPosition (WorldKey worldKey ()) model location =
     case location of
         Local relative ->
             relativeToAppPosition (WorldKey worldKey ()) model relative
+
+        World remote relative ->
+            remoteToAppPosition (WorldKey worldKey ()) model remote relative
 
 worldUpdate :
     (msg -> model -> ( model, Cmd msg ))

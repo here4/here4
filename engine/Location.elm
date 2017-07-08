@@ -8,6 +8,7 @@ type alias WorldId = String
 
 type Location
     = Local Relative
+    | World WorldId Relative
 
 
 type Relative
