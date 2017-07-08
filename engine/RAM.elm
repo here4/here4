@@ -20,7 +20,7 @@ type alias RAMModel =
 
 
 type alias Model =
-    WorldModel RAMModel
+    Multiverse RAMModel
 
 
 create :

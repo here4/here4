@@ -1,4 +1,4 @@
-module World exposing (Attributes, WorldModel, create)
+module World exposing (Attributes, Multiverse, create)
 
 import Html exposing (Html)
 import Bag exposing (Bag)
@@ -27,7 +27,7 @@ type alias Attributes =
     }
 
 
-type alias WorldModel a =
+type alias Multiverse a =
     { worldModel : a
     , worlds : Bag Stuff
     }
@@ -55,7 +55,7 @@ create :
     ( model, Cmd msg )
     -> (msg -> model -> ( model, Cmd msg ))
     -> List Attributes
-    -> Program Args (Model.Model (WorldModel model) (WorldMsg msg)) (Model.Msg (WorldMsg msg))
+    -> Program Args (Model.Model (Multiverse model) (WorldMsg msg)) (Model.Msg (WorldMsg msg))
 create hubInit hubUpdate attributes =
     Space.programWithFlags
         { init = worldInit hubInit attributes
@@ -75,14 +75,14 @@ create hubInit hubUpdate attributes =
         }
 
 
-worldApp : WorldKey AppKey -> WorldModel a -> Maybe App
+worldApp : WorldKey AppKey -> Multiverse a -> Maybe App
 worldApp (WorldKey worldKey (AppKey appKey)) model =
     Bag.get worldKey model.worlds
         |> Maybe.map .apps
         |> Maybe.andThen (Bag.get appKey)
 
 
-worldParty : WorldKey PartyKey -> WorldModel a -> Maybe Party
+worldParty : WorldKey PartyKey -> Multiverse a -> Maybe Party
 worldParty (WorldKey worldKey (PartyKey partyKey)) model =
     Bag.get worldKey model.worlds
         |> Maybe.map .parties
@@ -141,7 +141,7 @@ oneWorldInit attributes ( oldWorlds, oldCmds ) =
 worldInit :
     ( model, Cmd msg )
     -> List Attributes
-    -> ( WorldModel model, Cmd (WorldMsg msg) )
+    -> ( Multiverse model, Cmd (WorldMsg msg) )
 worldInit hubInit attributes =
     let
         ( hubModel, hubCmd ) =
@@ -157,7 +157,7 @@ worldInit hubInit attributes =
         )
 
 
-worldView : WorldKey () -> WorldModel model -> Maybe Model.World
+worldView : WorldKey () -> Multiverse model -> Maybe Model.World
 worldView (WorldKey worldKey ()) model =
     let
         mStuff =
@@ -255,7 +255,7 @@ toAppMsg dispatch =
                 Effect (toAppEffect e)
 
 
-relativeAppPosition : WorldKey PartyKey -> Relative -> WorldModel model -> ( Maybe AppKey, Maybe AppPosition )
+relativeAppPosition : WorldKey PartyKey -> Relative -> Multiverse model -> ( Maybe AppKey, Maybe AppPosition )
 relativeAppPosition (WorldKey worldKey (PartyKey partyKey)) relative model =
     let
         -- lookup : AppId -> (AppKey, App)
@@ -318,7 +318,7 @@ relativeAppPosition (WorldKey worldKey (PartyKey partyKey)) relative model =
                 ( mAppKey appId, Nothing )
 
 
-relativeRelocate : WorldKey PartyKey -> Relative -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
+relativeRelocate : WorldKey PartyKey -> Relative -> Multiverse model -> ( Multiverse model, Cmd (WorldMsg msg) )
 relativeRelocate worldPartyKey relative model =
     let
         (WorldKey worldKey (PartyKey partyKey)) = worldPartyKey
@@ -360,7 +360,7 @@ relativeRelocate worldPartyKey relative model =
         )
 
 
-remoteRelocate : WorldKey PartyKey -> WorldId -> Relative -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
+remoteRelocate : WorldKey PartyKey -> WorldId -> Relative -> Multiverse model -> ( Multiverse model, Cmd (WorldMsg msg) )
 remoteRelocate oldWorldPartyKey remoteWorldId relative model =
     let
         -- WorldKey worldKey (PartyKey partyKey) = oldWorldPartyKey
@@ -406,7 +406,7 @@ remoteRelocate oldWorldPartyKey remoteWorldId relative model =
                 ( model, Cmd.none )
 
 
-relocate : WorldKey PartyKey -> Location -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
+relocate : WorldKey PartyKey -> Location -> Multiverse model -> ( Multiverse model, Cmd (WorldMsg msg) )
 relocate worldPartyKey location model =
     case location of
         Local relative ->
@@ -419,8 +419,8 @@ relocate worldPartyKey location model =
 worldUpdate :
     (msg -> model -> ( model, Cmd msg ))
     -> WorldMsg msg
-    -> WorldModel model
-    -> ( WorldModel model, Cmd (WorldMsg msg) )
+    -> Multiverse model
+    -> ( Multiverse model, Cmd (WorldMsg msg) )
 worldUpdate hubUpdate msg model =
     case msg of
         Hub hubMsg ->
@@ -542,7 +542,7 @@ worldUpdate hubUpdate msg model =
             ( model, Cmd.none )
 
 
-worldAnimate : WorldKey () -> Ground -> Time -> WorldModel a -> WorldModel a
+worldAnimate : WorldKey () -> Ground -> Time -> Multiverse a -> Multiverse a
 worldAnimate (WorldKey worldKey ()) ground dt model =
     let
         updateApps stuff =
@@ -551,7 +551,7 @@ worldAnimate (WorldKey worldKey ()) ground dt model =
         { model | worlds = Bag.update worldKey (Maybe.map updateApps) model.worlds }
 
 
-worldJoin : WorldKey () -> WorldModel model -> ( Maybe (WorldKey PartyKey), WorldModel model, Cmd (WorldMsg msg) )
+worldJoin : WorldKey () -> Multiverse model -> ( Maybe (WorldKey PartyKey), Multiverse model, Cmd (WorldMsg msg) )
 worldJoin (WorldKey worldKey ()) model =
     let
         -- freshParty : Stuff -> (Party, Cmd msg)
@@ -613,7 +613,7 @@ worldJoin (WorldKey worldKey ()) model =
                 ( Nothing, model, Cmd.none )
 
 
-worldLeave : WorldKey PartyKey -> WorldModel a -> WorldModel a
+worldLeave : WorldKey PartyKey -> Multiverse a -> Multiverse a
 worldLeave (WorldKey worldKey (PartyKey partyKey)) model =
     let
         updateParties f stuff =
@@ -622,7 +622,7 @@ worldLeave (WorldKey worldKey (PartyKey partyKey)) model =
         { model | worlds = Bag.update worldKey (Maybe.map (updateParties (Bag.remove partyKey))) model.worlds }
 
 
-worldChangeRide : WorldKey PartyKey -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
+worldChangeRide : WorldKey PartyKey -> Multiverse model -> ( Multiverse model, Cmd (WorldMsg msg) )
 worldChangeRide (WorldKey worldKey (PartyKey partyKey)) model =
     let
         updateRide party =
@@ -719,19 +719,19 @@ worldChangeRide (WorldKey worldKey (PartyKey partyKey)) model =
             )
 
 
-worldId : WorldKey () -> WorldModel a -> Maybe String
+worldId : WorldKey () -> Multiverse a -> Maybe String
 worldId (WorldKey worldKey ()) model =
     Bag.get worldKey model.worlds
         |> Maybe.map .id
 
 
-worldLabel : WorldKey () -> WorldModel a -> Maybe String
+worldLabel : WorldKey () -> Multiverse a -> Maybe String
 worldLabel (WorldKey worldKey ()) model =
     Bag.get worldKey model.worlds
         |> Maybe.map .label
 
 
-worldPartyLabel : WorldKey PartyKey -> WorldModel a -> String
+worldPartyLabel : WorldKey PartyKey -> Multiverse a -> String
 worldPartyLabel worldPartyKey model =
     let
         (WorldKey worldKey (PartyKey _)) =
@@ -758,7 +758,7 @@ worldPartyLabel worldPartyKey model =
                 "Party not found"
 
 
-worldOverlay : WorldKey PartyKey -> WorldModel a -> Html (WorldMsg msg)
+worldOverlay : WorldKey PartyKey -> Multiverse a -> Html (WorldMsg msg)
 worldOverlay worldPartyKey model =
     let
         (WorldKey worldKey (PartyKey _)) =
@@ -789,7 +789,7 @@ worldOverlay worldPartyKey model =
                 Html.text "Party not found"
 
 
-worldFraming : WorldKey PartyKey -> WorldModel a -> Maybe Framing
+worldFraming : WorldKey PartyKey -> Multiverse a -> Maybe Framing
 worldFraming worldPartyKey model =
     let
         (WorldKey worldKey partyKey) =
@@ -813,7 +813,7 @@ worldFraming worldPartyKey model =
                 Nothing
 
 
-worldFocus : WorldKey AppKey -> WorldModel a -> Maybe Focus
+worldFocus : WorldKey AppKey -> Multiverse a -> Maybe Focus
 worldFocus appKey model =
     case worldApp appKey model of
         Just app ->
@@ -823,7 +823,7 @@ worldFocus appKey model =
             Nothing
 
 
-worldGround : WorldKey () -> WorldModel model -> Maybe Ground
+worldGround : WorldKey () -> Multiverse model -> Maybe Ground
 worldGround (WorldKey worldKey ()) model =
     Bag.get worldKey model.worlds
         |> Maybe.andThen .maybeGround
