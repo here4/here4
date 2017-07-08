@@ -95,7 +95,7 @@ update world msg model =
             ( { model | inputs = mouseToInputs movement model.inputs }, Cmd.none )
 
         Model.GamepadUpdate gps0 ->
-            ( updateGamepads gps0 model, Cmd.none )
+            updateGamepads gps0 model
 
         Model.LockRequest wantToBeLocked ->
             ( { model | wantToBeLocked = wantToBeLocked }
@@ -419,47 +419,64 @@ gamepadToInputs gamepad inputs0 =
         }
 
 
-updateGamepads : List Gamepad.Gamepad -> Model worldModel worldMsg -> Model worldModel worldMsg
+updateGamepads :
+    List Gamepad.Gamepad
+    -> Model worldModel worldMsg
+    -> ( Model worldModel worldMsg, Cmd (Msg wordlMsg) )
 updateGamepads gps0 model =
     let
         ( gps, is ) =
             GamepadInputs.persistentGamepads model.gamepadIds gps0
+
+        joinIfNew =
+            if model.numPlayers == 1 then
+                Model.playerJoin (PlayerKey 1)
+            else
+                Cmd.none
     in
         case gps of
             [] ->
-                model
+                ( model, Cmd.none )
 
             [ Just gp ] ->
-                { model
+                ( { model
                     | numPlayers = 1
                     , inputs = gamepadToInputs gp model.inputs
                     , gamepadIds = is
-                }
+                   }
+                , Cmd.none
+                )
 
             (Just gp) :: Nothing :: _ ->
-                { model
+                ( { model
                     | numPlayers = 1
                     , inputs = gamepadToInputs gp model.inputs
                     , gamepadIds = is
-                }
+                  }
+                , Cmd.none
+                )
 
             Nothing :: (Just gp2) :: _ ->
-                { model
+                ( { model
                     | numPlayers = 2
                     , inputs2 = gamepadToInputs gp2 model.inputs2
                     , gamepadIds = is
-                }
+                  }
+                , joinIfNew
+                )
 
             (Just gp) :: (Just gp2) :: _ ->
-                { model
+                ( { model
                     | numPlayers = 2
                     , inputs = gamepadToInputs gp model.inputs
                     , inputs2 = gamepadToInputs gp2 model.inputs2
                     , gamepadIds = is
-                }
+                  }
+                , joinIfNew
+                )
 
             _ ->
-                model
+                ( model, Cmd.none )
 
 
 aboveGround : Model.EyeLevel -> Vec3 -> Vec3

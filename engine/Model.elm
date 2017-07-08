@@ -249,6 +249,11 @@ type alias Args =
     }
 
 
+playerJoin : PlayerKey -> Cmd (Msg worldMsg)
+playerJoin playerKey =
+    Task.succeed playerKey |> Task.perform (JoinWorld (WorldKey 0 ()))
+
+
 {-| When the application first starts, this is the initial state of the Model.
 Not using the movement attribute of Args at this time;
 it's a carryover from the original, and the additional complexity
@@ -260,9 +265,6 @@ init worldInit { movement, isLocked } =
     let
         ( worldModel, worldCmdMsg ) =
             worldInit
-
-        playerJoin =
-            Task.succeed >> Task.perform (JoinWorld (WorldKey 1 ()))
     in
         ( { numPlayers = 1
           , player1 = defaultPlayer
