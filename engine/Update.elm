@@ -9,7 +9,7 @@ import App exposing (Focus)
 import Body exposing (reposition)
 import Camera exposing (..)
 import Camera.POV exposing (pov)
-import Camera.DollyArc exposing (dollyZoom, dolly, arc)
+import Camera.DollyArc exposing (dollyZoom, dolly, zoom, arc)
 import Camera.Tracking exposing (tracking)
 import Camera.Util as Camera
 import Control exposing (WorldMsg, Route(..))
@@ -588,8 +588,10 @@ prevShot shot =
         tracking
     else if shot.label == dolly.label then
         dollyZoom
-    else if shot.label == arc.label then
+    else if shot.label == zoom.label then
         dolly
+    else if shot.label == arc.label then
+        zoom
     else
         tracking
 
@@ -603,6 +605,8 @@ nextShot shot =
     else if shot.label == dollyZoom.label then
         dolly
     else if shot.label == dolly.label then
+        zoom
+    else if shot.label == zoom.label then
         arc
     else if shot.label == arc.label then
         pov

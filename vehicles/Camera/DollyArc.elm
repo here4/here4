@@ -1,4 +1,4 @@
-module Camera.DollyArc exposing (dollyZoom, dolly, arc)
+module Camera.DollyArc exposing (dollyZoom, dolly, zoom, arc)
 
 import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
@@ -7,6 +7,8 @@ import Camera exposing (..)
 import Camera.Util as Camera
 import Ground exposing (Ground)
 import Model
+
+import Debug
 
 
 dollyZoom : Shot
@@ -22,6 +24,14 @@ dolly =
     { label = "Dolly"
     , init = dollyInit
     , shoot = dollyShoot 3.0
+    }
+
+
+zoom : Shot
+zoom =
+    { label = "Zoom"
+    , init = dollyInit
+    , shoot = zoomShoot
     }
 
 
@@ -111,6 +121,50 @@ dollyZoomShoot minDistance ground input framing camera =
             clamp 1 89 (10 * (10 - sqrt (finalDistance - minDistance)))
     in
         { dollyCamera | fovy = fovy }
+
+
+zoomShoot : Ground -> Input -> Framing -> Camera -> Camera
+zoomShoot ground input framing camera =
+    let
+        eyeLevel pos =
+            1.8 + ground.elevation pos
+
+        -- input
+        inputZoom =
+            -input.y * 30 * input.dt
+
+        inputYaw =
+            -input.x * 1 * input.dt
+
+        target =
+            framing.target
+
+        -- The original displacement of the camera, relative to where the target was
+        originalDisplacement =
+            V3.sub camera.position camera.target.position
+
+        -- New position of the camera, just tracking the target
+        trackingPosition =
+            V3.add target.position originalDisplacement
+
+        newDisplacement =
+            moveAroundSphere 0 inputYaw originalDisplacement
+
+        -- The new position, relative to where the target is now
+        position =
+            V3.add target.position newDisplacement
+
+        fovy =
+            clamp 1 89 (camera.fovy + inputZoom)
+            |> Debug.log "zoom new fovy:"
+    in
+        { camera | position = position
+                 , fovy = fovy
+        }
+            |> Camera.retarget target
+            |> Camera.rollUpright
+
+        -- { dollyCamera | fovy = fovy }
 
 
 arcShoot : Ground -> Input -> Framing -> Camera -> Camera
