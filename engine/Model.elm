@@ -33,7 +33,10 @@ type Msg worldMsg
     | Animate Time
     | Resize Window.Size
     | WorldMessage worldMsg
+    | WorldEffect GlobalMsg
 
+type GlobalMsg
+    = PlayerUpdate (WorldKey PartyKey) (WorldKey PartyKey)
 
 type alias World =
     { bodies : List Body

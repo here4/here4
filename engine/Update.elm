@@ -20,7 +20,7 @@ import GamepadInputs
 import KeyboardInput
 import Ground exposing (Ground)
 import Methods exposing (Methods)
-import Model exposing (Model, Msg, WorldKey(..), AppKey(..), PartyKey(..), PlayerKey(..))
+import Model exposing (Model, Msg, GlobalMsg(..), WorldKey(..), AppKey(..), PartyKey(..), PlayerKey(..))
 import Orientation exposing (fromVec3)
 import Ports
 
@@ -38,8 +38,28 @@ update world msg model =
             let
                 ( worldModel, worldCmdMsg ) =
                     world.update worldMsg model.worldModel
+
+                response x =
+                    case x of
+                        GlobalEffect e ->
+                            Model.WorldEffect e
+
+                        m ->
+                            Model.WorldMessage m
             in
-                ( { model | worldModel = worldModel }, Cmd.map Model.WorldMessage worldCmdMsg )
+                ( { model | worldModel = worldModel }, Cmd.map response worldCmdMsg )
+
+        Model.WorldEffect (PlayerUpdate oldPartyKey newPartyKey) ->
+            let
+                p1 = model.player1
+                p2 = model.player2
+            in
+                if model.player1.partyKey == Just oldPartyKey then
+                    ( { model | player1 = { p1 | partyKey = Just newPartyKey } }, Cmd.none )
+                else if model.player2.partyKey == Just oldPartyKey then
+                    ( { model | player2 = { p2 | partyKey = Just newPartyKey } }, Cmd.none )
+                else
+                    ( model, Cmd.none )
 
         Model.KeyChange keyfunc ->
             let

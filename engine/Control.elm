@@ -6,7 +6,7 @@ import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Ground exposing (Ground)
 import Location exposing (..)
-import Model exposing (Inputs, WorldKey(..), AppKey, PartyKey)
+import Model exposing (GlobalMsg, Inputs, WorldKey(..), AppKey, PartyKey)
 
 
 type alias CtrlMsg a =
@@ -17,8 +17,7 @@ type Route
     | ToParty (WorldKey PartyKey)
 
 type alias WorldMsg a =
-    DispatchHub Route (EffectMsg (WorldKey ())) Msg Dynamic a
-
+    DispatchHub Route (EffectMsg (WorldKey ())) Msg Dynamic GlobalMsg a
 
 type Msg
     = Move Vec3

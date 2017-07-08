@@ -8,7 +8,7 @@ import Control exposing (..)
 import Maybe.Extra exposing (isJust)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
-import Model exposing (Args, WorldKey(..), AppKey(..), PartyKey(..))
+import Model exposing (Args, GlobalMsg, WorldKey(..), AppKey(..), PartyKey(..))
 import Location exposing (..)
 import Body exposing (Body)
 import Camera exposing (Framing, Shot)
@@ -189,8 +189,8 @@ toWorldEffect worldKey e =
 
 toWorldMsg :
     WorldKey ()
-    -> DispatchHub Route (EffectMsg ()) Msg Dynamic a
-    -> DispatchHub Route (EffectMsg (WorldKey ())) Msg Dynamic a
+    -> DispatchHub Route (EffectMsg ()) Msg Dynamic GlobalMsg a
+    -> DispatchHub Route (EffectMsg (WorldKey ())) Msg Dynamic GlobalMsg a
 toWorldMsg worldKey msg =
     let
         toWorldDispatch d =
@@ -208,6 +208,8 @@ toWorldMsg worldKey msg =
                 Forward key ctrlMsg
             HubEff e ->
                 HubEff (toWorldEffect worldKey e)
+            GlobalEffect globalMsg ->
+                GlobalEffect globalMsg
 
 toAppMsg : Dispatch (EffectMsg (WorldKey ())) Msg Dynamic -> AppMsg
 toAppMsg dispatch =
@@ -324,8 +326,10 @@ relativeRelocate (WorldKey worldKey (PartyKey partyKey)) relative model =
         )
 
 remoteRelocate : WorldKey PartyKey -> WorldId -> Relative -> WorldModel model -> ( WorldModel model, Cmd (WorldMsg msg) )
-remoteRelocate (WorldKey worldKey (PartyKey partyKey)) remoteWorldId relative model =
+remoteRelocate oldWorldPartyKey remoteWorldId relative model =
     let
+        -- WorldKey worldKey (PartyKey partyKey) = oldWorldPartyKey
+
         mRemote =
             Bag.find (\world -> world.id == remoteWorldId) model.worlds
     in
@@ -333,18 +337,31 @@ remoteRelocate (WorldKey worldKey (PartyKey partyKey)) remoteWorldId relative mo
             Just (remoteWorldKey, remoteWorld) ->
                 let
                     -- leave this world
-                    leftThisWorld = worldLeave (WorldKey worldKey (PartyKey partyKey)) model
+                    leftThisWorld = worldLeave oldWorldPartyKey model
 
                     -- enter next world
-                    (mNewPartyKey, joinedNewWorld, joinCmd) = worldJoin (WorldKey remoteWorldKey ()) leftThisWorld
+                    (mNewWorldPartyKey, joinedNewWorld, joinCmd) = worldJoin (WorldKey remoteWorldKey ()) leftThisWorld
                 in
-                    case mNewPartyKey of
-                        Just (WorldKey _ newPartyKey) ->
+                    case mNewWorldPartyKey of
+                        Just newWorldPartyKey ->
                             let
                                 -- relocate relative
-                                (newModel, relCmd) = relativeRelocate (WorldKey remoteWorldKey newPartyKey) relative joinedNewWorld
+                                ( newModel, relativeCmd ) =
+                                    relativeRelocate newWorldPartyKey relative joinedNewWorld
+
+                                playerUpdateMsg =
+                                    Model.PlayerUpdate oldWorldPartyKey newWorldPartyKey
+
+                                playerUpdateCmd =
+                                      Task.succeed playerUpdateMsg |> Task.perform GlobalEffect
                             in
-                                (newModel, Cmd.batch [relCmd, joinCmd])
+                                ( newModel
+                                , Cmd.batch
+                                      [ playerUpdateCmd
+                                      , relativeCmd
+                                      , joinCmd
+                                      ]
+                                )
 
                         Nothing ->
                             (model, Cmd.none)
@@ -359,7 +376,7 @@ relocate worldPartyKey location model =
         Local relative ->
             relativeRelocate worldPartyKey relative model
 
-        World remote relative ->
+        Remote remote relative ->
             remoteRelocate worldPartyKey remote relative model
 
 worldUpdate :
@@ -505,7 +522,7 @@ worldJoin (WorldKey worldKey ()) model =
             Bag.get worldKey model.worlds
             |> Maybe.map freshParty
 
-        -- foo : Bag Party -> ( WorldKey PartyKey, Bag Party )
+        -- insertParty : Party -> Bag Party -> ( WorldKey PartyKey, Bag Party )
         insertParty newParty parties =
             let
                 ( partyKey, newParties ) =

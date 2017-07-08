@@ -5,7 +5,6 @@ import Dispatch exposing (..)
 import Model exposing (Args)
 import World exposing (..)
 import App exposing (..)
-import Ground exposing (Ground)
 
 
 type alias MultiWorldMsg =

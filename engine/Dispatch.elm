@@ -7,8 +7,9 @@ type Dispatch effectMsg ctrlMsg nodeMsg
     | Effect effectMsg
 
 
-type DispatchHub key effectMsg ctrlMsg nodeMsg hubMsg
+type DispatchHub key effectMsg ctrlMsg nodeMsg globalMsg hubMsg
     = Hub hubMsg
     | Send key (Dispatch effectMsg ctrlMsg nodeMsg)
     | Forward key ctrlMsg
     | HubEff effectMsg
+    | GlobalEffect globalMsg

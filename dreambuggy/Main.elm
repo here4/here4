@@ -55,11 +55,18 @@ main =
                   , appear = fogMountainsDiamond
                   }
 
-              , Statue.create
+              , Statue.portal (Remote "world2" (Facing "fire-cube"))
                   { id = "fire-cube"
                   , label = "Fire Cube"
-                  , position = vec3 121 0 -253
+                  , position = vec3 21 0 -25
                   , appear = fireCube
+                  }
+
+              , Statue.portal (Remote "world2" (Behind "shufflepuck"))
+                  { id = "sky-diamond"
+                  , label = "Sky Diamond"
+                  , position = vec3 5 1.5 1
+                  , appear = cloudsDiamond
                   }
               ]
 
@@ -108,6 +115,13 @@ main =
                   , label = "Sky Diamond"
                   , position = vec3 5 1.5 1
                   , appear = cloudsDiamond
+                  }
+
+              , Statue.portal (Remote "world1" (Facing "fire-cube"))
+                  { id = "fire-cube"
+                  , label = "Fire Cube"
+                  , position = vec3 21 0 -25
+                  , appear = fireCube
                   }
 
               ]
