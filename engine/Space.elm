@@ -28,12 +28,12 @@ import View
 programWithFlags :
     Methods model msg
     -> Program Model.Args (Model.Model model (WorldMsg msg)) (Model.Msg (WorldMsg msg))
-programWithFlags world =
+programWithFlags methods =
     Html.programWithFlags
-        { init = Model.init world.init
-        , update = Update.update world
+        { init = Model.init methods.init
+        , update = Update.update methods
         , subscriptions = subscriptions
-        , view = View.view world.view
+        , view = View.view methods
         }
 
 

@@ -21,6 +21,8 @@ import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
 import Camera exposing (Camera)
 import Camera.Util exposing (cameraUp)
+import Control exposing (WorldMsg)
+import Methods exposing (..)
 import Model exposing (Model, Msg(..), WorldKey(..))
 import Orientation
 
@@ -28,30 +30,30 @@ import Orientation
 {-| Generate a View from a Model
 -}
 view :
-    (WorldKey () -> worldModel -> Maybe Model.World)
-    -> Model worldModel worldMsg
-    -> Html (Msg worldMsg)
-view worldView model =
+    Methods model msg
+    -> Model model (WorldMsg msg)
+    -> Html (Msg (WorldMsg msg))
+view methods model =
     case model.maybeWindowSize of
         Nothing ->
             text "Starting ..."
 
         Just windowSize ->
-            layoutScene windowSize worldView model
+            layoutScene windowSize methods model
 
 
 layoutScene :
     Window.Size
-    -> (WorldKey () -> worldModel -> Maybe Model.World)
-    -> Model worldModel worldMsg
-    -> Html (Msg worldMsg)
-layoutScene windowSize worldView model =
+    -> Methods worldModel msg
+    -> Model worldModel (WorldMsg msg)
+    -> Html (Msg (WorldMsg msg))
+layoutScene windowSize methods model =
     let
         toUnit (WorldKey n _) = WorldKey n ()
 
         mRender player =
             Maybe.map toUnit player.partyKey
-            |> Maybe.andThen (\worldKey -> worldView worldKey model.worldModel)
+            |> Maybe.andThen (\worldKey -> methods.view worldKey model.worldModel)
             |> Maybe.map (renderWorld model.globalTime)
 
         mRender1 =
