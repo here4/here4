@@ -3,14 +3,13 @@ module Statue exposing (create, portal)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Task exposing (Task)
 import Time exposing (Time)
 import App exposing (App, AppMsg, AppPosition, Focus, appToFocus)
 import Appearance exposing (Appearance)
 import Body exposing (..)
 import Camera exposing (..)
 import Camera.Util as Camera
-import Control exposing (CtrlMsg, EffectMsg(..))
+import Control exposing (CtrlMsg, EffectMsg(..), teleport)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Location exposing (..)
@@ -85,7 +84,7 @@ update msg model =
         Ctrl (Control.Enter partyKey) ->
             case model.destination of
                 Just dest ->
-                    ( model, Task.succeed dest |> Task.perform (Effect << RelocateParty () partyKey) )
+                    ( model, teleport partyKey dest )
 
                 Nothing ->
                     ( model, Cmd.none )

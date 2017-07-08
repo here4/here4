@@ -7,6 +7,7 @@ import Dynamic exposing (Dynamic)
 import Ground exposing (Ground)
 import Location exposing (..)
 import Model exposing (GlobalMsg, Inputs, WorldKey(..), AppKey, PartyKey)
+import Task exposing (Task)
 
 
 type alias CtrlMsg a =
@@ -32,3 +33,8 @@ type Msg
 type EffectMsg worldKey
     = UpdateGround worldKey Ground
     | RelocateParty worldKey PartyKey Location
+
+
+teleport : PartyKey -> Location -> Cmd (CtrlMsg a)
+teleport partyKey location =
+    Task.succeed location |> Task.perform (Effect << RelocateParty () partyKey)
