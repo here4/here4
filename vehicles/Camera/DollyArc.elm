@@ -8,8 +8,6 @@ import Camera.Util as Camera
 import Ground exposing (Ground)
 import Model
 
-import Debug
-
 
 dollyZoom : Shot
 dollyZoom =
@@ -156,15 +154,13 @@ zoomShoot ground input framing camera =
 
         fovy =
             clamp 1 89 (camera.fovy + inputZoom)
-            |> Debug.log "zoom new fovy:"
     in
-        { camera | position = position
-                 , fovy = fovy
+        { camera
+            | position = position
+            , fovy = fovy
         }
             |> Camera.retarget target
             |> Camera.rollUpright
-
-        -- { dollyCamera | fovy = fovy }
 
 
 arcShoot : Ground -> Input -> Framing -> Camera -> Camera
