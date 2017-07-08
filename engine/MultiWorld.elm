@@ -25,10 +25,10 @@ type alias Model =
 
 
 create :
-    List { apps : List ( App, Cmd AppMsg ), defaultSelf : ( App, Cmd AppMsg) }
+    List World.Attributes
     -> Program Args (Model.Model Model Msg) (Model.Msg Msg)
-create details =
-    World.create init update details
+create attributes =
+    World.create init update attributes
 
 
 init : ( MultiWorldModel, Cmd MultiWorldMsg )

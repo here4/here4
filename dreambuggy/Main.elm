@@ -25,7 +25,9 @@ import Vehicles.DreamBuggy as DreamBuggy
 main : Program Args (Model.Model MultiWorld.Model MultiWorld.Msg) (Model.Msg MultiWorld.Msg)
 main =
     MultiWorld.create
-        [ { apps =
+        [ { id = "world1"
+          , label = "Balls World"
+          , apps =
               [ StaticGround.create Terrain.generate
 
               , Sky.create skySphere
@@ -71,7 +73,9 @@ main =
                 }
           }
 
-        , { apps =
+        , { id = "world2"
+          , label = "Shufflepuck World"
+          , apps =
               [ StaticGround.create Terrain.generate
 
               , Sky.create skySphere

@@ -1,4 +1,4 @@
-module World exposing (WorldModel, create)
+module World exposing (Attributes, WorldModel, create)
 
 import Html exposing (Html)
 import Bag exposing (Bag)
@@ -17,7 +17,9 @@ import Math.Vector3 as V3 exposing (vec3)
 import Task
 
 type alias Attributes =
-    { apps : List ( App, Cmd AppMsg )
+    { id : String
+    , label : String
+    , apps : List ( App, Cmd AppMsg )
     , defaultSelf : ( App, Cmd AppMsg )
     }
 
@@ -27,7 +29,9 @@ type alias WorldModel a =
     }
 
 type alias Stuff =
-    { maybeGround : Maybe Ground
+    { id : String
+    , label : String
+    , maybeGround : Maybe Ground
     , apps : Bag App
     , parties : Bag Party
     , defaultSelf : ( App, Cmd AppMsg )
@@ -101,7 +105,9 @@ oneWorldInit :
 oneWorldInit attributes ( oldWorlds, oldCmds ) =
     let
         emptyStuff =
-            { maybeGround = Nothing
+            { id = attributes.id
+            , label = attributes.label
+            , maybeGround = Nothing
             , apps = Bag.empty
             , parties = Bag.empty
             , defaultSelf = attributes.defaultSelf
