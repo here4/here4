@@ -331,12 +331,23 @@ remoteRelocate (WorldKey worldKey (PartyKey partyKey)) remoteWorldId relative mo
     in
         case mRemote of
             Just (remoteWorldKey, remoteWorld) ->
+                let
+                    -- leave this world
+                    leftThisWorld = worldLeave (WorldKey worldKey (PartyKey partyKey)) model
 
-                -- leave this world
-                -- enter next world
-                -- relocate relative
+                    -- enter next world
+                    (mNewPartyKey, joinedNewWorld, joinCmd) = worldJoin (WorldKey remoteWorldKey ()) leftThisWorld
+                in
+                    case mNewPartyKey of
+                        Just (WorldKey _ newPartyKey) ->
+                            let
+                                -- relocate relative
+                                (newModel, relCmd) = relativeRelocate (WorldKey remoteWorldKey newPartyKey) relative joinedNewWorld
+                            in
+                                (newModel, Cmd.batch [relCmd, joinCmd])
 
-                (model, Cmd.none)
+                        Nothing ->
+                            (model, Cmd.none)
 
             Nothing ->
                 (model, Cmd.none)
