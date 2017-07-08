@@ -22,7 +22,8 @@ import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
 
 type alias Attributes =
-    { label : String
+    { id : String
+    , label : String
     , height : Float
     , speed : Float
     }
@@ -42,7 +43,8 @@ type Msg
 create : Attributes -> ( App, Cmd AppMsg )
 create attributes =
     App.create init
-        { label = always attributes.label
+        { id = always attributes.id
+        , label = always attributes.label
         , update = update attributes
         , animate = animate
         , bodies = bodies

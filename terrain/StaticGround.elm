@@ -24,7 +24,8 @@ create :
     -> ( App, Cmd AppMsg )
 create makeGround =
     App.create (init makeGround)
-        { label = always "Ground"
+        { id = always "ground"
+        , label = always "Ground"
         , update = update
         , animate = animate
         , bodies = bodies

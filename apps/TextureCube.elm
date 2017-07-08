@@ -31,7 +31,8 @@ type Msg
 create : String -> String -> ( App, Cmd AppMsg )
 create label path =
     App.create (init path)
-        { label = always label
+        { id = always "crate"
+        , label = always label
         , update = update
         , animate = animate
         , bodies = bodies

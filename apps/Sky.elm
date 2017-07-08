@@ -23,7 +23,8 @@ type alias Msg =
 create : Appearance -> ( App, Cmd AppMsg )
 create appear =
     App.create (init appear)
-        { label = always "Sky"
+        { id = always "sky"
+        , label = always "Sky"
         , update = update
         , animate = animate
         , bodies = bodies

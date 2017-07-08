@@ -29,7 +29,8 @@ type alias Msg =
 create : String -> Vec3 -> ( App, Cmd AppMsg )
 create label pos =
     App.create (init pos)
-        { label = always label
+        { id = always "wedge"
+        , label = always label
         , update = update
         , animate = animate
         , bodies = bodies

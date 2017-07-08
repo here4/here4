@@ -23,7 +23,8 @@ import Physics.Collisions exposing (collisions)
 
 
 type alias Attributes =
-    { label : String
+    { id : String
+    , label : String
     , position : Vec3
     , scale : Vec3
     , orientation : Orientation
@@ -59,7 +60,8 @@ default =
         length =
             width * golden
     in
-        { label = "Shufflepuck"
+        { id = "shufflepuck"
+        , label = "Shufflepuck"
         , position = vec3 0 0 0
         , scale = vec3 1 1 1
         , orientation = Orientation.initial
@@ -134,7 +136,8 @@ type Msg
 create : Attributes -> ( App, Cmd AppMsg )
 create attributes =
     App.create (init attributes)
-        { label = label
+        { id = always attributes.id
+        , label = label
         , update = update
         , animate = animate
         , bodies = bodies

@@ -41,25 +41,29 @@ main =
               , Wedge.create "Wedge" (vec3 23 0 12)
 
               , Statue.create
-                  { label = "Clouds Sphere"
+                  { id = "clouds-sphere"
+                  , label = "Clouds Sphere"
                   , position = vec3 3 10 5
                   , appear = cloudsSphere
                   }
 
               , Statue.create
-                  { label = "Landscape Diamond"
+                  { id = "landscape-diamond"
+                  , label = "Landscape Diamond"
                   , position = vec3 0 1.5 0
                   , appear = fogMountainsDiamond
                   }
 
               , Statue.portal ( vec3 120 17 -261 )
-                  { label = "Voronoi Cube"
+                  { id = "voronoi-cube"
+                  , label = "Voronoi Cube"
                   , position = vec3 10 0 10
                   , appear = voronoiCube
                   }
 
               , Statue.create
-                  { label = "Fire Cube"
+                  { id = "fire-cube"
+                  , label = "Fire Cube"
                   , position = vec3 121 0 -253
                   , appear = fireCube
                   }
@@ -67,7 +71,8 @@ main =
 
           , defaultSelf =
               Suzanne.create
-                { label = "Walking"
+                { id = "suzanne"
+                , label = "Walking"
                 , height = 1.4
                 , speed = 8.0
                 }
@@ -83,7 +88,8 @@ main =
               , Boids.create 100
 
               , Statue.create
-                  { label = "Landscape Cube"
+                  { id = "landscape-cube"
+                  , label = "Landscape Cube"
                   , appear = fogMountainsCube
                   , position = vec3 10 1.5 -10
                   }
@@ -94,7 +100,8 @@ main =
                     Shufflepuck.create { s | position = vec3 53 0 18 }
 
               , Statue.portal (vec3 50 14 11)
-                  { label = "Sky Diamond"
+                  { id = "sky-diamond"
+                  , label = "Sky Diamond"
                   , position = vec3 5 1.5 1
                   , appear = cloudsDiamond
                   }
@@ -103,7 +110,8 @@ main =
 
           , defaultSelf =
               Suzanne.create
-                  { label = "Walking"
+                  { id = "suzanne"
+                  , label = "Walking"
                   , height = 1.4
                   , speed = 8.0
                   }
@@ -129,7 +137,8 @@ elmLogo =
         drive = DreamBuggy.drive { speed = 8.0 }
     in
         Obj.create
-            { label = "Elm Logo"
+            { id = "elm-logo"
+            , label = "Elm Logo"
             , overlay = overlay
             , meshPath = "meshes/elmLogo.obj"
             , diffuseTexturePath = "textures/elmLogoDiffuse.png"

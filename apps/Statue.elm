@@ -18,7 +18,8 @@ import Orientation
 import Camera.DollyArc as Camera
 
 type alias Attributes =
-    { label : String
+    { id : String
+    , label : String
     , position : Vec3
     , appear : Appearance
     }
@@ -43,7 +44,8 @@ portal position = createHelp (Just (At position (WithOrientation Orientation.ini
 createHelp : Maybe Location -> Attributes -> ( App, Cmd AppMsg )
 createHelp destination attributes =
     App.create (init destination attributes)
-        { label = always attributes.label
+        { id = always attributes.id
+        , label = always attributes.label
         , update = update
         , animate = animate
         , bodies = bodies

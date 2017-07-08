@@ -22,7 +22,8 @@ import OBJ
 import OBJ.Types exposing (ObjFile, Mesh(..))
 
 type alias Attributes =
-    { label : String
+    { id : String
+    , label : String
     , overlay : Html (CtrlMsg Msg)
     , meshPath : String
     , diffuseTexturePath : String
@@ -47,7 +48,8 @@ type Msg
 create : Attributes -> ( App, Cmd AppMsg )
 create attributes =
     App.create (init attributes)
-        { label = always attributes.label
+        { id = always attributes.id
+        , label = always attributes.label
         , update = update attributes.drive
         , animate = animate
         , bodies = bodies

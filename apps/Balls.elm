@@ -31,7 +31,8 @@ type Msg
 create : Int -> ( App, Cmd AppMsg )
 create n =
     App.createUncontrolled (init n)
-        { label = always "Balls"
+        { id = always "balls"
+        , label = always "Balls"
         , update = update
         , animate = animate
         , bodies = bodies

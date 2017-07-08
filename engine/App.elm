@@ -1,4 +1,4 @@
-module App exposing (App, AppMsg, AppPosition, create, createUncontrolled, Focus, animate, bodies, reposition, label, overlay, framing, noFraming, focus, update, appToFocus, orientedToFocus)
+module App exposing (App, AppMsg, AppPosition, create, createUncontrolled, Focus, animate, bodies, reposition, id, label, overlay, framing, noFraming, focus, update, appToFocus, orientedToFocus)
 
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
@@ -17,7 +17,8 @@ import Ground exposing (Ground)
 
 
 type alias Animated model msg =
-    { label : model -> String
+    { id : model -> String
+    , label : model -> String
     , update : msg -> model -> ( model, Cmd msg )
     , bodies : model -> List Body
     , animate : Ground -> Time -> model -> model
@@ -77,6 +78,11 @@ packInit ( x, cmd ) =
     ( Dynamic.pack x, Cmd.map (Self << Dynamic.pack) cmd )
 
 
+packId : (model -> String) -> AppModel -> String
+packId f dyn =
+    f (Dynamic.unpack dyn)
+
+
 packLabel : (model -> String) -> AppModel -> String
 packLabel f dyn =
     f (Dynamic.unpack dyn)
@@ -119,8 +125,9 @@ packReposition f pos dyn =
     Dynamic.pack (f pos (Dynamic.unpack dyn))
 
 packMethods : Animated model (CtrlMsg msg) -> Animated AppModel AppMsg
-packMethods { label, update, animate, bodies, framing, focus, overlay, reposition } =
-    { label = packLabel label
+packMethods { id, label, update, animate, bodies, framing, focus, overlay, reposition } =
+    { id = packId id
+    , label = packLabel label
     , update = packUpdate update
     , animate = packAnimate animate
     , bodies = packBodies bodies
@@ -199,6 +206,10 @@ updateSelf f msg model =
    ----------------------------------------------------------------------
 -}
 
+
+id : App -> String
+id { methods, model } =
+    methods.id model
 
 label : App -> String
 label { methods, model } =
