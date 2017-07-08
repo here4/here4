@@ -26,26 +26,88 @@ main : Program Args (Model.Model MultiWorld.Model MultiWorld.Msg) (Model.Msg Mul
 main =
     MultiWorld.create
         [ { apps =
-            [ elmLogo
-            , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
-            , let s = Shufflepuck.default in Shufflepuck.create { s | position = vec3 53 0 18 }
-            , Wedge.create "Wedge" (vec3 23 0 12)
-            , Statue.create { label = "Clouds Sphere", position = vec3 3 10 5, appear = cloudsSphere }
-            , Statue.create { label = "Landscape Diamond", position = vec3 0 1.5 0, appear = fogMountainsDiamond }
-            , Statue.portal (vec3 -30 14 31) { label = "Sky Diamond", position = vec3 5 1.5 1, appear = cloudsDiamond }
-            , Statue.create { label = "Landscape Cube", position = vec3 10 1.5 -10, appear = fogMountainsCube }
+              [ StaticGround.create Terrain.generate
 
-            , Statue.portal ( vec3 120 17 -261 )
-                { label = "Voronoi Cube", position = vec3 10 0 10, appear = voronoiCube }
-            , Statue.create { label = "Fire Cube", position = vec3 121 0 -253, appear = fireCube }
+              , Sky.create skySphere
 
-            , Boids.create 100
-            , Balls.create 30
-            , StaticGround.create Terrain.generate
-            , Sky.create skySphere
-            ]
-          , defaultSelf = Suzanne.create { label = "Walking", height = 1.4, speed = 2.0 }
-          -- , defaultSelf = Statue.create "Hippy actualization" (vec3 30 50 6) cloudsSphere
+              , elmLogo
+
+              , Balls.create 30
+
+              , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
+
+              , Wedge.create "Wedge" (vec3 23 0 12)
+
+              , Statue.create
+                  { label = "Clouds Sphere"
+                  , position = vec3 3 10 5
+                  , appear = cloudsSphere
+                  }
+
+              , Statue.create
+                  { label = "Landscape Diamond"
+                  , position = vec3 0 1.5 0
+                  , appear = fogMountainsDiamond
+                  }
+
+              , Statue.portal ( vec3 120 17 -261 )
+                  { label = "Voronoi Cube"
+                  , position = vec3 10 0 10
+                  , appear = voronoiCube
+                  }
+
+              , Statue.create
+                  { label = "Fire Cube"
+                  , position = vec3 121 0 -253
+                  , appear = fireCube
+                  }
+              ]
+
+          , defaultSelf =
+              Suzanne.create
+                { label = "Walking"
+                , height = 1.4
+                , speed = 8.0
+                }
+          }
+
+        , { apps =
+              [ StaticGround.create Terrain.generate
+
+              , Sky.create skySphere
+
+              , Boids.create 100
+
+              , Statue.create
+                  { label = "Landscape Cube"
+                  , appear = fogMountainsCube
+                  , position = vec3 10 1.5 -10
+                  }
+
+              , let
+                    s = Shufflepuck.default
+                in
+                    Shufflepuck.create { s | position = vec3 53 0 18 }
+
+              , Statue.portal (vec3 50 14 11)
+                  { label = "Sky Diamond"
+                  , position = vec3 5 1.5 1
+                  , appear = cloudsDiamond
+                  }
+
+              ]
+
+          , defaultSelf =
+              Suzanne.create
+                  { label = "Walking"
+                  , height = 1.4
+                  , speed = 8.0
+                  }
+{-
+          , defaultSelf =
+              Statue.create
+                  { label = "Hippy actualization",  position = vec3 30 50 6, appear = cloudsSphere }
+-}
           }
         ]
 
