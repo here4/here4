@@ -310,24 +310,39 @@ worldUpdate hubUpdate msg model =
 
         HubEff (Control.RelocateParty (WorldKey worldKey ()) (PartyKey partyKey) location) ->
             let
-                leaveRide party =
+                updateRide party =
                     case toAppPosition (WorldKey worldKey ()) model location of
                         (Just rideKey, _) ->
-                            { party | rideKey = Just rideKey }
+                            ( { party | rideKey = Just rideKey }
+                            , Cmd.map (Send (ToApp (WorldKey worldKey rideKey)))
+                                  (Task.succeed (PartyKey partyKey) |> Task.perform (Ctrl << Enter))
+                            )
 
                         (_, Just appPosition) ->
-                            { party | rideKey = Nothing
-                                    , self = App.reposition (Just appPosition) party.self
-                            }
+                            ( { party | rideKey = Nothing
+                                      , self = App.reposition (Just appPosition) party.self
+                              }
+                            , Cmd.none
+                            )
 
                         _ ->
-                            party
+                            ( party, Cmd.none )
+
+                mNewPartyCmds =
+                    Maybe.map updateRide <| worldParty (WorldKey worldKey (PartyKey partyKey)) model
+
+                mNewParty =
+                    Maybe.map Tuple.first mNewPartyCmds
+
+                newCmds =
+                    Maybe.map Tuple.second mNewPartyCmds
+                    |> Maybe.withDefault Cmd.none
 
                 updateParties stuff =
-                    { stuff | parties = Bag.update partyKey (Maybe.map leaveRide) stuff.parties }
+                    { stuff | parties = Bag.update partyKey (always mNewParty) stuff.parties }
             in
                 ( { model | worlds = Bag.update worldKey (Maybe.map updateParties) model.worlds }
-                , Cmd.none
+                , newCmds
                 )
 
         Send key appMsg ->
