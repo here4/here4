@@ -16,6 +16,11 @@ import Ground exposing (Ground)
 import Math.Vector3 as V3 exposing (vec3)
 import Task
 
+type alias Attributes =
+    { apps : List ( App, Cmd AppMsg )
+    , defaultSelf : ( App, Cmd AppMsg )
+    }
+
 type alias WorldModel a =
     { worldModel : a
     , worlds : Bag Stuff
@@ -38,11 +43,11 @@ type alias Party =
 create :
     ( model, Cmd msg )
     -> (msg -> model -> ( model, Cmd msg ))
-    -> List { apps : List ( App, Cmd AppMsg ), defaultSelf : ( App, Cmd AppMsg ) }
+    -> List Attributes
     -> Program Args (Model.Model (WorldModel model) (WorldMsg msg)) (Model.Msg (WorldMsg msg))
-create hubInit hubUpdate details =
+create hubInit hubUpdate attributes =
     Space.programWithFlags
-        { init = worldInit hubInit details
+        { init = worldInit hubInit attributes
         , view = worldView
         , update = worldUpdate hubUpdate
         , label = worldLabel
@@ -90,23 +95,23 @@ worldApps (WorldKey worldKey ()) appsList =
 
 
 oneWorldInit :
-    { apps : List ( App, Cmd AppMsg ), defaultSelf : ( App, Cmd AppMsg ) }
+    Attributes
     -> ( Bag Stuff, List (Cmd (WorldMsg msg)) )
     -> ( Bag Stuff, List (Cmd (WorldMsg msg)) )
-oneWorldInit detail ( oldWorlds, oldCmds ) =
+oneWorldInit attributes ( oldWorlds, oldCmds ) =
     let
         emptyStuff =
             { maybeGround = Nothing
             , apps = Bag.empty
             , parties = Bag.empty
-            , defaultSelf = detail.defaultSelf
+            , defaultSelf = attributes.defaultSelf
             }
 
         ( worldKey, oneWorlds ) =
             Bag.insert emptyStuff oldWorlds
 
         ( appsBag, appCmds ) =
-            worldApps (WorldKey worldKey ()) detail.apps
+            worldApps (WorldKey worldKey ()) attributes.apps
 
         updateApps stuff = { stuff | apps = appsBag }
 
@@ -117,15 +122,15 @@ oneWorldInit detail ( oldWorlds, oldCmds ) =
 
 worldInit :
     ( model, Cmd msg )
-    -> List { apps : List ( App, Cmd AppMsg ), defaultSelf : ( App, Cmd AppMsg ) }
+    -> List Attributes
     -> ( WorldModel model, Cmd (WorldMsg msg) )
-worldInit hubInit details =
+worldInit hubInit attributes =
     let
         ( hubModel, hubCmd ) =
             hubInit
 
         ( worldsBag, worldsCmds ) =
-            List.foldl oneWorldInit ( Bag.empty, [] ) details
+            List.foldl oneWorldInit ( Bag.empty, [] ) attributes
     in
         ( { worldModel = hubModel
           , worlds = worldsBag
