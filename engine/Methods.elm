@@ -11,6 +11,8 @@ import Time exposing (Time)
 type alias Methods worldModel worldMsg =
     { init : ( worldModel, Cmd (WorldMsg worldMsg) )
     , update : WorldMsg worldMsg -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg) )
+    , worldId : WorldKey () -> worldModel -> Maybe String
+    , worldLabel : WorldKey () -> worldModel -> Maybe String
     , partyLabel : WorldKey PartyKey -> worldModel -> String
     , overlay : WorldKey PartyKey -> worldModel -> Html (WorldMsg worldMsg)
     , view : WorldKey () -> worldModel -> Maybe Model.World

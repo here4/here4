@@ -54,6 +54,8 @@ create hubInit hubUpdate attributes =
         { init = worldInit hubInit attributes
         , view = worldView
         , update = worldUpdate hubUpdate
+        , worldId = worldId
+        , worldLabel = worldLabel
         , partyLabel = worldPartyLabel
         , overlay = worldOverlay
         , animate = worldAnimate
@@ -493,6 +495,18 @@ worldChangeRide (WorldKey worldKey (PartyKey partyKey)) model =
             ( { model | worlds = Bag.update worldKey (Maybe.map updateParties) model.worlds }
             , newCmds
             )
+
+
+worldId : WorldKey () -> WorldModel a -> Maybe String
+worldId (WorldKey worldKey ()) model =
+    Bag.get worldKey model.worlds
+    |> Maybe.map .id
+
+worldLabel : WorldKey () -> WorldModel a -> Maybe String
+worldLabel (WorldKey worldKey ()) model =
+    Bag.get worldKey model.worlds
+    |> Maybe.map .label
+
 
 worldPartyLabel : WorldKey PartyKey -> WorldModel a -> String
 worldPartyLabel worldPartyKey model =
