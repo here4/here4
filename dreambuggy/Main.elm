@@ -28,7 +28,7 @@ main : Navigator RAM.Model RAM.Msg
 main =
     RAM.create
         [ { id = "world1"
-          , label = "Ballyboo"
+          , label = "Dreambuggy"
           , apps =
                 [ StaticGround.create Terrain.generate
                 , Sky.create skySphere
@@ -79,17 +79,17 @@ main =
           , defaultSelf =
                 Suzanne.create
                     { id = "suzanne"
-                    , label = "Walking over here"
+                    , label = "Walking"
                     , position = vec3 0 10 0
                     , height = 1.4
                     , speed = 8.0
                     }
           }
         , { id = "world2"
-          , label = "Shufflepuckia"
+          , label = "Shufflepuck Club"
           , apps =
                 [ BoxRoom.create { dimensions = vec3 20 50 30 }
-                -- , StaticGround.create Terrain.generate
+
                 , let
                     s =
                         Shufflepuck.default
@@ -103,14 +103,14 @@ main =
                 , Statue.portal (Remote "world1" (Facing "fire-cube"))
                     { id = "fire-cube"
                     , label = "Fire Cube"
-                    , position = vec3 21 0 -25
+                    , position = vec3 9 0 -14
                     , appear = fireCube
                     }
                 ]
           , defaultSelf =
                 Suzanne.create
                     { id = "suzanne"
-                    , label = "Walking over there"
+                    , label = "Walking"
                     , position = vec3 0 10 0
                     , height = 1.4
                     , speed = 8.0
