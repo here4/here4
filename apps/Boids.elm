@@ -1,16 +1,16 @@
 module Boids exposing (create)
 
+import App exposing (..)
+import Behavior.Boids exposing (..)
+import Body exposing (..)
+import Body.BFly exposing (bfly)
+import Color exposing (white)
+import FontAwesome
 import Html exposing (Html)
 import Html.Attributes as Html
-import FontAwesome
-import Color exposing (white)
+import Math.RandomVector exposing (randomVec3)
 import Math.Vector3 exposing (Vec3, add, vec3)
 import Random
-import App exposing (..)
-import Body exposing (..)
-import Math.RandomVector exposing (randomVec3)
-import Behavior.Boids exposing (..)
-import Body.BFly exposing (bfly)
 import Shaders.VoronoiDistances exposing (voronoiDistances)
 
 

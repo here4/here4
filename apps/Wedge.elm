@@ -1,16 +1,15 @@
 module Wedge exposing (create)
 
-import Html exposing (Html)
-import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Task exposing (Task)
 import App exposing (..)
 import App.Control exposing (..)
 import Body exposing (..)
+import Body.Wedge exposing (wedge)
 import Dispatch exposing (..)
-import Ground exposing (Ground)
+import Html exposing (Html)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Orientation
-import Body.Wedge exposing (wedge)
+import Task exposing (Task)
 import Vehicles.DreamBird as DreamBird
 
 

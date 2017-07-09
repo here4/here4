@@ -2,13 +2,13 @@ module Statue exposing (create, portal)
 
 import App exposing (..)
 import App.Control exposing (..)
-import Html exposing (Html)
-import Html.Attributes as Html
-import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Appearance exposing (Appearance)
 import Body exposing (..)
 import Dispatch exposing (..)
+import Html exposing (Html)
+import Html.Attributes as Html
 import Location exposing (..)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Orientation
 
 

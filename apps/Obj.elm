@@ -1,21 +1,20 @@
 module Obj exposing (create)
 
-import Html exposing (Html)
-import Math.Vector3 exposing (Vec3, vec3)
-import Dict exposing (Dict)
-import Task exposing (Task)
-import Tuple exposing (first)
-import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
 import App.Control exposing (..)
 import Body exposing (..)
-import App.Control as Control
+import Body.Obj exposing (obj2)
+import Dict exposing (Dict)
 import Dispatch exposing (..)
+import Html exposing (Html)
+import Math.Vector3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Orientation
-import Body.Obj exposing (obj2)
 import OBJ
 import OBJ.Types exposing (ObjFile, Mesh(..))
+import Task exposing (Task)
+import Tuple exposing (first)
+import WebGL.Texture as Texture exposing (Texture, Error)
 
 
 type alias Attributes =
@@ -136,11 +135,11 @@ update mDrive msg model =
             Self (LoadObj url meshResult) ->
                 ( loadBody { model | mesh = meshResult }, Cmd.none )
 
-            Ctrl (Control.Move dp) ->
+            Ctrl (Move dp) ->
                 -- ( mapBody (translate dp), Cmd.none)
                 ( model, Cmd.none )
 
-            Ctrl (Control.Drive ground inputs) ->
+            Ctrl (Drive ground inputs) ->
                 case mDrive of
                     Just drive ->
                         ( mapBody (drive ground inputs), Cmd.none )

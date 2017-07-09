@@ -1,13 +1,13 @@
 module Sky exposing (create)
 
-import Html exposing (Html)
-import Math.Vector3 exposing (Vec3, vec3)
-import Task exposing (Task)
 import App exposing (..)
 import App.Control exposing (..)
 import Appearance exposing (Appearance)
 import Body exposing (..)
 import Dispatch exposing (..)
+import Html exposing (Html)
+import Math.Vector3 exposing (Vec3, vec3)
+import Task exposing (Task)
 
 
 type alias Model =

@@ -1,19 +1,18 @@
 module TextureCube exposing (create)
 
-import Html exposing (Html)
-import Math.Vector3 exposing (Vec3, vec3)
-import Task exposing (Task)
-import Tuple exposing (first)
-import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
 import App.Control exposing (..)
 import Body exposing (..)
 import Dispatch exposing (..)
-import Ground exposing (Ground)
+import Html exposing (Html)
+import Math.Vector3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Orientation
 import Primitive.Cube exposing (textureCube)
+import Task exposing (Task)
+import Tuple exposing (first)
 import Vehicles.DreamBuggy as DreamBuggy
+import WebGL.Texture as Texture exposing (Texture, Error)
 
 
 type alias Model =

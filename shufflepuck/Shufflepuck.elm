@@ -1,22 +1,22 @@
 module Shufflepuck exposing (create, default)
 
-import Html exposing (Html)
-import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Task exposing (Task)
-import Tuple exposing (first)
-import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
 import App.Control exposing (..)
 import Body exposing (..)
+import Bounding exposing (Bounding, bounce, bump)
+import Bounding.Box exposing (Box, boundingBox)
 import Camera
+import Html exposing (Html)
 import Dispatch exposing (..)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Orientation exposing (Orientation)
 import Primitive.Cube exposing (cloudsCube, textureCube)
 import Primitive.Cylinder exposing (cloudsCylinder, textureCylinder)
-import Bounding exposing (Bounding, bounce, bump)
-import Bounding.Box exposing (Box, boundingBox)
 import Physics.Collisions exposing (collisions)
+import Task exposing (Task)
+import Tuple exposing (first)
+import WebGL.Texture as Texture exposing (Texture, Error)
 
 
 type alias Attributes =

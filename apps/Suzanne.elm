@@ -1,21 +1,20 @@
 module Suzanne exposing (create)
 
-import Html exposing (Html)
-import Math.Vector3 exposing (Vec3, vec3)
-import Task exposing (Task)
-import Tuple exposing (first)
-import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
 import App.Control exposing (..)
 import Body exposing (..)
+import Body.Obj exposing (obj)
 import Dispatch exposing (..)
-import Ground exposing (Ground)
+import Html exposing (Html)
+import Math.Vector3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Orientation
-import Body.Obj exposing (obj)
-import Vehicles.Walking as Walking
 import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
+import Task exposing (Task)
+import Tuple exposing (first)
+import Vehicles.Walking as Walking
+import WebGL.Texture as Texture exposing (Texture, Error)
 
 
 type alias Attributes =

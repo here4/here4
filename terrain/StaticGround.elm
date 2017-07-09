@@ -1,12 +1,12 @@
 module StaticGround exposing (create)
 
-import Html exposing (Html)
-import Task exposing (Task)
 import App exposing (..)
-import Body exposing (Body)
 import App.Control exposing (..)
+import Body exposing (Body)
 import Dispatch exposing (..)
+import Html exposing (Html)
 import Math.Vector3 exposing (vec3)
+import Task exposing (Task)
 
 
 type alias Model =
