@@ -7,7 +7,7 @@ import Math.Vector3 as V3
 import Time exposing (Time)
 import App exposing (Focus)
 import Body exposing (reposition)
-import Camera exposing (..)
+import Camera.Types exposing (..)
 import Camera.POV exposing (pov)
 import Camera.DollyArc exposing (dollyZoom, dolly, zoom, arc)
 import Camera.Tracking exposing (tracking)

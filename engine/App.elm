@@ -2,7 +2,7 @@ module App exposing (..)
 
 import App.Internal as Internal
 import Body exposing (..)
-import Camera exposing (Framing)
+import Camera.Types exposing (Framing)
 import Control exposing (..)
 import Dispatch exposing (..)
 import Ground
@@ -20,7 +20,7 @@ type alias EffectMsg = Control.EffectMsg
 type alias AppPosition = Internal.AppPosition
 type alias Focus = Internal.Focus
 
-type alias Framing = Camera.Framing
+type alias Framing = Camera.Types.Framing
 
 type alias Ground = Ground.Ground
 

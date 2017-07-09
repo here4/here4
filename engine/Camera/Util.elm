@@ -4,7 +4,7 @@ import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Orientation exposing (Orientation)
 
 import Body exposing (..)
-import Camera exposing (..)
+import Camera.Types exposing (..)
 
 toTarget : Moving a -> Target
 toTarget thing =

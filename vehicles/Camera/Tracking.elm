@@ -3,7 +3,7 @@ module Camera.Tracking exposing (tracking)
 import Math.Vector3 as V3 exposing (..)
 import Orientation as Orientation
 import Body exposing (Moving, Oriented)
-import Camera exposing (..)
+import Camera.Types exposing (..)
 import Camera.Util as Camera
 import Ground exposing (Ground)
 import Model

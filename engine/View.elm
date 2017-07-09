@@ -19,7 +19,7 @@ import Window
 import App.Internal as App
 import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
-import Camera exposing (Camera)
+import Camera.Types exposing (Camera)
 import Camera.Util exposing (cameraUp)
 import Control exposing (WorldMsg)
 import Methods exposing (..)

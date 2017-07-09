@@ -2,7 +2,7 @@ module Methods exposing (..)
 
 import Html exposing (Html)
 import App exposing (Focus)
-import Camera exposing (Framing, Shot)
+import Camera.Types exposing (Framing, Shot)
 import Control exposing (..)
 import Ground exposing (Ground)
 import Model exposing (..)

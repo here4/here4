@@ -1,4 +1,4 @@
-module Camera exposing (..)
+module Camera.Types exposing (..)
 
 import Math.Vector3 as V3 exposing (Vec3)
 import Ground exposing (Ground)

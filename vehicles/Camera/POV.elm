@@ -1,8 +1,7 @@
 module Camera.POV exposing (pov)
 
 import Body exposing (Moving)
-import Camera exposing (..)
-import Camera.Util exposing (toCamera)
+import Camera.Types exposing (..)
 import Ground exposing (Ground)
 
 

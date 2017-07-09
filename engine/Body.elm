@@ -3,7 +3,7 @@ module Body exposing (..)
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
 import Appearance exposing (Appearance)
-import Camera exposing (..)
+import Camera.Types exposing (..)
 import Orientation exposing (Orientation)
 
 
