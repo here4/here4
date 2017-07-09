@@ -1,4 +1,5 @@
-module App exposing (App, AppMsg, AppPosition, create, createUncontrolled, Focus, animate, bodies, reposition, id, label, overlay, framing, noFraming, focus, update, appToFocus, orientedToFocus)
+module App.Internal exposing
+    (Animated, App, AppMsg, AppPosition, create, createUncontrolled, Focus, animate, bodies, reposition, id, label, overlay, framing, focus, update, appToFocus, orientedToFocus)
 
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
@@ -293,6 +294,3 @@ orientedToFocus x =
     { position = x.position }
 
 
-noFraming : PartyKey -> model -> Maybe Framing
-noFraming _ _ =
-    Nothing
