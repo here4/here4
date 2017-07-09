@@ -112,7 +112,7 @@ update world msg model =
 
         Model.JoinWorld worldKey playerKey ->
             let
-                ( partyKey, wm, cmdMsg ) =
+                ( partyKey, multiverse, cmdMsg ) =
                     world.join worldKey model.multiverse
 
                 p1 =
@@ -136,7 +136,7 @@ update world msg model =
                     { model
                         | player1 = player1
                         , player2 = player2
-                        , multiverse = wm
+                        , multiverse = multiverse
                     }
             in
                 ( newModel, Cmd.map Model.WorldMessage cmdMsg )
@@ -157,7 +157,7 @@ update world msg model =
                 p2 =
                     model.player2
 
-                ( wm, player1, player2 ) =
+                ( multiverse, player1, player2 ) =
                     case playerKey of
                         PlayerKey 0 ->
                             ( leave p1.partyKey
@@ -178,7 +178,7 @@ update world msg model =
                     { model
                         | player1 = player1
                         , player2 = player2
-                        , multiverse = wm
+                        , multiverse = multiverse
                     }
             in
                 ( newModel, Cmd.none )
@@ -245,12 +245,12 @@ animate world dt0 worldKey model0 =
                         dt0
 
                 -- Animate
-                wm =
+                multiverseA =
                     world.animate worldKey terrain dt model0.multiverse
 
 {-
                 -- Focus
-                ( wmF, wmFMsg, focPos ) =
+                ( multiverseF, multiverseFMsg, focPos ) =
                     let
                         key =
                             player1.focusKey
@@ -261,20 +261,20 @@ animate world dt0 worldKey model0 =
                                     dp =
                                         inputsToMove inputs1 player1
 
-                                    ( wmF, wmFMsg ) =
-                                        world.update (Forward (ToApp key) (Control.Move dp)) wm2
+                                    ( multiverseF, multiverseFMsg ) =
+                                        world.update (Forward (ToApp key) (Control.Move dp)) multiverse2
                                 in
-                                    ( wmF, wmFMsg, Just focus.position )
+                                    ( multiverseF, multiverseFMsg, Just focus.position )
 
                             _ ->
-                                ( wm2, Cmd.none, Nothing )
+                                ( multiverse2, Cmd.none, Nothing )
 -}
 
-                (clearedInputs1, player1, wm1, wm1Msg) =
-                    animatePlayer world worldKey terrain dt0 model0.inputs model0.player1 wm
+                (clearedInputs1, player1, multiverse1, multiverse1Msg) =
+                    animatePlayer world worldKey terrain dt0 model0.inputs model0.player1 multiverseA
 
-                (clearedInputs2, player2, wm2, wm2Msg) =
-                    animatePlayer world worldKey terrain dt0 model0.inputs2 model0.player2 wm1
+                (clearedInputs2, player2, multiverse2, multiverse2Msg) =
+                    animatePlayer world worldKey terrain dt0 model0.inputs2 model0.player2 multiverse1
 
                 newModel =
                     { model0
@@ -283,11 +283,11 @@ animate world dt0 worldKey model0 =
                         , player2 = player2
                         , inputs = clearedInputs1
                         , inputs2 = clearedInputs2
-                        , multiverse = wm2
+                        , multiverse = multiverse2
                     }
             in
                 ( newModel
-                , Cmd.map Model.WorldMessage (Cmd.batch [ wm1Msg, wm2Msg ])
+                , Cmd.map Model.WorldMessage (Cmd.batch [ multiverse1Msg, multiverse2Msg ])
                 )
 
 animatePlayer :
