@@ -4,6 +4,7 @@ import Html exposing (Html)
 import Bag exposing (Bag)
 import Time exposing (Time)
 import Space
+import App.Control exposing (..)
 import Control exposing (..)
 import Maybe.Extra exposing (isJust)
 import Dispatch exposing (..)
@@ -430,7 +431,7 @@ worldUpdate hubUpdate msg model =
             in
                 ( { model | state = hubModel }, Cmd.map Hub hubCmd )
 
-        HubEff (Control.UpdateGround (WorldKey worldKey ()) ground) ->
+        HubEff (App.Control.UpdateGround (WorldKey worldKey ()) ground) ->
             let
                 updateGround world =
                     { world | maybeGround = Just ground }
@@ -439,7 +440,7 @@ worldUpdate hubUpdate msg model =
                 , Cmd.none
                 )
 
-        HubEff (Control.RelocateParty (WorldKey worldKey ()) (PartyKey partyKey) location) ->
+        HubEff (App.Control.RelocateParty (WorldKey worldKey ()) (PartyKey partyKey) location) ->
             relocate (WorldKey worldKey (PartyKey partyKey)) location model
 
         Send key appMsg ->

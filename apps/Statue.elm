@@ -1,12 +1,12 @@
 module Statue exposing (create, portal)
 
 import App exposing (..)
+import App.Control exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Appearance exposing (Appearance)
 import Body exposing (..)
-import Control
 import Dispatch exposing (..)
 import Location exposing (..)
 import Orientation
@@ -76,7 +76,7 @@ init destination attributes =
 update : CtrlMsg Msg -> Model -> ( Model, Cmd (CtrlMsg Msg) )
 update msg model =
     case msg of
-        Ctrl (Control.Enter partyKey) ->
+        Ctrl (Enter partyKey) ->
             case model.destination of
                 Just dest ->
                     ( model, teleport partyKey dest )
@@ -84,7 +84,7 @@ update msg model =
                 Nothing ->
                     ( model, Cmd.none )
 
-        Ctrl (Control.Move dp) ->
+        Ctrl (Move dp) ->
             ( { model | body = translate dp model.body }, Cmd.none )
 
         _ ->

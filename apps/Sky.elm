@@ -4,9 +4,9 @@ import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import App exposing (..)
+import App.Control exposing (..)
 import Appearance exposing (Appearance)
 import Body exposing (..)
-import Control
 import Dispatch exposing (..)
 
 
@@ -41,7 +41,7 @@ init appear =
 update : CtrlMsg Msg -> Model -> ( Model, Cmd (CtrlMsg Msg) )
 update msg model =
     case msg of
-        Ctrl (Control.Move dp) ->
+        Ctrl (Move dp) ->
             ( translate dp model, Cmd.none )
 
         _ ->

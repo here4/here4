@@ -6,8 +6,8 @@ import Task exposing (Task)
 import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
+import App.Control exposing (..)
 import Body exposing (..)
-import Control
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Inputs)
@@ -78,11 +78,11 @@ update msg model =
                         -- ( { model | message = "Error loading texture" }, Cmd.none )
                         ( model, Cmd.none )
 
-            Ctrl (Control.Move dp) ->
+            Ctrl (Move dp) ->
                 -- ( mapBody (translate dp), Cmd.none)
                 ( model, Cmd.none )
 
-            Ctrl (Control.Drive ground inputs) ->
+            Ctrl (Drive ground inputs) ->
                 ( mapBody (DreamBuggy.drive { speed = 8.0 } ground inputs), Cmd.none )
 
             -- ( Maybe.map (\m -> { m | body = DreamBuggy.drive ground 8.0 inputs) m.body } model, Cmd.none )

@@ -4,7 +4,7 @@ import Html exposing (Html)
 import Task exposing (Task)
 import App exposing (..)
 import Body exposing (Body)
-import Control
+import App.Control exposing (..)
 import Dispatch exposing (..)
 import Math.Vector3 exposing (vec3)
 
@@ -52,7 +52,7 @@ update msg model =
         Self (GroundGenerated ( ground, bodies )) ->
             ( bodies
             , Task.succeed ground
-                |> Task.perform (Effect << Control.UpdateGround ())
+                |> Task.perform (Effect << UpdateGround ())
             )
 
         _ ->

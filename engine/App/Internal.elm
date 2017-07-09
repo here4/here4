@@ -1,6 +1,8 @@
 module App.Internal exposing
     (Animated, App, AppMsg, AppPosition, create, createUncontrolled, Focus, animate, bodies, reposition, id, label, overlay, framing, focus, update, appToFocus, orientedToFocus)
 
+
+import App.Control exposing (..)
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
@@ -11,7 +13,6 @@ import WebGL exposing (Entity)
 import Appearance exposing (..)
 import Body exposing (..)
 import Camera.Types exposing (Framing, Shot)
-import Control exposing (..)
 import Dispatch exposing (..)
 import Dynamic exposing (Dynamic)
 import Ground exposing (Ground)

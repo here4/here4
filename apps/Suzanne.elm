@@ -6,8 +6,8 @@ import Task exposing (Task)
 import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
+import App.Control exposing (..)
 import Body exposing (..)
-import Control
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Inputs)
@@ -115,11 +115,11 @@ update attributes msg model =
             Self (LoadObj meshResult) ->
                 ( loadBody { model | mesh = meshResult }, Cmd.none )
 
-            Ctrl (Control.Move dp) ->
+            Ctrl (Move dp) ->
                 -- ( mapBody (translate dp), Cmd.none)
                 ( model, Cmd.none )
 
-            Ctrl (Control.Drive ground inputs) ->
+            Ctrl (Drive ground inputs) ->
                 ( mapBody (Walking.drive { speed = attributes.speed, height = attributes.height } ground inputs), Cmd.none )
 
             _ ->

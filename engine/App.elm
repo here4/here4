@@ -1,10 +1,10 @@
 module App exposing (..)
 
+import App.Control exposing (..)
 import App.Internal as Internal
 import Body exposing (..)
 import Camera
 import Camera.Types exposing (Framing)
-import Control exposing (..)
 import Dispatch exposing (..)
 import Ground
 import Location exposing (Location)
@@ -14,9 +14,6 @@ import Time
 
 type alias App = Internal.App
 type alias AppMsg = Internal.AppMsg
-
-type alias CtrlMsg a = Control.CtrlMsg a
-type alias EffectMsg = Control.EffectMsg
 
 type alias AppPosition = Internal.AppPosition
 type alias Focus = Internal.Focus

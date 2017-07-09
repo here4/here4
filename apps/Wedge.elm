@@ -4,8 +4,8 @@ import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import App exposing (..)
+import App.Control exposing (..)
 import Body exposing (..)
-import Control
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Inputs)
@@ -63,10 +63,10 @@ update msg model =
             { model | body = f model.body }
     in
         case msg of
-            Ctrl (Control.Move dp) ->
+            Ctrl (Move dp) ->
                 ( model, Cmd.none )
 
-            Ctrl (Control.Drive ground inputs) ->
+            Ctrl (Drive ground inputs) ->
                 ( mapBody (DreamBird.drive { speed = 20.0 } ground inputs), Cmd.none )
 
             _ ->

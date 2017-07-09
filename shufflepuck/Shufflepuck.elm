@@ -6,9 +6,9 @@ import Task exposing (Task)
 import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
+import App.Control exposing (..)
 import Body exposing (..)
 import Camera
-import Control
 import Dispatch exposing (..)
 import Model exposing (Inputs)
 import Orientation exposing (Orientation)
@@ -401,10 +401,10 @@ update msg model =
                     -- ( { model | message = "Error loading texture" }, Cmd.none )
                     ( model, Cmd.none )
 
-        Ctrl (Control.Move dp) ->
+        Ctrl (Move dp) ->
             ( model, Cmd.none )
 
-        Ctrl (Control.Drive ground inputs) ->
+        Ctrl (Drive ground inputs) ->
             ( movePaddle inputs model, Cmd.none )
 
         _ ->

@@ -7,8 +7,9 @@ import Task exposing (Task)
 import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
+import App.Control exposing (..)
 import Body exposing (..)
-import Control
+import App.Control as Control
 import Dispatch exposing (..)
 import Model exposing (Inputs)
 import Orientation

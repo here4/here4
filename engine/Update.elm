@@ -12,6 +12,7 @@ import Camera.POV exposing (pov)
 import Camera.DollyArc exposing (dollyZoom, dolly, zoom, arc)
 import Camera.Tracking exposing (tracking)
 import Camera
+import App.Control as Control
 import Control exposing (WorldMsg, Route(..))
 import Dispatch exposing (..)
 import Gamepad
