@@ -93,18 +93,26 @@ worldParty (WorldKey worldKey (PartyKey partyKey)) model =
 worldApps : WorldKey () -> List ( App, Cmd AppMsg ) -> ( Bag App, List (Cmd (WorldMsg msg)) )
 worldApps (WorldKey worldKey ()) appsList =
     let
+        response appKey x =
+            case x of
+                Effect e ->
+                    HubEff (toWorldEffect (WorldKey worldKey ()) e)
+
+                m ->
+                    let
+                        key = ToApp (WorldKey worldKey (AppKey appKey))
+                    in
+                        toWorldMsg (WorldKey worldKey ()) (Send key m)
+
         f ( newApps, newCmdMsg ) ( oldBag, oldCmdMsgs ) =
             let
-                ( key, newBag ) =
+                ( appKey, newBag ) =
                     Bag.insert newApps oldBag
             in
-                ( newBag, oldCmdMsgs ++ [ Cmd.map (Send (ToApp (WorldKey worldKey (AppKey key)))) newCmdMsg ] )
+                ( newBag, Cmd.map (response appKey) newCmdMsg :: oldCmdMsgs )
 
-        ( appsBag, unbatched ) =
+        ( appsBag, worldCmds ) =
             List.foldl f ( Bag.empty, [] ) appsList
-
-        worldCmds =
-            List.map (Cmd.map (toWorldMsg (WorldKey worldKey ()))) unbatched
     in
         ( appsBag, worldCmds )
 
