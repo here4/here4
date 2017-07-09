@@ -38,7 +38,7 @@ newBoid m r pos vel thing0 =
 
 boidOrientation : Moving a -> Orientation
 boidOrientation b =
-    fromVec3 b.velocity
+    fromTo V3.k b.velocity
 
 
 stepBoid : Ground -> Time -> Spherical (Moving a) -> Spherical (Moving a)
@@ -106,7 +106,7 @@ bounds ground b =
             V3.toTuple b.position
 
         elevation =
-            ground.elevation b.position
+            max 0 (ground.elevation b.position)
     in
         vec3 (bound x -200 200)
             (bound y (elevation + 10 + b.radius) (elevation + 100))
@@ -119,7 +119,9 @@ boundVelocity v =
         l =
             V3.length v
     in
-        if (l < 1) then
+        if (l < 0) then
+            vec3 0 0 0
+        else if (l < 1) then
             (V3.scale (1 / l) v)
         else
             v
