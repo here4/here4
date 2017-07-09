@@ -28,8 +28,10 @@ createTileGround tiles =
 
 
 tileBounds : Tiles -> Float -> Vec3 -> Vec3
-tileBounds { placement } radius pos =
+tileBounds tiles radius pos =
     let
+        { placement } = tiles
+
         bound x low high =
             if (x < low + radius) then
                 low + radius
@@ -42,12 +44,17 @@ tileBounds { placement } radius pos =
 
         ( x, y, z ) =
             V3.toTuple pos
-    in
-        vec3
-            (bound x (placement.xOffset + 10) (placement.xOffset + toFloat placement.bigSide * placement.xDelta - 10))
-            (bound y 0 1000)
-            (bound z (placement.zOffset + 10) (placement.zOffset + toFloat placement.bigSide * placement.zDelta - 10))
 
+        newX =
+            bound x (placement.xOffset + 10) (placement.xOffset + toFloat placement.bigSide * placement.xDelta - 10)
+
+        newZ =
+            bound z (placement.zOffset + 10) (placement.zOffset + toFloat placement.bigSide * placement.zDelta - 10)
+
+        newY =
+            bound y (tileElevation tiles (vec3 newX y newZ)) 1000
+    in
+        vec3 newX newY newZ
 
 
 -- Elevation of terrain at a given coordinate
