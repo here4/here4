@@ -82,7 +82,7 @@ main =
                     , label = "Walking"
                     , position = vec3 0 10 0
                     , height = 1.4
-                    , speed = 8.0
+                    , speed = 16.0
                     }
           }
         , { id = "world2"

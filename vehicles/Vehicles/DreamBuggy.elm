@@ -164,7 +164,7 @@ goForward eyeLevel speed inputs motion =
 
         -- e = (eyeLevel motion.position) / 80.0 -- placement.yMult
         e =
-            (eyeLevel motion.position) / 20.0
+            (eyeLevel motion.position) / 30.0
 
         friction =
             if e > 0.8 then
