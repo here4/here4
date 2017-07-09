@@ -12,7 +12,6 @@ import Camera exposing (..)
 import Camera.Util as Camera
 import Control
 import Dispatch exposing (..)
-import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation
 import Body.Obj exposing (obj2)

@@ -8,7 +8,6 @@ import Appearance exposing (Appearance)
 import Body exposing (..)
 import Control
 import Dispatch exposing (..)
-import Ground exposing (Ground)
 
 
 type alias Model =

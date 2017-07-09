@@ -10,7 +10,6 @@ import Camera exposing (..)
 import Camera.Util as Camera
 import Control
 import Dispatch exposing (..)
-import Ground exposing (Ground)
 import Location exposing (..)
 import Orientation
 import Camera.DollyArc as Camera

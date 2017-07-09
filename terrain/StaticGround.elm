@@ -6,7 +6,6 @@ import App exposing (..)
 import Body exposing (Body)
 import Control
 import Dispatch exposing (..)
-import Ground exposing (Ground)
 import Math.Vector3 exposing (vec3)
 
 

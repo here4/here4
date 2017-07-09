@@ -5,6 +5,7 @@ import Body exposing (..)
 import Camera exposing (Framing)
 import Control exposing (..)
 import Dispatch exposing (..)
+import Ground
 import Location exposing (Location)
 import Model exposing (PartyKey)
 import Task exposing (Task)
@@ -18,6 +19,8 @@ type alias EffectMsg = Control.EffectMsg
 
 type alias AppPosition = Internal.AppPosition
 type alias Focus = Internal.Focus
+
+type alias Ground = Ground.Ground
 
 type alias PartyKey = Model.PartyKey
 

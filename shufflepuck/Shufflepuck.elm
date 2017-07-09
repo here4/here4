@@ -11,7 +11,6 @@ import Camera exposing (..)
 import Camera.Util as Camera
 import Control
 import Dispatch exposing (..)
-import Ground exposing (Ground)
 import Model exposing (Inputs)
 import Orientation exposing (Orientation)
 import Primitive.Cube exposing (cloudsCube, textureCube)
