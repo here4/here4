@@ -16,7 +16,7 @@ import Math.Vector3 exposing (..)
 import Time exposing (Time)
 import WebGL
 import Window
-import App exposing (..)
+import App.Internal as App
 import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
 import Camera exposing (Camera)

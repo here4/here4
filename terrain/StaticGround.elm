@@ -2,10 +2,9 @@ module StaticGround exposing (create)
 
 import Html exposing (Html)
 import Task exposing (Task)
-import Time exposing (Time)
-import App exposing (App, AppMsg, Focus, noFraming)
+import App exposing (..)
 import Body exposing (Body)
-import Control exposing (..)
+import Control
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Math.Vector3 exposing (vec3)
@@ -54,7 +53,7 @@ update msg model =
         Self (GroundGenerated ( ground, bodies )) ->
             ( bodies
             , Task.succeed ground
-                |> Task.perform (Effect << UpdateGround ())
+                |> Task.perform (Effect << Control.UpdateGround ())
             )
 
         _ ->

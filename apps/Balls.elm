@@ -4,7 +4,6 @@ import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector3 exposing (Vec3, add, vec3)
 import Random
-import Time exposing (Time)
 import App exposing (..)
 import Body exposing (..)
 import Camera exposing (..)

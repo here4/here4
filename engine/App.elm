@@ -8,6 +8,7 @@ import Dispatch exposing (..)
 import Location exposing (Location)
 import Model exposing (PartyKey)
 import Task exposing (Task)
+import Time
 
 type alias App = Internal.App
 type alias AppMsg = Internal.AppMsg
@@ -19,6 +20,8 @@ type alias AppPosition = Internal.AppPosition
 type alias Focus = Internal.Focus
 
 type alias PartyKey = Model.PartyKey
+
+type alias Time = Time.Time
 
 create : ( model, Cmd (CtrlMsg msg) ) -> Internal.Animated model (CtrlMsg msg) -> ( App, Cmd AppMsg )
 create = Internal.create
