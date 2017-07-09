@@ -16,17 +16,18 @@ import Tuple exposing (first)
 import Vehicles.Walking as Walking
 import WebGL.Texture as Texture exposing (Texture, Error)
 
-
 type alias Attributes =
     { id : String
     , label : String
+    , position : Vec3
     , height : Float
     , speed : Float
     }
 
 
 type alias Model =
-    { body : Maybe (Moving Body)
+    { motion : Moving {}
+    , body : Maybe (Moving Body)
     , mesh : Result String (MeshWith VertexWithTexture)
     , reflectionTexture : Result String Texture
     }
@@ -39,7 +40,7 @@ type Msg
 
 create : Attributes -> ( App, Cmd AppMsg )
 create attributes =
-    App.create init
+    App.create (init attributes)
         { id = always attributes.id
         , label = always attributes.label
         , update = update attributes
@@ -52,9 +53,14 @@ create attributes =
         }
 
 
-init : ( Model, Cmd (CtrlMsg Msg) )
-init =
-    ( { body = Nothing
+init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
+init attributes =
+    ( { motion =
+          { position = attributes.position
+          , orientation = Orientation.initial
+          , velocity = vec3 0 0 0
+          }
+      , body = Nothing
       , mesh = Err "Loading ..."
       , reflectionTexture = Err "Loading texture ..."
       }
@@ -79,6 +85,12 @@ loadTexture url msg =
             )
 
 
+setMotion : Moving {} -> Model -> Model
+setMotion motion model =
+    { model | motion = motion
+            , body = Maybe.map (copyMotion motion) model.body
+    }
+
 update :
     Attributes
     -> CtrlMsg Msg
@@ -86,9 +98,6 @@ update :
     -> ( Model, Cmd (CtrlMsg Msg) )
 update attributes msg model =
     let
-        mapBody f =
-            (\m -> { m | body = Maybe.map f m.body }) model
-
         loadBody m =
             case ( m.mesh, m.reflectionTexture ) of
                 ( Ok mesh, Ok texture ) ->
@@ -97,10 +106,10 @@ update attributes msg model =
                             Just
                                 { anchor = AnchorGround
                                 , scale = vec3 1 1 1
-                                , position = vec3 13 0 38
-                                , orientation = Orientation.initial
+                                , position = model.motion.position
+                                , orientation = model.motion.orientation
                                 , appear = obj mesh texture
-                                , velocity = vec3 0 0 0
+                                , velocity = model.motion.velocity
                                 }
                     }
 
@@ -119,8 +128,12 @@ update attributes msg model =
                 ( model, Cmd.none )
 
             Ctrl (Drive ground inputs) ->
-                ( mapBody (Walking.drive { speed = attributes.speed, height = attributes.height } ground inputs), Cmd.none )
-
+                let
+                    walkAttributes = { speed = attributes.speed, height = attributes.height }
+                in
+                    ( setMotion (Walking.drive walkAttributes ground inputs model.motion) model
+                    , Cmd.none
+                    )
             _ ->
                 ( model, Cmd.none )
 
@@ -142,19 +155,19 @@ bodies model_ =
 
 reposition : Maybe AppPosition -> Model -> Model
 reposition mPos model =
-    let
-        mapBody f =
-            (\m -> { m | body = Maybe.map f m.body }) model
+    case mPos of
+        Just pos ->
+            let
+                motion = model.motion
+                newMotion =
+                    { motion | position = pos.position
+                             , orientation = pos.orientation
+                    }
+            in
+                setMotion newMotion model
 
-        setPos pos body =
-            { body | position = pos.position, orientation = pos.orientation }
-    in
-        case mPos of
-            Just pos ->
-                mapBody (setPos pos)
-
-            Nothing ->
-                model
+        Nothing ->
+            model
 
 
 framing : PartyKey -> Model -> Maybe Framing

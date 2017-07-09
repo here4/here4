@@ -80,6 +80,12 @@ reposition t thing =
     { thing | position = t }
 
 
+copyMotion : Moving a -> Moving b -> Moving b
+copyMotion motion thing =
+    { thing | position = motion.position
+            , orientation = motion.orientation
+            , velocity = motion.velocity
+    }
 
 -- | Resize a Body
 

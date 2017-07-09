@@ -56,14 +56,15 @@ main =
                 , Statue.portal (Remote "world2" (Behind "shufflepuck"))
                     { id = "sky-diamond"
                     , label = "Sky Diamond"
-                    , position = vec3 5 1.5 1
+                    , position = vec3 -15 1.5 21
                     , appear = cloudsDiamond
                     }
                 ]
           , defaultSelf =
                 Suzanne.create
                     { id = "suzanne"
-                    , label = "Walking"
+                    , label = "Walking over here"
+                    , position = vec3 0 10 0
                     , height = 1.4
                     , speed = 8.0
                     }
@@ -111,7 +112,8 @@ main =
           , defaultSelf =
                 Suzanne.create
                     { id = "suzanne"
-                    , label = "Walking"
+                    , label = "Walking over there"
+                    , position = vec3 0 10 0
                     , height = 1.4
                     , speed = 8.0
                     }
