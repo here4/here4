@@ -13,7 +13,6 @@ import Camera exposing (..)
 import Camera.Util as Camera
 import Ground exposing (Ground)
 import Math.RandomVector exposing (randomVec3)
-import Model exposing (PartyKey)
 import Behavior.Boids exposing (..)
 import Body.BFly exposing (bfly)
 import Shaders.VoronoiDistances exposing (voronoiDistances)

@@ -6,14 +6,14 @@ import Task exposing (Task)
 import Time exposing (Time)
 import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
-import App exposing (App, AppMsg, AppPosition, Focus, appToFocus)
+import App exposing (..)
 import Body exposing (..)
 import Camera exposing (..)
 import Camera.Util as Camera
 import Control exposing (CtrlMsg)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
-import Model exposing (Inputs, PartyKey)
+import Model exposing (Inputs)
 import Orientation
 import Body.Obj exposing (obj)
 import Vehicles.Walking as Walking

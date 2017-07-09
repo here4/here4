@@ -1,10 +1,10 @@
 module Statue exposing (create, portal)
 
+import App exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Time exposing (Time)
-import App exposing (App, AppMsg, AppPosition, Focus, appToFocus)
 import Appearance exposing (Appearance)
 import Body exposing (..)
 import Camera exposing (..)
@@ -13,7 +13,6 @@ import Control exposing (CtrlMsg, EffectMsg(..), teleport)
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Location exposing (..)
-import Model exposing (PartyKey)
 import Orientation
 import Camera.DollyArc as Camera
 

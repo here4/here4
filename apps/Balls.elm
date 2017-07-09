@@ -11,7 +11,6 @@ import Camera exposing (..)
 import Camera.Util as Camera
 import Ground exposing (Ground)
 import Math.RandomVector exposing (randomVec3)
-import Model exposing (PartyKey)
 import Physics.Collisions exposing (collisions)
 import Physics.Gravity exposing (gravity)
 import Primitive.Sphere exposing (fogMountainsSphere)
