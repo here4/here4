@@ -1,4 +1,4 @@
-module Camera.Util exposing (..)
+module Camera exposing (..)
 
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Orientation exposing (Orientation)

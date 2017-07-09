@@ -6,7 +6,7 @@ import Math.Vector3 exposing (Vec3, add, vec3)
 import Random
 import App exposing (..)
 import Body exposing (..)
-import Camera.Util as Camera
+import Camera
 import Math.RandomVector exposing (randomVec3)
 import Physics.Collisions exposing (collisions)
 import Physics.Gravity exposing (gravity)

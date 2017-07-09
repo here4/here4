@@ -10,7 +10,7 @@ import Orientation exposing (Orientation)
 import Bag
 import Body exposing (Body, Oriented)
 import Camera.Types exposing (Camera, Shot)
-import Camera.Util exposing (toCamera)
+import Camera exposing (toCamera)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 

@@ -11,7 +11,7 @@ import Camera.Types exposing (..)
 import Camera.POV exposing (pov)
 import Camera.DollyArc exposing (dollyZoom, dolly, zoom, arc)
 import Camera.Tracking exposing (tracking)
-import Camera.Util as Camera
+import Camera
 import Control exposing (WorldMsg, Route(..))
 import Dispatch exposing (..)
 import Gamepad

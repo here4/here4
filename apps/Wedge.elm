@@ -5,7 +5,7 @@ import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
 import App exposing (..)
 import Body exposing (..)
-import Camera.Util as Camera
+import Camera
 import Control
 import Dispatch exposing (..)
 import Ground exposing (Ground)

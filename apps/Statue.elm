@@ -6,7 +6,7 @@ import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Appearance exposing (Appearance)
 import Body exposing (..)
-import Camera.Util as Camera
+import Camera
 import Control
 import Dispatch exposing (..)
 import Location exposing (..)

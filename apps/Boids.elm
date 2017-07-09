@@ -8,7 +8,7 @@ import Math.Vector3 exposing (Vec3, add, vec3)
 import Random
 import App exposing (..)
 import Body exposing (..)
-import Camera.Util as Camera
+import Camera as Camera
 import Math.RandomVector exposing (randomVec3)
 import Behavior.Boids exposing (..)
 import Body.BFly exposing (bfly)

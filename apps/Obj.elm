@@ -8,7 +8,7 @@ import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
 import Body exposing (..)
-import Camera.Util as Camera
+import Camera
 import Control
 import Dispatch exposing (..)
 import Model exposing (Inputs)

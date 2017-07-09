@@ -3,9 +3,6 @@ module View exposing (view)
 import Color exposing (black, white)
 import FontAwesome
 
-
--- import Html
-
 import Html exposing (Html, text, div, p, span)
 import Html.Attributes exposing (width, height, style)
 import List.Extra as List
@@ -20,7 +17,7 @@ import App.Internal as App
 import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
 import Camera.Types exposing (Camera)
-import Camera.Util exposing (cameraUp)
+import Camera exposing (cameraUp)
 import Control exposing (WorldMsg)
 import Methods exposing (..)
 import Model exposing (Model, Msg(..), WorldKey(..))
