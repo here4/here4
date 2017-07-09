@@ -54,12 +54,12 @@ layoutScene windowSize methods model =
 
         mRender player =
             Maybe.map toUnit player.partyKey
-                |> Maybe.andThen (\worldKey -> methods.view worldKey model.worldModel)
+                |> Maybe.andThen (\worldKey -> methods.view worldKey model.multiverse)
                 |> Maybe.map (renderWorld model.globalTime)
 
         worldLabel player =
             Maybe.map toUnit player.partyKey
-                |> Maybe.andThen (\worldKey -> methods.worldLabel worldKey model.worldModel)
+                |> Maybe.andThen (\worldKey -> methods.worldLabel worldKey model.multiverse)
                 |> Maybe.withDefault "(Nowhere)"
 
         worldLabel1 =

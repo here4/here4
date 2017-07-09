@@ -239,7 +239,7 @@ type alias Model worldModel worldMsg =
     , wantToBeLocked : Bool
     , isLocked : Bool
     , message : String
-    , worldModel : worldModel
+    , multiverse : worldModel
     }
 
 
@@ -279,7 +279,7 @@ init worldInit { movement, isLocked } =
           , wantToBeLocked = True
           , isLocked = isLocked
           , message = "No texture yet"
-          , worldModel = worldModel
+          , multiverse = worldModel
           }
         , Cmd.batch
             [ Window.size |> Task.perform Resize

@@ -35,8 +35,8 @@ update world msg model =
     case msg of
         Model.WorldMessage worldMsg ->
             let
-                ( worldModel, worldCmdMsg ) =
-                    world.update worldMsg model.worldModel
+                ( multiverse, worldCmdMsg ) =
+                    world.update worldMsg model.multiverse
 
                 response x =
                     case x of
@@ -46,7 +46,7 @@ update world msg model =
                         m ->
                             Model.WorldMessage m
             in
-                ( { model | worldModel = worldModel }, Cmd.map response worldCmdMsg )
+                ( { model | multiverse = multiverse }, Cmd.map response worldCmdMsg )
 
         Model.WorldEffect (PlayerUpdate oldPartyKey newPartyKey) ->
             let
@@ -113,7 +113,7 @@ update world msg model =
         Model.JoinWorld worldKey playerKey ->
             let
                 ( partyKey, wm, cmdMsg ) =
-                    world.join worldKey model.worldModel
+                    world.join worldKey model.multiverse
 
                 p1 =
                     model.player1
@@ -136,7 +136,7 @@ update world msg model =
                     { model
                         | player1 = player1
                         , player2 = player2
-                        , worldModel = wm
+                        , multiverse = wm
                     }
             in
                 ( newModel, Cmd.map Model.WorldMessage cmdMsg )
@@ -146,10 +146,10 @@ update world msg model =
                 leave mKey =
                     case mKey of
                         Nothing ->
-                            model.worldModel
+                            model.multiverse
 
                         Just partyKey ->
-                            world.leave partyKey model.worldModel
+                            world.leave partyKey model.multiverse
 
                 p1 =
                     model.player1
@@ -172,13 +172,13 @@ update world msg model =
                             )
 
                         _ ->
-                            ( model.worldModel, p1, p2 )
+                            ( model.multiverse, p1, p2 )
 
                 newModel =
                     { model
                         | player1 = player1
                         , player2 = player2
-                        , worldModel = wm
+                        , multiverse = wm
                     }
             in
                 ( newModel, Cmd.none )
@@ -232,7 +232,7 @@ animate :
     -> Model worldModel (WorldMsg worldMsg)
     -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
 animate world dt0 worldKey model0 =
-    case world.ground worldKey model0.worldModel of
+    case world.ground worldKey model0.multiverse of
         Nothing ->
             ( model0, Cmd.none )
 
@@ -246,7 +246,7 @@ animate world dt0 worldKey model0 =
 
                 -- Animate
                 wm =
-                    world.animate worldKey terrain dt model0.worldModel
+                    world.animate worldKey terrain dt model0.multiverse
 
 {-
                 -- Focus
@@ -255,7 +255,7 @@ animate world dt0 worldKey model0 =
                         key =
                             player1.focusKey
                     in
-                        case world.focus key model.worldModel of
+                        case world.focus key model.multiverse of
                             Just focus ->
                                 let
                                     dp =
@@ -283,7 +283,7 @@ animate world dt0 worldKey model0 =
                         , player2 = player2
                         , inputs = clearedInputs1
                         , inputs2 = clearedInputs2
-                        , worldModel = wm2
+                        , multiverse = wm2
                     }
             in
                 ( newModel
