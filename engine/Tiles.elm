@@ -27,15 +27,15 @@ createTileGround tiles =
     )
 
 
-tileBounds : Tiles -> Vec3 -> Vec3
-tileBounds { placement } pos =
+tileBounds : Tiles -> Float -> Vec3 -> Vec3
+tileBounds { placement } radius pos =
     let
         bound x low high =
-            if (x < low) then
-                low
+            if (x < low + radius) then
+                low + radius
             else
-                (if x > high then
-                    high
+                (if x > high - radius then
+                    high - radius
                  else
                     x
                 )

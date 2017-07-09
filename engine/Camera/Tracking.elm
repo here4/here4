@@ -78,7 +78,7 @@ trackingShoot direction ground input framing camera =
                 add behind newAbove
 
         cameraPos =
-            ground.bounds newCameraPos
+            ground.bounds 0.1 newCameraPos
 
         cameraOrientation =
             target.orientation

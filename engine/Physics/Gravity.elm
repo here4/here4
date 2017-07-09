@@ -43,7 +43,7 @@ bounds ground b =
             V3.toTuple b.velocity
 
         keepWithinBounds app =
-            { app | position = ground.bounds app.position }
+            { app | position = ground.bounds b.radius app.position }
 
         elevation =
             ground.elevation b.position

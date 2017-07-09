@@ -138,7 +138,7 @@ elmLogo =
                 ]
 
         drive =
-            DreamBuggy.drive { speed = 8.0 }
+            DreamBuggy.drive { speed = 8.0, radius = 1.0 }
     in
         Obj.create
             { id = "elm-logo"

@@ -42,8 +42,8 @@ inside box pos =
         rx >= 0 && ry >= 0 && rz >= 0 && rx <= dx && ry <= dy && rz <= dz
 
 
-emplace : Box -> Vec3 -> Vec3
-emplace box pos =
+emplace : Box -> Float -> Vec3 -> Vec3
+emplace box radius pos =
     let
         -- Relative position of point to box
         (rx, ry, rz) = V3.toTuple <| V3.sub pos box.position
@@ -52,9 +52,9 @@ emplace box pos =
         (dx, dy, dz) = V3.toTuple box.dimensions
 
         -- Clamp relative position to within dimensions
-        nx = clamp 0 dx rx
-        ny = clamp 0 dy ry
-        nz = clamp 0 dz rz
+        nx = clamp radius (dx-radius) rx
+        ny = clamp radius (dy-radius) ry
+        nz = clamp radius (dz-radius) rz
     in
         V3.add (vec3 nx ny nz) box.position
 

@@ -21,7 +21,7 @@ type alias Motion =
 
 type alias Methods a =
     { inside : a -> Vec3 -> Bool
-    , emplace : a -> Vec3 -> Vec3
+    , emplace : a -> Float -> Vec3 -> Vec3
     , bounce : a -> Float -> Time -> Motion -> Motion
     , bump : a -> Float -> Time -> Motion -> Motion
     }
@@ -43,9 +43,9 @@ outside a pos =
     not (a.methods.inside a.model pos)
 
 
-emplace : Bounding a -> Vec3 -> Vec3
-emplace a pos =
-    a.methods.emplace a.model pos
+emplace : Bounding a -> Float -> Vec3 -> Vec3
+emplace a radius pos =
+    a.methods.emplace a.model radius pos
 
 
 bounce : Bounding a -> Time -> Spherical (Moving b) -> Spherical (Moving b)

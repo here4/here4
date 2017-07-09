@@ -29,10 +29,10 @@ boidOrientation b =
     fromVec3 b.velocity
 
 
-stepBoid : Ground -> Time -> Moving a -> Moving a
+stepBoid : Ground -> Time -> Spherical (Moving a) -> Spherical (Moving a)
 stepBoid ground dt b =
     { b
-        | position = ground.bounds (V3.add b.position ((V3.scale dt b.velocity)))
+        | position = ground.bounds b.radius (V3.add b.position ((V3.scale dt b.velocity)))
         , orientation = boidOrientation b
     }
 

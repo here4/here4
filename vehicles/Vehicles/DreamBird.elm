@@ -18,6 +18,7 @@ import Ground exposing (Ground)
 
 type alias Attributes =
     { speed : Float
+    , radius : Float
     }
 
 
@@ -45,7 +46,7 @@ move attributes ground eyeLevel inputs motion =
     motion
         |> fly attributes.speed eyeLevel inputs
         |> flyPhysics eyeLevel inputs.dt
-        |> keepWithinbounds ground
+        |> keepWithinbounds ground attributes.radius
 
 
 
@@ -118,8 +119,8 @@ flyPhysics eyeLevel dt motion =
         { motion | position = pos_, velocity = add motion.velocity dv }
 
 
-keepWithinbounds ground motion =
-    { motion | position = ground.bounds motion.position }
+keepWithinbounds ground radius motion =
+    { motion | position = ground.bounds radius motion.position }
 
 
 overlay : Html msg

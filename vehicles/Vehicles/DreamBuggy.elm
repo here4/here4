@@ -20,6 +20,7 @@ import Debug
 
 type alias Attributes =
     { speed : Float
+    , radius : Float
     }
 
 
@@ -44,7 +45,7 @@ move attributes terrain eyeLevel inputs motion =
         |> goForward eyeLevel attributes.speed inputs
         |> gravity eyeLevel inputs.dt
         |> physics eyeLevel inputs.dt
-        |> keepWithinbounds terrain
+        |> keepWithinbounds terrain attributes.radius
 
 
 clampBuggy : Orientation -> Orientation
@@ -240,8 +241,8 @@ v3_clamp len v =
         V3.scale len (V3.normalize v)
 
 
-keepWithinbounds terrain motion =
-    { motion | position = terrain.bounds motion.position }
+keepWithinbounds terrain radius motion =
+    { motion | position = terrain.bounds radius motion.position }
 
 
 gravity : Model.EyeLevel -> Float -> Moving a -> Moving a

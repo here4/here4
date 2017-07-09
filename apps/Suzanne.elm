@@ -129,7 +129,7 @@ update attributes msg model =
 
             Ctrl (Drive ground inputs) ->
                 let
-                    walkAttributes = { speed = attributes.speed, height = attributes.height }
+                    walkAttributes = { speed = attributes.speed, height = attributes.height, radius = 1.5 }
                 in
                     ( setMotion (Walking.drive walkAttributes ground inputs model.motion) model
                     , Cmd.none
