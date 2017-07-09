@@ -29,11 +29,11 @@ type alias Attributes =
 
 type alias Multiverse state =
     { state  : state
-    , worlds : Bag Stuff
+    , worlds : Bag World
     }
 
 
-type alias Stuff =
+type alias World =
     { id : String
     , label : String
     , maybeGround : Maybe Ground
@@ -110,11 +110,11 @@ worldApps (WorldKey worldKey ()) appsList =
 
 oneWorldInit :
     Attributes
-    -> ( Bag Stuff, List (Cmd (WorldMsg msg)) )
-    -> ( Bag Stuff, List (Cmd (WorldMsg msg)) )
+    -> ( Bag World, List (Cmd (WorldMsg msg)) )
+    -> ( Bag World, List (Cmd (WorldMsg msg)) )
 oneWorldInit attributes ( oldWorlds, oldCmds ) =
     let
-        emptyStuff =
+        emptyWorld =
             { id = attributes.id
             , label = attributes.label
             , maybeGround = Nothing
@@ -124,13 +124,13 @@ oneWorldInit attributes ( oldWorlds, oldCmds ) =
             }
 
         ( worldKey, oneWorlds ) =
-            Bag.insert emptyStuff oldWorlds
+            Bag.insert emptyWorld oldWorlds
 
         ( appsBag, appCmds ) =
             worldApps (WorldKey worldKey ()) attributes.apps
 
-        updateApps stuff =
-            { stuff | apps = appsBag }
+        updateApps world =
+            { world | apps = appsBag }
 
         newWorlds =
             Bag.update worldKey (Maybe.map updateApps) oneWorlds
@@ -160,19 +160,19 @@ worldInit hubInit attributes =
 worldView : WorldKey () -> Multiverse model -> Maybe Model.World
 worldView (WorldKey worldKey ()) model =
     let
-        mStuff =
+        mWorld =
             Bag.get worldKey model.worlds
     in
-        case Maybe.andThen .maybeGround mStuff of
+        case Maybe.andThen .maybeGround mWorld of
             Nothing ->
                 Nothing
 
             Just ground ->
-                Maybe.map (makeWorld ground) mStuff
+                Maybe.map (makeWorld ground) mWorld
 
 
-makeWorld : Ground -> Stuff -> Model.World
-makeWorld ground stuff =
+makeWorld : Ground -> World -> Model.World
+makeWorld ground world =
     let
         partyBodies party =
             case party.rideKey of
@@ -183,8 +183,8 @@ makeWorld ground stuff =
                     bodies party.self
 
         worldBodies =
-            List.concatMap bodies (Bag.items stuff.apps)
-                ++ List.concatMap partyBodies (Bag.items stuff.parties)
+            List.concatMap bodies (Bag.items world.apps)
+                ++ List.concatMap partyBodies (Bag.items world.parties)
     in
         { bodies = worldBodies, ground = ground }
 
@@ -352,8 +352,8 @@ relativeRelocate worldPartyKey relative model =
             Maybe.map Tuple.second mNewPartyCmds
                 |> Maybe.withDefault Cmd.none
 
-        updateParties stuff =
-            { stuff | parties = Bag.update partyKey (always mNewParty) stuff.parties }
+        updateParties world =
+            { world | parties = Bag.update partyKey (always mNewParty) world.parties }
     in
         ( { model | worlds = Bag.update worldKey (Maybe.map updateParties) model.worlds }
         , newCmds
@@ -432,8 +432,8 @@ worldUpdate hubUpdate msg model =
 
         HubEff (Control.UpdateGround (WorldKey worldKey ()) ground) ->
             let
-                updateGround stuff =
-                    { stuff | maybeGround = Just ground }
+                updateGround world =
+                    { world | maybeGround = Just ground }
             in
                 ( { model | worlds = Bag.update worldKey (Maybe.map updateGround) model.worlds }
                 , Cmd.none
@@ -451,8 +451,8 @@ worldUpdate hubUpdate msg model =
                             , worldKey
                             , \newApp ->
                                 let
-                                    updateApps stuff =
-                                        { stuff | apps = Bag.replace appKey newApp stuff.apps }
+                                    updateApps world =
+                                        { world | apps = Bag.replace appKey newApp world.apps }
                                 in
                                     { model | worlds = Bag.update worldKey (Maybe.map updateApps) model.worlds }
                             )
@@ -466,8 +466,8 @@ worldUpdate hubUpdate msg model =
                                 , worldKey
                                 , \newSelf ->
                                     let
-                                        updateParties stuff =
-                                            { stuff | parties = Bag.update partyKey (Maybe.map (u newSelf)) stuff.parties }
+                                        updateParties world =
+                                            { world | parties = Bag.update partyKey (Maybe.map (u newSelf)) world.parties }
                                     in
                                         { model | worlds = Bag.update worldKey (Maybe.map updateParties) model.worlds }
                                 )
@@ -504,8 +504,8 @@ worldUpdate hubUpdate msg model =
                                         ( appModel, appCmdMsg ) =
                                             App.update (Ctrl fwdMsg) t
 
-                                        updateApps stuff =
-                                            { stuff | apps = Bag.replace rideKey appModel stuff.apps }
+                                        updateApps world =
+                                            { world | apps = Bag.replace rideKey appModel world.apps }
 
                                         newModel =
                                             { model | worlds = Bag.update worldKey (Maybe.map updateApps) model.worlds }
@@ -525,8 +525,8 @@ worldUpdate hubUpdate msg model =
                                 u newSelf party =
                                     { party | self = newSelf }
 
-                                updateParties stuff =
-                                    { stuff | parties = Bag.update partyKey (Maybe.map (u appModel)) stuff.parties }
+                                updateParties world =
+                                    { world | parties = Bag.update partyKey (Maybe.map (u appModel)) world.parties }
 
                                 newModel =
                                     { model | worlds = Bag.update worldKey (Maybe.map updateParties) model.worlds }
@@ -545,8 +545,8 @@ worldUpdate hubUpdate msg model =
 worldAnimate : WorldKey () -> Ground -> Time -> Multiverse a -> Multiverse a
 worldAnimate (WorldKey worldKey ()) ground dt model =
     let
-        updateApps stuff =
-            { stuff | apps = Bag.map (App.animate ground dt) stuff.apps }
+        updateApps world =
+            { world | apps = Bag.map (App.animate ground dt) world.apps }
     in
         { model | worlds = Bag.update worldKey (Maybe.map updateApps) model.worlds }
 
@@ -554,11 +554,11 @@ worldAnimate (WorldKey worldKey ()) ground dt model =
 worldJoin : WorldKey () -> Multiverse model -> ( Maybe (WorldKey PartyKey), Multiverse model, Cmd (WorldMsg msg) )
 worldJoin (WorldKey worldKey ()) model =
     let
-        -- freshParty : Stuff -> (Party, Cmd msg)
-        freshParty stuff =
+        -- freshParty : World -> (Party, Cmd msg)
+        freshParty world =
             let
                 ( defaultSelfApp, defaultSelfCmd ) =
-                    stuff.defaultSelf
+                    world.defaultSelf
             in
                 ( { rideKey = Nothing
                   , self = defaultSelfApp
@@ -584,25 +584,25 @@ worldJoin (WorldKey worldKey ()) model =
 
         -- updateParties :
         --     (Bag Party -> (WorldKey PartyKey, Bag Party, Cmd msg))
-        --     -> Stuff -> (WorldKey PartyKey, Stuff, Cmd msg)
-        updateParties f stuff =
+        --     -> World -> (WorldKey PartyKey, World, Cmd msg)
+        updateParties f world =
             let
                 ( worldPartyKey, newParties ) =
-                    f stuff.parties
+                    f world.parties
             in
-                ( worldPartyKey, { stuff | parties = newParties } )
+                ( worldPartyKey, { world | parties = newParties } )
     in
         case Bag.get worldKey model.worlds of
-            Just stuff ->
+            Just world ->
                 let
                     ( newParty, selfCmd ) =
-                        freshParty stuff
+                        freshParty world
 
-                    ( worldPartyKey, newStuff ) =
-                        updateParties (insertParty newParty) stuff
+                    ( worldPartyKey, newWorld ) =
+                        updateParties (insertParty newParty) world
 
                     newModel =
-                        { model | worlds = Bag.replace worldKey newStuff model.worlds }
+                        { model | worlds = Bag.replace worldKey newWorld model.worlds }
                 in
                     ( Just worldPartyKey
                     , newModel
@@ -616,8 +616,8 @@ worldJoin (WorldKey worldKey ()) model =
 worldLeave : WorldKey PartyKey -> Multiverse a -> Multiverse a
 worldLeave (WorldKey worldKey (PartyKey partyKey)) model =
     let
-        updateParties f stuff =
-            { stuff | parties = f stuff.parties }
+        updateParties f world =
+            { world | parties = f world.parties }
     in
         { model | worlds = Bag.update worldKey (Maybe.map (updateParties (Bag.remove partyKey))) model.worlds }
 
@@ -711,8 +711,8 @@ worldChangeRide (WorldKey worldKey (PartyKey partyKey)) model =
                 Maybe.map Tuple.second mNewPartyCmds
                     |> Maybe.withDefault Cmd.none
 
-            updateParties stuff =
-                { stuff | parties = Bag.update partyKey (always mNewParty) stuff.parties }
+            updateParties world =
+                { world | parties = Bag.update partyKey (always mNewParty) world.parties }
         in
             ( { model | worlds = Bag.update worldKey (Maybe.map updateParties) model.worlds }
             , newCmds
