@@ -127,7 +127,7 @@ framing : PartyKey -> Model -> Maybe Framing
 framing _ model_ =
     case model_ of
         Just model ->
-            Just (Camera.framing model.body)
+            Just (Camera.toFraming model.body)
 
         Nothing ->
             Nothing

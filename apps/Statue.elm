@@ -134,7 +134,7 @@ reposition mPos model =
 
 framing : PartyKey -> Model -> Maybe Framing
 framing _ model =
-    Just (Camera.framing model.body)
+    Just (Camera.toFraming model.body)
 
 
 focus : Model -> Maybe Focus

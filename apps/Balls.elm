@@ -94,7 +94,7 @@ reposition _ =
 
 framing : PartyKey -> Balls -> Maybe Framing
 framing _ balls =
-    Maybe.map Camera.framing (List.head balls)
+    Maybe.map Camera.toFraming (List.head balls)
 
 
 focus : Balls -> Maybe Focus

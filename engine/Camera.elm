@@ -28,8 +28,8 @@ toCamera thing =
     , fovy = 45
     }
 
-framing : Moving a -> Framing
-framing thing =
+toFraming : Moving a -> Framing
+toFraming thing =
     let
         target = toTarget thing
 

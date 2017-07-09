@@ -86,7 +86,7 @@ reposition _ =
 
 framing : PartyKey -> Boids -> Maybe Framing
 framing _ boids =
-    Maybe.map Camera.framing (List.head boids)
+    Maybe.map Camera.toFraming (List.head boids)
 
 
 focus : Boids -> Maybe Focus

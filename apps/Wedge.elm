@@ -102,7 +102,7 @@ framing : PartyKey -> Model -> Maybe Framing
 framing partyKey model =
     let
         framing =
-            Camera.framing model.body
+            Camera.toFraming model.body
 
         pov0 =
             framing.pov

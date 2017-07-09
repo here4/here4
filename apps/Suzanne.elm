@@ -161,7 +161,7 @@ reposition mPos model =
 
 framing : PartyKey -> Model -> Maybe Framing
 framing _ model =
-    Maybe.map (Camera.framing) model.body
+    Maybe.map (Camera.toFraming) model.body
 
 
 focus : Model -> Maybe Focus
