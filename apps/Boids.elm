@@ -1,7 +1,7 @@
 module Boids exposing (create)
 
 import App exposing (..)
-import Behavior.Boids exposing (..)
+import Behavior.Boids as Boids exposing (..)
 import Body exposing (..)
 import Body.BFly exposing (bfly)
 import Color exposing (white)
@@ -70,7 +70,7 @@ update msg model =
 
 animate : Ground -> Time -> Boids -> Boids
 animate ground dt boids =
-    moveBoids ground dt boids
+    moveBoids Boids.default ground dt boids
 
 
 bodies : Boids -> List Body

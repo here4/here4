@@ -7,6 +7,18 @@ import Time exposing (Time)
 import Body exposing (..)
 import Ground exposing (Ground)
 
+type alias Attributes =
+    { separation : Float
+    , alignment : Float
+    , cohesion : Float
+    }
+
+default : Attributes
+default =
+    { separation = 0.5
+    , alignment = 0.03 -- 0.07
+    , cohesion = 0.01
+    }
 
 type alias Boid a =
     Massive (Spherical (Moving a))
@@ -37,8 +49,8 @@ stepBoid ground dt b =
     }
 
 
-rule1 : Int -> Vec3 -> Boid a -> Vec3
-rule1 n sumPos b =
+rule1 : Float -> Int -> Vec3 -> Boid a -> Vec3
+rule1 cohesion n sumPos b =
     let
         perceived_scale =
             1.0 / (toFloat (n - 1))
@@ -46,11 +58,11 @@ rule1 n sumPos b =
         perceived_center =
             V3.scale perceived_scale (V3.sub sumPos b.position)
     in
-        V3.scale (1 / 100) <| V3.sub perceived_center b.position
+        V3.scale cohesion <| V3.sub perceived_center b.position
 
 
-rule2 : List Vec3 -> Boid a -> Vec3
-rule2 poss b =
+rule2 : Float -> List Vec3 -> Boid a -> Vec3
+rule2 separation poss b =
     let
         f pos =
             let
@@ -62,11 +74,11 @@ rule2 poss b =
                 else
                     vec3 0 0 0
     in
-        V3.scale (1 / 2) <| sumVec3s (List.map f poss)
+        V3.scale separation <| sumVec3s (List.map f poss)
 
 
-rule3 : Int -> Vec3 -> Boid a -> Vec3
-rule3 n sumVel b =
+rule3 : Float -> Int -> Vec3 -> Boid a -> Vec3
+rule3 alignment n sumVel b =
     let
         perceived_scale =
             1.0 / (toFloat (n - 1))
@@ -74,7 +86,7 @@ rule3 n sumVel b =
         perceived_vel =
             V3.scale perceived_scale (V3.sub sumVel b.velocity)
     in
-        V3.scale (1 / 15) <| V3.sub perceived_vel b.velocity
+        V3.scale alignment <| V3.sub perceived_vel b.velocity
 
 
 bounds : Ground -> Boid a -> Vec3
@@ -113,8 +125,8 @@ boundVelocity v =
             v
 
 
-moveBoids : Ground -> Time -> List (Boid a) -> List (Boid a)
-moveBoids ground dt boids =
+moveBoids : Attributes -> Ground -> Time -> List (Boid a) -> List (Boid a)
+moveBoids attributes ground dt boids =
     let
         nboids =
             List.length boids
@@ -132,13 +144,13 @@ moveBoids ground dt boids =
             sumVec3s velocities
 
         r1s =
-            List.map (rule1 nboids sumPos) boids
+            List.map (rule1 attributes.cohesion nboids sumPos) boids
 
         r2s =
-            List.map (rule2 positions) boids
+            List.map (rule2 attributes.separation positions) boids
 
         r3s =
-            List.map (rule3 nboids sumVel) boids
+            List.map (rule3 attributes.alignment nboids sumVel) boids
 
         box =
             List.map (bounds ground) boids
