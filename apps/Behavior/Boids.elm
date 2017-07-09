@@ -97,7 +97,7 @@ bounds ground b =
             ground.elevation b.position
     in
         vec3 (bound x -200 200)
-            (bound y (elevation + 10) (elevation + 100))
+            (bound y (elevation + 10 + b.radius) (elevation + 100))
             (bound z -200 200)
 
 
