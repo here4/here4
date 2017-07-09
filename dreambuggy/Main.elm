@@ -1,10 +1,9 @@
 module Main exposing (main)
 
-import App exposing (App, AppMsg)
 import Html exposing (Html)
-import Math.Vector3 exposing (vec3)
-import Model exposing (Args)
 import Location exposing (..)
+import Math.Vector3 exposing (vec3)
+import Navigator exposing (..)
 import RAM
 
 import Boids
@@ -24,7 +23,7 @@ import Primitive.Sphere exposing (skySphere, cloudsSphere)
 import Vehicles.DreamBuggy as DreamBuggy
 
 
-main : Program Args (Model.Model RAM.Model RAM.Msg) (Model.Msg RAM.Msg)
+main : Navigator RAM.Model RAM.Msg
 main =
     RAM.create
         [ { id = "world1"
