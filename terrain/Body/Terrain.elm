@@ -1,6 +1,7 @@
 module Body.Terrain
     exposing
         ( generate
+        , step
         , paint
         , ripplePaint
         , mountains
@@ -35,11 +36,23 @@ generate tagger =
 
 generateWithPlacement : Placement -> (( Ground, List Body ) -> msg) -> Cmd msg
 generateWithPlacement placement tagger =
-    let
-        elGen =
-            randTerrain2D (placement.bigSide + 1)
+    Random.generate tagger (randTerrain placement)
 
-        makeTerrain elevations =
+
+step : Random.Seed -> ( ( Ground, List Body ), Random.Seed )
+step =
+    stepWithPlacement defaultPlacement
+
+
+stepWithPlacement : Placement -> Random.Seed -> ( ( Ground, List Body ), Random.Seed )
+stepWithPlacement placement seed =
+    Random.step (randTerrain placement) seed
+
+
+createWithPlacement : Placement -> Array2D Float -> ( Ground, List Body )
+createWithPlacement placement elevations =
+    let
+        terrain =
             { placement = placement
             , elevations = elevations
             , bodies =
@@ -47,7 +60,16 @@ generateWithPlacement placement tagger =
                     ++ ripplePaint sea 0.3 placement elevations
             }
     in
-        Random.generate tagger (Random.map (createTileGround << makeTerrain) elGen)
+        createTileGround terrain
+
+
+randTerrain : Placement -> Random.Generator ( Ground, List Body )
+randTerrain placement =
+    let
+        elevations =
+            randTerrain2D (placement.bigSide + 1)
+    in
+        Random.map (createWithPlacement placement) elevations
 
 
 
