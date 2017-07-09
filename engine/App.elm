@@ -2,6 +2,7 @@ module App exposing (..)
 
 import App.Internal as Internal
 import Body exposing (..)
+import Camera
 import Camera.Types exposing (Framing)
 import Control exposing (..)
 import Dispatch exposing (..)
@@ -33,6 +34,9 @@ create = Internal.create
 
 createUncontrolled : ( model, Cmd msg ) -> Internal.Animated model msg -> ( App, Cmd AppMsg )
 createUncontrolled = Internal.createUncontrolled
+
+toFraming : Moving a -> Framing
+toFraming = Camera.toFraming
 
 appToFocus : Oriented a -> Focus
 appToFocus = Internal.appToFocus

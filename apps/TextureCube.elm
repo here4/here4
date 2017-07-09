@@ -7,7 +7,6 @@ import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
 import Body exposing (..)
-import Camera
 import Control
 import Dispatch exposing (..)
 import Ground exposing (Ground)
@@ -127,7 +126,7 @@ framing : PartyKey -> Model -> Maybe Framing
 framing _ model_ =
     case model_ of
         Just model ->
-            Just (Camera.toFraming model.body)
+            Just (toFraming model.body)
 
         Nothing ->
             Nothing

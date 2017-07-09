@@ -6,7 +6,6 @@ import Math.Vector3 exposing (Vec3, add, vec3)
 import Random
 import App exposing (..)
 import Body exposing (..)
-import Camera
 import Math.RandomVector exposing (randomVec3)
 import Physics.Collisions exposing (collisions)
 import Physics.Gravity exposing (gravity)
@@ -94,7 +93,7 @@ reposition _ =
 
 framing : PartyKey -> Balls -> Maybe Framing
 framing _ balls =
-    Maybe.map Camera.toFraming (List.head balls)
+    Maybe.map toFraming (List.head balls)
 
 
 focus : Balls -> Maybe Focus

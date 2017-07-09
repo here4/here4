@@ -8,7 +8,6 @@ import Tuple exposing (first)
 import WebGL.Texture as Texture exposing (Texture, Error)
 import App exposing (..)
 import Body exposing (..)
-import Camera
 import Control
 import Dispatch exposing (..)
 import Model exposing (Inputs)
@@ -186,7 +185,7 @@ reposition mPos model =
 
 framing : PartyKey -> Model -> Maybe Framing
 framing _ model =
-    Maybe.map (Camera.toFraming) model.body
+    Maybe.map toFraming model.body
 
 
 focus : Model -> Maybe Focus
