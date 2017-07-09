@@ -4,7 +4,9 @@ import App exposing (App, AppMsg)
 import Html exposing (Html)
 import Math.Vector3 exposing (vec3)
 import Model exposing (Args)
+import Location exposing (..)
 import RAM
+
 import Boids
 import Balls
 import Obj
@@ -16,7 +18,6 @@ import StaticGround
 import Suzanne
 import Wedge
 import Body.Terrain as Terrain
-import Location exposing (..)
 import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
 import Primitive.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Primitive.Sphere exposing (skySphere, cloudsSphere)
@@ -27,7 +28,7 @@ main : Program Args (Model.Model RAM.Model RAM.Msg) (Model.Msg RAM.Msg)
 main =
     RAM.create
         [ { id = "world1"
-          , label = "Balls World"
+          , label = "Ballyboo"
           , apps =
                 [ StaticGround.create Terrain.generate
                 , Sky.create skySphere
@@ -69,7 +70,7 @@ main =
                     }
           }
         , { id = "world2"
-          , label = "Shufflepuck World"
+          , label = "Shufflepuckia"
           , apps =
                 [ StaticGround.create Terrain.generate
                 , Sky.create skySphere
