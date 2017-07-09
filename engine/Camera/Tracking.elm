@@ -26,7 +26,7 @@ trackingInit direction ground camera =
         position =
             sub target.position (V3.scale 23 (direction target))
     in
-        Camera.retarget camera.target { camera | position = position }
+        Camera.retarget camera.target { camera | position = ground.bounds 0.1 position }
 
 
 trackingShoot : (Target -> Vec3) -> Ground -> Input -> Framing -> Camera -> Camera

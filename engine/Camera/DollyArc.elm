@@ -50,7 +50,7 @@ dollyInit ground camera =
         position =
             sub target.position (V3.scale 17 (Model.direction target))
     in
-        { camera | position = position }
+        { camera | position = ground.bounds 0.1 position }
             |> Camera.retarget camera.target
             |> Camera.rollUpright
 
@@ -101,7 +101,7 @@ dollyShoot minDistance ground input framing camera =
             else
                 newPosition
     in
-        { camera | position = position }
+        { camera | position = ground.bounds 0.1 position }
             |> Camera.retarget target
             |> Camera.rollUpright
 
@@ -156,7 +156,7 @@ zoomShoot ground input framing camera =
             clamp 1 89 (camera.fovy + inputZoom)
     in
         { camera
-            | position = position
+            | position = ground.bounds 0.1 position
             , fovy = fovy
         }
             |> Camera.retarget target
@@ -185,7 +185,7 @@ arcShoot ground input framing camera =
         position =
             V3.add framing.target.position newDisplacement
     in
-        { camera | position = position }
+        { camera | position = ground.bounds 0.1 position }
             |> Camera.retarget framing.target
             |> Camera.rollUpright
 
