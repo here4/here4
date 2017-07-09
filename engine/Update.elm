@@ -621,13 +621,11 @@ nextShot shot =
 selectCamera : Ground -> Model.Inputs -> Model.Player msg -> Model.Player msg
 selectCamera ground inputs player =
     let
-        i = Debug.log "selectCamera inputs" inputs
-
         ensureShot =
             Maybe.withDefault tracking player.shot
 
         ( newShot, newCamera ) =
-            if i.prevCamera then
+            if inputs.prevCamera then
                 let
                     shot =
                         prevShot ensureShot
@@ -637,13 +635,12 @@ selectCamera ground inputs player =
                 let
                     shot =
                         nextShot ensureShot
-                            |> Debug.log "Changing to next shot"
                 in
                     ( Just shot, shot.init ground player.camera )
             else if inputs.button_X then
-                ( Just (ensureShot |> Debug.log "Re-init shot"), ensureShot.init ground player.camera )
+                ( Just ensureShot, ensureShot.init ground player.camera )
             else
-                ( Just (ensureShot |> Debug.log "No change in shot"), player.camera )
+                ( Just ensureShot, player.camera )
 
         newVR =
             if inputs.changeVR then
