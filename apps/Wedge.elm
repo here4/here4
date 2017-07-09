@@ -8,7 +8,7 @@ import App exposing (..)
 import Body exposing (..)
 import Camera exposing (..)
 import Camera.Util as Camera
-import Control exposing (CtrlMsg)
+import Control
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Model exposing (Inputs)

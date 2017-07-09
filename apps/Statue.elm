@@ -9,7 +9,7 @@ import Appearance exposing (Appearance)
 import Body exposing (..)
 import Camera exposing (..)
 import Camera.Util as Camera
-import Control exposing (CtrlMsg, EffectMsg(..), teleport)
+import Control
 import Dispatch exposing (..)
 import Ground exposing (Ground)
 import Location exposing (..)
