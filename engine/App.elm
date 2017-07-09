@@ -20,6 +20,8 @@ type alias EffectMsg = Control.EffectMsg
 type alias AppPosition = Internal.AppPosition
 type alias Focus = Internal.Focus
 
+type alias Framing = Camera.Framing
+
 type alias Ground = Ground.Ground
 
 type alias PartyKey = Model.PartyKey
