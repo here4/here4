@@ -7,6 +7,7 @@ import Navigator exposing (..)
 import RAM
 
 import Boids
+import BoxRoom
 import Balls
 import Obj
 import Shufflepuck
@@ -59,6 +60,21 @@ main =
                     , position = vec3 -15 1.5 21
                     , appear = cloudsDiamond
                     }
+
+                , Boids.create 100
+
+                , Statue.portal (Local (Become "boids"))
+                    { id = "voronoi-cube"
+                    , label = "Voronoi Cube"
+                    , position = vec3 10 0 10
+                    , appear = voronoiCube
+                    }
+                , Statue.create
+                    { id = "landscape-cube"
+                    , label = "Landscape Cube"
+                    , appear = fogMountainsCube
+                    , position = vec3 10 1.5 -10
+                    }
                 ]
           , defaultSelf =
                 Suzanne.create
@@ -72,21 +88,8 @@ main =
         , { id = "world2"
           , label = "Shufflepuckia"
           , apps =
-                [ StaticGround.create Terrain.generate
-                , Sky.create skySphere
-                , Boids.create 100
-                , Statue.portal (Local (Become "boids"))
-                    { id = "voronoi-cube"
-                    , label = "Voronoi Cube"
-                    , position = vec3 10 0 10
-                    , appear = voronoiCube
-                    }
-                , Statue.create
-                    { id = "landscape-cube"
-                    , label = "Landscape Cube"
-                    , appear = fogMountainsCube
-                    , position = vec3 10 1.5 -10
-                    }
+                [ BoxRoom.create { dimensions = vec3 20 50 30 }
+                -- , StaticGround.create Terrain.generate
                 , let
                     s =
                         Shufflepuck.default
@@ -94,14 +97,9 @@ main =
                     Shufflepuck.create
                         { s
                             | id = "shufflepuck"
-                            , position = vec3 53 0 18
+                            , position = vec3 0 0 0
                         }
-                , Statue.portal (Local (Behind "shufflepuck"))
-                    { id = "sky-diamond"
-                    , label = "Sky Diamond"
-                    , position = vec3 5 1.5 1
-                    , appear = cloudsDiamond
-                    }
+
                 , Statue.portal (Remote "world1" (Facing "fire-cube"))
                     { id = "fire-cube"
                     , label = "Fire Cube"
