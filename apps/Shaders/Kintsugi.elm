@@ -141,7 +141,7 @@ void main(void)
     m.y = 20.0;
     
     float t = uv.x * 10.0;
-    t += amplitude * turbulence (uv.xy + vec2(iGlobalTime / 40.0) - m );
+    t += amplitude * turbulence (uv.xy + vec2(iGlobalTime / 80.0) - m );
     t = sin(t);
     gl_FragColor = marble_color(t);
 }
