@@ -1,4 +1,4 @@
-module Primitive.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, cube)
+module Primitive.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, cube, walls, floor, ceiling)
 
 import Math.Vector3 exposing (..)
 import Math.Matrix4 as M4 exposing (..)
@@ -48,8 +48,25 @@ voronoiCube =
     cube worldVertex voronoiDistances
 
 
+
 cube : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
-cube vertexShader fragmentShader p =
+cube = render cubeMesh
+
+
+walls : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+walls = render wallsMesh
+
+
+floor : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+floor = render floorMesh
+
+
+ceiling : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+ceiling = render ceilingMesh
+
+
+render : Mesh Vertex -> Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+render mesh vertexShader fragmentShader p =
     let
         resolution =
             vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
@@ -90,7 +107,7 @@ textureCube texture p =
     in
         [ entity worldVertex
             textureFragment
-            mesh
+            cubeMesh
             { iResolution = resolution
             , iHMD = iHMD
             , iTexture = texture
@@ -101,11 +118,24 @@ textureCube texture p =
         ]
 
 
-{-| The mesh for a cube
--}
-mesh : Mesh Vertex
-mesh =
+cubeMesh : Mesh Vertex
+cubeMesh =
     triangles <| List.concatMap rotatedFace [ ( 0, 0, 0 ), ( 90, 0, 1 ), ( 180, 0, 2 ), ( 270, 0, 3 ), ( 0, 90, 0 ), ( 0, -90, 0 ) ]
+
+
+wallsMesh : Mesh Vertex
+wallsMesh =
+    triangles <| List.concatMap rotatedFace [ ( 0, 0, 0 ), ( 0, 90, 1 ), ( 0, 180, 2 ), ( 0, 270, 3 ) ]
+
+
+floorMesh : Mesh Vertex
+floorMesh =
+    triangles <| List.concatMap rotatedFace [ ( 90, 0, 0 ) ]
+
+
+ceilingMesh : Mesh Vertex
+ceilingMesh =
+    triangles <| List.concatMap rotatedFace [ ( -90, 0, 0 ) ]
 
 
 rotatedFace : ( Float, Float, Float ) -> List (Triple Vertex)
