@@ -243,7 +243,7 @@ init a =
             vec3 a.tableWidth boundHeight a.tableLength
 
         box =
-            { position = vec3 (-a.tableWidth / 2.0) (a.tableThickness / 2.0) (-a.tableLength / 2.0)
+            { position = vec3 (-a.tableWidth / 2.0) a.tableThickness (-a.tableLength / 2.0)
             , dimensions = dimensions
             }
 
