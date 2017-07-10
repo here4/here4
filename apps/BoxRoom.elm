@@ -11,8 +11,12 @@ import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Orientation
 import Task exposing (Task)
-import Primitive.Cube exposing (plasmaCube)
+import Primitive.Cube as Cube
+import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
+import Shaders.Clouds exposing (clouds)
+import Shaders.Fire exposing (fire)
+import Shaders.SimplePlasma exposing (simplePlasma)
 
 type alias Attributes =
     { dimensions : Vec3
@@ -20,7 +24,10 @@ type alias Attributes =
 
 
 type alias Model =
-    Body
+    { walls : Body
+    , floor : Body
+    , ceiling : Body
+    }
 
 
 type alias Msg =
@@ -54,13 +61,17 @@ init attributes =
         originPosition =
             vec3 (-width / 2) 0 (-length / 2)
 
-        room =
+        make appear =
             { anchor = AnchorGround
             , scale = attributes.dimensions
             , position = floorCenterPosition
             , orientation = Orientation.initial
-            , appear = plasmaCube
+            , appear = appear
             }
+
+        walls = make (Cube.walls worldVertex simplePlasma)
+        floor = make (Cube.floor worldVertex fire)
+        ceiling = make (Cube.ceiling worldVertex clouds)
 
         box =
             { position = originPosition
@@ -76,7 +87,12 @@ init attributes =
             Task.succeed ground
                 |> Task.perform (Effect << UpdateGround ())
     in
-        ( room, groundEffect )
+        ( { walls = walls
+          , floor = floor
+          , ceiling = ceiling
+          }
+        , groundEffect
+        )
 
 
 update : CtrlMsg Msg -> Model -> ( Model, Cmd (CtrlMsg Msg) )
@@ -85,13 +101,13 @@ update msg model =
 
 
 animate : Ground -> Time -> Model -> Model
-animate ground dt body =
-    body
+animate ground dt model =
+    model
 
 
 bodies : Model -> List Body
-bodies body =
-    [ body ]
+bodies model =
+    [ model.walls, model.floor, model.ceiling ]
 
 
 overlay : Model -> Html msg
