@@ -31,17 +31,16 @@ type alias Attributes =
     , tableThickness : Float
     , tableHeight : Float
     , goalWidth : Float
+    , hover : Float
     , puckTexture : String
     , puckMass : Float
     , puckRadius : Float
     , puckThickness : Float
-    , puckHover : Float
     , puckMaxSpeed : Float
     , paddleTexture : String
     , paddleMass : Float
     , paddleRadius : Float
     , paddleThickness : Float
-    , paddleHover : Float
     }
 
 
@@ -68,17 +67,16 @@ default =
         , tableHeight = 0.9
         , tableThickness = 0.2
         , goalWidth = width * 0.2
+        , hover = 0.3
         , puckTexture = "textures/mp_diff_orange.png"
         , puckMass = 5.0
         , puckRadius = width * 0.03
         , puckThickness = 0.03
-        , puckHover = 0.3
         , puckMaxSpeed = width * 0.25
         , paddleTexture = "textures/ring_bottoms.jpg"
         , paddleMass = 10.0
         , paddleRadius = width * 0.045
         , paddleThickness = 0.07
-        , paddleHover = 0.3
         }
 
 
@@ -230,16 +228,16 @@ init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
 init a =
     let
         puckY =
-            a.puckHover
+            a.hover
 
         paddleY =
-            a.paddleHover
+            a.hover
 
         paddleZ =
             a.tableLength / 4.0
 
         boundHeight =
-            a.tableThickness / 2 + max (a.puckHover + a.puckThickness) (a.paddleThickness + a.paddleHover)
+            a.tableThickness / 2 + max (a.hover + a.puckThickness) (a.paddleThickness + a.hover)
 
         dimensions =
             vec3 a.tableWidth boundHeight a.tableLength
@@ -446,7 +444,7 @@ collide dt model =
 
         recenter offset p =
             { p
-                | position = V3.add (vec3 0 a.puckHover (offset * a.tableLength / 2.0)) a.position
+                | position = V3.add (vec3 0 a.hover (offset * a.tableLength / 2.0)) a.position
                 , velocity = vec3 0 0 0
             }
 
