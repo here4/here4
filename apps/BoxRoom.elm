@@ -15,7 +15,7 @@ import Primitive.Cube as Cube
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 import Shaders.Clouds exposing (clouds)
-import Shaders.Fire exposing (fire)
+import Shaders.Kintsugi exposing (kintsugi)
 import Shaders.SimplePlasma exposing (simplePlasma)
 
 type alias Attributes =
@@ -70,7 +70,7 @@ init attributes =
             }
 
         walls = make (Cube.walls worldVertex simplePlasma)
-        floor = make (Cube.floor worldVertex fire)
+        floor = make (Cube.floor worldVertex kintsugi)
         ceiling = make (Cube.ceiling worldVertex clouds)
 
         box =
