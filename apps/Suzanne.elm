@@ -22,6 +22,7 @@ type alias Attributes =
     , position : Vec3
     , height : Float
     , speed : Float
+    , diffuseTexturePath : String
     }
 
 
@@ -34,7 +35,7 @@ type alias Model =
 
 
 type Msg
-    = TextureLoaded (Result String Texture)
+    = DiffTextureLoaded (Result String Texture)
     | LoadObj (Result String (MeshWith VertexWithTexture))
 
 
@@ -65,8 +66,7 @@ init attributes =
       , reflectionTexture = Err "Loading texture ..."
       }
     , Cmd.batch
-        -- [ loadTexture "textures/chavant.jpg" (Self << TextureLoaded)
-        [ loadTexture "textures/elmLogoDiffuse.png" (Self << TextureLoaded)
+        [ loadTexture attributes.diffuseTexturePath (Self << DiffTextureLoaded)
         , OBJ.loadMesh "meshes/suzanne.obj" (Self << LoadObj)
         ]
     )
@@ -118,7 +118,7 @@ update attributes msg model =
                     m
     in
         case msg of
-            Self (TextureLoaded textureResult) ->
+            Self (DiffTextureLoaded textureResult) ->
                 ( loadBody { model | reflectionTexture = textureResult }, Cmd.none )
 
             Self (LoadObj meshResult) ->

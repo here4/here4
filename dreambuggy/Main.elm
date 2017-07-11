@@ -77,14 +77,7 @@ main =
                     , position = vec3 10 1.5 -10
                     }
                 ]
-          , defaultSelf =
-                Suzanne.create
-                    { id = "suzanne"
-                    , label = "Walking"
-                    , position = vec3 0 10 0
-                    , height = 1.4
-                    , speed = 16.0
-                    }
+          , defaultSelf = avatar 16.0
           }
         , { id = "world2"
           , label = "Shufflepuck Club"
@@ -109,14 +102,7 @@ main =
                     , appear = fireCube
                     }
                 ]
-          , defaultSelf =
-                Suzanne.create
-                    { id = "suzanne"
-                    , label = "Walking"
-                    , position = vec3 0 10 0
-                    , height = 1.4
-                    , speed = 8.0
-                    }
+          , defaultSelf = avatar 5.7
 
           {-
              , defaultSelf =
@@ -150,4 +136,16 @@ elmLogo =
             , diffuseTexturePath = "textures/elmLogoDiffuse.png"
             , normalTexturePath = "textures/elmLogoNorm.png"
             , drive = Just drive
+            }
+
+
+avatar : Float -> ( App, Cmd AppMsg )
+avatar speed =
+        Suzanne.create
+            { id = "suzanne"
+            , label = "Walking"
+            , diffuseTexturePath = "textures/elmLogoDiffuse.png"
+            , position = vec3 0 10 0
+            , height = 1.4
+            , speed = speed
             }
