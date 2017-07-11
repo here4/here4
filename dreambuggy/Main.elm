@@ -46,7 +46,7 @@ main =
                 , Statue.create
                     { id = "landscape-diamond"
                     , label = "Landscape Diamond"
-                    , position = vec3 0 1.5 0
+                    , position = vec3 40 1.5 28
                     , appear = fogMountainsDiamond
                     }
                 , Statue.portal (Remote "world2" (Facing "fire-cube"))
