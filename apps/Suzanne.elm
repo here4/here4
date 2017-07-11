@@ -22,6 +22,7 @@ type alias Attributes =
     , position : Vec3
     , height : Float
     , speed : Float
+    , meshPath : String
     , diffuseTexturePath : String
     }
 
@@ -67,7 +68,7 @@ init attributes =
       }
     , Cmd.batch
         [ loadTexture attributes.diffuseTexturePath (Self << DiffTextureLoaded)
-        , OBJ.loadMesh "meshes/suzanne.obj" (Self << LoadObj)
+        , OBJ.loadMesh attributes.meshPath (Self << LoadObj)
         ]
     )
 

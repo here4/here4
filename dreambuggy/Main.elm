@@ -144,6 +144,7 @@ avatar speed =
         Suzanne.create
             { id = "suzanne"
             , label = "Walking"
+            , meshPath = "meshes/suzanne.obj"
             , diffuseTexturePath = "textures/elmLogoDiffuse.png"
             , position = vec3 0 10 0
             , height = 1.4
