@@ -1,27 +1,25 @@
 module View exposing (view)
 
-import Color exposing (Color, black, white)
-import FontAwesome
 
-import Html exposing (Html, text, div, p, span)
-import Html.Attributes exposing (width, height, style)
-import List.Extra as List
-import Math.Matrix4 as M4
-import Math.Matrix4 exposing (Mat4)
-import Math.Vector3 as V3
-import Math.Vector3 exposing (..)
-import Time exposing (Time)
-import WebGL
-import Window
 import App.Internal as App
 import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
-import Camera.Types exposing (Camera)
 import Camera exposing (cameraUp)
+import Camera.Types exposing (Camera)
+import Color exposing (Color, black, white)
 import Control exposing (WorldMsg)
+import FontAwesome
+import Html exposing (Html, text, div, p, span)
+import Html.Attributes exposing (width, height, style)
+import List.Extra as List
+import Math.Matrix4 as M4 exposing (Mat4)
+import Math.Vector3 as V3 exposing (..)
 import Methods exposing (..)
 import Model exposing (Model, Msg(..), WorldKey(..))
 import Orientation
+import Time exposing (Time)
+import WebGL
+import Window
 
 
 {-| Generate a View from a Model
