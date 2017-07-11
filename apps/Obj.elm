@@ -7,7 +7,7 @@ import Body.Obj exposing (textured)
 import Dict exposing (Dict)
 import Dispatch exposing (..)
 import Html exposing (Html)
-import Math.Vector3 exposing (Vec3, vec3)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Orientation
 import OBJ
@@ -168,9 +168,25 @@ update mDrive msg model =
                 ( model, Cmd.none )
 
 
-animate : ground -> Time -> Model -> Model
+animate : Ground -> Time -> Model -> Model
 animate ground dt model =
-    model
+    let
+        aboveGround pos =
+            let
+                minY = 1.8 + ground.elevation pos
+            in
+                if V3.getY pos > minY then
+                    pos
+                else
+                    V3.setY minY pos
+
+        motion = model.motion
+
+        newMotion =
+            { motion | position = aboveGround motion.position
+            }
+    in
+        setMotion newMotion model
 
 
 bodies : Model -> List Body
