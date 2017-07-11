@@ -3,7 +3,7 @@ module Suzanne exposing (create)
 import App exposing (..)
 import App.Control exposing (..)
 import Body exposing (..)
-import Body.Obj exposing (obj)
+import Body.Obj exposing (reflective)
 import Dispatch exposing (..)
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
@@ -110,7 +110,7 @@ update attributes msg model =
                                 , scale = vec3 1 1 1
                                 , position = model.motion.position
                                 , orientation = model.motion.orientation
-                                , appear = obj mesh texture
+                                , appear = reflective mesh texture
                                 , velocity = model.motion.velocity
                                 }
                     }

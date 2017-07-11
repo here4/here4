@@ -3,7 +3,7 @@ module Obj exposing (create)
 import App exposing (..)
 import App.Control exposing (..)
 import Body exposing (..)
-import Body.Obj exposing (obj2)
+import Body.Obj exposing (textured)
 import Dict exposing (Dict)
 import Dispatch exposing (..)
 import Html exposing (Html)
@@ -108,7 +108,7 @@ update mDrive msg model =
                         appear p =
                             Dict.values mesh
                                 |> List.concatMap Dict.values
-                                |> List.concatMap (\m -> obj2 diffTexture normTexture m p)
+                                |> List.concatMap (\m -> textured diffTexture normTexture m p)
                     in
                         { m
                             | body =

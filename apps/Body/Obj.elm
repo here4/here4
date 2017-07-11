@@ -1,4 +1,4 @@
-module Body.Obj exposing (obj, obj2)
+module Body.Obj exposing (reflective, textured)
 
 import Math.Vector3 exposing (..)
 import Math.Matrix4 as M4 exposing (..)
@@ -13,8 +13,8 @@ import OBJ
 import OBJ.Types as Obj exposing (VertexWithTexture)
 
 
-obj : Obj.MeshWith VertexWithTexture -> WebGL.Texture -> Appearance
-obj { vertices, indices } texture p =
+reflective : Obj.MeshWith VertexWithTexture -> WebGL.Texture -> Appearance
+reflective { vertices, indices } texture p =
     let
         resolution =
             vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
@@ -46,8 +46,8 @@ obj { vertices, indices } texture p =
         ]
 
 
-obj2 : WebGL.Texture -> WebGL.Texture -> Obj.Mesh -> Appearance
-obj2 textureDiff textureNorm mesh p =
+textured : WebGL.Texture -> WebGL.Texture -> Obj.Mesh -> Appearance
+textured textureDiff textureNorm mesh p =
     let
         resolution =
             vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
