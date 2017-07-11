@@ -131,6 +131,7 @@ elmLogo =
         Obj.create
             { id = "elm-logo"
             , label = "Elm Logo"
+            , position = vec3 38 0 12
             , overlay = overlay
             , meshPath = "meshes/elmLogo.obj"
             , diffuseTexturePath = "textures/elmLogoDiffuse.png"

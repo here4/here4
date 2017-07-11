@@ -20,16 +20,18 @@ import WebGL.Texture as Texture exposing (Texture, Error)
 type alias Attributes =
     { id : String
     , label : String
+    , position : Vec3
     , overlay : Html (CtrlMsg Msg)
     , meshPath : String
     , diffuseTexturePath : String
     , normalTexturePath : String
-    , drive : Maybe (Ground -> Inputs -> Moving Body -> Moving Body)
+    , drive : Maybe (Ground -> Inputs -> Moving {} -> Moving {})
     }
 
 
 type alias Model =
-    { body : Maybe (Moving Body)
+    { motion : Moving {}
+    , body : Maybe (Moving Body)
     , mesh : Result String ObjFile
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
@@ -59,7 +61,12 @@ create attributes =
 
 init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
 init attributes =
-    ( { body = Nothing
+    ( { motion =
+          { position = attributes.position
+          , orientation = Orientation.initial
+          , velocity = vec3 0 0 0
+          }
+      , body = Nothing
       , mesh = Err "Loading ..."
       , diffTexture = Err "Loading texture ..."
       , normTexture = Err "Loading texture ..."
@@ -91,15 +98,22 @@ loadTexture url msg =
             )
 
 
+setMotion : Moving {} -> Model -> Model
+setMotion motion model =
+    { model | motion = motion
+            , body = Maybe.map (copyMotion motion) model.body
+    }
+
+
 update :
-    Maybe (Ground -> Inputs -> Moving Body -> Moving Body)
+    Maybe (Ground -> Inputs -> Moving {} -> Moving {})
     -> CtrlMsg Msg
     -> Model
     -> ( Model, Cmd (CtrlMsg Msg) )
 update mDrive msg model =
     let
-        mapBody f =
-            (\m -> { m | body = Maybe.map f m.body }) model
+        -- mapBody f =
+        --     (\m -> { m | body = Maybe.map f m.body }) model
 
         loadBody m =
             case ( m.mesh, m.diffTexture, m.normTexture ) of
@@ -115,10 +129,10 @@ update mDrive msg model =
                                 Just
                                     { anchor = AnchorGround
                                     , scale = vec3 1 1 1
-                                    , position = vec3 38 0 12
-                                    , orientation = Orientation.initial
+                                    , position = model.motion.position
+                                    , orientation = model.motion.orientation
                                     , appear = appear
-                                    , velocity = vec3 0 0 0
+                                    , velocity = model.motion.velocity
                                     }
                         }
 
@@ -142,7 +156,10 @@ update mDrive msg model =
             Ctrl (Drive ground inputs) ->
                 case mDrive of
                     Just drive ->
-                        ( mapBody (drive ground inputs), Cmd.none )
+                        -- ( mapBody (drive ground inputs), Cmd.none )
+                        ( setMotion (drive ground inputs model.motion) model
+                        , Cmd.none
+                        )
 
                     Nothing ->
                         ( model, Cmd.none )
@@ -168,19 +185,19 @@ bodies model_ =
 
 reposition : Maybe AppPosition -> Model -> Model
 reposition mPos model =
-    let
-        mapBody f =
-            (\m -> { m | body = Maybe.map f m.body }) model
+    case mPos of
+        Just pos ->
+            let
+                motion = model.motion
+                newMotion =
+                    { motion | position = pos.position
+                             , orientation = pos.orientation
+                    }
+            in
+                setMotion newMotion model
 
-        setPos body =
-            case mPos of
-                Just pos ->
-                    { body | position = pos.position, orientation = pos.orientation }
-
-                Nothing ->
-                    body
-    in
-        mapBody setPos
+        Nothing ->
+            model
 
 
 framing : PartyKey -> Model -> Maybe Framing
