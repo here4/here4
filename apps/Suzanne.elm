@@ -65,7 +65,8 @@ init attributes =
       , reflectionTexture = Err "Loading texture ..."
       }
     , Cmd.batch
-        [ loadTexture "textures/chavant.jpg" (Self << TextureLoaded)
+        -- [ loadTexture "textures/chavant.jpg" (Self << TextureLoaded)
+        [ loadTexture "textures/elmLogoDiffuse.png" (Self << TextureLoaded)
         , OBJ.loadMesh "meshes/suzanne.obj" (Self << LoadObj)
         ]
     )
