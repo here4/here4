@@ -29,6 +29,7 @@ main =
     RAM.create
         [ { id = "world1"
           , label = "Dreambuggy"
+          , backgroundColor = "rgb(135, 206, 235)"
           , apps =
                 [ StaticGround.create Terrain.generate
                 , Sky.create skySphere
@@ -87,6 +88,7 @@ main =
           }
         , { id = "world2"
           , label = "Shufflepuck Club"
+          , backgroundColor = "rgb(255, 255, 255)"
           , apps =
                 [ BoxRoom.create { dimensions = vec3 20 50 30 }
 

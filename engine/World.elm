@@ -23,6 +23,7 @@ import Task
 type alias Attributes =
     { id : String
     , label : String
+    , backgroundColor : String
     , apps : List ( App, Cmd AppMsg )
     , defaultSelf : ( App, Cmd AppMsg )
     }
@@ -37,6 +38,7 @@ type alias Multiverse state =
 type alias World =
     { id : String
     , label : String
+    , backgroundColor : String
     , maybeGround : Maybe Ground
     , apps : Bag App
     , parties : Bag Party
@@ -126,6 +128,7 @@ oneWorldInit attributes ( oldWorlds, oldCmds ) =
         emptyWorld =
             { id = attributes.id
             , label = attributes.label
+            , backgroundColor = attributes.backgroundColor
             , maybeGround = Nothing
             , apps = Bag.empty
             , parties = Bag.empty
@@ -195,7 +198,10 @@ makeWorld ground world =
             List.concatMap bodies (Bag.items world.apps)
                 ++ List.concatMap partyBodies (Bag.items world.parties)
     in
-        { bodies = worldBodies, ground = ground }
+        { backgroundColor = world.backgroundColor
+        , bodies = worldBodies
+        , ground = ground
+        }
 
 
 toWorldEffect : WorldKey () -> EffectMsg () -> EffectMsg (WorldKey ())

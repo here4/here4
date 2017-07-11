@@ -50,7 +50,8 @@ type GlobalMsg
 
 
 type alias World =
-    { bodies : List Body
+    { backgroundColor : String
+    , bodies : List Body
     , ground : Ground
     }
 

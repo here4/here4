@@ -49,10 +49,9 @@ layoutScene windowSize methods model =
         toUnit (WorldKey n _) =
             WorldKey n ()
 
-        mRender player =
+        mView player =
             Maybe.map toUnit player.partyKey
                 |> Maybe.andThen (\worldKey -> methods.view worldKey model.multiverse)
-                |> Maybe.map (renderWorld model.globalTime)
 
         worldLabel player =
             Maybe.map toUnit player.partyKey
@@ -65,31 +64,31 @@ layoutScene windowSize methods model =
         worldLabel2 =
             worldLabel model.player2
 
-        mRender1 =
-            mRender model.player1
+        mView1 =
+            mView model.player1
 
-        mRender2 =
-            mRender model.player2
+        mView2 =
+            mView model.player2
 
         orLoading f m =
             Maybe.withDefault (loading windowSize) (Maybe.map f m)
     in
         if model.player1.cameraVR then
-            orLoading (layoutSceneVR windowSize model) mRender1
+            orLoading (layoutSceneVR windowSize model) mView1
         else if model.numPlayers == 2 then
-            case ( mRender1, mRender2 ) of
-                ( Just render1, Just render2 ) ->
+            case ( mView1, mView2 ) of
+                ( Just view1, Just view2 ) ->
                     layoutScene2 windowSize
                         model
                         worldLabel1
-                        render1
+                        view1
                         worldLabel2
-                        render2
+                        view2
 
                 _ ->
                     loading windowSize
         else
-            orLoading (layoutScene1 windowSize model worldLabel1) mRender1
+            orLoading (layoutScene1 windowSize model worldLabel1) mView1
 
 
 loading : Window.Size -> Html (Msg worldMsg)
@@ -117,13 +116,17 @@ type alias RenderWorld msg =
     Model.Eye -> Window.Size -> Model.Player msg -> List WebGL.Entity
 
 
-layoutScene1 : Window.Size -> Model worldModel worldMsg -> String -> RenderWorld worldMsg -> Html (Msg worldMsg)
-layoutScene1 windowSize model worldLabel render =
+-- layoutScene1 : String -> Window.Size -> Model worldModel worldMsg -> String -> RenderWorld worldMsg -> Html (Msg worldMsg)
+layoutScene1 : Window.Size -> Model worldModel worldMsg -> String -> Model.World -> Html (Msg worldMsg)
+layoutScene1 windowSize model worldLabel view =
+    let
+        render = renderWorld model.globalTime view
+    in
     div
         [ style
             [ ( "width", toString windowSize.width ++ "px" )
             , ( "height", toString windowSize.height ++ "px" )
-            , ( "backgroundColor", "rgb(135, 206, 235)" )
+            , ( "backgroundColor", view.backgroundColor )
             ]
         ]
         [ WebGL.toHtml
@@ -142,24 +145,30 @@ layoutScene1 windowSize model worldLabel render =
         ]
 
 
-layoutScene2 : Window.Size -> Model worldModel worldMsg -> String -> RenderWorld worldMsg -> String -> RenderWorld worldMsg -> Html (Msg worldMsg)
-layoutScene2 windowSize model worldLabel1 render1 worldLabel2 render2 =
+layoutScene2 : Window.Size -> Model worldModel worldMsg -> String -> Model.World -> String -> Model.World -> Html (Msg worldMsg)
+layoutScene2 windowSize model worldLabel1 view1 worldLabel2 view2 =
     let
         w2 =
             windowSize.width // 2
 
         ws2 =
             { windowSize | width = w2 }
+
+        render1 = renderWorld model.globalTime view1
+        render2 = renderWorld model.globalTime view2
     in
         div
             [ style
                 [ ( "width", toString windowSize.width ++ "px" )
                 , ( "height", toString windowSize.height ++ "px" )
-                , ( "backgroundColor", "rgb(135, 206, 235)" )
+                -- , ( "backgroundColor", "rgb(135, 206, 235)" )
                 ]
             ]
             [ span []
-                [ div []
+                [ div
+                    [ style
+                        [ ( "backgroundColor", view1.backgroundColor ) ]
+                    ]
                     [ WebGL.toHtml
                         [ width w2
                         , height windowSize.height
@@ -177,7 +186,10 @@ layoutScene2 windowSize model worldLabel1 render1 worldLabel2 render2 =
                         (render1 Model.OneEye ws2 model.player1)
                     , hud worldLabel1 model.paused model.player1 0 w2 (windowSize.width // 20) (windowSize.height // 10)
                     ]
-                , div []
+                , div
+                    [ style
+                        [ ( "backgroundColor", view2.backgroundColor ) ]
+                    ]
                     [ WebGL.toHtml
                         [ width w2
                         , height windowSize.height
@@ -199,9 +211,11 @@ layoutScene2 windowSize model worldLabel1 render1 worldLabel2 render2 =
             ]
 
 
-layoutSceneVR : Window.Size -> Model worldModel worldMsg -> RenderWorld worldMsg -> Html (Msg worldMsg)
-layoutSceneVR windowSize model render =
+layoutSceneVR : Window.Size -> Model worldModel worldMsg -> Model.World -> Html (Msg worldMsg)
+layoutSceneVR windowSize model view =
     let
+        render = renderWorld model.globalTime view
+
         w2 =
             windowSize.width // 2
 
@@ -212,7 +226,7 @@ layoutSceneVR windowSize model render =
             [ style
                 [ ( "width", toString windowSize.width ++ "px" )
                 , ( "height", toString windowSize.height ++ "px" )
-                , ( "backgroundColor", "rgb(135, 206, 235)" )
+                , ( "backgroundColor", view.backgroundColor )
                 ]
             ]
             [ WebGL.toHtml
