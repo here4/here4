@@ -1,5 +1,6 @@
 module Model exposing (..)
 
+import Color exposing (Color)
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
@@ -50,7 +51,7 @@ type GlobalMsg
 
 
 type alias World =
-    { backgroundColor : String
+    { backgroundColor : Color
     , bodies : List Body
     , ground : Ground
     }

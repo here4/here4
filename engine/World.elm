@@ -1,7 +1,8 @@
 module World exposing (Attributes, Multiverse, create)
 
-import Html exposing (Html)
 import Bag exposing (Bag)
+import Color exposing (Color)
+import Html exposing (Html)
 import Time exposing (Time)
 import Space
 import App.Control exposing (..)
@@ -23,7 +24,7 @@ import Task
 type alias Attributes =
     { id : String
     , label : String
-    , backgroundColor : String
+    , backgroundColor : Color
     , apps : List ( App, Cmd AppMsg )
     , defaultSelf : ( App, Cmd AppMsg )
     }
@@ -38,7 +39,7 @@ type alias Multiverse state =
 type alias World =
     { id : String
     , label : String
-    , backgroundColor : String
+    , backgroundColor : Color
     , maybeGround : Maybe Ground
     , apps : Bag App
     , parties : Bag Party

@@ -1,6 +1,6 @@
 module View exposing (view)
 
-import Color exposing (black, white)
+import Color exposing (Color, black, white)
 import FontAwesome
 
 import Html exposing (Html, text, div, p, span)
@@ -116,6 +116,18 @@ type alias RenderWorld msg =
     Model.Eye -> Window.Size -> Model.Player msg -> List WebGL.Entity
 
 
+rgbAttribute : Color -> String
+rgbAttribute color =
+    let
+        rgb = Color.toRgb color
+        s =
+            [rgb.red, rgb.green, rgb.blue]
+            |> List.map toString
+            |> String.join ","
+    in
+        "rgb(" ++ s ++ ")"
+
+
 -- layoutScene1 : String -> Window.Size -> Model worldModel worldMsg -> String -> RenderWorld worldMsg -> Html (Msg worldMsg)
 layoutScene1 : Window.Size -> Model worldModel worldMsg -> String -> Model.World -> Html (Msg worldMsg)
 layoutScene1 windowSize model worldLabel view =
@@ -126,7 +138,7 @@ layoutScene1 windowSize model worldLabel view =
         [ style
             [ ( "width", toString windowSize.width ++ "px" )
             , ( "height", toString windowSize.height ++ "px" )
-            , ( "backgroundColor", view.backgroundColor )
+            , ( "backgroundColor", rgbAttribute view.backgroundColor )
             ]
         ]
         [ WebGL.toHtml
@@ -161,13 +173,12 @@ layoutScene2 windowSize model worldLabel1 view1 worldLabel2 view2 =
             [ style
                 [ ( "width", toString windowSize.width ++ "px" )
                 , ( "height", toString windowSize.height ++ "px" )
-                -- , ( "backgroundColor", "rgb(135, 206, 235)" )
                 ]
             ]
             [ span []
                 [ div
                     [ style
-                        [ ( "backgroundColor", view1.backgroundColor ) ]
+                        [ ( "backgroundColor", rgbAttribute view1.backgroundColor ) ]
                     ]
                     [ WebGL.toHtml
                         [ width w2
@@ -188,7 +199,7 @@ layoutScene2 windowSize model worldLabel1 view1 worldLabel2 view2 =
                     ]
                 , div
                     [ style
-                        [ ( "backgroundColor", view2.backgroundColor ) ]
+                        [ ( "backgroundColor", rgbAttribute view2.backgroundColor ) ]
                     ]
                     [ WebGL.toHtml
                         [ width w2
@@ -226,7 +237,7 @@ layoutSceneVR windowSize model view =
             [ style
                 [ ( "width", toString windowSize.width ++ "px" )
                 , ( "height", toString windowSize.height ++ "px" )
-                , ( "backgroundColor", view.backgroundColor )
+                , ( "backgroundColor", rgbAttribute view.backgroundColor )
                 ]
             ]
             [ WebGL.toHtml
