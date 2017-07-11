@@ -14,8 +14,8 @@ import Shufflepuck
 import Sky
 import Statue
 import TextureCube
+import Reflective
 import StaticGround
-import Suzanne
 import Wedge
 import Body.Terrain as Terrain
 import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
@@ -141,8 +141,8 @@ elmLogo =
 
 avatar : Float -> ( App, Cmd AppMsg )
 avatar speed =
-        Suzanne.create
-            { id = "suzanne"
+        Reflective.create
+            { id = "avatar"
             , label = "Walking"
             , meshPath = "meshes/suzanne.obj"
             , diffuseTexturePath = "textures/elmLogoDiffuse.png"

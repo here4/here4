@@ -1,4 +1,4 @@
-module Suzanne exposing (create)
+module Reflective exposing (create)
 
 import App exposing (..)
 import App.Control exposing (..)
