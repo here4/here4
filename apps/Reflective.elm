@@ -13,17 +13,17 @@ import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
 import Task exposing (Task)
 import Tuple exposing (first)
-import Vehicle
+import Vehicle exposing (Driveable)
 import Vehicles.Walking as Walking
 import WebGL.Texture as Texture exposing (Texture, Error)
 
-type alias Attributes driveAttributes =
+type alias Attributes vehicle =
     { id : String
     , label : String
     , position : Vec3
     , meshPath : String
     , diffuseTexturePath : String
-    , driveAttributes : Vehicle.Driveable driveAttributes
+    , vehicle : Driveable vehicle
     }
 
 
@@ -40,7 +40,7 @@ type Msg
     | LoadObj (Result String (MeshWith VertexWithTexture))
 
 
-create : Attributes a -> ( App, Cmd AppMsg )
+create : Attributes vehicle -> ( App, Cmd AppMsg )
 create attributes =
     App.create (init attributes)
         { id = always attributes.id
@@ -55,7 +55,7 @@ create attributes =
         }
 
 
-init : Attributes a -> ( Model, Cmd (CtrlMsg Msg) )
+init : Attributes vehicle -> ( Model, Cmd (CtrlMsg Msg) )
 init attributes =
     ( { motion =
           { position = attributes.position
@@ -94,7 +94,7 @@ setMotion motion model =
     }
 
 update :
-    Attributes a
+    Attributes vehicle
     -> CtrlMsg Msg
     -> Model
     -> ( Model, Cmd (CtrlMsg Msg) )
@@ -130,13 +130,9 @@ update attributes msg model =
                 ( model, Cmd.none )
 
             Ctrl (Drive ground inputs) ->
-                let
-                    d = attributes.driveAttributes
-                    walkAttributes = { speed = d.speed, height = d.height, radius = d.radius }
-                in
-                    ( setMotion (Walking.drive walkAttributes ground inputs model.motion) model
-                    , Cmd.none
-                    )
+                ( setMotion (Walking.drive attributes.vehicle ground inputs model.motion) model
+                , Cmd.none
+                )
             _ ->
                 ( model, Cmd.none )
 

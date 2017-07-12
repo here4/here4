@@ -124,9 +124,6 @@ elmLogo =
                 , Html.hr [] []
                 , DreamBuggy.overlay
                 ]
-
-        drive =
-            DreamBuggy.drive { speed = 8.0, radius = 1.0 }
     in
         Obj.create
             { id = "elm-logo"
@@ -136,7 +133,12 @@ elmLogo =
             , meshPath = "meshes/elmLogo.obj"
             , diffuseTexturePath = "textures/elmLogoDiffuse.png"
             , normalTexturePath = "textures/elmLogoNorm.png"
-            , drive = Just drive
+            , drive = Just DreamBuggy.drive
+            , vehicle =
+                { speed = 8.0
+                , height = 1.2
+                , radius = 1.0
+                }
             }
 
 
@@ -148,7 +150,7 @@ avatar speed =
             , meshPath = "meshes/suzanne.obj"
             , diffuseTexturePath = "textures/elmLogoDiffuse.png"
             , position = vec3 0 10 0
-            , driveAttributes =
+            , vehicle =
                 { speed = speed
                 , height = 1.4
                 , radius = 1.5

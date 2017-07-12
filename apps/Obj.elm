@@ -14,10 +14,11 @@ import OBJ
 import OBJ.Types exposing (ObjFile, Mesh(..))
 import Task exposing (Task)
 import Tuple exposing (first)
+import Vehicle exposing (Driveable)
 import WebGL.Texture as Texture exposing (Texture, Error)
 
 
-type alias Attributes =
+type alias Attributes vehicle =
     { id : String
     , label : String
     , position : Vec3
@@ -25,12 +26,14 @@ type alias Attributes =
     , meshPath : String
     , diffuseTexturePath : String
     , normalTexturePath : String
-    , drive : Maybe (Ground -> Inputs -> Moving {} -> Moving {})
+    , drive : Maybe (Driveable vehicle -> Ground -> Inputs -> Moving {} -> Moving {})
+    , vehicle : Driveable vehicle
     }
 
 
-type alias Model =
+type alias Model vehicle =
     { motion : Moving {}
+    , vehicle : Driveable vehicle
     , body : Maybe (Moving Body)
     , mesh : Result String ObjFile
     , diffTexture : Result String Texture
@@ -44,7 +47,7 @@ type Msg
     | LoadObj String (Result String (Dict String (Dict String Mesh)))
 
 
-create : Attributes -> ( App, Cmd AppMsg )
+create : Attributes d -> ( App, Cmd AppMsg )
 create attributes =
     App.create (init attributes)
         { id = always attributes.id
@@ -59,13 +62,14 @@ create attributes =
         }
 
 
-init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
+init : Attributes vehicle -> ( Model vehicle, Cmd (CtrlMsg Msg) )
 init attributes =
     ( { motion =
           { position = attributes.position
           , orientation = Orientation.initial
           , velocity = vec3 0 0 0
           }
+      , vehicle = attributes.vehicle
       , body = Nothing
       , mesh = Err "Loading ..."
       , diffTexture = Err "Loading texture ..."
@@ -98,7 +102,7 @@ loadTexture url msg =
             )
 
 
-setMotion : Moving {} -> Model -> Model
+setMotion : Moving {} -> Model vehicle -> Model vehicle
 setMotion motion model =
     { model | motion = motion
             , body = Maybe.map (copyMotion motion) model.body
@@ -106,10 +110,10 @@ setMotion motion model =
 
 
 update :
-    Maybe (Ground -> Inputs -> Moving {} -> Moving {})
+    Maybe (Driveable vehicle -> Ground -> Inputs -> Moving {} -> Moving {})
     -> CtrlMsg Msg
-    -> Model
-    -> ( Model, Cmd (CtrlMsg Msg) )
+    -> Model vehicle
+    -> ( Model vehicle, Cmd (CtrlMsg Msg) )
 update mDrive msg model =
     let
         -- mapBody f =
@@ -157,7 +161,7 @@ update mDrive msg model =
                 case mDrive of
                     Just drive ->
                         -- ( mapBody (drive ground inputs), Cmd.none )
-                        ( setMotion (drive ground inputs model.motion) model
+                        ( setMotion (drive model.vehicle ground inputs model.motion) model
                         , Cmd.none
                         )
 
@@ -168,7 +172,7 @@ update mDrive msg model =
                 ( model, Cmd.none )
 
 
-animate : Ground -> Time -> Model -> Model
+animate : Ground -> Time -> Model vehicle -> Model vehicle
 animate ground dt model =
     let
         aboveGround pos =
@@ -189,7 +193,7 @@ animate ground dt model =
         setMotion newMotion model
 
 
-bodies : Model -> List Body
+bodies : Model vehicle -> List Body
 bodies model_ =
     case model_.body of
         Just body ->
@@ -199,7 +203,7 @@ bodies model_ =
             []
 
 
-reposition : Maybe AppPosition -> Model -> Model
+reposition : Maybe AppPosition -> Model vehicle -> Model vehicle
 reposition mPos model =
     case mPos of
         Just pos ->
@@ -216,11 +220,11 @@ reposition mPos model =
             model
 
 
-framing : PartyKey -> Model -> Maybe Framing
+framing : PartyKey -> Model vehicle -> Maybe Framing
 framing _ model =
     Maybe.map toFraming model.body
 
 
-focus : Model -> Maybe Focus
+focus : Model vehicle -> Maybe Focus
 focus model =
     Maybe.map appToFocus model.body

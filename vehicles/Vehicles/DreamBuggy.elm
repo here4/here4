@@ -11,6 +11,8 @@ import Orientation exposing (..)
 import Body exposing (..)
 import Model
 import Ground exposing (Ground)
+import Vehicle exposing (Driveable)
+
 import Debug
 
 
@@ -18,18 +20,12 @@ import Debug
 -- DreamBuggy
 
 
-type alias Attributes =
-    { speed : Float
-    , radius : Float
-    }
-
-
 welcome : Model.Motion -> Model.Motion
 welcome motion =
     { motion | orientation = clampBuggy motion.orientation }
 
 
-drive : Attributes -> Ground -> Model.Inputs -> Moving a -> Moving a
+drive : Driveable vehicle -> Ground -> Model.Inputs -> Moving a -> Moving a
 drive attributes ground inputs thing =
     let
         eyeLevel pos =
@@ -38,7 +34,7 @@ drive attributes ground inputs thing =
         move attributes ground eyeLevel inputs thing
 
 
-move : Attributes -> Ground -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
+move : Driveable vehicle -> Ground -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
 move attributes terrain eyeLevel inputs motion =
     motion
         |> turn eyeLevel attributes.speed inputs.x inputs.dt
