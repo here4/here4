@@ -14,19 +14,23 @@ import Orientation
 import Vehicle exposing (Driveable)
 
 
+type alias VehicleAttributes vehicle =
+    { drive : Maybe (Driveable vehicle -> Ground -> Inputs -> Moving {} -> Moving {})
+    , vehicle : Driveable vehicle
+    }
+
 type alias Attributes vehicle =
     { id : String
     , label : String
     , position : Vec3
     , overlay : Html (CtrlMsg Msg)
     , object : ObjectAttributes
-    , drive : Maybe (Driveable vehicle -> Ground -> Inputs -> Moving {} -> Moving {})
-    , vehicle : Driveable vehicle
+    , action : VehicleAttributes vehicle
     }
 
 type alias Model vehicle =
     { motion : Moving {}
-    , vehicle : Driveable vehicle
+    , action : VehicleAttributes vehicle
     , body : Maybe (Moving Body)
     , object : Load ObjectResult
     }
@@ -40,7 +44,7 @@ create attributes =
     App.create (init attributes)
         { id = always attributes.id
         , label = always attributes.label
-        , update = update attributes.drive
+        , update = update attributes.action
         , animate = animate
         , bodies = bodies
         , framing = framing
@@ -89,7 +93,7 @@ init attributes =
               , orientation = Orientation.initial
               , velocity = vec3 0 0 0
               }
-          , vehicle = attributes.vehicle
+          , action = attributes.action
           , body = Nothing
           , object = object
           }
@@ -103,11 +107,11 @@ setMotion motion model =
 
 
 update :
-    Maybe (Driveable vehicle -> Ground -> Inputs -> Moving {} -> Moving {})
+    VehicleAttributes vehicle
     -> CtrlMsg Msg
     -> Model vehicle
     -> ( Model vehicle, Cmd (CtrlMsg Msg) )
-update mDrive msg model =
+update vehicle msg model =
         case msg of
             Self m ->
                 loadBody (objectUpdate m model.object) model
@@ -117,9 +121,9 @@ update mDrive msg model =
                 ( model, Cmd.none )
 
             Ctrl (Drive ground inputs) ->
-                case mDrive of
+                case vehicle.drive of
                     Just drive ->
-                        ( setMotion (drive model.vehicle ground inputs model.motion) model
+                        ( setMotion (drive model.action.vehicle ground inputs model.motion) model
                         , Cmd.none
                         )
 

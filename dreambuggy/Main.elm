@@ -14,7 +14,6 @@ import Object
 import Shufflepuck
 import Sky
 import Statue
--- import TextureCube
 import StaticGround
 import Body.Terrain as Terrain
 import Body.Wedge exposing (wedge)
@@ -39,7 +38,6 @@ main =
 
                 , Balls.create 30
 
-                -- , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
                 , textureCube
 
                 , deltaWedge
@@ -50,11 +48,13 @@ main =
                     , position = vec3 3 10 5
                     , overlay = Html.text "Clouds sphere"
                     , object = Object.Appearance cloudsSphere
-                    , drive = Nothing
-                    , vehicle =
-                        { speed = 0
-                        , height = 1.4
-                        , radius = 1.5
+                    , action =
+                        { drive = Nothing
+                        , vehicle =
+                            { speed = 0
+                            , height = 1.4
+                            , radius = 1.5
+                            }
                         }
                     }
 
@@ -146,11 +146,13 @@ deltaWedge =
             , position = vec3 23 0 12
             , overlay = overlay
             , object = Object.Appearance wedge
-            , drive = Just DreamBird.drive
-            , vehicle =
-                { speed = 20.0
-                , height = 0.7
-                , radius = 1.0
+            , action =
+                { drive = Just DreamBird.drive
+                , vehicle =
+                    { speed = 20.0
+                    , height = 0.7
+                    , radius = 1.0
+                    }
                 }
             }
 
@@ -176,11 +178,13 @@ textureCube =
                 { mesh = cubeMesh
                 , texturePath = "resources/woodCrate.jpg"
                 }
-            , drive = Just DreamBuggy.drive
-            , vehicle =
-                { speed = 8.0
-                , height = 1.0
-                , radius = 1.0
+            , action =
+                { drive = Just DreamBuggy.drive
+                , vehicle =
+                    { speed = 8.0
+                    , height = 1.0
+                    , radius = 1.0
+                    }
                 }
             }
 
@@ -207,11 +211,13 @@ elmLogo =
                 , diffuseTexturePath = "textures/elmLogoDiffuse.png"
                 , normalTexturePath = "textures/elmLogoNorm.png"
                 }
-            , drive = Just DreamBuggy.drive
-            , vehicle =
-                { speed = 8.0
-                , height = 1.2
-                , radius = 1.0
+            , action =
+                { drive = Just DreamBuggy.drive
+                , vehicle =
+                    { speed = 8.0
+                    , height = 1.2
+                    , radius = 1.0
+                    }
                 }
             }
 
@@ -237,10 +243,12 @@ avatar speed =
                 { meshPath = "meshes/suzanne.obj"
                 , reflectionTexturePath = "textures/elmLogoDiffuse.png"
                 }
-            , drive = Just Walking.drive
-            , vehicle =
-                { speed = speed
-                , height = 1.4
-                , radius = 1.5
+            , action =
+                { drive = Just Walking.drive
+                , vehicle =
+                    { speed = speed
+                    , height = 1.4
+                    , radius = 1.5
+                    }
                 }
             }
