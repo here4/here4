@@ -10,6 +10,7 @@ import Boids
 import BoxRoom
 import Balls
 import Obj
+import Object
 import Shufflepuck
 import Sky
 import Statue
@@ -130,7 +131,7 @@ elmLogo =
             , label = "Elm Logo"
             , position = vec3 38 0 12
             , overlay = overlay
-            , object = Obj.TexturedObj
+            , object = Object.TexturedObj
                 { meshPath = "meshes/elmLogo.obj"
                 , diffuseTexturePath = "textures/elmLogoDiffuse.png"
                 , normalTexturePath = "textures/elmLogoNorm.png"

@@ -1,4 +1,4 @@
-module Obj exposing (create, ObjectAttributes(..))
+module Obj exposing (create)
 
 import App exposing (..)
 import App.Control exposing (..)
@@ -8,57 +8,11 @@ import Dispatch exposing (..)
 import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
+import Object exposing (..)
 import Object.Types exposing (Load(..))
 import Orientation
-import Object.Types exposing (Load(..))
-import Object.TexturedObj exposing (..)
-import Tuple
 import Vehicle exposing (Driveable)
 
-
-type ObjectAttributes
-    = TexturedObj TexturedObjAttributes
-
-type ObjectResult
-    = TexturedObjResult TexturedObjResult
-
-type ObjectMsg
-    = TexturedObjMsg TexturedObjMsg
-
-
-wrap :
-    (result -> ObjectResult)
-    -> (msg -> ObjectMsg)
-    -> (Load result, Cmd msg)
-    -> (Load ObjectResult, Cmd ObjectMsg)
-wrap t m (model, msg) =
-    case model of
-        Loading model_ ->
-            ( Loading (t model_), Cmd.map m msg )
-        Ready appear ->
-            ( Ready appear, Cmd.none )
-
-
-objectInit : ObjectAttributes -> (Load ObjectResult, Cmd ObjectMsg)
-objectInit attributes =
-    case attributes of
-        TexturedObj a ->
-            texturedObjInit a
-            |> wrap TexturedObjResult TexturedObjMsg
-
-
-objectUpdate : ObjectMsg -> Load ObjectResult -> (Load ObjectResult, Cmd ObjectMsg)
-objectUpdate msg model =
-    case model of
-        Ready appear ->
-            ( Ready appear, Cmd.none )
-
-        Loading partial ->
-            case (msg, partial) of
-                (TexturedObjMsg msg_, TexturedObjResult model_) ->
-                    texturedObjUpdate msg_ (Loading model_)
-                    |> wrap TexturedObjResult TexturedObjMsg
-                
 
 type alias Attributes vehicle =
     { id : String
