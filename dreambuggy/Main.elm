@@ -14,11 +14,11 @@ import Object
 import Shufflepuck
 import Sky
 import Statue
-import TextureCube
+-- import TextureCube
 import StaticGround
 import Body.Terrain as Terrain
 import Body.Wedge exposing (wedge)
-import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
+import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube, cubeMesh)
 import Primitive.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Primitive.Sphere exposing (skySphere, cloudsSphere)
 import Vehicles.DreamBird as DreamBird
@@ -39,7 +39,8 @@ main =
 
                 , Balls.create 30
 
-                , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
+                -- , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
+                , textureCube
 
                 , deltaWedge
 
@@ -149,6 +150,36 @@ deltaWedge =
             , vehicle =
                 { speed = 20.0
                 , height = 0.7
+                , radius = 1.0
+                }
+            }
+
+textureCube : ( App, Cmd AppMsg )
+textureCube =
+    let
+        overlay =
+            Html.div []
+                [ Html.h2 []
+                    [ Html.text "A wooden box" ]
+                , Html.text "This highly attractive wooden box doubles as a secret vehicle."
+                , Html.br [] []
+                , Html.hr [] []
+                , DreamBuggy.overlay
+                ]
+    in
+        Obj.create
+            { id = "crate"
+            , label = "Wooden crate"
+            , position = vec3 -2 0 17
+            , overlay = overlay
+            , object = Object.FlatTexture
+                { mesh = cubeMesh
+                , texturePath = "resources/woodCrate.jpg"
+                }
+            , drive = Just DreamBuggy.drive
+            , vehicle =
+                { speed = 8.0
+                , height = 1.0
                 , radius = 1.0
                 }
             }
