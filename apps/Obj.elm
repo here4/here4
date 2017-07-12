@@ -1,4 +1,4 @@
-module Obj exposing (create)
+module Obj exposing (create, ObjectAttributes(..))
 
 import App exposing (..)
 import App.Control exposing (..)
@@ -8,27 +8,64 @@ import Dispatch exposing (..)
 import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
+import Object.Types exposing (Load(..))
 import Orientation
 import Object.Types exposing (Load(..))
 import Object.TexturedObj exposing (..)
-import Tuple exposing (first)
+import Tuple
 import Vehicle exposing (Driveable)
 
 
-type Object
+type ObjectAttributes
     = TexturedObj TexturedObjAttributes
 
 type ObjectResult
-    = TR TexturedObjResult
+    = TexturedObjResult TexturedObjResult
 
+type ObjectMsg
+    = TexturedObjMsg TexturedObjMsg
+
+
+wrap :
+    (result -> ObjectResult)
+    -> (msg -> ObjectMsg)
+    -> (Load result, Cmd msg)
+    -> (Load ObjectResult, Cmd ObjectMsg)
+wrap t m (model, msg) =
+    case model of
+        Loading model_ ->
+            ( Loading (t model_), Cmd.map m msg )
+        Ready appear ->
+            ( Ready appear, Cmd.none )
+
+
+objectInit : ObjectAttributes -> (Load ObjectResult, Cmd ObjectMsg)
+objectInit attributes =
+    case attributes of
+        TexturedObj a ->
+            texturedObjInit a
+            |> wrap TexturedObjResult TexturedObjMsg
+
+
+objectUpdate : ObjectMsg -> Load ObjectResult -> (Load ObjectResult, Cmd ObjectMsg)
+objectUpdate msg model =
+    case model of
+        Ready appear ->
+            ( Ready appear, Cmd.none )
+
+        Loading partial ->
+            case (msg, partial) of
+                (TexturedObjMsg msg_, TexturedObjResult model_) ->
+                    texturedObjUpdate msg_ (Loading model_)
+                    |> wrap TexturedObjResult TexturedObjMsg
+                
 
 type alias Attributes vehicle =
     { id : String
     , label : String
     , position : Vec3
     , overlay : Html (CtrlMsg Msg)
-    -- , object : Object
-    , object : TexturedObjAttributes
+    , object : ObjectAttributes
     , drive : Maybe (Driveable vehicle -> Ground -> Inputs -> Moving {} -> Moving {})
     , vehicle : Driveable vehicle
     }
@@ -37,15 +74,12 @@ type alias Model vehicle =
     { motion : Moving {}
     , vehicle : Driveable vehicle
     , body : Maybe (Moving Body)
-    -- , objResult : Load ObjResult
-    , object : Load TexturedObjResult
+    , object : Load ObjectResult
     }
 
 
 type alias Msg
-    = TexturedObjMsg
-
-
+    = ObjectMsg
 
 create : Attributes d -> ( App, Cmd AppMsg )
 create attributes =
@@ -66,9 +100,7 @@ init : Attributes vehicle -> ( Model vehicle, Cmd (CtrlMsg Msg) )
 init attributes =
     let
         (object, objectCmds) =
-            -- case attributes.object of
-            --     TexturedObj texObj -> texturedObjInit texObj
-            texturedObjInit attributes.object
+            objectInit attributes.object
     in
     ( { motion =
           { position = attributes.position
@@ -101,7 +133,8 @@ update mDrive msg model =
             Self m ->
                 let
                     ( newObject, newMsg ) =
-                        texturedObjUpdate m model.object
+                        -- texturedObjUpdate m model.object
+                        objectUpdate m model.object
                     mBody =
                         case newObject of
                             Loading _ ->
@@ -114,12 +147,12 @@ update mDrive msg model =
                                     , orientation = model.motion.orientation
                                     , appear = appear
                                     , velocity = model.motion.velocity
-                                    }
+                                   }
                 in
                     ( { model | object = newObject
                               , body = mBody
                       }
-                    , Cmd.none
+                    , Cmd.map Self newMsg
                     )
 
             Ctrl (Move dp) ->
