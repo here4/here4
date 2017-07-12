@@ -12,7 +12,6 @@ import Body.Obj exposing (reflective)
 import Dict exposing (Dict)
 import Object.Types exposing (Load(..))
 import OBJ
---import OBJ.Types exposing (ObjFile, Mesh(..))
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
 import Task exposing (Task)
 import WebGL.Texture as Texture exposing (Texture, Error)
@@ -20,7 +19,7 @@ import WebGL.Texture as Texture exposing (Texture, Error)
 
 type alias ReflectiveObjAttributes =
     { meshPath : String
-    , diffuseTexturePath : String
+    , reflectionTexturePath : String
     }
 
 type alias ReflectiveObjResult =
@@ -40,7 +39,7 @@ reflectiveObjInit attributes =
           , reflectionTexture = Err "Loading texture ..."
           }
     , Cmd.batch
-        [ loadTexture attributes.diffuseTexturePath DiffTextureLoaded
+        [ loadTexture attributes.reflectionTexturePath DiffTextureLoaded
         , OBJ.loadMesh attributes.meshPath LoadObj
         ]
     )

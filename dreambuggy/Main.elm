@@ -164,7 +164,7 @@ avatar speed =
             , overlay = overlay
             , object = Object.ReflectiveObj
                 { meshPath = "meshes/suzanne.obj"
-                , diffuseTexturePath = "textures/elmLogoDiffuse.png"
+                , reflectionTexturePath = "textures/elmLogoDiffuse.png"
                 }
             , drive = Just Walking.drive
             , vehicle =
