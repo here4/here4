@@ -130,9 +130,11 @@ elmLogo =
             , label = "Elm Logo"
             , position = vec3 38 0 12
             , overlay = overlay
-            , meshPath = "meshes/elmLogo.obj"
-            , diffuseTexturePath = "textures/elmLogoDiffuse.png"
-            , normalTexturePath = "textures/elmLogoNorm.png"
+            , object =
+                { meshPath = "meshes/elmLogo.obj"
+                , diffuseTexturePath = "textures/elmLogoDiffuse.png"
+                , normalTexturePath = "textures/elmLogoNorm.png"
+                }
             , drive = Just DreamBuggy.drive
             , vehicle =
                 { speed = 8.0
