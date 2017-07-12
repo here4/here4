@@ -50,24 +50,49 @@ create attributes =
         }
 
 
+loadBody :
+    ( Load ObjectResult, Cmd ObjectMsg )
+    -> Model vehicle
+    -> ( Model vehicle, Cmd (CtrlMsg Msg) )
+loadBody (newObject, newMsg) model =
+    let
+        mBody =
+            case newObject of
+                Loading _ ->
+                    Nothing
+                Ready appear ->
+                    Just
+                        { anchor = AnchorGround
+                        , scale = vec3 1 1 1
+                        , position = model.motion.position
+                        , orientation = model.motion.orientation
+                        , appear = appear
+                        , velocity = model.motion.velocity
+                       }
+    in
+        ( { model | object = newObject
+                  , body = mBody
+          }
+        , Cmd.map Self newMsg
+        )
+
+
 init : Attributes vehicle -> ( Model vehicle, Cmd (CtrlMsg Msg) )
 init attributes =
     let
         (object, objectCmds) =
             objectInit attributes.object
     in
-    ( { motion =
-          { position = attributes.position
-          , orientation = Orientation.initial
-          , velocity = vec3 0 0 0
+      loadBody (object, objectCmds)
+          { motion =
+              { position = attributes.position
+              , orientation = Orientation.initial
+              , velocity = vec3 0 0 0
+              }
+          , vehicle = attributes.vehicle
+          , body = Nothing
+          , object = object
           }
-      , vehicle = attributes.vehicle
-      , body = Nothing
-      , object = object
-      }
-    , Cmd.map Self objectCmds
-    )
-
 
 
 setMotion : Moving {} -> Model vehicle -> Model vehicle
@@ -85,28 +110,7 @@ update :
 update mDrive msg model =
         case msg of
             Self m ->
-                let
-                    ( newObject, newMsg ) =
-                        objectUpdate m model.object
-                    mBody =
-                        case newObject of
-                            Loading _ ->
-                                Nothing
-                            Ready appear ->
-                                Just
-                                    { anchor = AnchorGround
-                                    , scale = vec3 1 1 1
-                                    , position = model.motion.position
-                                    , orientation = model.motion.orientation
-                                    , appear = appear
-                                    , velocity = model.motion.velocity
-                                   }
-                in
-                    ( { model | object = newObject
-                              , body = mBody
-                      }
-                    , Cmd.map Self newMsg
-                    )
+                loadBody (objectUpdate m model.object) model
 
             Ctrl (Move dp) ->
                 -- ( mapBody (translate dp), Cmd.none)

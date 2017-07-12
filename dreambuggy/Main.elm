@@ -38,11 +38,18 @@ main =
                 , Balls.create 30
                 , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
                 , Wedge.create "Wedge" (vec3 23 0 12)
-                , Statue.create
+                , Obj.create
                     { id = "clouds-sphere"
                     , label = "Clouds Sphere"
                     , position = vec3 3 10 5
-                    , appear = cloudsSphere
+                    , overlay = Html.text "Clouds sphere"
+                    , object = Object.Appearance cloudsSphere
+                    , drive = Nothing
+                    , vehicle =
+                        { speed = 0
+                        , height = 1.4
+                        , radius = 1.5
+                        }
                     }
                 , Statue.create
                     { id = "landscape-diamond"
