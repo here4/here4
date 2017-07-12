@@ -15,7 +15,6 @@ import Shufflepuck
 import Sky
 import Statue
 import TextureCube
-import Reflective
 import StaticGround
 import Wedge
 import Body.Terrain as Terrain
