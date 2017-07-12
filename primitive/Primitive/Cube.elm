@@ -10,6 +10,10 @@ module Primitive.Cube exposing
     , walls
     , floor
     , ceiling
+    , cubeMesh
+    , wallsMesh
+    , floorMesh
+    , ceilingMesh
     )
 
 import Math.Vector3 exposing (..)
