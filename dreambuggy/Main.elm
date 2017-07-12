@@ -16,7 +16,6 @@ import Sky
 import Statue
 import TextureCube
 import StaticGround
--- import Wedge
 import Body.Terrain as Terrain
 import Body.Wedge exposing (wedge)
 import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
@@ -42,7 +41,6 @@ main =
 
                 , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
 
-                -- , Wedge.create "Wedge" (vec3 23 0 12)
                 , deltaWedge
 
                 , Obj.create
