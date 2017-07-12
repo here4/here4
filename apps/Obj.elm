@@ -1,4 +1,4 @@
-module Obj exposing (create)
+module Obj exposing (create, Action(..))
 
 import App exposing (..)
 import App.Control exposing (..)
@@ -19,18 +19,21 @@ type alias VehicleAttributes vehicle =
     , vehicle : Driveable vehicle
     }
 
+type Action vehicle
+    = Vehicle (VehicleAttributes vehicle)
+
 type alias Attributes vehicle =
     { id : String
     , label : String
     , position : Vec3
     , overlay : Html (CtrlMsg Msg)
     , object : ObjectAttributes
-    , action : VehicleAttributes vehicle
+    , action : Action vehicle
     }
 
 type alias Model vehicle =
     { motion : Moving {}
-    , action : VehicleAttributes vehicle
+    , action : Action vehicle
     , body : Maybe (Moving Body)
     , object : Load ObjectResult
     }
@@ -107,11 +110,11 @@ setMotion motion model =
 
 
 update :
-    VehicleAttributes vehicle
+    Action vehicle
     -> CtrlMsg Msg
     -> Model vehicle
     -> ( Model vehicle, Cmd (CtrlMsg Msg) )
-update vehicle msg model =
+update action msg model =
         case msg of
             Self m ->
                 loadBody (objectUpdate m model.object) model
@@ -121,14 +124,16 @@ update vehicle msg model =
                 ( model, Cmd.none )
 
             Ctrl (Drive ground inputs) ->
-                case vehicle.drive of
-                    Just drive ->
-                        ( setMotion (drive model.action.vehicle ground inputs model.motion) model
-                        , Cmd.none
-                        )
+                case action of
+                    Vehicle v ->
+                        case v.drive of
+                            Just drive ->
+                                ( setMotion (drive v.vehicle ground inputs model.motion) model
+                                , Cmd.none
+                                )
 
-                    Nothing ->
-                        ( model, Cmd.none )
+                            Nothing ->
+                                ( model, Cmd.none )
 
             _ ->
                 ( model, Cmd.none )
