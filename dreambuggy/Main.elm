@@ -16,11 +16,13 @@ import Sky
 import Statue
 import TextureCube
 import StaticGround
-import Wedge
+-- import Wedge
 import Body.Terrain as Terrain
+import Body.Wedge exposing (wedge)
 import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube)
 import Primitive.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Primitive.Sphere exposing (skySphere, cloudsSphere)
+import Vehicles.DreamBird as DreamBird
 import Vehicles.DreamBuggy as DreamBuggy
 import Vehicles.Walking as Walking
 
@@ -35,9 +37,14 @@ main =
                 [ StaticGround.create Terrain.generate
                 , Sky.create skySphere
                 , elmLogo
+
                 , Balls.create 30
+
                 , TextureCube.create "Wooden crate" "resources/woodCrate.jpg"
-                , Wedge.create "Wedge" (vec3 23 0 12)
+
+                -- , Wedge.create "Wedge" (vec3 23 0 12)
+                , deltaWedge
+
                 , Obj.create
                     { id = "clouds-sphere"
                     , label = "Clouds Sphere"
@@ -51,6 +58,7 @@ main =
                         , radius = 1.5
                         }
                     }
+
                 , Statue.create
                     { id = "landscape-diamond"
                     , label = "Landscape Diamond"
@@ -119,6 +127,33 @@ main =
           -}
           }
         ]
+
+deltaWedge : ( App, Cmd AppMsg )
+deltaWedge =
+    let
+        overlay =
+            Html.div []
+                [ Html.h2 []
+                    [ Html.text "Delta Wedge" ]
+                , Html.text "A manoueverable delta wing with solid plasma anti-gravity thrusters and zero-friction flight surfaces."
+                , Html.br [] []
+                , Html.hr [] []
+                , DreamBird.overlay
+                ]
+    in
+        Obj.create
+            { id = "wedge"
+            , label = "Delta Wedge"
+            , position = vec3 23 0 12
+            , overlay = overlay
+            , object = Object.Appearance wedge
+            , drive = Just DreamBird.drive
+            , vehicle =
+                { speed = 20.0
+                , height = 0.7
+                , radius = 1.0
+                }
+            }
 
 
 elmLogo : ( App, Cmd AppMsg )
