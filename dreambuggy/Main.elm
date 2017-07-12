@@ -23,6 +23,7 @@ import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube
 import Primitive.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Primitive.Sphere exposing (skySphere, cloudsSphere)
 import Vehicles.DreamBuggy as DreamBuggy
+import Vehicles.Walking as Walking
 
 
 main : Navigator RAM.Model RAM.Msg
@@ -147,12 +148,26 @@ elmLogo =
 
 avatar : Float -> ( App, Cmd AppMsg )
 avatar speed =
-        Reflective.create
+    let
+        overlay =
+            Html.div []
+                [ Html.h2 []
+                    [ Html.text "Avatar" ]
+                , Html.br [] []
+                , Html.hr [] []
+                , Walking.overlay
+                ]
+    in
+        Obj.create
             { id = "avatar"
             , label = "Walking"
-            , meshPath = "meshes/suzanne.obj"
-            , diffuseTexturePath = "textures/elmLogoDiffuse.png"
             , position = vec3 0 10 0
+            , overlay = overlay
+            , object = Object.ReflectiveObj
+                { meshPath = "meshes/suzanne.obj"
+                , diffuseTexturePath = "textures/elmLogoDiffuse.png"
+                }
+            , drive = Just Walking.drive
             , vehicle =
                 { speed = speed
                 , height = 1.4
