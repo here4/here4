@@ -148,6 +148,9 @@ avatar speed =
             , meshPath = "meshes/suzanne.obj"
             , diffuseTexturePath = "textures/elmLogoDiffuse.png"
             , position = vec3 0 10 0
-            , height = 1.4
-            , speed = speed
+            , driveAttributes =
+                { speed = speed
+                , height = 1.4
+                , radius = 1.5
+                }
             }
