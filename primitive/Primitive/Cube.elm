@@ -1,4 +1,16 @@
-module Primitive.Cube exposing (skyCube, textureCube, cloudsCube, fireCube, fogMountainsCube, plasmaCube, voronoiCube, cube, walls, floor, ceiling)
+module Primitive.Cube exposing
+    ( skyCube
+    , textureCube
+    , cloudsCube
+    , fireCube
+    , fogMountainsCube
+    , plasmaCube
+    , voronoiCube
+    , cube
+    , walls
+    , floor
+    , ceiling
+    )
 
 import Math.Vector3 exposing (..)
 import Math.Matrix4 as M4 exposing (..)
