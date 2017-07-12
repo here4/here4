@@ -1,4 +1,14 @@
-module Obj exposing (create, Action(..))
+module Obj exposing
+    ( Action(..)
+    , create
+    , create_
+    , id
+    , label
+    , position
+    , overlay
+    , object
+    , action
+    )
 
 import App exposing (..)
 import App.Control exposing (..)
@@ -20,7 +30,8 @@ type alias VehicleAttributes vehicle =
     }
 
 type Action vehicle
-    = Vehicle (VehicleAttributes vehicle)
+    = Statue
+    | Vehicle (VehicleAttributes vehicle)
 
 type alias Attributes vehicle =
     { id : String
@@ -41,6 +52,43 @@ type alias Model vehicle =
 
 type alias Msg
     = ObjectMsg
+
+
+defaultAttributes : Attributes vehicle
+defaultAttributes =
+    { id = ""
+    , label = ""
+    , position = vec3 0 0 0
+    , overlay = Html.text ""
+    , object = Invisible ()
+    , action = Statue
+    }
+
+type alias Update vehicle = 
+    Attributes vehicle -> Attributes vehicle
+
+id : String -> Update vehicle
+id s attr = { attr | id = s }
+
+label : String -> Update vehicle
+label l attr = { attr | label = l }
+
+position : Vec3 -> Update vehicle
+position pos attr = { attr | position = pos }
+
+overlay : Html (CtrlMsg Msg) -> Update vehicle
+overlay o attr = { attr | overlay = o }
+
+object : ObjectAttributes -> Update vehicle
+object o attr = { attr | object = o }
+
+action : Action vehicle -> Update vehicle
+action a attr = { attr | action = a }
+
+
+create_ : List (Update vehicle) -> (App, Cmd AppMsg)
+create_ us =
+    create (List.foldl (\f attr -> f attr) defaultAttributes us)
 
 create : Attributes d -> ( App, Cmd AppMsg )
 create attributes =
@@ -125,6 +173,9 @@ update action msg model =
 
             Ctrl (Drive ground inputs) ->
                 case action of
+                    Statue ->
+                        ( model, Cmd.none )
+
                     Vehicle v ->
                         case v.drive of
                             Just drive ->

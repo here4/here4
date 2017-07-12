@@ -14,13 +14,15 @@ import Object.Types exposing (Load(..))
 import Tuple
 
 type ObjectAttributes
-    = Appearance Appearance
+    = Invisible ()
+    | Appearance Appearance
     | FlatTexture FlatTextureAttributes
     | TexturedObj TexturedObjAttributes
     | ReflectiveObj ReflectiveObjAttributes
 
 type ObjectResult
-    = FlatTextureResult FlatTextureResult
+    = InvisibleResult ()
+    | FlatTextureResult FlatTextureResult
     | TexturedObjResult TexturedObjResult
     | ReflectiveObjResult ReflectiveObjResult
 
@@ -46,6 +48,8 @@ wrap t m (model, msg) =
 objectInit : ObjectAttributes -> (Load ObjectResult, Cmd ObjectMsg)
 objectInit attributes =
     case attributes of
+        Invisible () ->
+            ( Loading (InvisibleResult ()), Cmd.none )
         Appearance appear ->
             ( Ready appear, Cmd.none )
         FlatTexture obj ->

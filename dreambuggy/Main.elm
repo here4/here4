@@ -58,12 +58,13 @@ main =
                         }
                     }
 
-                , Statue.create
-                    { id = "landscape-diamond"
-                    , label = "Landscape Diamond"
-                    , position = vec3 40 1.5 28
-                    , appear = fogMountainsDiamond
-                    }
+                , Obj.create_
+                    [ Obj.id "landscape-diamond"
+                    , Obj.label "Landscape Diamond"
+                    , Obj.position (vec3 40 1.5 28)
+                    , Obj.object (Object.Appearance fogMountainsDiamond)
+                    ]
+
                 , Statue.portal (Remote "world2" (Facing "fire-cube"))
                     { id = "fire-cube"
                     , label = "Fire Cube"
