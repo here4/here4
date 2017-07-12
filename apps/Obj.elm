@@ -4,37 +4,14 @@ import App exposing (..)
 import App.Control exposing (..)
 import Appearance exposing (Appearance)
 import Body exposing (..)
-import Body.Obj exposing (textured)
-import Dict exposing (Dict)
 import Dispatch exposing (..)
 import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Orientation
-import OBJ
-import OBJ.Types exposing (ObjFile, Mesh(..))
-import Task exposing (Task)
+import Object.TexturedObj exposing (..)
 import Tuple exposing (first)
 import Vehicle exposing (Driveable)
-import WebGL.Texture as Texture exposing (Texture, Error)
-
-
-type alias TexturedObjAttributes =
-    { meshPath : String
-    , diffuseTexturePath : String
-    , normalTexturePath : String
-    }
-
-type alias TexturedObjResult =
-    { mesh : Result String ObjFile
-    , diffTexture : Result String Texture
-    , normTexture : Result String Texture
-    }
-
-type TexturedObjMsg
-    = DiffTextureLoaded (Result String Texture)
-    | NormTextureLoaded (Result String Texture)
-    | LoadObj String (Result String (Dict String (Dict String Mesh)))
 
 
 type Object
@@ -42,10 +19,6 @@ type Object
 
 type ObjectResult
     = TR TexturedObjResult
-
-type Load result
-    = Loading result
-    | Ready Appearance
 
 
 type alias Attributes vehicle =
@@ -71,50 +44,6 @@ type alias Model vehicle =
 type alias Msg
     = TexturedObjMsg
 
-texturedObjectInit : TexturedObjAttributes -> (Load TexturedObjResult, Cmd TexturedObjMsg)
-texturedObjectInit attributes =
-    ( Loading
-          { mesh = Err "Loading ..."
-          , diffTexture = Err "Loading texture ..."
-          , normTexture = Err "Loading texture ..."
-          }
-    , Cmd.batch
-        [ loadTexture attributes.diffuseTexturePath DiffTextureLoaded
-        , loadTexture attributes.normalTexturePath NormTextureLoaded
-        , loadModel True attributes.meshPath
-        ]
-    )
-
-texturedObjectUpdate : TexturedObjMsg -> Load TexturedObjResult -> (Load TexturedObjResult, Cmd TexturedObjMsg)
-texturedObjectUpdate msg model =
-    let
-        loadBody m =
-            case ( m.mesh, m.diffTexture, m.normTexture ) of
-                ( Ok mesh, Ok diffTexture, Ok normTexture ) ->
-                    let
-                        appear p =
-                            Dict.values mesh
-                                |> List.concatMap Dict.values
-                                |> List.concatMap (\m -> textured diffTexture normTexture m p)
-                    in
-                        Ready appear
-                _ ->
-                    Loading m
-    in
-        case model of
-            Ready appear ->
-                ( Ready appear, Cmd.none )
-
-            Loading partial ->
-            
-                case msg of
-                    DiffTextureLoaded textureResult ->
-                        ( loadBody { partial | diffTexture = textureResult }, Cmd.none )
-                    NormTextureLoaded textureResult ->
-                        ( loadBody { partial | normTexture = textureResult }, Cmd.none )
-                    LoadObj url meshResult ->
-                        ( loadBody { partial | mesh = meshResult }, Cmd.none )
-
 
 
 create : Attributes d -> ( App, Cmd AppMsg )
@@ -137,8 +66,8 @@ init attributes =
     let
         (object, objectCmds) =
             -- case attributes.object of
-            --     TexturedObj texObj -> texturedObjectInit texObj
-            texturedObjectInit attributes.object
+            --     TexturedObj texObj -> texturedObjInit texObj
+            texturedObjInit attributes.object
     in
     ( { motion =
           { position = attributes.position
@@ -152,24 +81,6 @@ init attributes =
     , Cmd.map Self objectCmds
     )
 
-
-loadModel : Bool -> String -> Cmd Msg
-loadModel withTangents url =
-    OBJ.loadObjFileWith { withTangents = withTangents } url (LoadObj url)
-
-
-loadTexture : String -> (Result String Texture -> msg) -> Cmd msg
-loadTexture url msg =
-    Texture.load url
-        |> Task.attempt
-            (\r ->
-                case r of
-                    Ok t ->
-                        msg (Ok t)
-
-                    Err e ->
-                        msg (Err ("Failed to load texture: " ++ toString e))
-            )
 
 
 setMotion : Moving {} -> Model vehicle -> Model vehicle
@@ -189,7 +100,7 @@ update mDrive msg model =
             Self m ->
                 let
                     ( newObject, newMsg ) =
-                        texturedObjectUpdate m model.object
+                        texturedObjUpdate m model.object
                     mBody =
                         case newObject of
                             Loading _ ->
