@@ -6,14 +6,15 @@ module Object exposing
     , objectUpdate
     )
 
-
+import Appearance exposing (Appearance)
 import Object.ReflectiveObj exposing (..)
 import Object.TexturedObj exposing (..)
 import Object.Types exposing (Load(..))
 import Tuple
 
 type ObjectAttributes
-    = TexturedObj TexturedObjAttributes
+    = Appearance Appearance
+    | TexturedObj TexturedObjAttributes
     | ReflectiveObj ReflectiveObjAttributes
 
 type ObjectResult
@@ -41,6 +42,8 @@ wrap t m (model, msg) =
 objectInit : ObjectAttributes -> (Load ObjectResult, Cmd ObjectMsg)
 objectInit attributes =
     case attributes of
+        Appearance appear ->
+            ( Ready appear, Cmd.none )
         TexturedObj obj ->
             texturedObjInit obj
             |> wrap TexturedObjResult TexturedObjMsg
