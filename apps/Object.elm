@@ -7,6 +7,7 @@ module Object exposing
     )
 
 import Appearance exposing (Appearance)
+import Object.FlatTexture exposing (..)
 import Object.ReflectiveObj exposing (..)
 import Object.TexturedObj exposing (..)
 import Object.Types exposing (Load(..))
@@ -14,15 +15,18 @@ import Tuple
 
 type ObjectAttributes
     = Appearance Appearance
+    | FlatTexture FlatTextureAttributes
     | TexturedObj TexturedObjAttributes
     | ReflectiveObj ReflectiveObjAttributes
 
 type ObjectResult
-    = TexturedObjResult TexturedObjResult
+    = FlatTextureResult FlatTextureResult
+    | TexturedObjResult TexturedObjResult
     | ReflectiveObjResult ReflectiveObjResult
 
 type ObjectMsg
-    = TexturedObjMsg TexturedObjMsg
+    = FlatTextureMsg FlatTextureMsg
+    | TexturedObjMsg TexturedObjMsg
     | ReflectiveObjMsg ReflectiveObjMsg
 
 
@@ -44,6 +48,9 @@ objectInit attributes =
     case attributes of
         Appearance appear ->
             ( Ready appear, Cmd.none )
+        FlatTexture obj ->
+            flatTextureInit obj
+            |> wrap FlatTextureResult FlatTextureMsg
         TexturedObj obj ->
             texturedObjInit obj
             |> wrap TexturedObjResult TexturedObjMsg
@@ -60,6 +67,9 @@ objectUpdate msg model =
 
         Loading partial ->
             case (msg, partial) of
+                (FlatTextureMsg msg_, FlatTextureResult model_) ->
+                    flatTextureUpdate msg_ (Loading model_)
+                    |> wrap FlatTextureResult FlatTextureMsg
                 (TexturedObjMsg msg_, TexturedObjResult model_) ->
                     texturedObjUpdate msg_ (Loading model_)
                     |> wrap TexturedObjResult TexturedObjMsg
