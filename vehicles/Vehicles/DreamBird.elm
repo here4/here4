@@ -10,19 +10,14 @@ import Orientation exposing (..)
 import Body exposing (..)
 import Model
 import Ground exposing (Ground)
+import Vehicle exposing (Driveable)
 
 
 ----------------------------------------------------------------------
 -- DreamBird
 
 
-type alias Attributes =
-    { speed : Float
-    , radius : Float
-    }
-
-
-drive : Attributes -> Ground -> Model.Inputs -> Moving (HasBody a) -> Moving (HasBody a)
+drive : Driveable vehicle -> Ground -> Model.Inputs -> Moving (HasBody a) -> Moving (HasBody a)
 drive attributes ground inputs body =
     let
         eyeLevel pos =
@@ -41,7 +36,7 @@ drive attributes ground inputs body =
         }
 
 
-move : Attributes -> Ground -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
+move : Driveable vehicle -> Ground -> Model.EyeLevel -> Model.Inputs -> Model.Motion -> Model.Motion
 move attributes ground eyeLevel inputs motion =
     motion
         |> fly attributes.speed eyeLevel inputs
