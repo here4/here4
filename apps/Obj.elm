@@ -87,7 +87,6 @@ update mDrive msg model =
             Self m ->
                 let
                     ( newObject, newMsg ) =
-                        -- texturedObjUpdate m model.object
                         objectUpdate m model.object
                     mBody =
                         case newObject of
@@ -116,7 +115,6 @@ update mDrive msg model =
             Ctrl (Drive ground inputs) ->
                 case mDrive of
                     Just drive ->
-                        -- ( mapBody (drive ground inputs), Cmd.none )
                         ( setMotion (drive model.vehicle ground inputs model.motion) model
                         , Cmd.none
                         )

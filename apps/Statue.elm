@@ -113,13 +113,6 @@ reposition mPos model =
     let
         setPos pos x =
             { x | position = pos.position, orientation = pos.orientation }
-
-        behind pos =
-            let
-                dir =
-                    Orientation.rotateLabV pos.orientation V3.k
-            in
-                { pos | position = V3.sub pos.position dir }
     in
         case mPos of
             Just pos ->
