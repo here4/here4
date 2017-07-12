@@ -1,6 +1,5 @@
 module Object.TexturedObj exposing
-    ( Load(..)
-    , TexturedObjAttributes
+    ( TexturedObjAttributes
     , TexturedObjResult
     , TexturedObjMsg(..)
     , texturedObjInit
@@ -11,14 +10,11 @@ module Object.TexturedObj exposing
 import Appearance exposing (Appearance)
 import Body.Obj exposing (textured)
 import Dict exposing (Dict)
+import Object.Types exposing (Load(..))
 import OBJ
 import OBJ.Types exposing (ObjFile, Mesh(..))
 import Task exposing (Task)
 import WebGL.Texture as Texture exposing (Texture, Error)
-
-type Load result
-    = Loading result
-    | Ready Appearance
 
 
 type alias TexturedObjAttributes =

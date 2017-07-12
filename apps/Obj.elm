@@ -9,6 +9,7 @@ import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Orientation
+import Object.Types exposing (Load(..))
 import Object.TexturedObj exposing (..)
 import Tuple exposing (first)
 import Vehicle exposing (Driveable)
