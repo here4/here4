@@ -3,6 +3,7 @@ module Object.Attributes exposing
     , Action(..)
     , Attributes
     , Update
+    , defaultAttributes
     , id
     , label
     , position
@@ -19,9 +20,9 @@ import App.Control exposing (CtrlMsg)
 import Body exposing (..)
 import Html exposing (Html)
 import Location exposing (..)
-import Math.Vector3 as V3 exposing (Vec3)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
-import Object exposing (ObjectAttributes)
+import Object exposing (ObjectAttributes(..))
 import Orientation exposing (Orientation)
 import Vehicle exposing (Driveable)
 
@@ -45,6 +46,20 @@ type alias Attributes vehicle msg =
     , object : ObjectAttributes
     , action : Action vehicle
     }
+
+
+defaultAttributes : Attributes vehicle msg
+defaultAttributes =
+    { id = ""
+    , label = ""
+    , position = vec3 0 0 0
+    , scale = 1.0
+    , rotation = Orientation.initial
+    , overlay = Html.text ""
+    , object = Invisible ()
+    , action = Statue
+    }
+
 
 type alias Update vehicle msg = 
     Attributes vehicle msg -> Attributes vehicle msg

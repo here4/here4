@@ -29,18 +29,6 @@ type alias Msg
     = ObjectMsg
 
 
-defaultAttributes : Attributes vehicle Msg
-defaultAttributes =
-    { id = ""
-    , label = ""
-    , position = vec3 0 0 0
-    , scale = 1.0
-    , rotation = Orientation.initial
-    , overlay = Html.text ""
-    , object = Invisible ()
-    , action = Statue
-    }
-
 
 create : List (Update vehicle Msg) -> (App, Cmd AppMsg)
 create updates =
