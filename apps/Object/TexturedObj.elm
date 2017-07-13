@@ -10,6 +10,7 @@ module Object.TexturedObj exposing
 import Appearance exposing (Appearance)
 import Body.Obj exposing (textured)
 import Dict exposing (Dict)
+import Math.Vector3 as V3 exposing (Vec3)
 import Object.Types exposing (Load(..))
 import OBJ
 import OBJ.Types exposing (ObjFile, Mesh(..))
@@ -21,12 +22,14 @@ type alias TexturedObjAttributes =
     { meshPath : String
     , diffuseTexturePath : String
     , normalTexturePath : String
+    , offset : Vec3
     }
 
 type alias TexturedObjResult =
     { mesh : Result String ObjFile
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
+    , offset : Vec3
     }
 
 type TexturedObjMsg
@@ -41,6 +44,7 @@ texturedObjInit attributes =
           { mesh = Err "Loading ..."
           , diffTexture = Err "Loading texture ..."
           , normTexture = Err "Loading texture ..."
+          , offset = attributes.offset
           }
     , Cmd.batch
         [ loadTexture attributes.diffuseTexturePath DiffTextureLoaded
@@ -53,18 +57,18 @@ texturedObjInit attributes =
 texturedObjUpdate : TexturedObjMsg -> Load TexturedObjResult -> (Load TexturedObjResult, Cmd TexturedObjMsg)
 texturedObjUpdate msg model =
     let
-        loadBody m =
-            case ( m.mesh, m.diffTexture, m.normTexture ) of
+        loadBody r =
+            case ( r.mesh, r.diffTexture, r.normTexture ) of
                 ( Ok mesh, Ok diffTexture, Ok normTexture ) ->
                     let
                         appear p =
                             Dict.values mesh
                                 |> List.concatMap Dict.values
-                                |> List.concatMap (\m -> textured diffTexture normTexture m p)
+                                |> List.concatMap (\m -> textured r.offset diffTexture normTexture m p)
                     in
                         Ready appear
                 _ ->
-                    Loading m
+                    Loading r
     in
         case model of
             Ready appear ->

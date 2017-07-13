@@ -8,6 +8,8 @@ module Object.Attributes exposing
     , label
     , position
     , scale
+    , offset
+    , forward
     , rotation
     , overlay
     , object
@@ -40,8 +42,9 @@ type alias Attributes vehicle msg =
     { id : String
     , label : String
     , position : Vec3
-    , rotation : Orientation
     , scale : Float
+    , offset : Vec3
+    , rotation : Orientation
     , overlay : Html (CtrlMsg msg)
     , object : ObjectAttributes
     , action : Action vehicle
@@ -54,6 +57,7 @@ defaultAttributes =
     , label = ""
     , position = vec3 0 0 0
     , scale = 1.0
+    , offset = vec3 0 0 0
     , rotation = Orientation.initial
     , overlay = Html.text ""
     , object = Invisible ()
@@ -75,6 +79,12 @@ position pos attr = { attr | position = pos }
 
 scale : Float -> Update vehicle msg
 scale s attr = { attr | scale = s }
+
+offset : Vec3 -> Update vehicle msg
+offset off attr = { attr | offset = off }
+
+forward : Vec3 -> Update vehicle msg
+forward fwd attr = { attr | rotation = Orientation.fromTo fwd V3.k }
 
 rotation : Orientation -> Update vehicle msg
 rotation o attr = { attr | rotation = o }

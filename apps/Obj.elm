@@ -9,7 +9,7 @@ import Body exposing (..)
 import Dispatch exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
-import Math.Vector3 as V3 exposing (vec3)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Object exposing (..)
 import Object.Attributes exposing (..)
 import Object.Types exposing (Load(..))
@@ -49,17 +49,15 @@ create updates =
         create_ (List.foldl (\f attr -> f attr) defaultAttributes updates)
 
 
-bodyOrientation : Model vehicle -> Orientation
-bodyOrientation model =
-    Orientation.unwind model.motion.orientation model.rotation
-
-
 applyMotion : Model vehicle -> Model vehicle
 applyMotion model =
     let
+        orientation =
+            Orientation.unwind model.motion.orientation model.rotation
+
         apply motion thing =
             { thing | position = motion.position
-                    , orientation = bodyOrientation model
+                    , orientation = orientation
                     , velocity = motion.velocity
             }
     in
@@ -85,10 +83,10 @@ loadBody s (newObject, newMsg) model =
                     Just
                         { anchor = AnchorGround
                         , scale = vec3 s s s
-                        , position = model.motion.position
-                        , orientation = bodyOrientation model
+                        , position = vec3 0 0 0
+                        , orientation = Orientation.initial
                         , appear = appear
-                        , velocity = model.motion.velocity
+                        , velocity = vec3 0 0 0
                        }
     in
         ( applyMotion
