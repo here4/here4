@@ -58,12 +58,14 @@ main =
                     , object (Object.Appearance fogMountainsDiamond)
                     ]
 
-                , Statue.portal (Remote "world2" (Facing "fire-cube"))
-                    { id = "fire-cube"
-                    , label = "Fire Cube"
-                    , position = vec3 21 0 -25
-                    , appear = fireCube
-                    }
+                , Obj.create
+                    [ id "fire-cube"
+                    , label "Fire Cube"
+                    , position <| vec3 21 0 -25
+                    , object   <| Object.Appearance fireCube
+                    , portal   <| Remote "world2" (Facing "fire-cube")
+                    ]
+
                 , Statue.portal (Remote "world2" (Behind "shufflepuck"))
                     { id = "sky-diamond"
                     , label = "Sky Diamond"
