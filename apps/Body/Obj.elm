@@ -8,7 +8,7 @@ import WebGL.Settings.DepthTest as DepthTest
 import Appearance exposing (..)
 import Shaders.TextureFragment exposing (textureFragment)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
-import Shaders.Reflection as Shaders
+import Shaders.Obj as Shaders
 import OBJ
 import OBJ.Types as Obj exposing (VertexWithTexture)
 

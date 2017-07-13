@@ -1,4 +1,4 @@
-module Shaders.Reflection exposing (..)
+module Shaders.Obj exposing (..)
 
 import WebGL
 
