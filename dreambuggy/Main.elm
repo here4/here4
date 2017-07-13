@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Html exposing (Html)
 import Location exposing (..)
-import Math.Vector3 exposing (vec3)
+import Math.Vector3 as V3 exposing (vec3)
 import Navigator exposing (..)
 import RAM
 
@@ -12,6 +12,7 @@ import Balls
 import Obj
 import Object
 import Object.Attributes exposing (..)
+import Orientation
 import Shufflepuck
 import Sky
 import StaticGround
@@ -41,6 +42,8 @@ main =
                 , textureCube
 
                 , deltaWedge
+
+                , buggy
 
                 , Obj.create
                     [ id "clouds-sphere"
@@ -90,7 +93,7 @@ main =
                     , object   <| Object.Appearance fogMountainsCube
                     ]
                 ]
-          , defaultSelf = avatar 16.0
+          , defaultSelf = avatar 8.0
           }
         , { id = "world2"
           , label = "Shufflepuck Club"
@@ -182,6 +185,40 @@ textureCube =
                 , vehicle =
                     { speed = 8.0
                     , height = 1.0
+                    , radius = 1.0
+                    }
+                }
+            ]
+
+buggy : ( App, Cmd AppMsg )
+buggy =
+    let
+        html =
+            Html.div []
+                [ Html.h2 []
+                    [ Html.text "Buggy" ]
+                , Html.br [] []
+                , Html.hr [] []
+                , DreamBuggy.overlay
+                ]
+    in
+        Obj.create
+            [ id "buggy"
+            , label "Buggy"
+            , position <| vec3 87 0 43
+            , rotation <| Orientation.fromTo V3.i V3.k
+            , scale    <| 0.01
+            , overlay  <| html
+            , object   <| Object.TexturedObj
+                { meshPath = "OffRoad Car/Models/OFF -Road car  3D Models.obj"
+                , diffuseTexturePath = "textures/elmLogoDiffuse.png"
+                , normalTexturePath = "textures/elmLogoNorm.png"
+                }
+            , vehicle <|
+                { drive = DreamBuggy.drive
+                , vehicle =
+                    { speed = 16.0
+                    , height = 1.2
                     , radius = 1.0
                     }
                 }
