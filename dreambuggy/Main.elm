@@ -205,14 +205,15 @@ buggy =
         Obj.create
             [ id "buggy"
             , label "Buggy"
-            , position <| vec3 87 0 43
-            , rotation <| Orientation.fromTo V3.i V3.k
+            , position <| vec3 37 0 43
+            , forward  <| V3.i
             , scale    <| 0.01
             , overlay  <| html
             , object   <| Object.TexturedObj
                 { meshPath = "OffRoad Car/Models/OFF -Road car  3D Models.obj"
                 , diffuseTexturePath = "textures/elmLogoDiffuse.png"
                 , normalTexturePath = "textures/elmLogoNorm.png"
+                , offset = vec3 221.670662 39.350132 -132.558582
                 }
             , vehicle <|
                 { drive = DreamBuggy.drive
@@ -246,6 +247,7 @@ elmLogo =
                 { meshPath = "meshes/elmLogo.obj"
                 , diffuseTexturePath = "textures/elmLogoDiffuse.png"
                 , normalTexturePath = "textures/elmLogoNorm.png"
+                , offset = vec3 0 0 0
                 }
             , vehicle <|
                 { drive = DreamBuggy.drive
