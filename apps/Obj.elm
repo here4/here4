@@ -54,6 +54,22 @@ bodyOrientation model =
     Orientation.unwind model.motion.orientation model.rotation
 
 
+applyMotion : Model vehicle -> Model vehicle
+applyMotion model =
+    let
+        apply motion thing =
+            { thing | position = motion.position
+                    , orientation = bodyOrientation model
+                    , velocity = motion.velocity
+            }
+    in
+        { model | body = Maybe.map (apply model.motion) model.body }
+
+
+setMotion : Moving {} -> Model vehicle -> Model vehicle
+setMotion motion model = applyMotion { model | motion = motion }
+
+
 loadBody :
     Float
     -> ( Load ObjectResult, Cmd ObjectMsg )
@@ -75,9 +91,10 @@ loadBody s (newObject, newMsg) model =
                         , velocity = model.motion.velocity
                        }
     in
-        ( { model | object = newObject
-                  , body = mBody
-          }
+        ( applyMotion
+              { model | object = newObject
+                      , body = mBody
+              }
         , Cmd.map Self newMsg
         )
 
@@ -99,20 +116,6 @@ init attributes =
           , body = Nothing
           , object = object
           }
-
-
-setMotion : Moving {} -> Model vehicle -> Model vehicle
-setMotion motion model =
-    let
-        applyMotion motion thing =
-            { thing | position = motion.position
-                    , orientation = bodyOrientation model
-                    , velocity = motion.velocity
-            }
-    in
-        { model | motion = motion
-                , body = Maybe.map (applyMotion motion) model.body
-        }
 
 
 update :
