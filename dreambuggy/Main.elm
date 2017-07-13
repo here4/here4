@@ -14,7 +14,6 @@ import Object
 import Object.Attributes exposing (..)
 import Shufflepuck
 import Sky
-import Statue
 import StaticGround
 import Body.Terrain as Terrain
 import Body.Wedge exposing (wedge)
