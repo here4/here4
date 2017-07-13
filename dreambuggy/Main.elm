@@ -66,27 +66,30 @@ main =
                     , portal   <| Remote "world2" (Facing "fire-cube")
                     ]
 
-                , Statue.portal (Remote "world2" (Behind "shufflepuck"))
-                    { id = "sky-diamond"
-                    , label = "Sky Diamond"
-                    , position = vec3 -15 1.5 21
-                    , appear = cloudsDiamond
-                    }
+                , Obj.create
+                    [ id "sky-diamond"
+                    , label "Sky Diamond"
+                    , position <| vec3 -15 1.5 21
+                    , object   <| Object.Appearance cloudsDiamond
+                    , portal   <| Remote "world2" (Behind "shufflepuck")
+                    ]
 
                 , Boids.create 100
 
-                , Statue.portal (Local (Become "boids"))
-                    { id = "voronoi-cube"
-                    , label = "Voronoi Cube"
-                    , position = vec3 10 0 10
-                    , appear = voronoiCube
-                    }
-                , Statue.create
-                    { id = "landscape-cube"
-                    , label = "Landscape Cube"
-                    , appear = fogMountainsCube
-                    , position = vec3 10 1.5 -10
-                    }
+                , Obj.create
+                    [ id "voronoi-cube"
+                    , label "Voronoi Cube"
+                    , position <| vec3 10 0 10
+                    , object   <| Object.Appearance voronoiCube
+                    , portal   <|  Local (Become "boids")
+                    ]
+
+                , Obj.create
+                    [ id "landscape-cube"
+                    , label "Landscape Cube"
+                    , position <| vec3 10 1.5 -10
+                    , object   <| Object.Appearance fogMountainsCube
+                    ]
                 ]
           , defaultSelf = avatar 16.0
           }
@@ -106,12 +109,13 @@ main =
                             , position = vec3 0 0 0
                         }
 
-                , Statue.portal (Remote "world1" (Facing "fire-cube"))
-                    { id = "fire-cube"
-                    , label = "Fire Cube"
-                    , position = vec3 9 0 -14
-                    , appear = fireCube
-                    }
+                , Obj.create
+                    [ id "fire-cube"
+                    , label "Fire Cube"
+                    , position <| vec3 9 0 -14
+                    , object   <| Object.Appearance fireCube
+                    , portal   <| Remote "world1" (Facing "fire-cube")
+                    ]
                 ]
           , defaultSelf = avatar 5.7
 
