@@ -8,6 +8,7 @@ import Appearance exposing (Appearance)
 import Body exposing (..)
 import Dispatch exposing (..)
 import Html exposing (Html)
+import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (vec3)
 import Object exposing (..)
 import Object.Attributes exposing (..)
@@ -202,3 +203,17 @@ framing _ model =
 focus : Model vehicle -> Maybe Focus
 focus model =
     Maybe.map appToFocus model.body
+
+{-
+overlay : Model vehicle -> Html msg
+overlay model =
+    let
+        textLeft =
+            Html.style [ ( "text-align", "left" ) ]
+    in
+        Html.div []
+            [ Html.h2 []
+                [ Html.text model.label ]
+            , Html.text "A statue"
+            ]
+-}
