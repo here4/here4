@@ -63,7 +63,7 @@ create updates =
 
 bodyOrientation : Model vehicle -> Orientation
 bodyOrientation model =
-    Orientation.followedBy model.motion.orientation model.rotation
+    Orientation.unwind model.motion.orientation model.rotation
 
 
 loadBody :

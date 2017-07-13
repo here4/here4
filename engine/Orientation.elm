@@ -81,9 +81,14 @@ toRollPitchYaw o =
         ( roll, pitch, yaw )
 
 
+-- wind?
 followedBy : Orientation -> Orientation -> Orientation
 followedBy =
     Qn.multiply
+
+unwind : Orientation -> Orientation -> Orientation
+unwind q1 q2 =
+    Qn.multiply q1 (Qn.conjugate q2)
 
 
 rotateBodyV : Orientation -> Vec3 -> Vec3
