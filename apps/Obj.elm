@@ -1,13 +1,6 @@
 module Obj exposing
-    ( Action(..)
-    , create
+    ( create
     , create_
-    , id
-    , label
-    , position
-    , overlay
-    , object
-    , action
     )
 
 import App exposing (..)
@@ -16,31 +9,12 @@ import Appearance exposing (Appearance)
 import Body exposing (..)
 import Dispatch exposing (..)
 import Html exposing (Html)
-import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Model exposing (Inputs)
+import Math.Vector3 as V3 exposing (vec3)
 import Object exposing (..)
+import Object.Attributes exposing (..)
 import Object.Types exposing (Load(..))
 import Orientation
-import Vehicle exposing (Driveable)
 
-
-type alias VehicleAttributes vehicle =
-    { drive : Maybe (Driveable vehicle -> Ground -> Inputs -> Moving {} -> Moving {})
-    , vehicle : Driveable vehicle
-    }
-
-type Action vehicle
-    = Statue
-    | Vehicle (VehicleAttributes vehicle)
-
-type alias Attributes vehicle =
-    { id : String
-    , label : String
-    , position : Vec3
-    , overlay : Html (CtrlMsg Msg)
-    , object : ObjectAttributes
-    , action : Action vehicle
-    }
 
 type alias Model vehicle =
     { motion : Moving {}
@@ -54,7 +28,7 @@ type alias Msg
     = ObjectMsg
 
 
-defaultAttributes : Attributes vehicle
+defaultAttributes : Attributes vehicle Msg
 defaultAttributes =
     { id = ""
     , label = ""
@@ -64,33 +38,12 @@ defaultAttributes =
     , action = Statue
     }
 
-type alias Update vehicle = 
-    Attributes vehicle -> Attributes vehicle
 
-id : String -> Update vehicle
-id s attr = { attr | id = s }
-
-label : String -> Update vehicle
-label l attr = { attr | label = l }
-
-position : Vec3 -> Update vehicle
-position pos attr = { attr | position = pos }
-
-overlay : Html (CtrlMsg Msg) -> Update vehicle
-overlay o attr = { attr | overlay = o }
-
-object : ObjectAttributes -> Update vehicle
-object o attr = { attr | object = o }
-
-action : Action vehicle -> Update vehicle
-action a attr = { attr | action = a }
-
-
-create_ : List (Update vehicle) -> (App, Cmd AppMsg)
+create_ : List (Update vehicle Msg) -> (App, Cmd AppMsg)
 create_ us =
     create (List.foldl (\f attr -> f attr) defaultAttributes us)
 
-create : Attributes d -> ( App, Cmd AppMsg )
+create : Attributes vehicle Msg -> ( App, Cmd AppMsg )
 create attributes =
     App.create (init attributes)
         { id = always attributes.id
@@ -132,7 +85,7 @@ loadBody (newObject, newMsg) model =
         )
 
 
-init : Attributes vehicle -> ( Model vehicle, Cmd (CtrlMsg Msg) )
+init : Attributes vehicle Msg -> ( Model vehicle, Cmd (CtrlMsg Msg) )
 init attributes =
     let
         (object, objectCmds) =

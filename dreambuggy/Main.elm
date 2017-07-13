@@ -11,6 +11,7 @@ import BoxRoom
 import Balls
 import Obj
 import Object
+import Object.Attributes exposing (..)
 import Shufflepuck
 import Sky
 import Statue
@@ -48,7 +49,7 @@ main =
                     , position = vec3 3 10 5
                     , overlay = Html.text "Clouds sphere"
                     , object = Object.Appearance cloudsSphere
-                    , action = Obj.Vehicle
+                    , action = Vehicle
                         { drive = Nothing
                         , vehicle =
                             { speed = 0
@@ -59,10 +60,10 @@ main =
                     }
 
                 , Obj.create_
-                    [ Obj.id "landscape-diamond"
-                    , Obj.label "Landscape Diamond"
-                    , Obj.position (vec3 40 1.5 28)
-                    , Obj.object (Object.Appearance fogMountainsDiamond)
+                    [ id "landscape-diamond"
+                    , label "Landscape Diamond"
+                    , position (vec3 40 1.5 28)
+                    , object (Object.Appearance fogMountainsDiamond)
                     ]
 
                 , Statue.portal (Remote "world2" (Facing "fire-cube"))
@@ -147,7 +148,7 @@ deltaWedge =
             , position = vec3 23 0 12
             , overlay = overlay
             , object = Object.Appearance wedge
-            , action = Obj.Vehicle
+            , action = Vehicle
                 { drive = Just DreamBird.drive
                 , vehicle =
                     { speed = 20.0
@@ -179,7 +180,7 @@ textureCube =
                 { mesh = cubeMesh
                 , texturePath = "resources/woodCrate.jpg"
                 }
-            , action = Obj.Vehicle
+            , action = Vehicle
                 { drive = Just DreamBuggy.drive
                 , vehicle =
                     { speed = 8.0
@@ -212,7 +213,7 @@ elmLogo =
                 , diffuseTexturePath = "textures/elmLogoDiffuse.png"
                 , normalTexturePath = "textures/elmLogoNorm.png"
                 }
-            , action = Obj.Vehicle
+            , action = Vehicle
                 { drive = Just DreamBuggy.drive
                 , vehicle =
                     { speed = 8.0
@@ -244,7 +245,7 @@ avatar speed =
                 { meshPath = "meshes/suzanne.obj"
                 , reflectionTexturePath = "textures/elmLogoDiffuse.png"
                 }
-            , action = Obj.Vehicle
+            , action = Vehicle
                 { drive = Just Walking.drive
                 , vehicle =
                     { speed = speed
