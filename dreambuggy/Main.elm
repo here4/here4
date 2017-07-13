@@ -49,14 +49,6 @@ main =
                     , position <| vec3 3 10 5
                     , overlay  <| Html.text "Clouds sphere"
                     , object   <| Object.Appearance cloudsSphere
-                    , action   <| Vehicle
-                        { drive = Nothing
-                        , vehicle =
-                            { speed = 0
-                            , height = 1.4
-                            , radius = 1.5
-                            }
-                        }
                     ]
 
                 , Obj.create
@@ -149,7 +141,7 @@ deltaWedge =
             , overlay  <| html
             , object   <| Object.Appearance wedge
             , action   <| Vehicle
-                { drive = Just DreamBird.drive
+                { drive = DreamBird.drive
                 , vehicle =
                     { speed = 20.0
                     , height = 0.7
@@ -181,7 +173,7 @@ textureCube =
                 , texturePath = "resources/woodCrate.jpg"
                 }
             , action <| Vehicle
-                { drive = Just DreamBuggy.drive
+                { drive = DreamBuggy.drive
                 , vehicle =
                     { speed = 8.0
                     , height = 1.0
@@ -214,7 +206,7 @@ elmLogo =
                 , normalTexturePath = "textures/elmLogoNorm.png"
                 }
             , action <| Vehicle
-                { drive = Just DreamBuggy.drive
+                { drive = DreamBuggy.drive
                 , vehicle =
                     { speed = 8.0
                     , height = 1.2
@@ -246,7 +238,7 @@ avatar speed =
                 , reflectionTexturePath = "textures/elmLogoDiffuse.png"
                 }
             , action <| Vehicle
-                { drive = Just Walking.drive
+                { drive = Walking.drive
                 , vehicle =
                     { speed = speed
                     , height = 1.4

@@ -129,14 +129,9 @@ update action msg model =
                         ( model, Cmd.none )
 
                     Vehicle v ->
-                        case v.drive of
-                            Just drive ->
-                                ( setMotion (drive v.vehicle ground inputs model.motion) model
-                                , Cmd.none
-                                )
-
-                            Nothing ->
-                                ( model, Cmd.none )
+                        ( setMotion (v.drive v.vehicle ground inputs model.motion) model
+                        , Cmd.none
+                        )
 
             _ ->
                 ( model, Cmd.none )

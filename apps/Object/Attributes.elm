@@ -21,7 +21,7 @@ import Object exposing (ObjectAttributes)
 import Vehicle exposing (Driveable)
 
 type alias VehicleAttributes vehicle =
-    { drive : Maybe (Driveable vehicle -> Ground -> Inputs -> Moving {} -> Moving {})
+    { drive : Driveable vehicle -> Ground -> Inputs -> Moving {} -> Moving {}
     , vehicle : Driveable vehicle
     }
 
