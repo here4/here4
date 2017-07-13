@@ -8,7 +8,7 @@ module Object.Attributes exposing
     , position
     , overlay
     , object
-    , action
+    , vehicle
     )
 
 import App exposing (..)
@@ -56,6 +56,6 @@ overlay o attr = { attr | overlay = o }
 object : ObjectAttributes -> Update vehicle msg
 object o attr = { attr | object = o }
 
-action : Action vehicle -> Update vehicle msg
-action a attr = { attr | action = a }
+vehicle : VehicleAttributes vehicle -> Update vehicle msg
+vehicle v attr = { attr | action = Vehicle v }
 

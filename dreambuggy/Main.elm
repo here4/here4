@@ -140,7 +140,7 @@ deltaWedge =
             , position <| vec3 23 0 12
             , overlay  <| html
             , object   <| Object.Appearance wedge
-            , action   <| Vehicle
+            , vehicle  <|
                 { drive = DreamBird.drive
                 , vehicle =
                     { speed = 20.0
@@ -172,7 +172,7 @@ textureCube =
                 { mesh = cubeMesh
                 , texturePath = "resources/woodCrate.jpg"
                 }
-            , action <| Vehicle
+            , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
                     { speed = 8.0
@@ -205,7 +205,7 @@ elmLogo =
                 , diffuseTexturePath = "textures/elmLogoDiffuse.png"
                 , normalTexturePath = "textures/elmLogoNorm.png"
                 }
-            , action <| Vehicle
+            , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
                     { speed = 8.0
@@ -237,7 +237,7 @@ avatar speed =
                 { meshPath = "meshes/suzanne.obj"
                 , reflectionTexturePath = "textures/elmLogoDiffuse.png"
                 }
-            , action <| Vehicle
+            , vehicle <|
                 { drive = Walking.drive
                 , vehicle =
                     { speed = speed
