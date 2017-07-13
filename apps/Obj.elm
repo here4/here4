@@ -1,6 +1,5 @@
 module Obj exposing
     ( create
-    , create_
     )
 
 import App exposing (..)
@@ -39,23 +38,23 @@ defaultAttributes =
     }
 
 
-create_ : List (Update vehicle Msg) -> (App, Cmd AppMsg)
-create_ us =
-    create (List.foldl (\f attr -> f attr) defaultAttributes us)
-
-create : Attributes vehicle Msg -> ( App, Cmd AppMsg )
-create attributes =
-    App.create (init attributes)
-        { id = always attributes.id
-        , label = always attributes.label
-        , update = update attributes.action
-        , animate = animate
-        , bodies = bodies
-        , framing = framing
-        , focus = focus
-        , overlay = always attributes.overlay
-        , reposition = reposition
-        }
+create : List (Update vehicle Msg) -> (App, Cmd AppMsg)
+create updates =
+    let
+        create_ attributes =
+            App.create (init attributes)
+                { id = always attributes.id
+                , label = always attributes.label
+                , update = update attributes.action
+                , animate = animate
+                , bodies = bodies
+                , framing = framing
+                , focus = focus
+                , overlay = always attributes.overlay
+                , reposition = reposition
+                }
+    in
+        create_ (List.foldl (\f attr -> f attr) defaultAttributes updates)
 
 
 loadBody :

@@ -43,7 +43,7 @@ main =
 
                 , deltaWedge
 
-                , Obj.create_
+                , Obj.create
                     [ id "clouds-sphere"
                     , label "Clouds Sphere"
                     , position <| vec3 3 10 5
@@ -59,7 +59,7 @@ main =
                         }
                     ]
 
-                , Obj.create_
+                , Obj.create
                     [ id "landscape-diamond"
                     , label "Landscape Diamond"
                     , position (vec3 40 1.5 28)
@@ -142,7 +142,7 @@ deltaWedge =
                 , DreamBird.overlay
                 ]
     in
-        Obj.create_
+        Obj.create
             [ id "wedge"
             , label "Delta Wedge"
             , position <| vec3 23 0 12
@@ -171,7 +171,7 @@ textureCube =
                 , DreamBuggy.overlay
                 ]
     in
-        Obj.create_
+        Obj.create
             [ id "crate"
             , label "Wooden crate"
             , position <| vec3 -2 0 17
@@ -203,7 +203,7 @@ elmLogo =
                 , DreamBuggy.overlay
                 ]
     in
-        Obj.create_
+        Obj.create
             [ id "elm-logo"
             , label "Elm Logo"
             , position <| vec3 38 0 12
@@ -236,7 +236,7 @@ avatar speed =
                 , Walking.overlay
                 ]
     in
-        Obj.create_
+        Obj.create
             [ id "avatar"
             , label "Walking"
             , position <| vec3 0 10 0
