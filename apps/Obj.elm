@@ -119,19 +119,28 @@ update action msg model =
             Self m ->
                 loadBody (objectUpdate m model.object) model
 
+            Ctrl (Enter partyKey) ->
+                case action of
+                    Portal location ->
+                        ( model, teleport partyKey location )
+
+                    _ ->
+                        ( model, Cmd.none )
+
             Ctrl (Move dp) ->
                 -- ( mapBody (translate dp), Cmd.none)
                 ( model, Cmd.none )
 
             Ctrl (Drive ground inputs) ->
                 case action of
-                    Statue ->
-                        ( model, Cmd.none )
-
                     Vehicle v ->
                         ( setMotion (v.drive v.vehicle ground inputs model.motion) model
                         , Cmd.none
                         )
+
+                    _ ->
+                        ( model, Cmd.none )
+
 
             _ ->
                 ( model, Cmd.none )
