@@ -132,7 +132,7 @@ main =
 deltaWedge : ( App, Cmd AppMsg )
 deltaWedge =
     let
-        overlay =
+        o =
             Html.div []
                 [ Html.h2 []
                     [ Html.text "Delta Wedge" ]
@@ -142,13 +142,13 @@ deltaWedge =
                 , DreamBird.overlay
                 ]
     in
-        Obj.create
-            { id = "wedge"
-            , label = "Delta Wedge"
-            , position = vec3 23 0 12
-            , overlay = overlay
-            , object = Object.Appearance wedge
-            , action = Vehicle
+        Obj.create_
+            [ id "wedge"
+            , label "Delta Wedge"
+            , position <| vec3 23 0 12
+            , overlay  <| o
+            , object   <| Object.Appearance wedge
+            , action   <| Vehicle
                 { drive = Just DreamBird.drive
                 , vehicle =
                     { speed = 20.0
@@ -156,7 +156,7 @@ deltaWedge =
                     , radius = 1.0
                     }
                 }
-            }
+            ]
 
 textureCube : ( App, Cmd AppMsg )
 textureCube =
