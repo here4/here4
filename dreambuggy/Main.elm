@@ -43,13 +43,13 @@ main =
 
                 , deltaWedge
 
-                , Obj.create
-                    { id = "clouds-sphere"
-                    , label = "Clouds Sphere"
-                    , position = vec3 3 10 5
-                    , overlay = Html.text "Clouds sphere"
-                    , object = Object.Appearance cloudsSphere
-                    , action = Vehicle
+                , Obj.create_
+                    [ id "clouds-sphere"
+                    , label "Clouds Sphere"
+                    , position <| vec3 3 10 5
+                    , overlay  <| Html.text "Clouds sphere"
+                    , object   <| Object.Appearance cloudsSphere
+                    , action   <| Vehicle
                         { drive = Nothing
                         , vehicle =
                             { speed = 0
@@ -57,7 +57,7 @@ main =
                             , radius = 1.5
                             }
                         }
-                    }
+                    ]
 
                 , Obj.create_
                     [ id "landscape-diamond"
@@ -132,7 +132,7 @@ main =
 deltaWedge : ( App, Cmd AppMsg )
 deltaWedge =
     let
-        o =
+        html =
             Html.div []
                 [ Html.h2 []
                     [ Html.text "Delta Wedge" ]
@@ -146,7 +146,7 @@ deltaWedge =
             [ id "wedge"
             , label "Delta Wedge"
             , position <| vec3 23 0 12
-            , overlay  <| o
+            , overlay  <| html
             , object   <| Object.Appearance wedge
             , action   <| Vehicle
                 { drive = Just DreamBird.drive
@@ -161,7 +161,7 @@ deltaWedge =
 textureCube : ( App, Cmd AppMsg )
 textureCube =
     let
-        overlay =
+        html =
             Html.div []
                 [ Html.h2 []
                     [ Html.text "A wooden box" ]
@@ -171,16 +171,16 @@ textureCube =
                 , DreamBuggy.overlay
                 ]
     in
-        Obj.create
-            { id = "crate"
-            , label = "Wooden crate"
-            , position = vec3 -2 0 17
-            , overlay = overlay
-            , object = Object.FlatTexture
+        Obj.create_
+            [ id "crate"
+            , label "Wooden crate"
+            , position <| vec3 -2 0 17
+            , overlay html
+            , object <| Object.FlatTexture
                 { mesh = cubeMesh
                 , texturePath = "resources/woodCrate.jpg"
                 }
-            , action = Vehicle
+            , action <| Vehicle
                 { drive = Just DreamBuggy.drive
                 , vehicle =
                     { speed = 8.0
@@ -188,13 +188,13 @@ textureCube =
                     , radius = 1.0
                     }
                 }
-            }
+            ]
 
 
 elmLogo : ( App, Cmd AppMsg )
 elmLogo =
     let
-        overlay =
+        html =
             Html.div []
                 [ Html.h2 []
                     [ Html.text "Elm Logo" ]
@@ -203,17 +203,17 @@ elmLogo =
                 , DreamBuggy.overlay
                 ]
     in
-        Obj.create
-            { id = "elm-logo"
-            , label = "Elm Logo"
-            , position = vec3 38 0 12
-            , overlay = overlay
-            , object = Object.TexturedObj
+        Obj.create_
+            [ id "elm-logo"
+            , label "Elm Logo"
+            , position <| vec3 38 0 12
+            , overlay  <| html
+            , object   <| Object.TexturedObj
                 { meshPath = "meshes/elmLogo.obj"
                 , diffuseTexturePath = "textures/elmLogoDiffuse.png"
                 , normalTexturePath = "textures/elmLogoNorm.png"
                 }
-            , action = Vehicle
+            , action <| Vehicle
                 { drive = Just DreamBuggy.drive
                 , vehicle =
                     { speed = 8.0
@@ -221,13 +221,13 @@ elmLogo =
                     , radius = 1.0
                     }
                 }
-            }
+            ]
 
 
 avatar : Float -> ( App, Cmd AppMsg )
 avatar speed =
     let
-        overlay =
+        html =
             Html.div []
                 [ Html.h2 []
                     [ Html.text "Avatar" ]
@@ -236,16 +236,16 @@ avatar speed =
                 , Walking.overlay
                 ]
     in
-        Obj.create
-            { id = "avatar"
-            , label = "Walking"
-            , position = vec3 0 10 0
-            , overlay = overlay
-            , object = Object.ReflectiveObj
+        Obj.create_
+            [ id "avatar"
+            , label "Walking"
+            , position <| vec3 0 10 0
+            , overlay  <| html
+            , object <| Object.ReflectiveObj
                 { meshPath = "meshes/suzanne.obj"
                 , reflectionTexturePath = "textures/elmLogoDiffuse.png"
                 }
-            , action = Vehicle
+            , action <| Vehicle
                 { drive = Just Walking.drive
                 , vehicle =
                     { speed = speed
@@ -253,4 +253,4 @@ avatar speed =
                     , radius = 1.5
                     }
                 }
-            }
+            ]
