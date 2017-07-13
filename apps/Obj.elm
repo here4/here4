@@ -13,11 +13,12 @@ import Math.Vector3 as V3 exposing (vec3)
 import Object exposing (..)
 import Object.Attributes exposing (..)
 import Object.Types exposing (Load(..))
-import Orientation
+import Orientation exposing (Orientation)
 
 
 type alias Model vehicle =
     { motion : Moving {}
+    , rotation : Orientation
     , action : Action vehicle
     , body : Maybe (Moving Body)
     , object : Load ObjectResult
@@ -33,6 +34,8 @@ defaultAttributes =
     { id = ""
     , label = ""
     , position = vec3 0 0 0
+    , scale = 1.0
+    , rotation = Orientation.initial
     , overlay = Html.text ""
     , object = Invisible ()
     , action = Statue
@@ -46,7 +49,7 @@ create updates =
             App.create (init attributes)
                 { id = always attributes.id
                 , label = always attributes.label
-                , update = update attributes.action
+                , update = update attributes.scale attributes.action
                 , animate = animate
                 , bodies = bodies
                 , framing = framing
@@ -58,11 +61,17 @@ create updates =
         create_ (List.foldl (\f attr -> f attr) defaultAttributes updates)
 
 
+bodyOrientation : Model vehicle -> Orientation
+bodyOrientation model =
+    Orientation.followedBy model.motion.orientation model.rotation
+
+
 loadBody :
-    ( Load ObjectResult, Cmd ObjectMsg )
+    Float
+    -> ( Load ObjectResult, Cmd ObjectMsg )
     -> Model vehicle
     -> ( Model vehicle, Cmd (CtrlMsg Msg) )
-loadBody (newObject, newMsg) model =
+loadBody s (newObject, newMsg) model =
     let
         mBody =
             case newObject of
@@ -71,9 +80,9 @@ loadBody (newObject, newMsg) model =
                 Ready appear ->
                     Just
                         { anchor = AnchorGround
-                        , scale = vec3 1 1 1
+                        , scale = vec3 s s s
                         , position = model.motion.position
-                        , orientation = model.motion.orientation
+                        , orientation = bodyOrientation model
                         , appear = appear
                         , velocity = model.motion.velocity
                        }
@@ -91,12 +100,13 @@ init attributes =
         (object, objectCmds) =
             objectInit attributes.object
     in
-      loadBody (object, objectCmds)
+      loadBody attributes.scale (object, objectCmds)
           { motion =
               { position = attributes.position
               , orientation = Orientation.initial
               , velocity = vec3 0 0 0
               }
+          , rotation = attributes.rotation
           , action = attributes.action
           , body = Nothing
           , object = object
@@ -105,20 +115,28 @@ init attributes =
 
 setMotion : Moving {} -> Model vehicle -> Model vehicle
 setMotion motion model =
-    { model | motion = motion
-            , body = Maybe.map (copyMotion motion) model.body
-    }
+    let
+        applyMotion motion thing =
+            { thing | position = motion.position
+                    , orientation = bodyOrientation model
+                    , velocity = motion.velocity
+            }
+    in
+        { model | motion = motion
+                , body = Maybe.map (applyMotion motion) model.body
+        }
 
 
 update :
-    Action vehicle
+    Float
+    -> Action vehicle
     -> CtrlMsg Msg
     -> Model vehicle
     -> ( Model vehicle, Cmd (CtrlMsg Msg) )
-update action msg model =
+update scale action msg model =
         case msg of
             Self m ->
-                loadBody (objectUpdate m model.object) model
+                loadBody scale (objectUpdate m model.object) model
 
             Ctrl (Enter partyKey) ->
                 case action of

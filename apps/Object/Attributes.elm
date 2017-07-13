@@ -6,6 +6,8 @@ module Object.Attributes exposing
     , id
     , label
     , position
+    , scale
+    , rotation
     , overlay
     , object
     , portal
@@ -20,6 +22,7 @@ import Location exposing (..)
 import Math.Vector3 as V3 exposing (Vec3)
 import Model exposing (Inputs)
 import Object exposing (ObjectAttributes)
+import Orientation exposing (Orientation)
 import Vehicle exposing (Driveable)
 
 type alias VehicleAttributes vehicle =
@@ -36,6 +39,8 @@ type alias Attributes vehicle msg =
     { id : String
     , label : String
     , position : Vec3
+    , rotation : Orientation
+    , scale : Float
     , overlay : Html (CtrlMsg msg)
     , object : ObjectAttributes
     , action : Action vehicle
@@ -52,6 +57,12 @@ label l attr = { attr | label = l }
 
 position : Vec3 -> Update vehicle msg
 position pos attr = { attr | position = pos }
+
+scale : Float -> Update vehicle msg
+scale s attr = { attr | scale = s }
+
+rotation : Orientation -> Update vehicle msg
+rotation o attr = { attr | rotation = o }
 
 overlay : Html (CtrlMsg msg) -> Update vehicle msg
 overlay o attr = { attr | overlay = o }
