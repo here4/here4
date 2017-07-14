@@ -47,8 +47,8 @@ reflective { vertices, indices } texture p =
         ]
 
 
-textured : Vec3 -> WebGL.Texture -> WebGL.Texture -> Obj.Mesh -> Appearance
-textured offset textureDiff textureNorm mesh p =
+textured : WebGL.Texture -> WebGL.Texture -> Obj.Mesh -> Appearance
+textured textureDiff textureNorm mesh p =
     let
         resolution =
             vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
@@ -77,62 +77,21 @@ textured offset textureDiff textureNorm mesh p =
             , lightPosition = lightPos
             }
 
-{-
-        debugBounds vertices =
-            let
-                f v (oldMinV, oldMaxV) =
-                    let
-                        (minX, minY, minZ) = V3.toTuple oldMinV
-                        (maxX, maxY, maxZ) = V3.toTuple oldMaxV
-                        (vx, vy, vz) = V3.toTuple v.position
-
-                        minV = V3.fromTuple (min minX vx, min minY vy, min minZ vz)
-                        maxV = V3.fromTuple (max maxX vx, max maxY vy, max maxZ vz)
-                    in
-                        (minV, maxV)
-
-                big = 1e10
-
-                bounds =
-                    List.foldl f (vec3 big big big, vec3 -big -big -big)
-
-                calcOffset (minV, maxV) =
-                    add minV (V3.scale 0.5 (sub maxV minV))
-
-                dvs vs =
-                    let
-                        tup =
-                            (Debug.log "mesh bounds:" (bounds vs), vs)
-
-                        tup2 =
-                            (Debug.log "offsets:" (calcOffset ((bounds vs))), vs)
-                    in
-                        Tuple.second tup
-
-            in
-                dvs vertices
--}
-            
-
-        applyOffset =
-            -- debugBounds >>
-            List.map (\v -> { v | position = sub v.position offset })
-
     in
         case mesh of
             Obj.WithoutTexture { vertices, indices } ->
                 [ renderCullFace Shaders.simpleVert Shaders.simpleFrag
-                    (indexedTriangles (applyOffset vertices) indices) uniforms
+                    (indexedTriangles vertices indices) uniforms
                 ]
 
             Obj.WithTexture { vertices, indices } ->
                 [ renderCullFace Shaders.noNormalVert Shaders.noNormalFrag
-                    (indexedTriangles (applyOffset vertices) indices) uniforms
+                    (indexedTriangles vertices indices) uniforms
                 ]
 
             Obj.WithTextureAndTangent { vertices, indices } ->
                 [ renderCullFace Shaders.normalVert Shaders.normalFrag
-                    (indexedTriangles (applyOffset vertices) indices) uniforms
+                    (indexedTriangles vertices indices) uniforms
                 ]
 
 
