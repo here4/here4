@@ -72,11 +72,20 @@ turn attributes dimensions eyeLevel dx dt motion =
         motionY =
             eyeLevel motion.position
 
+        vehicleWidth =
+            V3.getX dimensions
+
+        vehicleFwdLength =
+            V3.getZ dimensions
+
         w =
-            (V3.getX dimensions) / 2.0
+            vehicleWidth / 2.0
 
         l =
-            (V3.getZ dimensions) / 2.0
+            vehicleFwdLength / 2.0
+
+        centerY =
+            eyeLevel motion.position
 
         frontRightTireY =
             eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 w 0 l)))
@@ -107,9 +116,6 @@ turn attributes dimensions eyeLevel dx dt motion =
 
         targetUpRoll =
             let
-                vehicleWidth =
-                    1.0
-
                 ( x, y ) =
                     perp2dCCW vehicleWidth (rightTireY - leftTireY)
             in
@@ -117,9 +123,6 @@ turn attributes dimensions eyeLevel dx dt motion =
 
         targetUpPitch =
             let
-                vehicleFwdLength =
-                    1.0
-
                 ( z, y ) =
                     perp2dCCW vehicleFwdLength (frontTireY - rearTireY)
             in
