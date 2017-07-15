@@ -18,7 +18,7 @@ import Orientation exposing (Orientation)
 
 type alias Model vehicle =
     { motion : Moving {}
-    , rotation : Orientation
+    , rotation : Maybe Orientation
     , action : Action vehicle
     , body : Maybe (Moving Body)
     , object : Load ObjectResult
@@ -52,12 +52,14 @@ create updates =
 applyMotion : Model vehicle -> Model vehicle
 applyMotion model =
     let
-        orientation =
-            Orientation.unwind model.motion.orientation model.rotation
+        orientation o =
+            model.rotation
+            |> Maybe.map (Orientation.unwind o)
+            |> Maybe.withDefault o
 
         apply motion thing =
             { thing | position = motion.position
-                    , orientation = orientation
+                    , orientation = orientation motion.orientation
                     , velocity = motion.velocity
             }
     in

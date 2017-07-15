@@ -44,7 +44,7 @@ type alias Attributes vehicle msg =
     , position : Vec3
     , scale : Float
     , offset : Vec3
-    , rotation : Orientation
+    , rotation : Maybe Orientation
     , overlay : Html (CtrlMsg msg)
     , object : ObjectAttributes
     , action : Action vehicle
@@ -58,7 +58,7 @@ defaultAttributes =
     , position = vec3 0 0 0
     , scale = 1.0
     , offset = vec3 0 0 0
-    , rotation = Orientation.initial
+    , rotation = Nothing
     , overlay = Html.text ""
     , object = Invisible ()
     , action = Statue
@@ -84,10 +84,10 @@ offset : Vec3 -> Update vehicle msg
 offset off attr = { attr | offset = off }
 
 forward : Vec3 -> Update vehicle msg
-forward fwd attr = { attr | rotation = Orientation.fromTo fwd V3.k }
+forward fwd attr = { attr | rotation = Just (Orientation.fromTo fwd V3.k) }
 
 rotation : Orientation -> Update vehicle msg
-rotation o attr = { attr | rotation = o }
+rotation o attr = { attr | rotation = Just o }
 
 overlay : Html (CtrlMsg msg) -> Update vehicle msg
 overlay o attr = { attr | overlay = o }
