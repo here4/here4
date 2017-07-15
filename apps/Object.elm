@@ -9,6 +9,7 @@ module Object exposing
     )
 
 import Appearance exposing (Appearance)
+import Math.Vector3 exposing (Vec3)
 import Object.FlatTexture exposing (..)
 import Object.ReflectiveObj exposing (..)
 import Object.TexturedObj as TexturedObj exposing (..)
@@ -18,7 +19,7 @@ import Tuple
 
 type ObjectAttributes
     = Invisible ()
-    | Appearance Appearance
+    | Appearance Appearance Vec3
     | FlatTexture FlatTextureAttributes
     | TexturedObj TexturedObjAttributes
     | ReflectiveObj ReflectiveObjAttributes
@@ -40,6 +41,7 @@ texturedObj meshPath diffuseTexturePath normalTexturePath =
     TexturedObj.texturedObj meshPath diffuseTexturePath normalTexturePath
     |> TexturedObj
 
+
 texturedObjWith : String -> String -> String
     -> List (Update TexturedObjAttributes)
     -> ObjectAttributes
@@ -47,6 +49,7 @@ texturedObjWith meshPath diffuseTexturePath normalTexturePath updates =
     TexturedObj.texturedObj meshPath diffuseTexturePath normalTexturePath
     |> applyUpdates updates
     |> TexturedObj
+
 
 wrap :
     (result -> ObjectResult)
@@ -57,8 +60,8 @@ wrap t m (model, msg) =
     case model of
         Loading model_ ->
             ( Loading (t model_), Cmd.map m msg )
-        Ready appear ->
-            ( Ready appear, Cmd.none )
+        Ready appear dimensions ->
+            ( Ready appear dimensions, Cmd.none )
 
 
 objectInit : ObjectAttributes -> (Load ObjectResult, Cmd ObjectMsg)
@@ -66,8 +69,8 @@ objectInit attributes =
     case attributes of
         Invisible () ->
             ( Loading (InvisibleResult ()), Cmd.none )
-        Appearance appear ->
-            ( Ready appear, Cmd.none )
+        Appearance appear dimensions ->
+            ( Ready appear dimensions, Cmd.none )
         FlatTexture obj ->
             flatTextureInit obj
             |> wrap FlatTextureResult FlatTextureMsg
@@ -82,8 +85,8 @@ objectInit attributes =
 objectUpdate : ObjectMsg -> Load ObjectResult -> (Load ObjectResult, Cmd ObjectMsg)
 objectUpdate msg model =
     case model of
-        Ready appear ->
-            ( Ready appear, Cmd.none )
+        Ready appear dimensions ->
+            ( Ready appear dimensions, Cmd.none )
 
         Loading partial ->
             case (msg, partial) of

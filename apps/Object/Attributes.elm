@@ -29,7 +29,7 @@ import Setter exposing (..)
 import Vehicle exposing (Driveable)
 
 type alias VehicleAttributes vehicle =
-    { drive : Driveable vehicle -> Ground -> Inputs -> Moving {} -> Moving {}
+    { drive : Driveable vehicle -> Vec3 -> Ground -> Inputs -> Moving {} -> Moving {}
     , vehicle : Driveable vehicle
     }
 

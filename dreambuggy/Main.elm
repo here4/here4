@@ -50,21 +50,21 @@ main =
                     , label "Clouds Sphere"
                     , position <| vec3 3 10 5
                     , overlay  <| Html.text "Clouds sphere"
-                    , object   <| Object.Appearance cloudsSphere
+                    , object   <| Object.Appearance cloudsSphere (vec3 2 2 2)
                     ]
 
                 , Obj.create
                     [ id "landscape-diamond"
                     , label "Landscape Diamond"
-                    , position (vec3 40 1.5 28)
-                    , object (Object.Appearance fogMountainsDiamond)
+                    , position <| vec3 40 1.5 28
+                    , object   <| Object.Appearance fogMountainsDiamond (vec3 2 2 2)
                     ]
 
                 , Obj.create
                     [ id "fire-cube"
                     , label "Fire Cube"
                     , position <| vec3 21 0 -25
-                    , object   <| Object.Appearance fireCube
+                    , object   <| Object.Appearance fireCube (vec3 1 1 1)
                     , portal   <| Remote "world2" (Facing "fire-cube")
                     ]
 
@@ -72,7 +72,7 @@ main =
                     [ id "sky-diamond"
                     , label "Sky Diamond"
                     , position <| vec3 -15 1.5 21
-                    , object   <| Object.Appearance cloudsDiamond
+                    , object   <| Object.Appearance cloudsDiamond (vec3 2 2 2)
                     , portal   <| Remote "world2" (Behind "shufflepuck")
                     ]
 
@@ -82,7 +82,7 @@ main =
                     [ id "voronoi-cube"
                     , label "Voronoi Cube"
                     , position <| vec3 10 0 10
-                    , object   <| Object.Appearance voronoiCube
+                    , object   <| Object.Appearance voronoiCube (vec3 1 1 1)
                     , portal   <| Local (Become "boids")
                     ]
 
@@ -90,7 +90,7 @@ main =
                     [ id "landscape-cube"
                     , label "Landscape Cube"
                     , position <| vec3 10 1.5 -10
-                    , object   <| Object.Appearance fogMountainsCube
+                    , object   <| Object.Appearance fogMountainsCube (vec3 1 1 1)
                     ]
                 ]
           , defaultSelf = avatar 8.0
@@ -115,7 +115,7 @@ main =
                     [ id "fire-cube"
                     , label "Fire Cube"
                     , position <| vec3 9 0 -14
-                    , object   <| Object.Appearance fireCube
+                    , object   <| Object.Appearance fireCube (vec3 1 1 1)
                     , portal   <| Remote "world1" (Facing "fire-cube")
                     ]
                 ]
@@ -147,7 +147,7 @@ deltaWedge =
             , label "Delta Wedge"
             , position <| vec3 23 0 12
             , overlay  <| html
-            , object   <| Object.Appearance wedge
+            , object   <| Object.Appearance wedge (vec3 1 1 1)
             , vehicle  <|
                 { drive = DreamBird.drive
                 , vehicle =
@@ -206,15 +206,15 @@ buggy =
             [ id "buggy"
             , label "Buggy"
             , position <| vec3 37 0 43
-            , forward  <| V3.i
-            , scale    <| 0.01
             , overlay  <| html
             , object   <| Object.texturedObjWith
                 "OffRoad Car/Models/OFF -Road car  3D Models.obj"
                 "textures/elmLogoDiffuse.png"
                 "textures/elmLogoNorm.png"
-                [ offset   <| vec3 221.670662 39.350132 -132.558582
-                , rotation <| Orientation.fromTo V3.i V3.k
+                -- [ offset   <| vec3 221.670662 39.350132 -132.558582
+                [ offset   <| vec3 221.670662 0 -132.558582
+                , scale    <| 0.01
+                , forward  <| V3.i
                 ]
             , vehicle <|
                 { drive = DreamBuggy.drive

@@ -13,6 +13,7 @@ import Body.Obj exposing (textured)
 import Dict exposing (Dict)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Object.Types exposing (Load(..))
+import Object.Util exposing (..)
 import OBJ
 import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
 import Orientation exposing (Orientation)
@@ -25,6 +26,7 @@ type alias TexturedObjAttributes =
     , diffuseTexturePath : String
     , normalTexturePath : String
     , offset : Vec3
+    , scale : Float
     , rotation : Maybe Orientation
     }
 
@@ -33,6 +35,7 @@ type alias TexturedObjResult =
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
     , offset : Vec3
+    , scale : Float
     , rotation : Maybe Orientation
     }
 
@@ -47,6 +50,7 @@ texturedObj meshPath diffuseTexturePath normalTexturePath =
     , diffuseTexturePath = diffuseTexturePath
     , normalTexturePath = normalTexturePath
     , offset = vec3 0 0 0
+    , scale = 1.0
     , rotation = Nothing
     }
 
@@ -57,6 +61,7 @@ texturedObjInit attributes =
           , diffTexture = Err "Loading texture ..."
           , normTexture = Err "Loading texture ..."
           , offset = attributes.offset
+          , scale = attributes.scale
           , rotation = attributes.rotation
           }
     , Cmd.batch
@@ -70,46 +75,11 @@ texturedObjInit attributes =
 texturedObjUpdate : TexturedObjMsg -> Load TexturedObjResult -> (Load TexturedObjResult, Cmd TexturedObjMsg)
 texturedObjUpdate msg model =
     let
-{-
-        debugBounds vertices =
-            let
-                f v (oldMinV, oldMaxV) =
-                    let
-                        (minX, minY, minZ) = V3.toTuple oldMinV
-                        (maxX, maxY, maxZ) = V3.toTuple oldMaxV
-                        (vx, vy, vz) = V3.toTuple v.position
-
-                        minV = V3.fromTuple (min minX vx, min minY vy, min minZ vz)
-                        maxV = V3.fromTuple (max maxX vx, max maxY vy, max maxZ vz)
-                    in
-                        (minV, maxV)
-
-                big = 1e10
-
-                bounds =
-                    List.foldl f (vec3 big big big, vec3 -big -big -big)
-
-                calcOffset (minV, maxV) =
-                    add minV (V3.scale 0.5 (sub maxV minV))
-
-                dvs vs =
-                    let
-                        tup =
-                            (Debug.log "mesh bounds:" (bounds vs), vs)
-
-                        tup2 =
-                            (Debug.log "offsets:" (calcOffset ((bounds vs))), vs)
-                    in
-                        Tuple.second tup
-
-            in
-                dvs vertices
--}
-
-        apply offset rotation mesh =
+        apply offset scale rotation mesh =
             let
                 transform p =
                     V3.sub p offset
+                    |> V3.scale scale
                     |> Maybe.withDefault identity (Maybe.map Orientation.rotateBodyV rotation)
 
                 mapTransform =
@@ -136,20 +106,23 @@ texturedObjUpdate msg model =
                         meshes =
                             Dict.values mesh
                                 |> List.concatMap Dict.values
-                                |> List.map (apply r.offset r.rotation)
+                                |> List.map (apply r.offset r.scale r.rotation)
+
+                        dimensions =
+                            bounds (List.concatMap positions meshes)
 
                         appearMesh = textured diffTexture normTexture
 
                         appear p =
                                 List.concatMap (\m -> appearMesh m p) meshes
                     in
-                        Ready appear
+                        Ready appear dimensions
                 _ ->
                     Loading r
     in
         case model of
-            Ready appear ->
-                ( Ready appear, Cmd.none )
+            Ready appear dimensions ->
+                ( Ready appear dimensions, Cmd.none )
 
             Loading partial ->
             

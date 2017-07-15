@@ -15,7 +15,6 @@ import Vehicle exposing (Driveable)
 
 import Debug
 
-
 ----------------------------------------------------------------------
 -- DreamBuggy
 
@@ -25,19 +24,19 @@ welcome motion =
     { motion | orientation = clampBuggy motion.orientation }
 
 
-drive : Driveable vehicle -> Ground -> Model.Inputs -> Moving a -> Moving a
-drive attributes ground inputs thing =
+drive : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+drive attributes dimensions ground inputs thing =
     let
         eyeLevel pos =
             ground.elevation pos
     in
-        move attributes ground eyeLevel inputs thing
+        move attributes dimensions ground eyeLevel inputs thing
 
 
-move : Driveable vehicle -> Ground -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
-move attributes terrain eyeLevel inputs motion =
+move : Driveable vehicle -> Vec3 -> Ground -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
+move attributes dimensions terrain eyeLevel inputs motion =
     motion
-        |> turn eyeLevel attributes.speed inputs.x inputs.dt
+        |> turn attributes dimensions eyeLevel inputs.x inputs.dt
         |> goForward eyeLevel attributes.speed inputs
         |> gravity eyeLevel inputs.dt
         |> physics eyeLevel inputs.dt
@@ -67,23 +66,29 @@ flatten v =
         normalize (vec3 r.x 0 r.z)
 
 
-turn : Model.EyeLevel -> Float -> Float -> Float -> Moving a -> Moving a
-turn eyeLevel speed dx dt motion =
+turn : Driveable vehicle -> Vec3 -> Model.EyeLevel -> Float -> Float -> Moving a -> Moving a
+turn attributes dimensions eyeLevel dx dt motion =
     let
         motionY =
             eyeLevel motion.position
 
+        w =
+            (V3.getX dimensions) / 2.0
+
+        l =
+            (V3.getZ dimensions) / 2.0
+
         frontRightTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 0.5 0 0.5)))
+            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 w 0 l)))
 
         frontLeftTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 0.5 0 0.5)))
+            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 w 0 -l)))
 
         rearRightTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 0.5 0 -0.5)))
+            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -w 0 l)))
 
         rearLeftTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -0.5 0 -0.5)))
+            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -w 0 -l)))
 
         frontTireY =
             max frontLeftTireY frontRightTireY
@@ -121,7 +126,7 @@ turn eyeLevel speed dx dt motion =
                 vec3 0 y z
 
         steer =
-            0.1 * speed * dx * dt
+            0.1 * attributes.speed * dx * dt
 
         targetOrientation =
             if getY motion.position > (eyeLevel motion.position) + 5 then

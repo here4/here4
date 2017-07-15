@@ -4,7 +4,8 @@ module Object.Types exposing
 
 
 import Appearance exposing (Appearance)
+import Math.Vector3 exposing (Vec3)
 
 type Load result
     = Loading result
-    | Ready Appearance
+    | Ready Appearance Vec3

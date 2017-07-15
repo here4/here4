@@ -10,8 +10,9 @@ module Object.FlatTexture exposing
 import Appearance exposing (Appearance)
 import Body.Obj exposing (reflective)
 import Dict exposing (Dict)
-import Math.Vector3 exposing (vec3)
+import Math.Vector3 as V3 exposing (vec3)
 import Object.Types exposing (Load(..))
+import Object.Util exposing (..)
 import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
 import Shaders.TextureFragment exposing (textureFragment)
@@ -53,13 +54,13 @@ flatTextureUpdate msg model =
         loadBody m =
             case m.texture of
                 ( Ok texture_ ) ->
-                    Ready (makeAppearance m.mesh texture_)
+                    Ready (makeAppearance m.mesh texture_) (vec3 1 1 1)
                 _ ->
                     Loading m
     in
         case model of
-            Ready appear ->
-                ( Ready appear, Cmd.none )
+            Ready appear dimensions ->
+                ( Ready appear dimensions, Cmd.none )
 
             Loading partial ->
             

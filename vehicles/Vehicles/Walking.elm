@@ -19,8 +19,8 @@ import Vehicle exposing (Driveable)
 -- Walking
 
 
-drive : Driveable vehicle -> Ground -> Model.Inputs -> Moving a -> Moving a
-drive attributes ground inputs thing =
+drive : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+drive attributes dimensions ground inputs thing =
     let
         eyeLevel pos =
             ground.elevation pos + attributes.height

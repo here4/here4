@@ -17,8 +17,8 @@ import Vehicle exposing (Driveable)
 -- DreamBird
 
 
-drive : Driveable vehicle -> Ground -> Model.Inputs -> Moving a -> Moving a
-drive attributes ground inputs body =
+drive : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+drive attributes dimensions ground inputs body =
     let
         eyeLevel pos =
             1.8 + ground.elevation pos

@@ -23,6 +23,7 @@ type alias Model vehicle =
     , action : Action vehicle
     , body : Maybe (Moving Body)
     , object : Load ObjectResult
+    , dimensions : Vec3
     }
 
 
@@ -78,12 +79,12 @@ loadBody :
     -> ( Model vehicle, Cmd (CtrlMsg Msg) )
 loadBody s (newObject, newMsg) model =
     let
-        mBody =
+        (mBody, dimensions) =
             case newObject of
                 Loading _ ->
-                    Nothing
-                Ready appear ->
-                    Just
+                    (Nothing, vec3 1 1 1)
+                Ready appear dimensions ->
+                    ( Just
                         { anchor = AnchorGround
                         , scale = vec3 s s s
                         , position = vec3 0 0 0
@@ -91,10 +92,13 @@ loadBody s (newObject, newMsg) model =
                         , appear = appear
                         , velocity = vec3 0 0 0
                        }
+                    , dimensions
+                    )
     in
         ( applyMotion
               { model | object = newObject
                       , body = mBody
+                      , dimensions = dimensions
               }
         , Cmd.map Self newMsg
         )
@@ -116,6 +120,7 @@ init attributes =
           , action = attributes.action
           , body = Nothing
           , object = object
+          , dimensions = vec3 1 1 1
           }
 
 
@@ -145,7 +150,7 @@ update scale action msg model =
             Ctrl (Drive ground inputs) ->
                 case action of
                     Vehicle v ->
-                        ( setMotion (v.drive v.vehicle ground inputs model.motion) model
+                        ( setMotion (v.drive v.vehicle model.dimensions ground inputs model.motion) model
                         , Cmd.none
                         )
 
