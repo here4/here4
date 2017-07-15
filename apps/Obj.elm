@@ -73,11 +73,11 @@ setMotion motion model = applyMotion { model | motion = motion }
 
 
 loadBody :
-    Float
+    Vec3
     -> ( Load ObjectResult, Cmd ObjectMsg )
     -> Model vehicle
     -> ( Model vehicle, Cmd (CtrlMsg Msg) )
-loadBody s (newObject, newMsg) model =
+loadBody scale (newObject, newMsg) model =
     let
         (mBody, dimensions) =
             case newObject of
@@ -86,7 +86,7 @@ loadBody s (newObject, newMsg) model =
                 Ready appear dimensions ->
                     ( Just
                         { anchor = AnchorGround
-                        , scale = vec3 s s s
+                        , scale = scale
                         , position = vec3 0 0 0
                         , orientation = Orientation.initial
                         , appear = appear
@@ -125,7 +125,7 @@ init attributes =
 
 
 update :
-    Float
+    Vec3
     -> Action vehicle
     -> CtrlMsg Msg
     -> Model vehicle

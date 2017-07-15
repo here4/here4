@@ -11,6 +11,7 @@ module Object.TexturedObj exposing
 import Appearance exposing (Appearance)
 import Body.Obj exposing (textured)
 import Dict exposing (Dict)
+import Math.Matrix4 as M4
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Object.Types exposing (Load(..))
 import Object.Util exposing (..)
@@ -26,7 +27,7 @@ type alias TexturedObjAttributes =
     , diffuseTexturePath : String
     , normalTexturePath : String
     , offset : Vec3
-    , scale : Float
+    , scale : Vec3
     , rotation : Maybe Orientation
     }
 
@@ -35,7 +36,7 @@ type alias TexturedObjResult =
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
     , offset : Vec3
-    , scale : Float
+    , scale : Vec3
     , rotation : Maybe Orientation
     }
 
@@ -50,7 +51,7 @@ texturedObj meshPath diffuseTexturePath normalTexturePath =
     , diffuseTexturePath = diffuseTexturePath
     , normalTexturePath = normalTexturePath
     , offset = vec3 0 0 0
-    , scale = 1.0
+    , scale = vec3 1 1 1
     , rotation = Nothing
     }
 
@@ -79,7 +80,7 @@ texturedObjUpdate msg model =
             let
                 transform p =
                     V3.sub p offset
-                    |> V3.scale scale
+                    |> M4.transform (M4.makeScale scale)
                     |> Maybe.withDefault identity (Maybe.map Orientation.rotateBodyV rotation)
 
                 mapTransform =
