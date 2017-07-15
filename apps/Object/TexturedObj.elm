@@ -13,7 +13,7 @@ import Body.Obj exposing (textured)
 import Dict exposing (Dict)
 import Math.Matrix4 as M4
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Object.Types exposing (Load(..))
+import Object.Types exposing (Load(..), Scale(..))
 import Object.Util exposing (..)
 import OBJ
 import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
@@ -27,7 +27,7 @@ type alias TexturedObjAttributes =
     , diffuseTexturePath : String
     , normalTexturePath : String
     , offset : Vec3
-    , scale : Vec3
+    , scale : Scale
     , rotation : Maybe Orientation
     }
 
@@ -36,7 +36,7 @@ type alias TexturedObjResult =
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
     , offset : Vec3
-    , scale : Vec3
+    , scale : Scale
     , rotation : Maybe Orientation
     }
 
@@ -51,7 +51,7 @@ texturedObj meshPath diffuseTexturePath normalTexturePath =
     , diffuseTexturePath = diffuseTexturePath
     , normalTexturePath = normalTexturePath
     , offset = vec3 0 0 0
-    , scale = vec3 1 1 1
+    , scale = Scale 1.0
     , rotation = Nothing
     }
 
@@ -104,10 +104,17 @@ texturedObjUpdate msg model =
             case ( r.mesh, r.diffTexture, r.normTexture ) of
                 ( Ok mesh, Ok diffTexture, Ok normTexture ) ->
                     let
+                        loadScale =
+                            case r.scale of
+                                Scale f ->
+                                    vec3 f f f
+                                Scale3 fx fy fz ->
+                                    vec3 fx fy fz
+
                         meshes =
                             Dict.values mesh
                                 |> List.concatMap Dict.values
-                                |> List.map (apply r.offset r.scale r.rotation)
+                                |> List.map (apply r.offset loadScale r.rotation)
 
                         dimensions =
                             bounds (List.concatMap positions meshes)

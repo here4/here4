@@ -12,6 +12,7 @@ import Balls
 import Obj
 import Object
 import Object.Attributes exposing (..)
+import Object.Types exposing (..)
 import Orientation
 import Shufflepuck
 import Sky
@@ -213,7 +214,7 @@ buggy =
                 "textures/elmLogoNorm.png"
                 -- [ offset   <| vec3 221.670662 39.350132 -132.558582
                 [ offset   <| vec3 221.670662 0 -132.558582
-                , scale    <| vec3 0.01 0.01 0.01
+                , scale    <| Scale 0.1
                 , forward  <| V3.i
                 ]
             , vehicle <|

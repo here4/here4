@@ -24,6 +24,7 @@ import Location exposing (..)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Object exposing (ObjectAttributes(..))
+import Object.Types exposing (Scale(..))
 import Orientation exposing (Orientation)
 import Setter exposing (..)
 import Vehicle exposing (Driveable)
@@ -33,16 +34,19 @@ type alias VehicleAttributes vehicle =
     , vehicle : Driveable vehicle
     }
 
+
 type Action vehicle
     = Statue
     | Portal Location
     | Vehicle (VehicleAttributes vehicle)
 
+
+
 type alias Attributes vehicle msg =
     { id : String
     , label : String
     , position : Vec3
-    , scale : Vec3
+    , scale : Scale
     , offset : Vec3
     , rotation : Maybe Orientation
     , overlay : Html (CtrlMsg msg)
@@ -56,7 +60,7 @@ defaultAttributes =
     { id = ""
     , label = ""
     , position = vec3 0 0 0
-    , scale = vec3 1 1 1
+    , scale = Scale 1.0
     , offset = vec3 0 0 0
     , rotation = Nothing
     , overlay = Html.text ""
@@ -74,7 +78,7 @@ label l attr = { attr | label = l }
 position : Vec3 -> Update { a | position : Vec3 }
 position pos attr = { attr | position = pos }
 
-scale : Vec3 -> Update { a | scale : Vec3 }
+scale : Scale -> Update { a | scale : Scale }
 scale s attr = { attr | scale = s }
 
 offset : Vec3 -> Update { a | offset : Vec3 }
