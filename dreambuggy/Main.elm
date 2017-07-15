@@ -214,6 +214,7 @@ buggy =
                 , diffuseTexturePath = "textures/elmLogoDiffuse.png"
                 , normalTexturePath = "textures/elmLogoNorm.png"
                 , offset = vec3 221.670662 39.350132 -132.558582
+                , rotation = Orientation.fromTo V3.i V3.k
                 }
             , vehicle <|
                 { drive = DreamBuggy.drive
@@ -248,6 +249,7 @@ elmLogo =
                 , diffuseTexturePath = "textures/elmLogoDiffuse.png"
                 , normalTexturePath = "textures/elmLogoNorm.png"
                 , offset = vec3 0 0 0
+                , rotation = Orientation.initial
                 }
             , vehicle <|
                 { drive = DreamBuggy.drive

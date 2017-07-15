@@ -14,6 +14,7 @@ import Math.Vector3 as V3 exposing (Vec3)
 import Object.Types exposing (Load(..))
 import OBJ
 import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
+import Orientation exposing (Orientation)
 import Task exposing (Task)
 import WebGL.Texture as Texture exposing (Texture, Error)
 
@@ -23,6 +24,7 @@ type alias TexturedObjAttributes =
     , diffuseTexturePath : String
     , normalTexturePath : String
     , offset : Vec3
+    , rotation : Orientation
     }
 
 type alias TexturedObjResult =
@@ -30,6 +32,7 @@ type alias TexturedObjResult =
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
     , offset : Vec3
+    , rotation : Orientation
     }
 
 type TexturedObjMsg
@@ -45,6 +48,7 @@ texturedObjInit attributes =
           , diffTexture = Err "Loading texture ..."
           , normTexture = Err "Loading texture ..."
           , offset = attributes.offset
+          , rotation = attributes.rotation
           }
     , Cmd.batch
         [ loadTexture attributes.diffuseTexturePath DiffTextureLoaded
@@ -93,14 +97,18 @@ texturedObjUpdate msg model =
                 dvs vertices
 -}
 
-        applyOffset offset mesh =
+        apply offset rotation mesh =
             let
-                translate =
+                transform p =
+                    V3.sub p offset
+                    |> Orientation.rotateBodyV rotation
+
+                mapTransform =
                     -- debugBounds >>
-                    List.map (\v -> { v | position = V3.sub v.position offset })
+                    List.map (\v -> { v | position = transform v.position })
 
                 updateVertices m =
-                    { m | vertices = translate m.vertices }
+                    { m | vertices = mapTransform m.vertices }
             in
                 case mesh of
                     Obj.WithoutTexture m ->
@@ -119,7 +127,7 @@ texturedObjUpdate msg model =
                         meshes =
                             Dict.values mesh
                                 |> List.concatMap Dict.values
-                                |> List.map (applyOffset r.offset)
+                                |> List.map (apply r.offset r.rotation)
 
                         appearMesh = textured diffTexture normTexture
 
