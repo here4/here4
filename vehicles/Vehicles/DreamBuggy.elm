@@ -124,7 +124,10 @@ turn attributes dimensions eyeLevel dx dt motion =
         targetUpPitch =
             let
                 ( z, y ) =
-                    perp2dCCW vehicleFwdLength (frontTireY - rearTireY)
+                    if frontTireY > centerY then
+                        perp2dCCW vehicleFwdLength (frontTireY - rearTireY)
+                    else
+                        perp2dCCW (vehicleFwdLength/2.0) (centerY - rearTireY)
             in
                 vec3 0 y z
 
