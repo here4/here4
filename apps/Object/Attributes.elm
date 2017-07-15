@@ -81,7 +81,7 @@ offset : Vec3 -> Update { a | offset : Vec3 }
 offset off attr = { attr | offset = off }
 
 forward : Vec3 -> Update { a | rotation : Maybe Orientation }
-forward fwd attr = { attr | rotation = Just (Orientation.fromTo fwd V3.k) }
+forward fwd attr = { attr | rotation = Just (Orientation.fromTo V3.k fwd) }
 
 rotation : Orientation -> Update { a | rotation : Maybe Orientation }
 rotation o attr = { attr | rotation = Just o }
