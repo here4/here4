@@ -209,13 +209,13 @@ buggy =
             , forward  <| V3.i
             , scale    <| 0.01
             , overlay  <| html
-            , object   <| Object.TexturedObj
-                { meshPath = "OffRoad Car/Models/OFF -Road car  3D Models.obj"
-                , diffuseTexturePath = "textures/elmLogoDiffuse.png"
-                , normalTexturePath = "textures/elmLogoNorm.png"
-                , offset = vec3 221.670662 39.350132 -132.558582
-                , rotation = Orientation.fromTo V3.i V3.k
-                }
+            , object   <| Object.texturedObjWith
+                "OffRoad Car/Models/OFF -Road car  3D Models.obj"
+                "textures/elmLogoDiffuse.png"
+                "textures/elmLogoNorm.png"
+                [ offset   <| vec3 221.670662 39.350132 -132.558582
+                , rotation <| Orientation.fromTo V3.i V3.k
+                ]
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
@@ -244,13 +244,10 @@ elmLogo =
             , label "Elm Logo"
             , position <| vec3 38 0 12
             , overlay  <| html
-            , object   <| Object.TexturedObj
-                { meshPath = "meshes/elmLogo.obj"
-                , diffuseTexturePath = "textures/elmLogoDiffuse.png"
-                , normalTexturePath = "textures/elmLogoNorm.png"
-                , offset = vec3 0 0 0
-                , rotation = Orientation.initial
-                }
+            , object   <| Object.texturedObj
+                 "meshes/elmLogo.obj"
+                 "textures/elmLogoDiffuse.png"
+                 "textures/elmLogoNorm.png"
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =

@@ -2,6 +2,7 @@ module Object.TexturedObj exposing
     ( TexturedObjAttributes
     , TexturedObjResult
     , TexturedObjMsg(..)
+    , texturedObj
     , texturedObjInit
     , texturedObjUpdate
     )
@@ -10,7 +11,7 @@ module Object.TexturedObj exposing
 import Appearance exposing (Appearance)
 import Body.Obj exposing (textured)
 import Dict exposing (Dict)
-import Math.Vector3 as V3 exposing (Vec3)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Object.Types exposing (Load(..))
 import OBJ
 import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
@@ -24,7 +25,7 @@ type alias TexturedObjAttributes =
     , diffuseTexturePath : String
     , normalTexturePath : String
     , offset : Vec3
-    , rotation : Orientation
+    , rotation : Maybe Orientation
     }
 
 type alias TexturedObjResult =
@@ -32,7 +33,7 @@ type alias TexturedObjResult =
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
     , offset : Vec3
-    , rotation : Orientation
+    , rotation : Maybe Orientation
     }
 
 type TexturedObjMsg
@@ -40,6 +41,14 @@ type TexturedObjMsg
     | NormTextureLoaded (Result String Texture)
     | LoadObj String (Result String (Dict String (Dict String Mesh)))
 
+texturedObj : String -> String -> String -> TexturedObjAttributes
+texturedObj meshPath diffuseTexturePath normalTexturePath =
+    { meshPath = meshPath
+    , diffuseTexturePath = diffuseTexturePath
+    , normalTexturePath = normalTexturePath
+    , offset = vec3 0 0 0
+    , rotation = Nothing
+    }
 
 texturedObjInit : TexturedObjAttributes -> (Load TexturedObjResult, Cmd TexturedObjMsg)
 texturedObjInit attributes =
@@ -101,7 +110,7 @@ texturedObjUpdate msg model =
             let
                 transform p =
                     V3.sub p offset
-                    |> Orientation.rotateBodyV rotation
+                    |> Maybe.withDefault identity (Maybe.map Orientation.rotateBodyV rotation)
 
                 mapTransform =
                     -- debugBounds >>

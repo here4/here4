@@ -2,7 +2,6 @@ module Object.Attributes exposing
     ( VehicleAttributes
     , Action(..)
     , Attributes
-    , Update
     , defaultAttributes
     , id
     , label
@@ -26,6 +25,7 @@ import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Object exposing (ObjectAttributes(..))
 import Orientation exposing (Orientation)
+import Setter exposing (..)
 import Vehicle exposing (Driveable)
 
 type alias VehicleAttributes vehicle =
@@ -65,39 +65,36 @@ defaultAttributes =
     }
 
 
-type alias Update vehicle msg = 
-    Attributes vehicle msg -> Attributes vehicle msg
-
-id : String -> Update vehicle msg
+id : String -> Update { a | id : String }
 id s attr = { attr | id = s }
 
-label : String -> Update vehicle msg
+label : String -> Update { a | label : String }
 label l attr = { attr | label = l }
 
-position : Vec3 -> Update vehicle msg
+position : Vec3 -> Update { a | position : Vec3 }
 position pos attr = { attr | position = pos }
 
-scale : Float -> Update vehicle msg
+scale : Float -> Update { a | scale : Float }
 scale s attr = { attr | scale = s }
 
-offset : Vec3 -> Update vehicle msg
+offset : Vec3 -> Update { a | offset : Vec3 }
 offset off attr = { attr | offset = off }
 
-forward : Vec3 -> Update vehicle msg
+forward : Vec3 -> Update { a | rotation : Maybe Orientation }
 forward fwd attr = { attr | rotation = Just (Orientation.fromTo fwd V3.k) }
 
-rotation : Orientation -> Update vehicle msg
+rotation : Orientation -> Update { a | rotation : Maybe Orientation }
 rotation o attr = { attr | rotation = Just o }
 
-overlay : Html (CtrlMsg msg) -> Update vehicle msg
+overlay : Html (CtrlMsg msg) -> Update { a | overlay : Html (CtrlMsg msg) }
 overlay o attr = { attr | overlay = o }
 
-object : ObjectAttributes -> Update vehicle msg
+object : ObjectAttributes -> Update { a | object : ObjectAttributes }
 object o attr = { attr | object = o }
 
-portal : Location -> Update vehicle msg
+portal : Location -> Update { a | action : Action vehicle }
 portal location attr = { attr | action = Portal location }
 
-vehicle : VehicleAttributes vehicle -> Update vehicle msg
+vehicle : VehicleAttributes vehicle -> Update { a | action : Action vehicle }
 vehicle v attr = { attr | action = Vehicle v }
 

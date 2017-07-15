@@ -14,6 +14,7 @@ import Object exposing (..)
 import Object.Attributes exposing (..)
 import Object.Types exposing (Load(..))
 import Orientation exposing (Orientation)
+import Setter exposing (..)
 
 
 type alias Model vehicle =
@@ -30,7 +31,7 @@ type alias Msg
 
 
 
-create : List (Update vehicle Msg) -> (App, Cmd AppMsg)
+create : List (Update (Attributes vehicle Msg)) -> (App, Cmd AppMsg)
 create updates =
     let
         create_ attributes =
@@ -46,7 +47,7 @@ create updates =
                 , reposition = reposition
                 }
     in
-        create_ (List.foldl (\f attr -> f attr) defaultAttributes updates)
+        create_ (applyUpdates updates defaultAttributes)
 
 
 applyMotion : Model vehicle -> Model vehicle

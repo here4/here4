@@ -4,13 +4,16 @@ module Object exposing
     , ObjectMsg(..)
     , objectInit
     , objectUpdate
+    , texturedObj
+    , texturedObjWith
     )
 
 import Appearance exposing (Appearance)
 import Object.FlatTexture exposing (..)
 import Object.ReflectiveObj exposing (..)
-import Object.TexturedObj exposing (..)
+import Object.TexturedObj as TexturedObj exposing (..)
 import Object.Types exposing (Load(..))
+import Setter exposing (..)
 import Tuple
 
 type ObjectAttributes
@@ -31,6 +34,19 @@ type ObjectMsg
     | TexturedObjMsg TexturedObjMsg
     | ReflectiveObjMsg ReflectiveObjMsg
 
+
+texturedObj : String -> String -> String -> ObjectAttributes
+texturedObj meshPath diffuseTexturePath normalTexturePath =
+    TexturedObj.texturedObj meshPath diffuseTexturePath normalTexturePath
+    |> TexturedObj
+
+texturedObjWith : String -> String -> String
+    -> List (Update TexturedObjAttributes)
+    -> ObjectAttributes
+texturedObjWith meshPath diffuseTexturePath normalTexturePath updates =
+    TexturedObj.texturedObj meshPath diffuseTexturePath normalTexturePath
+    |> applyUpdates updates
+    |> TexturedObj
 
 wrap :
     (result -> ObjectResult)
