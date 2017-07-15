@@ -76,16 +76,10 @@ texturedObjInit attributes =
 texturedObjUpdate : TexturedObjMsg -> Load TexturedObjResult -> (Load TexturedObjResult, Cmd TexturedObjMsg)
 texturedObjUpdate msg model =
     let
-        apply offset scale rotation mesh =
+        transform t mesh =
             let
-                transform p =
-                    V3.sub p offset
-                    |> M4.transform (M4.makeScale scale)
-                    |> Maybe.withDefault identity (Maybe.map Orientation.rotateBodyV rotation)
-
                 mapTransform =
-                    -- debugBounds >>
-                    List.map (\v -> { v | position = transform v.position })
+                    List.map (\v -> { v | position = t v.position })
 
                 updateVertices m =
                     { m | vertices = mapTransform m.vertices }
@@ -100,31 +94,49 @@ texturedObjUpdate msg model =
                     Obj.WithTextureAndTangent m ->
                         Obj.WithTextureAndTangent (updateVertices m)
 
+
+        apply offset rotation mesh =
+            let
+                t p =
+                    V3.sub p offset
+                    |> Maybe.withDefault identity (Maybe.map Orientation.rotateBodyV rotation)
+            in
+                transform t mesh
+
+
+        rescale dimensions scale =
+            let
+                scale3 =
+                    scaleToVec3 dimensions scale
+            in
+                M4.transform (M4.makeScale scale3)
+
+
         loadBody r =
             case ( r.mesh, r.diffTexture, r.normTexture ) of
                 ( Ok mesh, Ok diffTexture, Ok normTexture ) ->
                     let
-                        loadScale =
-                            case r.scale of
-                                Scale f ->
-                                    vec3 f f f
-                                Scale3 fx fy fz ->
-                                    vec3 fx fy fz
-
                         meshes =
                             Dict.values mesh
                                 |> List.concatMap Dict.values
-                                |> List.map (apply r.offset loadScale r.rotation)
+                                |> List.map (apply r.offset r.rotation)
 
                         dimensions =
                             bounds (List.concatMap positions meshes)
 
-                        appearMesh = textured diffTexture normTexture
+                        t =
+                            rescale dimensions r.scale
+
+                        scaledMeshes =
+                            List.map (transform t) meshes
+
+                        appearMesh =
+                            textured diffTexture normTexture
 
                         appear p =
-                                List.concatMap (\m -> appearMesh m p) meshes
+                            List.concatMap (\m -> appearMesh m p) scaledMeshes
                     in
-                        Ready appear dimensions
+                        Ready appear (t dimensions)
                 _ ->
                     Loading r
     in

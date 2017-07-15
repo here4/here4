@@ -13,6 +13,7 @@ import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Object exposing (..)
 import Object.Attributes exposing (..)
 import Object.Types exposing (Load(..), Scale(..))
+import Object.Util exposing (scaleToVec3)
 import Orientation exposing (Orientation)
 import Setter exposing (..)
 
@@ -84,24 +85,16 @@ loadBody scale (newObject, newMsg) model =
                 Loading _ ->
                     (Nothing, vec3 1 1 1)
                 Ready appear dimensions ->
-                    let
-                        scale3 =
-                            case scale of
-                                Scale f ->
-                                    vec3 f f f
-                                Scale3 fx fy fz ->
-                                    vec3 fx fy fz
-                    in
-                        ( Just
-                            { anchor = AnchorGround
-                            , scale = scale3
-                            , position = vec3 0 0 0
-                            , orientation = Orientation.initial
-                            , appear = appear
-                            , velocity = vec3 0 0 0
-                           }
-                        , dimensions
-                        )
+                    ( Just
+                        { anchor = AnchorGround
+                        , scale = scaleToVec3 dimensions scale
+                        , position = vec3 0 0 0
+                        , orientation = Orientation.initial
+                        , appear = appear
+                        , velocity = vec3 0 0 0
+                       }
+                    , dimensions
+                    )
     in
         ( applyMotion
               { model | object = newObject

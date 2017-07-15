@@ -16,4 +16,8 @@ type Load result
 type Scale
     = Scale3 Float Float Float
     | Scale Float
+    | Dimensions Float Float Float
+    | Width Float
+    | Height Float
+    | Length Float
 
