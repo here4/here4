@@ -13,7 +13,7 @@ import Body.Obj exposing (textured)
 import Dict exposing (Dict)
 import Math.Matrix4 as M4
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Object.Types exposing (Load(..), Scale(..))
+import Object.Types exposing (..)
 import Object.Util exposing (..)
 import OBJ
 import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
@@ -26,7 +26,7 @@ type alias TexturedObjAttributes =
     { meshPath : String
     , diffuseTexturePath : String
     , normalTexturePath : String
-    , offset : Vec3
+    , offset : Offset
     , scale : Scale
     , rotation : Maybe Orientation
     }
@@ -35,7 +35,7 @@ type alias TexturedObjResult =
     { mesh : Result String ObjFile
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
-    , offset : Vec3
+    , offset : Offset
     , scale : Scale
     , rotation : Maybe Orientation
     }
@@ -50,7 +50,7 @@ texturedObj meshPath diffuseTexturePath normalTexturePath =
     { meshPath = meshPath
     , diffuseTexturePath = diffuseTexturePath
     , normalTexturePath = normalTexturePath
-    , offset = vec3 0 0 0
+    , offset = WorldSpace 0 0 0
     , scale = Scale 1.0
     , rotation = Nothing
     }
@@ -95,13 +95,17 @@ texturedObjUpdate msg model =
                         Obj.WithTextureAndTangent (updateVertices m)
 
 
-        apply offset rotation mesh =
+        translate rescale dimensions offset =
             let
-                t p =
-                    V3.sub p offset
-                    |> Maybe.withDefault identity (Maybe.map Orientation.rotateBodyV rotation)
+                offset3 =
+                    offsetToVec3 rescale dimensions offset
+
             in
-                transform t mesh
+                \v -> V3.sub v offset3
+
+
+        rotate rotation =
+            Maybe.withDefault identity (Maybe.map Orientation.rotateBodyV rotation)
 
 
         rescale dimensions scale =
@@ -119,24 +123,32 @@ texturedObjUpdate msg model =
                         meshes =
                             Dict.values mesh
                                 |> List.concatMap Dict.values
-                                |> List.map (apply r.offset r.rotation)
 
-                        dimensions =
+                        modelDimensions =
                             bounds (List.concatMap positions meshes)
 
-                        t =
-                            rescale dimensions r.scale
+                        modelToWorld =
+                            rescale modelDimensions r.scale
 
-                        scaledMeshes =
+                        worldDimensions =
+                            modelToWorld modelDimensions
+
+                        t : Vec3 -> Vec3
+                        t v =
+                             modelToWorld v
+                             |> translate modelToWorld worldDimensions r.offset
+                             |> rotate r.rotation
+
+                        newMeshes =
                             List.map (transform t) meshes
 
                         appearMesh =
                             textured diffTexture normTexture
 
                         appear p =
-                            List.concatMap (\m -> appearMesh m p) scaledMeshes
+                            List.concatMap (\m -> appearMesh m p) newMeshes
                     in
-                        Ready appear (t dimensions)
+                        Ready appear worldDimensions
                 _ ->
                     Loading r
     in

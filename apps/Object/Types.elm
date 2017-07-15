@@ -1,6 +1,7 @@
 module Object.Types exposing
     ( Load(..)
     , Scale(..)
+    , Offset(..)
     )
 
 
@@ -21,3 +22,9 @@ type Scale
     | Height Float
     | Length Float
 
+
+type Offset
+    = ModelSpace Float Float Float
+    | WorldSpace Float Float Float
+    | Center
+    | FloorCenter

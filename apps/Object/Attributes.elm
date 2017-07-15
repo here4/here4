@@ -24,7 +24,7 @@ import Location exposing (..)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
 import Object exposing (ObjectAttributes(..))
-import Object.Types exposing (Scale(..))
+import Object.Types exposing (Scale(..), Offset(..))
 import Orientation exposing (Orientation)
 import Setter exposing (..)
 import Vehicle exposing (Driveable)
@@ -47,7 +47,7 @@ type alias Attributes vehicle msg =
     , label : String
     , position : Vec3
     , scale : Scale
-    , offset : Vec3
+    , offset : Offset
     , rotation : Maybe Orientation
     , overlay : Html (CtrlMsg msg)
     , object : ObjectAttributes
@@ -61,7 +61,7 @@ defaultAttributes =
     , label = ""
     , position = vec3 0 0 0
     , scale = Scale 1.0
-    , offset = vec3 0 0 0
+    , offset = WorldSpace 0 0 0
     , rotation = Nothing
     , overlay = Html.text ""
     , object = Invisible ()
@@ -81,7 +81,7 @@ position pos attr = { attr | position = pos }
 scale : Scale -> Update { a | scale : Scale }
 scale s attr = { attr | scale = s }
 
-offset : Vec3 -> Update { a | offset : Vec3 }
+offset : Offset -> Update { a | offset : Offset }
 offset off attr = { attr | offset = off }
 
 forward : Vec3 -> Update { a | rotation : Maybe Orientation }

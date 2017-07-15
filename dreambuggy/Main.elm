@@ -212,9 +212,10 @@ buggy =
                 "OffRoad Car/Models/OFF -Road car  3D Models.obj"
                 "textures/elmLogoDiffuse.png"
                 "textures/elmLogoNorm.png"
-                -- [ offset   <| vec3 221.670662 39.350132 -132.558582
-                [ offset   <| vec3 221.670662 0 -132.558582
-                , scale    <| Width 4.0
+                -- [ offset   <| ModelSpace 221.670662 39.350132 -132.558582
+                -- [ offset   <| ModelSpace 221.670662 0 -132.558582
+                [ offset   <| FloorCenter
+                , scale    <| Width 6.0
                 , forward  <| V3.i
                 ]
             , vehicle <|
