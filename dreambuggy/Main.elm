@@ -83,7 +83,7 @@ main =
                     , label "Voronoi Cube"
                     , position <| vec3 10 0 10
                     , object   <| Object.Appearance voronoiCube
-                    , portal   <|  Local (Become "boids")
+                    , portal   <| Local (Become "boids")
                     ]
 
                 , Obj.create
