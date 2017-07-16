@@ -53,7 +53,11 @@ reflectiveObjUpdate msg model =
         loadBody m =
             case ( m.mesh, m.reflectionTexture ) of
                 ( Ok mesh, Ok texture ) ->
-                    Ready (reflective mesh texture) (bounds (List.map .position mesh.vertices))
+                    let
+                        (modelOrigin, modelDimensions) =
+                            bounds (List.map .position mesh.vertices)
+                    in
+                        Ready (reflective mesh texture) modelDimensions
                 _ ->
                     Loading m
     in

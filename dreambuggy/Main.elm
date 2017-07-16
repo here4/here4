@@ -35,17 +35,19 @@ main =
           , backgroundColor = rgb 135 206 235
           , apps =
                 [ StaticGround.create Terrain.generate
-                , Sky.create skySphere
+                -- , Sky.create skySphere
                 , elmLogo
 
-                , Balls.create 30
+                -- , Balls.create 30
 
                 , textureCube
 
                 , deltaWedge
 
                 , buggy
+                , aston_martin
 
+{-
                 , Obj.create
                     [ id "clouds-sphere"
                     , label "Clouds Sphere"
@@ -93,6 +95,7 @@ main =
                     , position <| vec3 10 1.5 -10
                     , object   <| Object.Appearance fogMountainsCube (vec3 1 1 1)
                     ]
+-}
                 ]
           , defaultSelf = avatar 8.0
           }
@@ -227,6 +230,43 @@ buggy =
                     }
                 }
             ]
+
+
+aston_martin : ( App, Cmd AppMsg )
+aston_martin =
+    let
+        html =
+            Html.div []
+                [ Html.h2 []
+                    [ Html.text "Aston Martin" ]
+                , Html.br [] []
+                , Html.hr [] []
+                , DreamBuggy.overlay
+                ]
+    in
+        Obj.create
+            [ id "aston_martin"
+            , label "Aston Martin"
+            , position <| vec3 -12 0 43
+            , overlay  <| html
+            , object   <| Object.texturedObjWith
+                "aston_martin/DB9.obj"
+                "textures/elmLogoDiffuse.png"
+                "textures/elmLogoNorm.png"
+                [ offset   <| FloorCenter
+                , scale    <| Width 8.0
+                , forward  <| V3.j
+                ]
+            , vehicle <|
+                { drive = DreamBuggy.drive
+                , vehicle =
+                    { speed = 20.0
+                    , height = 1.2
+                    , radius = 1.0
+                    }
+                }
+            ]
+
 
 
 elmLogo : ( App, Cmd AppMsg )

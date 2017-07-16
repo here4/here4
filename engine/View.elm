@@ -351,7 +351,7 @@ renderWorld globalTime world eye windowSize player =
             , windowSize = windowSize
             , lensDistort = lensDistort
             , cameraVR = player.cameraVR
-            , measuredFPS = 30.0
+            , measuredFPS = 1 -- 30.0
             }
 
         skyLookAt =

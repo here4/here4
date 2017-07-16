@@ -21,6 +21,7 @@ import Orientation exposing (Orientation)
 import Task exposing (Task)
 import WebGL.Texture as Texture exposing (Texture, Error)
 
+import Debug
 
 type alias TexturedObjAttributes =
     { meshPath : String
@@ -76,6 +77,7 @@ texturedObjInit attributes =
 texturedObjUpdate : TexturedObjMsg -> Load TexturedObjResult -> (Load TexturedObjResult, Cmd TexturedObjMsg)
 texturedObjUpdate msg model =
     let
+        transform : (Vec3 -> Vec3) -> Mesh -> Mesh
         transform t mesh =
             let
                 mapTransform =
@@ -95,23 +97,26 @@ texturedObjUpdate msg model =
                         Obj.WithTextureAndTangent (updateVertices m)
 
 
-        translate rescale dimensions offset =
+        translate : (Vec3 -> Vec3) -> Vec3 -> Offset -> Vec3 -> Vec3
+        translate modelToWOrld worldDimensions offset =
             let
                 offset3 =
-                    offsetToVec3 rescale dimensions offset
+                    offsetToVec3 modelToWOrld worldDimensions offset
 
             in
                 \v -> V3.sub v offset3
 
 
+        rotate : Maybe Orientation -> Vec3 -> Vec3
         rotate rotation =
             Maybe.withDefault identity (Maybe.map Orientation.rotateBodyV rotation)
 
 
-        rescale dimensions scale =
+        rescale : Vec3 -> Maybe Orientation -> Scale -> Vec3 -> Vec3
+        rescale dimensions rotation scale =
             let
                 scale3 =
-                    scaleToVec3 dimensions scale
+                    scaleToVec3 (rotate rotation dimensions) scale
             in
                 M4.transform (M4.makeScale scale3)
 
@@ -124,20 +129,30 @@ texturedObjUpdate msg model =
                             Dict.values mesh
                                 |> List.concatMap Dict.values
 
-                        modelDimensions =
-                            bounds (List.concatMap positions meshes)
+                        (modelOrigin, modelDimensions) =
+                            bounds (debugBounds (List.concatMap positions meshes))
+                            |> Debug.log "modelDimensions"
 
-                        modelToWorld =
-                            rescale modelDimensions r.scale
-
+                        modelToWorld v =
+                            -- (uncentered modelPosition, modelOrientation)
+                            rotate r.rotation v
+                            -- (uncenetered modelPosition, worldOrientation)
+                            |> rescale modelDimensions r.rotation r.scale
+                            -- (uncenetered worldPosition, worldOrientation)
+                    
                         worldDimensions =
                             modelToWorld modelDimensions
+                            |> Debug.log "worldDimensions"
 
                         t : Vec3 -> Vec3
                         t v =
-                             modelToWorld v
-                             |> translate modelToWorld worldDimensions r.offset
-                             |> rotate r.rotation
+                            V3.sub v modelOrigin
+                            -- (uncentered modelPosition, modelOrientation)
+                            |> modelToWorld
+                            -- (uncenetered worldPosition, worldOrientation)
+                            -- offset (in world space)
+                            |> translate modelToWorld worldDimensions r.offset
+                            -- (centered worldPosition, worldOrientation)
 
                         newMeshes =
                             List.map (transform t) meshes
