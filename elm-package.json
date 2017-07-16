@@ -9,6 +9,7 @@
         "primitive",
         "terrain",
         "apps",
+        "object",
         "vehicles",
         "shufflepuck"
     ],
