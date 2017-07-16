@@ -1,11 +1,11 @@
-module Object.FlatTexture exposing
-    ( FlatTextureAttributes
-    , FlatTextureResult
-    , FlatTextureMsg(..)
-    , flatTextureInit
-    , flatTextureUpdate
-    )
-
+module Object.FlatTexture
+    exposing
+        ( FlatTextureAttributes
+        , FlatTextureResult
+        , FlatTextureMsg(..)
+        , flatTextureInit
+        , flatTextureUpdate
+        )
 
 import Appearance exposing (Appearance)
 import Body.Obj exposing (reflective)
@@ -27,34 +27,37 @@ type alias FlatTextureAttributes =
     , texturePath : String
     }
 
+
 type alias FlatTextureResult =
     { mesh : Mesh Vertex
     , texture : Result String Texture
     }
 
+
 type FlatTextureMsg
     = TextureLoaded (Result String Texture)
 
 
-flatTextureInit : FlatTextureAttributes -> (Load FlatTextureResult, Cmd FlatTextureMsg)
+flatTextureInit : FlatTextureAttributes -> ( Load FlatTextureResult, Cmd FlatTextureMsg )
 flatTextureInit attributes =
     ( Loading
-          { mesh = attributes.mesh
-          , texture = Err "Loading texture ..."
-          }
-    -- , Texture.load attributes.texturePath
-    --     |> Task.attempt TextureLoaded
+        { mesh = attributes.mesh
+        , texture = Err "Loading texture ..."
+        }
+      -- , Texture.load attributes.texturePath
+      --     |> Task.attempt TextureLoaded
     , loadTexture attributes.texturePath TextureLoaded
     )
 
 
-flatTextureUpdate : FlatTextureMsg -> Load FlatTextureResult -> (Load FlatTextureResult, Cmd FlatTextureMsg)
+flatTextureUpdate : FlatTextureMsg -> Load FlatTextureResult -> ( Load FlatTextureResult, Cmd FlatTextureMsg )
 flatTextureUpdate msg model =
     let
         loadBody m =
             case m.texture of
-                ( Ok texture_ ) ->
+                Ok texture_ ->
                     Ready (makeAppearance m.mesh texture_) (vec3 1 1 1)
+
                 _ ->
                     Loading m
     in
@@ -63,10 +66,10 @@ flatTextureUpdate msg model =
                 ( Ready appear dimensions, Cmd.none )
 
             Loading partial ->
-            
                 case msg of
                     TextureLoaded textureResult ->
                         ( loadBody { partial | texture = textureResult }, Cmd.none )
+
 
 loadTexture : String -> (Result String Texture -> msg) -> Cmd msg
 loadTexture url msg =

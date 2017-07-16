@@ -1,9 +1,9 @@
-module Object.Types exposing
-    ( Load(..)
-    , Scale(..)
-    , Offset(..)
-    )
-
+module Object.Types
+    exposing
+        ( Load(..)
+        , Scale(..)
+        , Offset(..)
+        )
 
 import Appearance exposing (Appearance)
 import Math.Vector3 exposing (Vec3)

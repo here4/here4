@@ -1,6 +1,7 @@
-module Obj exposing
-    ( create
-    )
+module Obj
+    exposing
+        ( create
+        )
 
 import App exposing (..)
 import App.Control exposing (..)
@@ -28,12 +29,11 @@ type alias Model vehicle =
     }
 
 
-type alias Msg
-    = ObjectMsg
+type alias Msg =
+    ObjectMsg
 
 
-
-create : List (Update (Attributes vehicle Msg)) -> (App, Cmd AppMsg)
+create : List (Update (Attributes vehicle Msg)) -> ( App, Cmd AppMsg )
 create updates =
     let
         create_ attributes =
@@ -57,20 +57,22 @@ applyMotion model =
     let
         orientation o =
             model.rotation
-            |> Maybe.map (Orientation.unwind o)
-            |> Maybe.withDefault o
+                |> Maybe.map (Orientation.unwind o)
+                |> Maybe.withDefault o
 
         apply motion thing =
-            { thing | position = motion.position
-                    , orientation = orientation motion.orientation
-                    , velocity = motion.velocity
+            { thing
+                | position = motion.position
+                , orientation = orientation motion.orientation
+                , velocity = motion.velocity
             }
     in
         { model | body = Maybe.map (apply model.motion) model.body }
 
 
 setMotion : Moving {} -> Model vehicle -> Model vehicle
-setMotion motion model = applyMotion { model | motion = motion }
+setMotion motion model =
+    applyMotion { model | motion = motion }
 
 
 loadBody :
@@ -78,12 +80,13 @@ loadBody :
     -> ( Load ObjectResult, Cmd ObjectMsg )
     -> Model vehicle
     -> ( Model vehicle, Cmd (CtrlMsg Msg) )
-loadBody scale (newObject, newMsg) model =
+loadBody scale ( newObject, newMsg ) model =
     let
-        (mBody, dimensions) =
+        ( mBody, dimensions ) =
             case newObject of
                 Loading _ ->
-                    (Nothing, vec3 1 1 1)
+                    ( Nothing, vec3 1 1 1 )
+
                 Ready appear dimensions ->
                     ( Just
                         { anchor = AnchorGround
@@ -92,15 +95,16 @@ loadBody scale (newObject, newMsg) model =
                         , orientation = Orientation.initial
                         , appear = appear
                         , velocity = vec3 0 0 0
-                       }
+                        }
                     , dimensions
                     )
     in
         ( applyMotion
-              { model | object = newObject
-                      , body = mBody
-                      , dimensions = dimensions
-              }
+            { model
+                | object = newObject
+                , body = mBody
+                , dimensions = dimensions
+            }
         , Cmd.map Self newMsg
         )
 
@@ -108,21 +112,22 @@ loadBody scale (newObject, newMsg) model =
 init : Attributes vehicle Msg -> ( Model vehicle, Cmd (CtrlMsg Msg) )
 init attributes =
     let
-        (object, objectCmds) =
+        ( object, objectCmds ) =
             objectInit attributes.object
     in
-      loadBody attributes.scale (object, objectCmds)
-          { motion =
-              { position = attributes.position
-              , orientation = Orientation.initial
-              , velocity = vec3 0 0 0
-              }
-          , rotation = attributes.rotation
-          , action = attributes.action
-          , body = Nothing
-          , object = object
-          , dimensions = vec3 1 1 1
-          }
+        loadBody attributes.scale
+            ( object, objectCmds )
+            { motion =
+                { position = attributes.position
+                , orientation = Orientation.initial
+                , velocity = vec3 0 0 0
+                }
+            , rotation = attributes.rotation
+            , action = attributes.action
+            , body = Nothing
+            , object = object
+            , dimensions = vec3 1 1 1
+            }
 
 
 update :
@@ -132,35 +137,34 @@ update :
     -> Model vehicle
     -> ( Model vehicle, Cmd (CtrlMsg Msg) )
 update scale action msg model =
-        case msg of
-            Self m ->
-                loadBody scale (objectUpdate m model.object) model
+    case msg of
+        Self m ->
+            loadBody scale (objectUpdate m model.object) model
 
-            Ctrl (Enter partyKey) ->
-                case action of
-                    Portal location ->
-                        ( model, teleport partyKey location )
+        Ctrl (Enter partyKey) ->
+            case action of
+                Portal location ->
+                    ( model, teleport partyKey location )
 
-                    _ ->
-                        ( model, Cmd.none )
+                _ ->
+                    ( model, Cmd.none )
 
-            Ctrl (Move dp) ->
-                -- ( mapBody (translate dp), Cmd.none)
-                ( model, Cmd.none )
+        Ctrl (Move dp) ->
+            -- ( mapBody (translate dp), Cmd.none)
+            ( model, Cmd.none )
 
-            Ctrl (Drive ground inputs) ->
-                case action of
-                    Vehicle v ->
-                        ( setMotion (v.drive v.vehicle model.dimensions ground inputs model.motion) model
-                        , Cmd.none
-                        )
+        Ctrl (Drive ground inputs) ->
+            case action of
+                Vehicle v ->
+                    ( setMotion (v.drive v.vehicle model.dimensions ground inputs model.motion) model
+                    , Cmd.none
+                    )
 
-                    _ ->
-                        ( model, Cmd.none )
+                _ ->
+                    ( model, Cmd.none )
 
-
-            _ ->
-                ( model, Cmd.none )
+        _ ->
+            ( model, Cmd.none )
 
 
 animate : Ground -> Time -> Model vehicle -> Model vehicle
@@ -168,17 +172,20 @@ animate ground dt model =
     let
         aboveGround pos =
             let
-                minY = ground.elevation pos
+                minY =
+                    ground.elevation pos
             in
                 if V3.getY pos > minY then
                     pos
                 else
                     V3.setY minY pos
 
-        motion = model.motion
+        motion =
+            model.motion
 
         newMotion =
-            { motion | position = aboveGround motion.position
+            { motion
+                | position = aboveGround motion.position
             }
     in
         setMotion newMotion model
@@ -199,10 +206,13 @@ reposition mPos model =
     case mPos of
         Just pos ->
             let
-                motion = model.motion
+                motion =
+                    model.motion
+
                 newMotion =
-                    { motion | position = pos.position
-                             , orientation = pos.orientation
+                    { motion
+                        | position = pos.position
+                        , orientation = pos.orientation
                     }
             in
                 setMotion newMotion model
@@ -220,16 +230,18 @@ focus : Model vehicle -> Maybe Focus
 focus model =
     Maybe.map appToFocus model.body
 
+
+
 {-
-overlay : Model vehicle -> Html msg
-overlay model =
-    let
-        textLeft =
-            Html.style [ ( "text-align", "left" ) ]
-    in
-        Html.div []
-            [ Html.h2 []
-                [ Html.text model.label ]
-            , Html.text "A statue"
-            ]
+   overlay : Model vehicle -> Html msg
+   overlay model =
+       let
+           textLeft =
+               Html.style [ ( "text-align", "left" ) ]
+       in
+           Html.div []
+               [ Html.h2 []
+                   [ Html.text model.label ]
+               , Html.text "A statue"
+               ]
 -}

@@ -1,11 +1,11 @@
-module Object.ReflectiveObj exposing
-    ( ReflectiveObjAttributes
-    , ReflectiveObjResult
-    , ReflectiveObjMsg(..)
-    , reflectiveObjInit
-    , reflectiveObjUpdate
-    )
-
+module Object.ReflectiveObj
+    exposing
+        ( ReflectiveObjAttributes
+        , ReflectiveObjResult
+        , ReflectiveObjMsg(..)
+        , reflectiveObjInit
+        , reflectiveObjUpdate
+        )
 
 import Appearance exposing (Appearance)
 import Body.Obj exposing (reflective)
@@ -24,22 +24,24 @@ type alias ReflectiveObjAttributes =
     , reflectionTexturePath : String
     }
 
+
 type alias ReflectiveObjResult =
     { mesh : Result String (MeshWith VertexWithTexture)
     , reflectionTexture : Result String Texture
     }
+
 
 type ReflectiveObjMsg
     = DiffTextureLoaded (Result String Texture)
     | LoadObj (Result String (MeshWith VertexWithTexture))
 
 
-reflectiveObjInit : ReflectiveObjAttributes -> (Load ReflectiveObjResult, Cmd ReflectiveObjMsg)
+reflectiveObjInit : ReflectiveObjAttributes -> ( Load ReflectiveObjResult, Cmd ReflectiveObjMsg )
 reflectiveObjInit attributes =
     ( Loading
-          { mesh = Err "Loading ..."
-          , reflectionTexture = Err "Loading texture ..."
-          }
+        { mesh = Err "Loading ..."
+        , reflectionTexture = Err "Loading texture ..."
+        }
     , Cmd.batch
         [ loadTexture attributes.reflectionTexturePath DiffTextureLoaded
         , OBJ.loadMesh attributes.meshPath LoadObj
@@ -47,17 +49,18 @@ reflectiveObjInit attributes =
     )
 
 
-reflectiveObjUpdate : ReflectiveObjMsg -> Load ReflectiveObjResult -> (Load ReflectiveObjResult, Cmd ReflectiveObjMsg)
+reflectiveObjUpdate : ReflectiveObjMsg -> Load ReflectiveObjResult -> ( Load ReflectiveObjResult, Cmd ReflectiveObjMsg )
 reflectiveObjUpdate msg model =
     let
         loadBody m =
             case ( m.mesh, m.reflectionTexture ) of
                 ( Ok mesh, Ok texture ) ->
                     let
-                        (modelOrigin, modelDimensions) =
+                        ( modelOrigin, modelDimensions ) =
                             bounds (List.map .position mesh.vertices)
                     in
                         Ready (reflective mesh texture) modelDimensions
+
                 _ ->
                     Loading m
     in
@@ -66,10 +69,10 @@ reflectiveObjUpdate msg model =
                 ( Ready appear dimensions, Cmd.none )
 
             Loading partial ->
-            
                 case msg of
                     DiffTextureLoaded textureResult ->
                         ( loadBody { partial | reflectionTexture = textureResult }, Cmd.none )
+
                     LoadObj meshResult ->
                         ( loadBody { partial | mesh = meshResult }, Cmd.none )
 
@@ -86,4 +89,3 @@ loadTexture url msg =
                     Err e ->
                         msg (Err ("Failed to load texture: " ++ toString e))
             )
-

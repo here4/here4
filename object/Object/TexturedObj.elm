@@ -1,12 +1,12 @@
-module Object.TexturedObj exposing
-    ( TexturedObjAttributes
-    , TexturedObjResult
-    , TexturedObjMsg(..)
-    , texturedObj
-    , texturedObjInit
-    , texturedObjUpdate
-    )
-
+module Object.TexturedObj
+    exposing
+        ( TexturedObjAttributes
+        , TexturedObjResult
+        , TexturedObjMsg(..)
+        , texturedObj
+        , texturedObjInit
+        , texturedObjUpdate
+        )
 
 import Appearance exposing (Appearance)
 import Body.Obj exposing (textured)
@@ -20,8 +20,8 @@ import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
 import Orientation exposing (Orientation)
 import Task exposing (Task)
 import WebGL.Texture as Texture exposing (Texture, Error)
-
 import Debug
+
 
 type alias TexturedObjAttributes =
     { meshPath : String
@@ -32,6 +32,7 @@ type alias TexturedObjAttributes =
     , rotation : Maybe Orientation
     }
 
+
 type alias TexturedObjResult =
     { mesh : Result String ObjFile
     , diffTexture : Result String Texture
@@ -41,10 +42,12 @@ type alias TexturedObjResult =
     , rotation : Maybe Orientation
     }
 
+
 type TexturedObjMsg
     = DiffTextureLoaded (Result String Texture)
     | NormTextureLoaded (Result String Texture)
     | LoadObj String (Result String (Dict String (Dict String Mesh)))
+
 
 texturedObj : String -> String -> String -> TexturedObjAttributes
 texturedObj meshPath diffuseTexturePath normalTexturePath =
@@ -56,16 +59,17 @@ texturedObj meshPath diffuseTexturePath normalTexturePath =
     , rotation = Nothing
     }
 
-texturedObjInit : TexturedObjAttributes -> (Load TexturedObjResult, Cmd TexturedObjMsg)
+
+texturedObjInit : TexturedObjAttributes -> ( Load TexturedObjResult, Cmd TexturedObjMsg )
 texturedObjInit attributes =
     ( Loading
-          { mesh = Err "Loading ..."
-          , diffTexture = Err "Loading texture ..."
-          , normTexture = Err "Loading texture ..."
-          , offset = attributes.offset
-          , scale = attributes.scale
-          , rotation = attributes.rotation
-          }
+        { mesh = Err "Loading ..."
+        , diffTexture = Err "Loading texture ..."
+        , normTexture = Err "Loading texture ..."
+        , offset = attributes.offset
+        , scale = attributes.scale
+        , rotation = attributes.rotation
+        }
     , Cmd.batch
         [ loadTexture attributes.diffuseTexturePath DiffTextureLoaded
         , loadTexture attributes.normalTexturePath NormTextureLoaded
@@ -74,7 +78,7 @@ texturedObjInit attributes =
     )
 
 
-texturedObjUpdate : TexturedObjMsg -> Load TexturedObjResult -> (Load TexturedObjResult, Cmd TexturedObjMsg)
+texturedObjUpdate : TexturedObjMsg -> Load TexturedObjResult -> ( Load TexturedObjResult, Cmd TexturedObjMsg )
 texturedObjUpdate msg model =
     let
         transform : (Vec3 -> Vec3) -> Mesh -> Mesh
@@ -96,7 +100,6 @@ texturedObjUpdate msg model =
                     Obj.WithTextureAndTangent m ->
                         Obj.WithTextureAndTangent (updateVertices m)
 
-
         translate : (Vec3 -> Vec3) -> Vec3 -> Vec3 -> Offset -> Vec3 -> Vec3
         translate modelToWOrld worldOrigin worldDimensions offset =
             let
@@ -105,11 +108,9 @@ texturedObjUpdate msg model =
             in
                 \v -> V3.sub v (Debug.log "summed offset" (V3.add worldOrigin offset3))
 
-
         rotate : Maybe Orientation -> Vec3 -> Vec3
         rotate rotation =
             Maybe.withDefault identity (Maybe.map Orientation.rotateBodyV rotation)
-
 
         rescale : Vec3 -> Maybe Orientation -> Scale -> Vec3 -> Vec3
         rescale dimensions rotation scale =
@@ -119,7 +120,6 @@ texturedObjUpdate msg model =
             in
                 M4.transform (M4.makeScale scale3)
 
-
         loadBody r =
             case ( r.mesh, r.diffTexture, r.normTexture ) of
                 ( Ok mesh, Ok diffTexture, Ok normTexture ) ->
@@ -128,30 +128,29 @@ texturedObjUpdate msg model =
                             Dict.values mesh
                                 |> List.concatMap Dict.values
 
-                        (modelOrigin, modelDimensions) =
+                        ( modelOrigin, modelDimensions ) =
                             bounds (debugBounds (List.concatMap positions meshes))
-                            |> Debug.log "modelDimensions"
-
+                                |> Debug.log "modelDimensions"
 
                         modelToWorld v =
                             rotate r.rotation v
-                            -- (uncenetered modelPosition, worldOrientation)
-                            |> rescale modelDimensions r.rotation r.scale
-                            -- (uncenetered worldPosition, worldOrientation)
+                                -- (uncenetered modelPosition, worldOrientation)
+                                |> rescale modelDimensions r.rotation r.scale
 
-                        (worldOrigin, worldDimensions) =
-                            transformBounds modelToWorld (modelOrigin, modelDimensions)
-                            |> Debug.log "(worldOrigin, worldDimensions)"
+                        -- (uncenetered worldPosition, worldOrientation)
+                        ( worldOrigin, worldDimensions ) =
+                            transformBounds modelToWorld ( modelOrigin, modelDimensions )
+                                |> Debug.log "(worldOrigin, worldDimensions)"
 
                         t : Vec3 -> Vec3
                         t v =
                             -- (uncentered modelPosition, modelOrientation)
                             modelToWorld v
-                            -- (uncenetered worldPosition, worldOrientation)
-                            -- offset (in world space)
-                            |> translate modelToWorld worldOrigin worldDimensions r.offset
-                            -- (centered worldPosition, worldOrientation)
+                                -- (uncenetered worldPosition, worldOrientation)
+                                -- offset (in world space)
+                                |> translate modelToWorld worldOrigin worldDimensions r.offset
 
+                        -- (centered worldPosition, worldOrientation)
                         newMeshes =
                             List.map (transform t) meshes
 
@@ -162,6 +161,7 @@ texturedObjUpdate msg model =
                             List.concatMap (\m -> appearMesh m p) newMeshes
                     in
                         Ready appear worldDimensions
+
                 _ ->
                     Loading r
     in
@@ -170,12 +170,13 @@ texturedObjUpdate msg model =
                 ( Ready appear dimensions, Cmd.none )
 
             Loading partial ->
-            
                 case msg of
                     DiffTextureLoaded textureResult ->
                         ( loadBody { partial | diffTexture = textureResult }, Cmd.none )
+
                     NormTextureLoaded textureResult ->
                         ( loadBody { partial | normTexture = textureResult }, Cmd.none )
+
                     LoadObj url meshResult ->
                         ( loadBody { partial | mesh = meshResult }, Cmd.none )
 
@@ -197,4 +198,3 @@ loadTexture url msg =
                     Err e ->
                         msg (Err ("Failed to load texture: " ++ toString e))
             )
-
