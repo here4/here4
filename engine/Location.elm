@@ -27,3 +27,19 @@ type Relative
 type OrientationSpec
     = FacingNorth
     | WithOrientation Orientation
+
+
+type Scale
+    = Scale3 Float Float Float
+    | Scale Float
+    | Dimensions Float Float Float
+    | Width Float
+    | Height Float
+    | Length Float
+
+
+type Offset
+    = ModelSpace Float Float Float
+    | WorldSpace Float Float Float
+    | Center
+    | FloorCenter

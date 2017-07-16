@@ -11,6 +11,7 @@ module Object.TexturedObj
 import Appearance exposing (Appearance)
 import Body.Obj exposing (textured)
 import Dict exposing (Dict)
+import Location exposing (Offset(..), Scale(..))
 import Math.Matrix4 as M4
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Object.Types exposing (..)

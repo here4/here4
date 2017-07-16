@@ -12,7 +12,6 @@ import Balls
 import Obj
 import Object
 import Object.Attributes exposing (..)
-import Object.Types exposing (..)
 import Orientation
 import Shufflepuck
 import Sky
