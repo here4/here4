@@ -62,7 +62,7 @@ main =
                     , position <| vec3 40 1.5 28
                     , object   <| Object.Appearance fogMountainsDiamond (vec3 2 2 2)
                     ]
-
+-}
                 , Obj.create
                     [ id "fire-cube"
                     , label "Fire Cube"
@@ -88,7 +88,7 @@ main =
                     , object   <| Object.Appearance voronoiCube (vec3 1 1 1)
                     , portal   <| Local (Become "boids")
                     ]
-
+{-
                 , Obj.create
                     [ id "landscape-cube"
                     , label "Landscape Cube"
@@ -215,18 +215,16 @@ buggy =
                 "OffRoad Car/Models/OFF -Road car  3D Models.obj"
                 "textures/elmLogoDiffuse.png"
                 "textures/elmLogoNorm.png"
-                -- [ offset   <| ModelSpace 221.670662 39.350132 -132.558582
-                -- [ offset   <| ModelSpace 221.670662 0 -132.558582
                 [ offset   <| FloorCenter
-                , scale    <| Width 6.0
+                , scale    <| Width 1.2
                 , forward  <| V3.i
                 ]
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
-                    { speed = 16.0
-                    , height = 1.2
-                    , radius = 1.0
+                    { speed = 4.0
+                    , height = 0.6
+                    , radius = 0.0
                     }
                 }
             ]
@@ -254,13 +252,13 @@ aston_martin =
                 "textures/elmLogoDiffuse.png"
                 "textures/elmLogoNorm.png"
                 [ offset   <| FloorCenter
-                , scale    <| Width 8.0
+                , scale    <| Width 2.061
                 , forward  <| V3.j
                 ]
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
-                    { speed = 20.0
+                    { speed = 30.0
                     , height = 1.2
                     , radius = 1.0
                     }
