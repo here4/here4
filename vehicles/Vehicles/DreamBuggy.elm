@@ -69,9 +69,6 @@ flatten v =
 turn : Driveable vehicle -> Vec3 -> Model.EyeLevel -> Float -> Float -> Moving a -> Moving a
 turn attributes dimensions eyeLevel dx dt motion =
     let
-        motionY =
-            eyeLevel motion.position
-
         vehicleWidth =
             V3.getX dimensions
 
@@ -135,7 +132,7 @@ turn attributes dimensions eyeLevel dx dt motion =
             0.4 * dx * dt
 
         targetOrientation =
-            if getY motion.position > (eyeLevel motion.position) + 5 then
+            if getY motion.position > (eyeLevel motion.position) + 0.5 then
                 -- spin if in the air
                 motion.orientation
                     |> rollUpright
@@ -158,8 +155,8 @@ goForward eyeLevel speed inputs motion =
     -- if getY motion.position > eyeLevel motion.position then motion else
     let
         accel =
-            if getY motion.position > (eyeLevel motion.position) + 5 then
-                0.0
+            if getY motion.position > (eyeLevel motion.position) + 0.5 then
+                -0.1
             else
                 clamp -1.0 1.0 <|
                     inputs.y
@@ -174,7 +171,7 @@ goForward eyeLevel speed inputs motion =
 
         -- e = (eyeLevel motion.position) / 80.0 -- placement.yMult
         e =
-            (eyeLevel motion.position) / 80.0
+            (eyeLevel motion.position) / 50.0
 
         friction =
             if e > 0.8 then
@@ -224,7 +221,7 @@ physics eyeLevel dt motion =
             getY motion.velocity
 
         ( pos_, dv ) =
-            if p.y < e then
+            if p.y < e+0.5 then
                 let
                     vy =
                         if ((e < (0.8 * 80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10 * dt) then

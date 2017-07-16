@@ -103,7 +103,7 @@ texturedObjUpdate msg model =
                 offset3 =
                     offsetToVec3 modelToWOrld worldDimensions offset
             in
-                \v -> V3.sub v (V3.add worldOrigin offset3)
+                \v -> V3.sub v (Debug.log "summed offset" (V3.add worldOrigin offset3))
 
 
         rotate : Maybe Orientation -> Vec3 -> Vec3

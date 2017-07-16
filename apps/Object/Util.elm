@@ -4,6 +4,7 @@ import Math.Vector3 as V3 exposing (Vec3, vec3)
 import OBJ.Types as Obj
 import Object.Types exposing (Scale(..), Offset(..))
 
+
 debugBounds : List Vec3 -> List Vec3
 debugBounds vertices =
     let

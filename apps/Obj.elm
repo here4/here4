@@ -168,7 +168,7 @@ animate ground dt model =
     let
         aboveGround pos =
             let
-                minY = 1.8 + ground.elevation pos
+                minY = ground.elevation pos
             in
                 if V3.getY pos > minY then
                     pos
