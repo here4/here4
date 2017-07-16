@@ -14,11 +14,11 @@ import Html exposing (Html)
 import Html.Attributes as Html
 import Location exposing (Scale(..))
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Object exposing (..)
 import Object.Attributes exposing (..)
 import Object.TexturedObj as TexturedObj exposing (TexturedObjAttributes)
 import Object.Types exposing (Load(..))
 import Object.Util exposing (scaleToVec3)
+import Object.Wrapper exposing (..)
 import Orientation exposing (Orientation)
 import Setter exposing (..)
 

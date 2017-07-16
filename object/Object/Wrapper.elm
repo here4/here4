@@ -1,4 +1,4 @@
-module Object
+module Object.Wrapper
     exposing
         ( objectInit
         , objectUpdate
