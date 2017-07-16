@@ -1,6 +1,8 @@
 module Obj
     exposing
         ( create
+        , texturedObj
+        , texturedObjWith
         )
 
 import App exposing (..)
@@ -14,6 +16,7 @@ import Location exposing (Scale(..))
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Object exposing (..)
 import Object.Attributes exposing (..)
+import Object.TexturedObj as TexturedObj exposing (TexturedObjAttributes)
 import Object.Types exposing (Load(..))
 import Object.Util exposing (scaleToVec3)
 import Orientation exposing (Orientation)
@@ -32,6 +35,25 @@ type alias Model vehicle =
 
 type alias Msg =
     ObjectMsg
+
+
+texturedObj : String -> String -> String -> ObjectAttributes
+texturedObj meshPath diffuseTexturePath normalTexturePath =
+    TexturedObj.texturedObj meshPath diffuseTexturePath normalTexturePath
+        |> TexturedObj
+
+
+texturedObjWith :
+    String
+    -> String
+    -> String
+    -> List (Update TexturedObjAttributes)
+    -> ObjectAttributes
+texturedObjWith meshPath diffuseTexturePath normalTexturePath updates =
+    TexturedObj.texturedObj meshPath diffuseTexturePath normalTexturePath
+        |> applyUpdates updates
+        |> TexturedObj
+
 
 
 create : List (Update (Attributes vehicle Msg)) -> ( App, Cmd AppMsg )

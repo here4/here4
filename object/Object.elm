@@ -1,61 +1,18 @@
 module Object
     exposing
-        ( ObjectAttributes(..)
-        , ObjectResult(..)
-        , ObjectMsg(..)
-        , objectInit
+        ( objectInit
         , objectUpdate
-        , texturedObj
-        , texturedObjWith
         )
 
-import Appearance exposing (Appearance)
 import Math.Vector3 exposing (Vec3)
-import Object.FlatTexture exposing (..)
-import Object.ReflectiveObj exposing (..)
-import Object.TexturedObj as TexturedObj exposing (..)
+import Object.Attributes exposing (ObjectAttributes(..), ObjectResult(..), ObjectMsg(..))
+import Object.FlatTexture exposing (flatTextureInit, flatTextureUpdate)
+import Object.ReflectiveObj exposing (reflectiveObjInit, reflectiveObjUpdate)
+import Object.TexturedObj exposing (texturedObjInit, texturedObjUpdate)
 import Object.Types exposing (Load(..))
 import Setter exposing (..)
 import Tuple
 
-
-type ObjectAttributes
-    = Invisible ()
-    | Appearance Appearance Vec3
-    | FlatTexture FlatTextureAttributes
-    | TexturedObj TexturedObjAttributes
-    | ReflectiveObj ReflectiveObjAttributes
-
-
-type ObjectResult
-    = InvisibleResult ()
-    | FlatTextureResult FlatTextureResult
-    | TexturedObjResult TexturedObjResult
-    | ReflectiveObjResult ReflectiveObjResult
-
-
-type ObjectMsg
-    = FlatTextureMsg FlatTextureMsg
-    | TexturedObjMsg TexturedObjMsg
-    | ReflectiveObjMsg ReflectiveObjMsg
-
-
-texturedObj : String -> String -> String -> ObjectAttributes
-texturedObj meshPath diffuseTexturePath normalTexturePath =
-    TexturedObj.texturedObj meshPath diffuseTexturePath normalTexturePath
-        |> TexturedObj
-
-
-texturedObjWith :
-    String
-    -> String
-    -> String
-    -> List (Update TexturedObjAttributes)
-    -> ObjectAttributes
-texturedObjWith meshPath diffuseTexturePath normalTexturePath updates =
-    TexturedObj.texturedObj meshPath diffuseTexturePath normalTexturePath
-        |> applyUpdates updates
-        |> TexturedObj
 
 
 wrap :

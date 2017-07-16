@@ -3,6 +3,9 @@ module Object.Attributes
         ( VehicleAttributes
         , Action(..)
         , Attributes
+        , ObjectAttributes(..)
+        , ObjectResult(..)
+        , ObjectMsg(..)
         , defaultAttributes
         , id
         , label
@@ -19,12 +22,15 @@ module Object.Attributes
 
 import App exposing (..)
 import App.Control exposing (CtrlMsg)
+import Appearance exposing (Appearance)
 import Body exposing (..)
 import Html exposing (Html)
 import Location exposing (..)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Model exposing (Inputs)
-import Object exposing (ObjectAttributes(..))
+import Object.FlatTexture exposing (..)
+import Object.ReflectiveObj exposing (..)
+import Object.TexturedObj as TexturedObj exposing (..)
 import Orientation exposing (Orientation)
 import Setter exposing (..)
 import Vehicle exposing (Driveable)
@@ -53,6 +59,27 @@ type alias Attributes vehicle msg =
     , object : ObjectAttributes
     , action : Action vehicle
     }
+
+
+type ObjectAttributes
+    = Invisible ()
+    | Appearance Appearance Vec3
+    | FlatTexture FlatTextureAttributes
+    | TexturedObj TexturedObjAttributes
+    | ReflectiveObj ReflectiveObjAttributes
+
+
+type ObjectResult
+    = InvisibleResult ()
+    | FlatTextureResult FlatTextureResult
+    | TexturedObjResult TexturedObjResult
+    | ReflectiveObjResult ReflectiveObjResult
+
+
+type ObjectMsg
+    = FlatTextureMsg FlatTextureMsg
+    | TexturedObjMsg TexturedObjMsg
+    | ReflectiveObjMsg ReflectiveObjMsg
 
 
 defaultAttributes : Attributes vehicle msg

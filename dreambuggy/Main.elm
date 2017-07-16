@@ -10,7 +10,6 @@ import Boids
 import BoxRoom
 import Balls
 import Obj
-import Object
 import Object.Attributes exposing (..)
 import Orientation
 import Shufflepuck
@@ -52,21 +51,21 @@ main =
                     , label "Clouds Sphere"
                     , position <| vec3 3 10 5
                     , overlay  <| Html.text "Clouds sphere"
-                    , object   <| Object.Appearance cloudsSphere (vec3 2 2 2)
+                    , object   <| Appearance cloudsSphere (vec3 2 2 2)
                     ]
 
                 , Obj.create
                     [ id "landscape-diamond"
                     , label "Landscape Diamond"
                     , position <| vec3 40 1.5 28
-                    , object   <| Object.Appearance fogMountainsDiamond (vec3 2 2 2)
+                    , object   <| Appearance fogMountainsDiamond (vec3 2 2 2)
                     ]
 -}
                 , Obj.create
                     [ id "fire-cube"
                     , label "Fire Cube"
                     , position <| vec3 21 0 -25
-                    , object   <| Object.Appearance fireCube (vec3 1 1 1)
+                    , object   <| Appearance fireCube (vec3 1 1 1)
                     , portal   <| Remote "world2" (Facing "fire-cube")
                     ]
 
@@ -74,7 +73,7 @@ main =
                     [ id "sky-diamond"
                     , label "Sky Diamond"
                     , position <| vec3 -15 1.5 21
-                    , object   <| Object.Appearance cloudsDiamond (vec3 2 2 2)
+                    , object   <| Appearance cloudsDiamond (vec3 2 2 2)
                     , portal   <| Remote "world2" (Behind "shufflepuck")
                     ]
 
@@ -84,7 +83,7 @@ main =
                     [ id "voronoi-cube"
                     , label "Voronoi Cube"
                     , position <| vec3 10 0 10
-                    , object   <| Object.Appearance voronoiCube (vec3 1 1 1)
+                    , object   <| Appearance voronoiCube (vec3 1 1 1)
                     , portal   <| Local (Become "boids")
                     ]
 {-
@@ -92,7 +91,7 @@ main =
                     [ id "landscape-cube"
                     , label "Landscape Cube"
                     , position <| vec3 10 1.5 -10
-                    , object   <| Object.Appearance fogMountainsCube (vec3 1 1 1)
+                    , object   <| Appearance fogMountainsCube (vec3 1 1 1)
                     ]
 -}
                 ]
@@ -118,7 +117,7 @@ main =
                     [ id "fire-cube"
                     , label "Fire Cube"
                     , position <| vec3 9 0 -14
-                    , object   <| Object.Appearance fireCube (vec3 1 1 1)
+                    , object   <| Appearance fireCube (vec3 1 1 1)
                     , portal   <| Remote "world1" (Facing "fire-cube")
                     ]
                 ]
@@ -150,7 +149,7 @@ deltaWedge =
             , label "Delta Wedge"
             , position <| vec3 23 0 12
             , overlay  <| html
-            , object   <| Object.Appearance wedge (vec3 1 1 1)
+            , object   <| Appearance wedge (vec3 1 1 1)
             , vehicle  <|
                 { drive = DreamBird.drive
                 , vehicle =
@@ -179,7 +178,7 @@ textureCube =
             , label "Wooden crate"
             , position <| vec3 -2 0 17
             , overlay html
-            , object <| Object.FlatTexture
+            , object <| FlatTexture
                 { mesh = cubeMesh
                 , texturePath = "resources/woodCrate.jpg"
                 }
@@ -210,7 +209,7 @@ buggy =
             , label "Buggy"
             , position <| vec3 37 0 43
             , overlay  <| html
-            , object   <| Object.texturedObjWith
+            , object   <| Obj.texturedObjWith
                 "OffRoad Car/Models/OFF -Road car  3D Models.obj"
                 "textures/elmLogoDiffuse.png"
                 "textures/elmLogoNorm.png"
@@ -246,7 +245,7 @@ aston_martin =
             , label "Aston Martin"
             , position <| vec3 -12 0 43
             , overlay  <| html
-            , object   <| Object.texturedObjWith
+            , object   <| Obj.texturedObjWith
                 "aston_martin/DB9.obj"
                 "textures/elmLogoDiffuse.png"
                 "textures/elmLogoNorm.png"
@@ -283,7 +282,7 @@ elmLogo =
             , label "Elm Logo"
             , position <| vec3 38 0 12
             , overlay  <| html
-            , object   <| Object.texturedObj
+            , object   <| Obj.texturedObj
                  "meshes/elmLogo.obj"
                  "textures/elmLogoDiffuse.png"
                  "textures/elmLogoNorm.png"
@@ -315,7 +314,7 @@ avatar speed =
             , label "Walking"
             , position <| vec3 0 10 0
             , overlay  <| html
-            , object <| Object.ReflectiveObj
+            , object <| ReflectiveObj
                 { meshPath = "meshes/suzanne.obj"
                 , reflectionTexturePath = "textures/elmLogoDiffuse.png"
                 }
