@@ -97,14 +97,13 @@ texturedObjUpdate msg model =
                         Obj.WithTextureAndTangent (updateVertices m)
 
 
-        translate : (Vec3 -> Vec3) -> Vec3 -> Offset -> Vec3 -> Vec3
-        translate modelToWOrld worldDimensions offset =
+        translate : (Vec3 -> Vec3) -> Vec3 -> Vec3 -> Offset -> Vec3 -> Vec3
+        translate modelToWOrld worldOrigin worldDimensions offset =
             let
                 offset3 =
                     offsetToVec3 modelToWOrld worldDimensions offset
-
             in
-                \v -> V3.sub v offset3
+                \v -> V3.sub v (V3.add worldOrigin offset3)
 
 
         rotate : Maybe Orientation -> Vec3 -> Vec3
@@ -133,25 +132,24 @@ texturedObjUpdate msg model =
                             bounds (debugBounds (List.concatMap positions meshes))
                             |> Debug.log "modelDimensions"
 
+
                         modelToWorld v =
-                            -- (uncentered modelPosition, modelOrientation)
                             rotate r.rotation v
                             -- (uncenetered modelPosition, worldOrientation)
                             |> rescale modelDimensions r.rotation r.scale
                             -- (uncenetered worldPosition, worldOrientation)
-                    
-                        worldDimensions =
-                            modelToWorld modelDimensions
-                            |> Debug.log "worldDimensions"
+
+                        (worldOrigin, worldDimensions) =
+                            transformBounds modelToWorld (modelOrigin, modelDimensions)
+                            |> Debug.log "(worldOrigin, worldDimensions)"
 
                         t : Vec3 -> Vec3
                         t v =
-                            V3.sub v modelOrigin
                             -- (uncentered modelPosition, modelOrientation)
-                            |> modelToWorld
+                            modelToWorld v
                             -- (uncenetered worldPosition, worldOrientation)
                             -- offset (in world space)
-                            |> translate modelToWorld worldDimensions r.offset
+                            |> translate modelToWorld worldOrigin worldDimensions r.offset
                             -- (centered worldPosition, worldOrientation)
 
                         newMeshes =
