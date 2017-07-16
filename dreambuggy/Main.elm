@@ -44,8 +44,8 @@ main =
 
                 , deltaWedge
 
-                , buggy
-                , aston_martin
+                -- , buggy
+                -- , aston_martin
 
 {-
                 , Obj.create
