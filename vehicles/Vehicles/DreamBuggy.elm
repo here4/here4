@@ -132,7 +132,7 @@ turn attributes dimensions eyeLevel dx dt motion =
                 vec3 0 y z
 
         steer =
-            0.1 * attributes.speed * dx * dt
+            0.4 * dx * dt
 
         targetOrientation =
             if getY motion.position > (eyeLevel motion.position) + 5 then
@@ -140,7 +140,7 @@ turn attributes dimensions eyeLevel dx dt motion =
                 motion.orientation
                     |> rollUpright
                     |> pitchUpright
-                    |> followedBy (fromAngleAxis steer V3.j)
+                    |> followedBy (fromAngleAxis (5.0 * steer) V3.j)
             else
                 motion.orientation
                     |> rollTo targetUpRoll
@@ -158,10 +158,13 @@ goForward eyeLevel speed inputs motion =
     -- if getY motion.position > eyeLevel motion.position then motion else
     let
         accel =
-            clamp -1.0 1.0 <|
-                inputs.y
-                    + inputs.rightTrigger
-                    - inputs.leftTrigger
+            if getY motion.position > (eyeLevel motion.position) + 5 then
+                0.0
+            else
+                clamp -1.0 1.0 <|
+                    inputs.y
+                        + inputs.rightTrigger
+                        - inputs.leftTrigger
 
         move =
             V3.scale (speed * accel) V3.k
@@ -171,7 +174,7 @@ goForward eyeLevel speed inputs motion =
 
         -- e = (eyeLevel motion.position) / 80.0 -- placement.yMult
         e =
-            (eyeLevel motion.position) / 30.0
+            (eyeLevel motion.position) / 80.0
 
         friction =
             if e > 0.8 then
@@ -197,7 +200,7 @@ goForward eyeLevel speed inputs motion =
             else
                 20
     in
-        { motion | velocity = adjustVelocity maxSpeed friction (add move strafe) inputs.dt motion.velocity }
+        { motion | velocity = adjustVelocity ((sqrt speed) * maxSpeed) friction (add move strafe) inputs.dt motion.velocity }
 
 
 adjustVelocity : Float -> Float -> Vec3 -> Float -> Vec3 -> Vec3
