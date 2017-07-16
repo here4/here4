@@ -9,7 +9,7 @@ import RAM
 import Boids
 import BoxRoom
 import Balls
-import Obj
+import Object
 import Object.Attributes exposing (..)
 import Orientation
 import Shufflepuck
@@ -46,7 +46,7 @@ main =
                 -- , aston_martin
 
 {-
-                , Obj.create
+                , Object.create
                     [ id "clouds-sphere"
                     , label "Clouds Sphere"
                     , position <| vec3 3 10 5
@@ -54,14 +54,14 @@ main =
                     , object   <| Appearance cloudsSphere (vec3 2 2 2)
                     ]
 
-                , Obj.create
+                , Object.create
                     [ id "landscape-diamond"
                     , label "Landscape Diamond"
                     , position <| vec3 40 1.5 28
                     , object   <| Appearance fogMountainsDiamond (vec3 2 2 2)
                     ]
 -}
-                , Obj.create
+                , Object.create
                     [ id "fire-cube"
                     , label "Fire Cube"
                     , position <| vec3 21 0 -25
@@ -69,7 +69,7 @@ main =
                     , portal   <| Remote "world2" (Facing "fire-cube")
                     ]
 
-                , Obj.create
+                , Object.create
                     [ id "sky-diamond"
                     , label "Sky Diamond"
                     , position <| vec3 -15 1.5 21
@@ -79,7 +79,7 @@ main =
 
                 , Boids.create 100
 
-                , Obj.create
+                , Object.create
                     [ id "voronoi-cube"
                     , label "Voronoi Cube"
                     , position <| vec3 10 0 10
@@ -87,7 +87,7 @@ main =
                     , portal   <| Local (Become "boids")
                     ]
 {-
-                , Obj.create
+                , Object.create
                     [ id "landscape-cube"
                     , label "Landscape Cube"
                     , position <| vec3 10 1.5 -10
@@ -113,7 +113,7 @@ main =
                             , position = vec3 0 0 0
                         }
 
-                , Obj.create
+                , Object.create
                     [ id "fire-cube"
                     , label "Fire Cube"
                     , position <| vec3 9 0 -14
@@ -144,7 +144,7 @@ deltaWedge =
                 , DreamBird.overlay
                 ]
     in
-        Obj.create
+        Object.create
             [ id "wedge"
             , label "Delta Wedge"
             , position <| vec3 23 0 12
@@ -173,7 +173,7 @@ textureCube =
                 , DreamBuggy.overlay
                 ]
     in
-        Obj.create
+        Object.create
             [ id "crate"
             , label "Wooden crate"
             , position <| vec3 -2 0 17
@@ -204,12 +204,12 @@ buggy =
                 , DreamBuggy.overlay
                 ]
     in
-        Obj.create
+        Object.create
             [ id "buggy"
             , label "Buggy"
             , position <| vec3 37 0 43
             , overlay  <| html
-            , object   <| Obj.texturedObjWith
+            , object   <| Object.texturedObjWith
                 "OffRoad Car/Models/OFF -Road car  3D Models.obj"
                 "textures/elmLogoDiffuse.png"
                 "textures/elmLogoNorm.png"
@@ -240,12 +240,12 @@ aston_martin =
                 , DreamBuggy.overlay
                 ]
     in
-        Obj.create
+        Object.create
             [ id "aston_martin"
             , label "Aston Martin"
             , position <| vec3 -12 0 43
             , overlay  <| html
-            , object   <| Obj.texturedObjWith
+            , object   <| Object.texturedObjWith
                 "aston_martin/DB9.obj"
                 "textures/elmLogoDiffuse.png"
                 "textures/elmLogoNorm.png"
@@ -277,12 +277,12 @@ elmLogo =
                 , DreamBuggy.overlay
                 ]
     in
-        Obj.create
+        Object.create
             [ id "elm-logo"
             , label "Elm Logo"
             , position <| vec3 38 0 12
             , overlay  <| html
-            , object   <| Obj.texturedObj
+            , object   <| Object.texturedObj
                  "meshes/elmLogo.obj"
                  "textures/elmLogoDiffuse.png"
                  "textures/elmLogoNorm.png"
@@ -309,7 +309,7 @@ avatar speed =
                 , Walking.overlay
                 ]
     in
-        Obj.create
+        Object.create
             [ id "avatar"
             , label "Walking"
             , position <| vec3 0 10 0

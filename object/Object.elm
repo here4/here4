@@ -1,4 +1,4 @@
-module Obj
+module Object
     exposing
         ( create
         , texturedObj
