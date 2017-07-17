@@ -3,6 +3,8 @@ module Object
         ( create
         , texturedObj
         , texturedObjWith
+        , reflectiveObj
+        , reflectiveObjWith
         )
 
 import App exposing (..)
@@ -15,6 +17,7 @@ import Html.Attributes as Html
 import Location exposing (Scale(..))
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Object.Attributes exposing (..)
+import Object.ReflectiveObj as ReflectiveObj exposing (ReflectiveObjAttributes)
 import Object.TexturedObj as TexturedObj exposing (TexturedObjAttributes)
 import Object.Types exposing (Load(..))
 import Object.Util exposing (scaleToVec3)
@@ -54,6 +57,22 @@ texturedObjWith meshPath diffuseTexturePath normalTexturePath updates =
         |> applyUpdates updates
         |> TexturedObj
 
+
+reflectiveObj : String -> String -> ObjectAttributes
+reflectiveObj meshPath reflectionTexturePath =
+    ReflectiveObj.reflectiveObj meshPath reflectionTexturePath
+        |> ReflectiveObj
+
+
+reflectiveObjWith :
+    String
+    -> String
+    -> List (Update ReflectiveObjAttributes)
+    -> ObjectAttributes
+reflectiveObjWith meshPath reflectionTexturePath updates =
+    ReflectiveObj.reflectiveObj meshPath reflectionTexturePath
+        |> applyUpdates updates
+        |> ReflectiveObj
 
 
 create : List (Update (Attributes vehicle Msg)) -> ( App, Cmd AppMsg )

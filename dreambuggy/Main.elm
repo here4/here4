@@ -314,10 +314,9 @@ avatar speed =
             , label "Walking"
             , position <| vec3 0 10 0
             , overlay  <| html
-            , object <| ReflectiveObj
-                { meshPath = "meshes/suzanne.obj"
-                , reflectionTexturePath = "textures/elmLogoDiffuse.png"
-                }
+            , object <| Object.reflectiveObj
+                "meshes/suzanne.obj"
+                "textures/elmLogoDiffuse.png"
             , vehicle <|
                 { drive = Walking.drive
                 , vehicle =
