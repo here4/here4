@@ -258,7 +258,7 @@ aston_martin =
                 , vehicle =
                     { speed = 30.0
                     , height = 1.2
-                    , radius = 1.0
+                    , radius = 0.0
                     }
                 }
             ]
