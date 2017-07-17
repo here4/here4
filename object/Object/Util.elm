@@ -1,7 +1,6 @@
 module Object.Util exposing (..)
 
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import OBJ.Types as Obj
 import Location exposing (Scale(..), Offset(..))
 
 
@@ -110,19 +109,6 @@ transformBounds f ( origin, dimensions ) =
             , vec3 x2 y2 z1
             , vec3 x2 y2 z2
             ]
-
-
-positions : Obj.Mesh -> List Vec3
-positions mesh =
-    case mesh of
-        Obj.WithoutTexture m ->
-            List.map .position m.vertices
-
-        Obj.WithTexture m ->
-            List.map .position m.vertices
-
-        Obj.WithTextureAndTangent m ->
-            List.map .position m.vertices
 
 
 scaleToVec3 : Vec3 -> Scale -> Vec3
