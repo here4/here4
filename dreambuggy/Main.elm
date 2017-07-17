@@ -314,15 +314,17 @@ avatar speed =
             , label "Walking"
             , position <| vec3 0 10 0
             , overlay  <| html
-            , object <| Object.reflectiveObj
+            , object <| Object.reflectiveObjWith
                 "meshes/suzanne.obj"
                 "textures/elmLogoDiffuse.png"
+                [ offset   <| FloorCenter
+                ]
             , vehicle <|
                 { drive = Walking.drive
                 , vehicle =
                     { speed = speed
-                    , height = 1.4
-                    , radius = 1.5
+                    , height = 0.0
+                    , radius = 0.5
                     }
                 }
             ]
