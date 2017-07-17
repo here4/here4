@@ -13,6 +13,7 @@ import Body.Obj exposing (reflective)
 import Dict exposing (Dict)
 import Location exposing (..)
 import Math.Vector3 as V3 exposing (vec3)
+import Object.ObjUtil exposing (loadMeshWithVertexWithTexture)
 import Object.Types exposing (Load(..))
 import Object.Util exposing (..)
 import OBJ
@@ -74,17 +75,20 @@ reflectiveObjInit attributes =
 reflectiveObjUpdate : ReflectiveObjMsg -> Load ReflectiveObjResult -> ( Load ReflectiveObjResult, Cmd ReflectiveObjMsg )
 reflectiveObjUpdate msg model =
     let
-        loadBody m =
-            case ( m.mesh, m.reflectionTexture ) of
+        loadBody r =
+            case ( r.mesh, r.reflectionTexture ) of
                 ( Ok mesh, Ok texture ) ->
                     let
-                        ( modelOrigin, modelDimensions ) =
-                            bounds (List.map .position mesh.vertices)
+                        (newMesh, worldDimensions) =
+                            loadMeshWithVertexWithTexture r.offset r.scale r.rotation mesh
+
+                        appear p =
+                            reflective newMesh texture p
                     in
-                        Ready (reflective mesh texture) modelDimensions
+                        Ready appear worldDimensions
 
                 _ ->
-                    Loading m
+                    Loading r
     in
         case model of
             Ready appear dimensions ->

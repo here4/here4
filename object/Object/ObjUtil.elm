@@ -1,4 +1,7 @@
-module Object.ObjUtil exposing (loadMesh)
+module Object.ObjUtil exposing
+    ( loadMesh
+    , loadMeshWithVertexWithTexture
+    )
 
 
 import Dict exposing (Dict)
@@ -7,7 +10,7 @@ import Math.Matrix4 as M4
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Orientation exposing (Orientation)
 import Object.Util exposing (..)
-import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
+import OBJ.Types as Obj exposing (ObjFile, Mesh(..), MeshWith, VertexWithTexture)
 
 
 -- | Load a mesh into world coordinates, with given offset, scale, rotation
@@ -56,6 +59,17 @@ loadMesh offset scale rotation mesh =
 
     in
         toWorldCoords offset scale rotation (List.concatMap positions) transformMeshes meshes
+
+
+loadMeshWithVertexWithTexture : Offset -> Scale -> Maybe Orientation
+    -> MeshWith VertexWithTexture
+    -> (MeshWith VertexWithTexture, Vec3)
+loadMeshWithVertexWithTexture offset scale rotation mesh =
+    let
+        ( modelOrigin, modelDimensions ) =
+            bounds (List.map .position mesh.vertices)
+    in
+        (mesh, modelDimensions)
 
 
 toWorldCoords : Offset -> Scale -> Maybe Orientation
