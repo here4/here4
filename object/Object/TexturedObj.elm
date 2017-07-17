@@ -121,39 +121,48 @@ texturedObjUpdate msg model =
             in
                 M4.transform (M4.makeScale scale3)
 
+        loadMesh offset scale rotation mesh =
+            let
+                meshes =
+                    Dict.values mesh
+                        |> List.concatMap Dict.values
+
+                ( modelOrigin, modelDimensions ) =
+                    bounds (debugBounds (List.concatMap positions meshes))
+                        |> Debug.log "modelDimensions"
+
+                modelToWorld v =
+                    rotate rotation v
+                        -- (uncenetered modelPosition, worldOrientation)
+                        |> rescale modelDimensions rotation scale
+
+                -- (uncenetered worldPosition, worldOrientation)
+                ( worldOrigin, worldDimensions ) =
+                    transformBounds modelToWorld ( modelOrigin, modelDimensions )
+                        |> Debug.log "(worldOrigin, worldDimensions)"
+
+                t : Vec3 -> Vec3
+                t v =
+                    -- (uncentered modelPosition, modelOrientation)
+                    modelToWorld v
+                        -- (uncenetered worldPosition, worldOrientation)
+                        -- offset (in world space)
+                        |> translate modelToWorld worldOrigin worldDimensions offset
+
+                -- (centered worldPosition, worldOrientation)
+                --
+                newMeshes =
+                   List.map (transform t) meshes
+            in
+                (newMeshes, worldDimensions)
+
+
         loadBody r =
             case ( r.mesh, r.diffTexture, r.normTexture ) of
                 ( Ok mesh, Ok diffTexture, Ok normTexture ) ->
                     let
-                        meshes =
-                            Dict.values mesh
-                                |> List.concatMap Dict.values
-
-                        ( modelOrigin, modelDimensions ) =
-                            bounds (debugBounds (List.concatMap positions meshes))
-                                |> Debug.log "modelDimensions"
-
-                        modelToWorld v =
-                            rotate r.rotation v
-                                -- (uncenetered modelPosition, worldOrientation)
-                                |> rescale modelDimensions r.rotation r.scale
-
-                        -- (uncenetered worldPosition, worldOrientation)
-                        ( worldOrigin, worldDimensions ) =
-                            transformBounds modelToWorld ( modelOrigin, modelDimensions )
-                                |> Debug.log "(worldOrigin, worldDimensions)"
-
-                        t : Vec3 -> Vec3
-                        t v =
-                            -- (uncentered modelPosition, modelOrientation)
-                            modelToWorld v
-                                -- (uncenetered worldPosition, worldOrientation)
-                                -- offset (in world space)
-                                |> translate modelToWorld worldOrigin worldDimensions r.offset
-
-                        -- (centered worldPosition, worldOrientation)
-                        newMeshes =
-                            List.map (transform t) meshes
+                        (newMeshes, worldDimensions) =
+                            loadMesh r.offset r.scale r.rotation mesh
 
                         appearMesh =
                             textured diffTexture normTexture
