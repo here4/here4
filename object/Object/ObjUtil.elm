@@ -1,6 +1,6 @@
 module Object.ObjUtil exposing
-    ( loadMesh
-    , loadMeshWithVertexWithTexture
+    ( toWorld_Mesh
+    , toWorld_MeshWithVertexWithTexture
     )
 
 
@@ -14,8 +14,8 @@ import OBJ.Types as Obj exposing (ObjFile, Mesh(..), MeshWith, VertexWithTexture
 
 
 -- | Load a mesh into world coordinates, with given offset, scale, rotation
-loadMesh : Offset -> Scale -> Maybe Orientation -> ObjFile -> (List Obj.Mesh, Vec3)
-loadMesh offset scale rotation mesh =
+toWorld_Mesh : Offset -> Scale -> Maybe Orientation -> ObjFile -> (List Obj.Mesh, Vec3)
+toWorld_Mesh offset scale rotation mesh =
     let
         positions : Obj.Mesh -> List Vec3
         positions mesh =
@@ -61,10 +61,10 @@ loadMesh offset scale rotation mesh =
         toWorldCoords offset scale rotation (List.concatMap positions) transformMeshes meshes
 
 
-loadMeshWithVertexWithTexture : Offset -> Scale -> Maybe Orientation
+toWorld_MeshWithVertexWithTexture : Offset -> Scale -> Maybe Orientation
     -> MeshWith VertexWithTexture
     -> (MeshWith VertexWithTexture, Vec3)
-loadMeshWithVertexWithTexture offset scale rotation mesh =
+toWorld_MeshWithVertexWithTexture offset scale rotation mesh =
     let
         getModelCoords : MeshWith VertexWithTexture -> List Vec3
         getModelCoords m =

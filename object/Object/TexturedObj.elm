@@ -13,7 +13,7 @@ import Body.Obj exposing (textured)
 import Dict exposing (Dict)
 import Location exposing (Offset(..), Scale(..))
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Object.ObjUtil exposing (loadMesh)
+import Object.ObjUtil exposing (toWorld_Mesh)
 import Object.Types exposing (..)
 import OBJ
 import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
@@ -86,7 +86,7 @@ texturedObjUpdate msg model =
                 ( Ok mesh, Ok diffTexture, Ok normTexture ) ->
                     let
                         (newMeshes, worldDimensions) =
-                            loadMesh r.offset r.scale r.rotation mesh
+                            toWorld_Mesh r.offset r.scale r.rotation mesh
 
                         appearMesh =
                             textured diffTexture normTexture

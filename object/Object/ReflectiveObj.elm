@@ -13,7 +13,7 @@ import Body.Obj exposing (reflective)
 import Dict exposing (Dict)
 import Location exposing (..)
 import Math.Vector3 as V3 exposing (vec3)
-import Object.ObjUtil exposing (loadMeshWithVertexWithTexture)
+import Object.ObjUtil exposing (toWorld_MeshWithVertexWithTexture)
 import Object.Types exposing (Load(..))
 import Object.Util exposing (..)
 import OBJ
@@ -80,7 +80,7 @@ reflectiveObjUpdate msg model =
                 ( Ok mesh, Ok texture ) ->
                     let
                         (newMesh, worldDimensions) =
-                            loadMeshWithVertexWithTexture r.offset r.scale r.rotation mesh
+                            toWorld_MeshWithVertexWithTexture r.offset r.scale r.rotation mesh
 
                         appear p =
                             reflective newMesh texture p
