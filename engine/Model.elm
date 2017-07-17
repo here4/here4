@@ -11,7 +11,7 @@ import Orientation exposing (Orientation)
 import Bag
 import Body exposing (Body, Oriented)
 import Camera.Types exposing (Camera, Shot)
-import Camera exposing (toCamera)
+import Camera exposing (defaultCamera)
 import Ground exposing (Ground)
 import Gamepad exposing (Gamepad, gamepads)
 
@@ -68,7 +68,9 @@ type alias Player msg =
     { partyKey : Maybe (WorldKey PartyKey)
     , rideLabel : String
     , focusKey : WorldKey AppKey
-    , camera : Camera
+    , camera : Camera -- smoothed, current view camera
+    , rawCamera : Camera
+    , recentRawCameras : List Camera
     , shot : Maybe Shot
     , cameraVR : Bool
     , overlayVisible : Bool
@@ -99,18 +101,13 @@ defaultMotion =
     }
 
 
-defaultCamera : Camera
-defaultCamera =
-    toCamera
-        { position = vec3 0 eyeLevel 0
-        , orientation = Orientation.initial
-        }
-
 
 defaultPlayer : Player msg
 defaultPlayer =
     { partyKey = Nothing
     , camera = defaultCamera
+    , rawCamera = defaultCamera
+    , recentRawCameras = []
     , shot = Nothing
     , rideLabel = ""
     , focusKey = WorldKey 0 (AppKey 0)

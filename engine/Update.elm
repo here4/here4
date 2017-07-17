@@ -511,16 +511,39 @@ updatePlayer terrain inputs dt label overlayContent mshot framing player0 =
                     , overlayContent = overlayContent
                 }
 
-            mapCamera f player =
-                { player | camera = f player.camera }
-
             shootFraming player =
                 case framing of
                     Just framing_ ->
-                        mapCamera (shoot terrain inputs dt shot framing_) player
+                        let
+                            keepAboveGround camera =
+                                reposition (aboveGround eyeLevel camera.position) camera
+
+                            -- coeffs = [ 0.9, 0.09, 0.01 ]
+                            coeffs = [ 0.6, 0.2, 0.1, 0.07, 0.03 ]
+                            -- coeffs = [ 0.35, 0.23, 0.16, 0.11, 0.07, 0.04, 0.02, 0.01, 0.008, 0.002 ]
+
+                            rawCamera =
+                                shoot terrain inputs dt shot framing_ player.rawCamera
+                                |> keepAboveGround
+
+                            newRecentRawCameras =
+                                List.take (List.length coeffs) (rawCamera :: player.recentRawCameras)
+
+                            newCamera =
+                                -- Camera.interpolate 0.6 camera rawCamera
+                                Camera.smooth coeffs newRecentRawCameras
+                        in
+                            { player | camera = newCamera
+                                     , rawCamera = rawCamera
+                                     , recentRawCameras = newRecentRawCameras
+                            }
 
                     Nothing ->
                         player
+
+{-
+            mapCamera f player =
+                { player | camera = f player.camera }
 
             smoothCamera player =
                 let
@@ -531,8 +554,10 @@ updatePlayer terrain inputs dt label overlayContent mshot framing player0 =
 
                     -- TODO: slerp between old and new camera orientations
                     -- (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
+
                 in
                     mapCamera (reposition cameraPos) player
+-}
 
             -- { player
             --     | camera = { c | position = cameraPos }
@@ -579,7 +604,6 @@ updatePlayer terrain inputs dt label overlayContent mshot framing player0 =
             player0
                 |> relabel
                 |> shootFraming
-                |> smoothCamera
 
 
 prevShot : Shot -> Shot

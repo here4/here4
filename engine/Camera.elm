@@ -2,6 +2,7 @@ module Camera exposing (..)
 
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Orientation exposing (Orientation)
+import Smooth
 
 import Body exposing (..)
 import Camera.Types exposing (..)
@@ -48,6 +49,13 @@ toFraming thing =
         }
 
 
+defaultCamera : Camera
+defaultCamera =
+    toCamera
+        { position = vec3 0 1.8 0
+        , orientation = Orientation.initial
+        }
+
 cameraUp : { a | orientation : Orientation } -> Vec3
 cameraUp thing =
     Orientation.rotateBodyV thing.orientation V3.j
@@ -68,3 +76,46 @@ retarget target camera =
 -- | Roll a cmaera to upright
 rollUpright : Camera -> Camera
 rollUpright camera = { camera | orientation = Orientation.rollUpright camera.orientation }
+
+
+interpolate : Float -> Camera -> Camera -> Camera
+interpolate alpha oldCamera newCamera =
+    { position =
+        V3.add
+            (V3.scale (1.0-alpha) oldCamera.position)
+            (V3.scale alpha newCamera.position)
+    , orientation =
+        newCamera.orientation
+    , target =
+        newCamera.target
+    , fovy =
+        ((1.0-alpha) * oldCamera.fovy) + (alpha * newCamera.fovy)
+    }
+
+
+-- | Given a list of coefficients, previous raw cameras and a new raw camera,
+-- return a new smoothed camera
+--
+-- Assume the input cameras is already reversed, such
+-- that it can be built by prepending new elements
+smooth : List Float -> List Camera -> Camera
+smooth coeffs cameras =
+    let
+        sum newCamera oldCamera =
+            { position = V3.add newCamera.position oldCamera.position
+            , orientation = newCamera.orientation
+            , target = newCamera.target
+            , fovy = newCamera.fovy + oldCamera.fovy
+            }
+
+
+        scale f camera =
+            { position = V3.scale f camera.position
+            , orientation = camera.orientation
+            , target = camera.target
+            , fovy = f * camera.fovy
+            }
+
+        pad = Maybe.withDefault defaultCamera (List.head cameras)
+    in
+        Smooth.smooth sum scale pad coeffs cameras
