@@ -14,6 +14,19 @@ import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
 loadMesh : Offset -> Scale -> Maybe Orientation -> ObjFile -> (List Obj.Mesh, Vec3)
 loadMesh offset scale rotation mesh =
     let
+        positions : Obj.Mesh -> List Vec3
+        positions mesh =
+            case mesh of
+                Obj.WithoutTexture m ->
+                    List.map .position m.vertices
+
+                Obj.WithTexture m ->
+                    List.map .position m.vertices
+
+                Obj.WithTextureAndTangent m ->
+                    List.map .position m.vertices
+
+
         transform : (Vec3 -> Vec3) -> Mesh -> Mesh
         transform t mesh =
             let
@@ -33,6 +46,25 @@ loadMesh offset scale rotation mesh =
                     Obj.WithTextureAndTangent m ->
                         Obj.WithTextureAndTangent (updateVertices m)
 
+        transformMeshes : (Vec3 -> Vec3) -> List Mesh -> List Mesh
+        transformMeshes t =
+            List.map (transform t)
+
+        meshes =
+            Dict.values mesh
+                |> List.concatMap Dict.values
+
+    in
+        toWorldCoords offset scale rotation (List.concatMap positions) transformMeshes meshes
+
+
+toWorldCoords : Offset -> Scale -> Maybe Orientation
+    -> (a -> List Vec3)
+    -> ((Vec3 -> Vec3) -> a -> a)
+    -> a
+    -> (a, Vec3)
+toWorldCoords offset scale rotation getModelCoords mapTransform model =
+    let
         translate : (Vec3 -> Vec3) -> Vec3 -> Vec3 -> Offset -> Vec3 -> Vec3
         translate modelToWOrld worldOrigin worldDimensions offset =
             let
@@ -53,12 +85,8 @@ loadMesh offset scale rotation mesh =
             in
                 M4.transform (M4.makeScale scale3)
 
-        meshes =
-            Dict.values mesh
-                |> List.concatMap Dict.values
-
         ( modelOrigin, modelDimensions ) =
-            bounds (debugBounds (List.concatMap positions meshes))
+            bounds (debugBounds (getModelCoords model))
                 |> Debug.log "modelDimensions"
 
         modelToWorld v =
@@ -82,21 +110,8 @@ loadMesh offset scale rotation mesh =
         -- (centered worldPosition, worldOrientation)
         --
         newMeshes =
-           List.map (transform t) meshes
+           (mapTransform t) model
     in
         (newMeshes, worldDimensions)
-
-
-positions : Obj.Mesh -> List Vec3
-positions mesh =
-    case mesh of
-        Obj.WithoutTexture m ->
-            List.map .position m.vertices
-
-        Obj.WithTexture m ->
-            List.map .position m.vertices
-
-        Obj.WithTextureAndTangent m ->
-            List.map .position m.vertices
 
 
