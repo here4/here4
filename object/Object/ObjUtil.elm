@@ -66,10 +66,18 @@ loadMeshWithVertexWithTexture : Offset -> Scale -> Maybe Orientation
     -> (MeshWith VertexWithTexture, Vec3)
 loadMeshWithVertexWithTexture offset scale rotation mesh =
     let
-        ( modelOrigin, modelDimensions ) =
-            bounds (List.map .position mesh.vertices)
+        getModelCoords : MeshWith VertexWithTexture -> List Vec3
+        getModelCoords m =
+            List.map .position m.vertices
+
+        transform : (Vec3 -> Vec3) -> MeshWith VertexWithTexture -> MeshWith VertexWithTexture
+        transform t mesh =
+            let
+                t_onto vertex = { vertex | position = t vertex.position }
+            in
+                { mesh | vertices = List.map t_onto mesh.vertices }
     in
-        (mesh, modelDimensions)
+        toWorldCoords offset scale rotation getModelCoords transform mesh
 
 
 toWorldCoords : Offset -> Scale -> Maybe Orientation
