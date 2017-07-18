@@ -25,7 +25,7 @@ type alias NoiseVertexInput =
 
 
 type alias NoiseVertexOutput =
-    { elm_FragColor : Vec4, elm_FragCoord : Vec2, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
+    { elm_FragColor : Vec4, elm_FragCoord : Vec2, worldPosition : Vec4, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
 
 
 type alias RippleNoiseVertexInput =
@@ -57,6 +57,7 @@ uniform mat4 iPerspective;
 uniform mat4 iLookAt;
 varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
+varying vec4 worldPosition;
 varying float iTextureScale;
 varying float iTimeScale;
 varying float iSmoothing;
@@ -95,6 +96,8 @@ void main () {
   } else {
     gl_Position = p;
   }
+
+  worldPosition = gl_Position;
 }
 
 |]
@@ -117,6 +120,7 @@ uniform mat4 iPerspective;
 uniform mat4 iLookAt;
 varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
+varying vec4 worldPosition;
 varying float iTextureScale;
 varying float iTimeScale;
 varying float iSmoothing;
@@ -155,6 +159,7 @@ void main () {
 
   elm_FragColor = color;
   elm_FragCoord = coord.xy;
+  worldPosition = gl_Position;
   iTextureScale = textureScale;
   iTimeScale = timeScale;
   iSmoothing = smoothing;
