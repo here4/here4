@@ -7,13 +7,10 @@ import WebGL.Settings exposing (cullFace, front)
 import WebGL.Settings.DepthTest as DepthTest
 import Appearance exposing (..)
 import Shaders.Obj as Shaders
-import OBJ
-import OBJ.Types as Obj exposing (VertexWithTexture)
 
-import Debug
 
-reflective : Obj.MeshWith VertexWithTexture -> WebGL.Texture -> Appearance
-reflective { vertices, indices } texture p =
+reflective : WebGL.Mesh { a | normal : Vec3, position : Vec3 } -> WebGL.Texture -> Appearance
+reflective mesh texture p =
     let
         resolution =
             vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
@@ -23,9 +20,6 @@ reflective { vertices, indices } texture p =
                 1.0
             else
                 0.0
-
-        mesh =
-            indexedTriangles vertices indices
     in
         [ entityWith [ DepthTest.default, cullFace front ]
             Shaders.reflectionVert

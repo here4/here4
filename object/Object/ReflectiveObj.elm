@@ -20,6 +20,7 @@ import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
 import Orientation exposing (Orientation)
 import Task exposing (Task)
+import WebGL exposing (indexedTriangles)
 import WebGL.Texture as Texture exposing (Texture, Error)
 
 
@@ -79,8 +80,11 @@ reflectiveObjUpdate msg model =
             case ( r.mesh, r.reflectionTexture ) of
                 ( Ok mesh, Ok texture ) ->
                     let
-                        (newMesh, worldDimensions) =
+                        ( {vertices, indices } , worldDimensions) =
                             toWorld_MeshWithVertexWithTexture r.offset r.scale r.rotation mesh
+
+                        newMesh =
+                            indexedTriangles vertices indices
 
                         appear p =
                             reflective newMesh texture p
