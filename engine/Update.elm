@@ -518,8 +518,9 @@ updatePlayer terrain inputs dt label overlayContent mshot framing player0 =
                             keepAboveGround camera =
                                 reposition (aboveGround eyeLevel camera.position) camera
 
+                            coeffs = [ 1.0 ]
                             -- coeffs = [ 0.9, 0.09, 0.01 ]
-                            coeffs = [ 0.6, 0.2, 0.1, 0.07, 0.03 ]
+                            -- coeffs = [ 0.6, 0.2, 0.1, 0.07, 0.03 ]
                             -- coeffs = [ 0.35, 0.23, 0.16, 0.11, 0.07, 0.04, 0.02, 0.01, 0.008, 0.002 ]
 
                             rawCamera =
