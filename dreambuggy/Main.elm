@@ -33,7 +33,7 @@ main =
           , backgroundColor = rgb 135 206 235
           , apps =
                 [ StaticGround.create Terrain.generate
-                -- , Sky.create skySphere
+                , Sky.create skySphere
                 , elmLogo
 
                 -- , Balls.create 30
@@ -42,8 +42,8 @@ main =
 
                 , deltaWedge
 
-                -- , buggy
-                -- , aston_martin
+                , buggy
+                , aston_martin
 
 {-
                 , Object.create
@@ -214,13 +214,13 @@ buggy =
                 "textures/elmLogoDiffuse.png"
                 "textures/elmLogoNorm.png"
                 [ offset   <| FloorCenter
-                , scale    <| Width 1.2
+                , scale    <| Width 1.6
                 , forward  <| V3.i
                 ]
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
-                    { speed = 4.0
+                    { speed = 10.0
                     , height = 0.6
                     , radius = 0.0
                     }
@@ -318,6 +318,7 @@ avatar speed =
                 "meshes/suzanne.obj"
                 "textures/elmLogoDiffuse.png"
                 [ offset   <| FloorCenter
+                , scale    <| Height 1.4
                 ]
             , vehicle <|
                 { drive = Walking.drive
