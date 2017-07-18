@@ -6,8 +6,6 @@ import WebGL exposing (..)
 import WebGL.Settings exposing (cullFace, front)
 import WebGL.Settings.DepthTest as DepthTest
 import Appearance exposing (..)
-import Shaders.TextureFragment exposing (textureFragment)
-import Shaders.WorldVertex exposing (Vertex, worldVertex)
 import Shaders.Obj as Shaders
 import OBJ
 import OBJ.Types as Obj exposing (VertexWithTexture)
@@ -47,8 +45,8 @@ reflective { vertices, indices } texture p =
         ]
 
 
-textured : WebGL.Texture -> WebGL.Texture -> Obj.Mesh -> Appearance
-textured textureDiff textureNorm mesh p =
+-- textured : WebGL.Mesh a -> Shader a u v -> Shader {} u v -> WebGL.Texture -> WebGL.Texture -> Appearance
+textured mesh vertexShader fragmentShader textureDiff textureNorm p =
     let
         resolution =
             vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
@@ -76,24 +74,8 @@ textured textureDiff textureNorm mesh p =
             , textureNorm = textureNorm
             , lightPosition = lightPos
             }
-
     in
-        case mesh of
-            Obj.WithoutTexture { vertices, indices } ->
-                [ renderCullFace Shaders.simpleVert Shaders.simpleFrag
-                    (indexedTriangles vertices indices) uniforms
-                ]
-
-            Obj.WithTexture { vertices, indices } ->
-                [ renderCullFace Shaders.noNormalVert Shaders.noNormalFrag
-                    (indexedTriangles vertices indices) uniforms
-                ]
-
-            Obj.WithTextureAndTangent { vertices, indices } ->
-                [ renderCullFace Shaders.normalVert Shaders.normalFrag
-                    (indexedTriangles vertices indices) uniforms
-                ]
-
+        [ renderCullFace vertexShader fragmentShader mesh uniforms ]
 
 {-
            [ entityWith [ DepthTest.default, cullFace front ]

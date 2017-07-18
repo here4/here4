@@ -18,7 +18,9 @@ import Object.Types exposing (..)
 import OBJ
 import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
 import Orientation exposing (Orientation)
+import Shaders.Obj as Shaders
 import Task exposing (Task)
+import WebGL exposing (indexedTriangles)
 import WebGL.Texture as Texture exposing (Texture, Error)
 import Debug
 
@@ -34,7 +36,7 @@ type alias TexturedObjAttributes =
 
 
 type alias TexturedObjResult =
-    { meshes : List Mesh
+    { meshes : List (Texture -> Texture -> Appearance)
     , worldDimensions : Maybe Vec3
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
@@ -87,11 +89,8 @@ texturedObjUpdate msg model =
             case ( r.worldDimensions, r.diffTexture, r.normTexture ) of
                 ( Just worldDimensions, Ok diffTexture, Ok normTexture ) ->
                     let
-                        appearMesh =
-                            textured diffTexture normTexture
-
                         appear p =
-                            List.concatMap (\m -> appearMesh m p) r.meshes
+                            List.concatMap (\f -> f diffTexture normTexture p) r.meshes
                     in
                         Ready appear worldDimensions
 
@@ -104,8 +103,23 @@ texturedObjUpdate msg model =
                     let
                         (newMeshes, worldDimensions) =
                             toWorld_Mesh r.offset r.scale r.rotation mesh
+
+                        makeAppearance mesh =
+                            case mesh of
+                                Obj.WithoutTexture { vertices, indices } ->
+                                    textured (indexedTriangles vertices indices)
+                                        Shaders.simpleVert Shaders.simpleFrag
+
+                                Obj.WithTexture { vertices, indices } ->
+                                    textured (indexedTriangles vertices indices)
+                                        Shaders.noNormalVert Shaders.noNormalFrag
+
+                                Obj.WithTextureAndTangent { vertices, indices } ->
+                                    textured (indexedTriangles vertices indices)
+                                        Shaders.normalVert Shaders.normalFrag
+
                     in
-                        { r | meshes = newMeshes
+                        { r | meshes = List.map makeAppearance newMeshes
                             , worldDimensions = Just worldDimensions
                         }
                 _ ->
