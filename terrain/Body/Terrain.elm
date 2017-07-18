@@ -157,26 +157,26 @@ ripplePaint how ripple placement terrain =
         visibleTerrain placement terrain (terrainGridMaybe 1 ripple placement paintedTerrain)
 
 
-visibleTerrain : Placement -> Array2D Float -> Array2D Body -> List Body
+visibleTerrain : Placement -> Array2D Float -> Array2D (List Body) -> List Body
 visibleTerrain placement terrain arr =
     let
         appears =
             Array2D.map
-                (\body -> Appearance.transform (M4.translate body.position) body.appear)
+                (List.map (\body -> Appearance.transform (M4.translate body.position) body.appear))
                 arr
     in
         List.map toBody
             [ { scale = vec3 1 1 1, position = vec3 0 0 0, orientation = Orientation.initial, appear = appearTerrain placement terrain appears } ]
 
 
-appearTerrain : Placement -> Array2D Float -> Array2D Appearance -> Appearance
+appearTerrain : Placement -> Array2D Float -> Array2D (List Appearance) -> Appearance
 appearTerrain placement terrain appears p =
     List.concat <|
         List.map (\appear -> appear p) <|
             nearby placement terrain p.cameraPos appears
 
 
-nearby : Placement -> Array2D Float -> Vec3 -> Array2D Appearance -> List Appearance
+nearby : Placement -> Array2D Float -> Vec3 -> Array2D (List Appearance) -> List Appearance
 nearby placement terrain pos appears =
     let
         ix0 =
@@ -186,7 +186,7 @@ nearby placement terrain pos appears =
             floor ((getZ pos - placement.zOffset) / (placement.zDelta * toFloat placement.tileSize))
 
         getXZ x z =
-            Array2D.getXY z x (\_ -> []) appears
+            Array2D.getXY z x [] appears
 
         -- The visible radius of tiles depends on the height of the camera
         r =
@@ -197,7 +197,7 @@ nearby placement terrain pos appears =
         ir =
             iradius r
     in
-        List.map (\( x, y ) -> getXZ (ix0 + x) (iz0 + y)) ir
+        List.concat (List.map (\( x, y ) -> getXZ (ix0 + x) (iz0 + y)) ir)
 
 
 
@@ -222,13 +222,13 @@ approxElevation placement terrain pos =
         getXZ ix0 iz0
 
 
-terrainGrid : Int -> Placement -> Array2D NoiseSurfaceVertex -> Array2D Body
+terrainGrid : Int -> Placement -> Array2D NoiseSurfaceVertex -> Array2D (List Body)
 terrainGrid skip placement =
     placeTerrain (noiseSurface2D skip) placement
         << tileTerrain skip placement.tileSize
 
 
-terrainGridMaybe : Int -> Float -> Placement -> Array2D (Maybe NoiseSurfaceVertex) -> Array2D Body
+terrainGridMaybe : Int -> Float -> Placement -> Array2D (Maybe NoiseSurfaceVertex) -> Array2D (List Body)
 terrainGridMaybe skip ripple placement =
     placeTerrain (rippleNoiseSurface2D skip ripple) placement
         << tileTerrain skip placement.tileSize
@@ -273,7 +273,7 @@ mkTile skip smallSide arr0 ( x0, y0 ) =
 -- placeTerrain : List (List ((List (List NoiseSurfaceVertex)), (Int, Int))) -> Array2D Body
 
 
-placeTerrain : (Placement -> ( Float, Float ) -> v -> Oriented (Visible {})) -> Placement -> List (List ( v, ( Int, Int ) )) -> Array2D Body
+placeTerrain : (Placement -> ( Float, Float ) -> v -> List (Oriented (Visible {}))) -> Placement -> List (List ( v, ( Int, Int ) )) -> Array2D (List Body)
 placeTerrain toSurface2D placement terrainsCoords =
     let
         terrainSurfacesCoords =
@@ -283,11 +283,13 @@ placeTerrain toSurface2D placement terrainsCoords =
             Array2D.fromLists terrainSurfacesCoords
     in
         Array2D.map
-            (\( s, ( x, z ) ) ->
-                toBody
+            (\( l, ( x, z ) ) ->
+                (List.map (\s -> toBody
                     { s
                         | scale = vec3 1 1 1
                         , position = vec3 (toFloat x * placement.xDelta) 0 (toFloat z * placement.zDelta)
-                    }
+                    })
+                    l
+                )
             )
             terrainz

@@ -46,9 +46,9 @@ surface2D :
     -> Placement
     -> ( Float, Float )
     -> List (List SurfaceVertex)
-    -> Oriented (Visible {})
+    -> List (Oriented (Visible {}))
 surface2D skip placement xz =
-    surface noiseVertex noiseColorFragment
+    List.map (surface noiseVertex noiseColorFragment)
         << surfaceMesh xz skip placement
         << List.map (List.map toNSV)
 
@@ -58,9 +58,9 @@ noiseSurface2D :
     -> Placement
     -> ( Float, Float )
     -> List (List NoiseSurfaceVertex)
-    -> Oriented (Visible {})
+    -> List (Oriented (Visible {}))
 noiseSurface2D skip placement xz =
-    surface noiseVertex noiseColorFragment
+    List.map (surface noiseVertex noiseColorFragment)
         << surfaceMesh xz skip placement
 
 
@@ -126,9 +126,9 @@ rippleNoiseSurface2D :
     -> Placement
     -> ( Float, Float )
     -> List (List (Maybe NoiseSurfaceVertex))
-    -> Oriented (Visible {})
+    -> List (Oriented (Visible {}))
 rippleNoiseSurface2D skip ripple placement xz =
-    rippleSurface rippleNoiseVertex noiseColorFragment ripple
+    List.map (rippleSurface rippleNoiseVertex noiseColorFragment ripple)
         << surfaceMeshMaybe xz skip placement
 
 
@@ -257,7 +257,7 @@ surfaceMesh :
     -> Int
     -> Placement
     -> List (List NoiseSurfaceVertex)
-    -> Mesh NoiseVertex
+    -> List (Mesh NoiseVertex)
 surfaceMesh ( rx, rz ) skip placement m =
     let
         zs =
@@ -266,7 +266,7 @@ surfaceMesh ( rx, rz ) skip placement m =
         rows =
             List.map2 (matRow ( rx, rz ) skip placement) (subsample skip zs) (subsample skip m)
     in
-        triangles <| List.concat <| List.map2 mkStrip rows (drop 1 rows)
+        [ triangles <| List.concat <| List.map2 mkStrip rows (drop 1 rows) ]
 
 
 
@@ -329,7 +329,7 @@ surfaceMeshMaybe :
     -> Int
     -> Placement
     -> List (List (Maybe NoiseSurfaceVertex))
-    -> Mesh NoiseVertex
+    -> List (Mesh NoiseVertex)
 surfaceMeshMaybe ( rx, rz ) skip placement m =
     let
         zs =
@@ -338,4 +338,4 @@ surfaceMeshMaybe ( rx, rz ) skip placement m =
         rows =
             List.map2 (matRowMaybe ( rx, rz ) skip placement) (subsample skip zs) (subsample skip m)
     in
-        triangles <| List.concat <| List.map2 mkStripMaybe rows (drop 1 rows)
+        [ triangles <| List.concat <| List.map2 mkStripMaybe rows (drop 1 rows) ]
