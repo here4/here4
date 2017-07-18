@@ -34,7 +34,8 @@ type alias TexturedObjAttributes =
 
 
 type alias TexturedObjResult =
-    { mesh : Result String ObjFile
+    { meshes : List Mesh
+    , worldDimensions : Maybe Vec3
     , diffTexture : Result String Texture
     , normTexture : Result String Texture
     , offset : Offset
@@ -63,7 +64,8 @@ texturedObj meshPath diffuseTexturePath normalTexturePath =
 texturedObjInit : TexturedObjAttributes -> ( Load TexturedObjResult, Cmd TexturedObjMsg )
 texturedObjInit attributes =
     ( Loading
-        { mesh = Err "Loading ..."
+        { meshes = []
+        , worldDimensions = Nothing
         , diffTexture = Err "Loading texture ..."
         , normTexture = Err "Loading texture ..."
         , offset = attributes.offset
@@ -82,22 +84,32 @@ texturedObjUpdate : TexturedObjMsg -> Load TexturedObjResult -> ( Load TexturedO
 texturedObjUpdate msg model =
     let
         loadBody r =
-            case ( r.mesh, r.diffTexture, r.normTexture ) of
-                ( Ok mesh, Ok diffTexture, Ok normTexture ) ->
+            case ( r.worldDimensions, r.diffTexture, r.normTexture ) of
+                ( Just worldDimensions, Ok diffTexture, Ok normTexture ) ->
                     let
-                        (newMeshes, worldDimensions) =
-                            toWorld_Mesh r.offset r.scale r.rotation mesh
-
                         appearMesh =
                             textured diffTexture normTexture
 
                         appear p =
-                            List.concatMap (\m -> appearMesh m p) newMeshes
+                            List.concatMap (\m -> appearMesh m p) r.meshes
                     in
                         Ready appear worldDimensions
 
                 _ ->
                     Loading r
+
+        loadMeshes meshResult r =
+            case meshResult of
+                Ok mesh ->
+                    let
+                        (newMeshes, worldDimensions) =
+                            toWorld_Mesh r.offset r.scale r.rotation mesh
+                    in
+                        { r | meshes = newMeshes
+                            , worldDimensions = Just worldDimensions
+                        }
+                _ ->
+                    r
     in
         case model of
             Ready appear dimensions ->
@@ -112,7 +124,7 @@ texturedObjUpdate msg model =
                         ( loadBody { partial | normTexture = textureResult }, Cmd.none )
 
                     LoadObj url meshResult ->
-                        ( loadBody { partial | mesh = meshResult }, Cmd.none )
+                        ( loadBody (loadMeshes meshResult partial), Cmd.none )
 
 
 loadModel : Bool -> String -> Cmd TexturedObjMsg
