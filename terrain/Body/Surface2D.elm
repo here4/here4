@@ -199,28 +199,29 @@ type alias VertexLike v =
         , normal : Vec3
     }
 
--- Make a triangle facet, with normals at all vertices pointing in the
--- same direction
-makeFacet :
-    VertexLike v -> VertexLike v -> VertexLike v
-    -> ( VertexLike v, VertexLike v, VertexLike v )
-makeFacet v1 v2 v3 =
+-- Make the next pair of vertices for a strip, with successive normals
+vertexPair : VertexLike v -> VertexLike v -> VertexLike v -> VertexLike v -> List (VertexLike v)
+vertexPair v1 v2 v3 v4 =
     let
-        p1 = v1.position
-        p2 = v2.position
-        p3 = v3.position
-        normal = V3.cross (V3.sub p2 p1) (V3.sub p3 p1)
-
-        setNormal v =
-            { v | normal = normal }
+        mkVertex u1 u2 u3 =
+            let
+                p1 = u1.position
+                p2 = u2.position
+                p3 = u3.position
+            in
+                { u1 | normal = V3.cross (V3.sub p2 p1) (V3.sub p3 p1) }
     in
-        ( setNormal v1, setNormal v2, setNormal v3)
+        [ mkVertex v1 v2 v3, mkVertex v2 v3 v4 ]
 
-mkStrip :
-    List (VertexLike v) -> List (VertexLike v)
-    -> List ( VertexLike v, VertexLike v, VertexLike v )
+
+mkStrip : List (VertexLike v) -> List (VertexLike v) -> List (VertexLike v)
 mkStrip vs1 vs2 =
-    map3 makeFacet vs1 vs2 (drop 1 vs1) ++ map3 makeFacet vs2 (drop 1 vs1) (drop 1 vs2)
+    case (vs1, vs2) of
+        ([v10, v11], [v20, v21]) ->
+            vertexPair v10 v20 v11 v21 ++ vertexPair v11 v21 v10 v20
+        ((v10::v11::r1), (v20::v21::r2)) ->
+            vertexPair v10 v20 v11 v21 ++ mkStrip (v11::r1) (v21::r2)
+        _ -> []
 
 
 matRow : ( Float, Float ) -> Int -> Placement -> Float -> List NoiseSurfaceVertex -> List NoiseVertex
@@ -266,12 +267,28 @@ surfaceMesh ( rx, rz ) skip placement m =
         rows =
             List.map2 (matRow ( rx, rz ) skip placement) (subsample skip zs) (subsample skip m)
     in
-        [ triangles <| List.concat <| List.map2 mkStrip rows (drop 1 rows) ]
+        List.map triangleStrip <| List.map2 mkStrip rows (drop 1 rows)
 
 
 
 ----------------------------------------------------------------------
 
+-- Make a triangle facet, with normals at all vertices pointing in the
+-- same direction
+makeFacet :
+    VertexLike v -> VertexLike v -> VertexLike v
+    -> ( VertexLike v, VertexLike v, VertexLike v )
+makeFacet v1 v2 v3 =
+    let
+        p1 = v1.position
+        p2 = v2.position
+        p3 = v3.position
+        normal = V3.cross (V3.sub p2 p1) (V3.sub p3 p1)
+
+        setNormal v =
+            { v | normal = normal }
+    in
+            ( setNormal v1, setNormal v2, setNormal v3)
 
 mkStripMaybe : List (Maybe (VertexLike v)) -> List (Maybe (VertexLike v))
     -> List ( VertexLike v, VertexLike v, VertexLike v )

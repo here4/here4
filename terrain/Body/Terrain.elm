@@ -191,7 +191,8 @@ nearby placement terrain pos appears =
         -- The visible radius of tiles depends on the height of the camera
         r =
             -- max 12 (floor ((getY pos - approxElevation placement terrain pos) / 10))
-            max 20 (floor ((getY pos - approxElevation placement terrain pos) / toFloat (placement.tileSize)))
+            -- max 20 (floor ((getY pos - approxElevation placement terrain pos) / toFloat (placement.tileSize)))
+            max 6 (floor ((getY pos - approxElevation placement terrain pos) / toFloat (placement.tileSize)))
 
         -- r = (max 64 (floor ((getY pos - approxElevation placement terrain pos)))) // placement.tileSize
         ir =
