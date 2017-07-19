@@ -38,10 +38,10 @@ debugBounds vertices =
         dvs vs =
             let
                 tup =
-                    ( Debug.log "mesh bounds:" (bounds vs), vs )
+                    ( bounds vs, vs )
 
                 tup2 =
-                    ( Debug.log "offsets:" (calcOffset ((bounds vs))), vs )
+                    ( calcOffset (bounds vs), vs )
             in
                 Tuple.second tup
     in

@@ -93,7 +93,7 @@ toWorldCoords offset scale rotation getModelCoords mapTransform model =
                 offset3 =
                     offsetToVec3 modelToWOrld worldDimensions offset
             in
-                \v -> V3.sub v (Debug.log "summed offset" (V3.add worldOrigin offset3))
+                \v -> V3.sub v (V3.add worldOrigin offset3)
 
         rotate : Maybe Orientation -> Vec3 -> Vec3
         rotate rotation =
@@ -109,7 +109,6 @@ toWorldCoords offset scale rotation getModelCoords mapTransform model =
 
         ( modelOrigin, modelDimensions ) =
             bounds (debugBounds (getModelCoords model))
-                |> Debug.log "modelDimensions"
 
         modelToWorld v =
             rotate rotation v
@@ -119,7 +118,6 @@ toWorldCoords offset scale rotation getModelCoords mapTransform model =
         -- (uncenetered worldPosition, worldOrientation)
         ( worldOrigin, worldDimensions ) =
             transformBounds modelToWorld ( modelOrigin, modelDimensions )
-                |> Debug.log "(worldOrigin, worldDimensions)"
 
         t : Vec3 -> Vec3
         t v =
