@@ -15,8 +15,10 @@ import Orientation
 import Shufflepuck
 import Sky
 import StaticGround
+import WaterWalls
 import Body.Terrain as Terrain
 import Body.Wedge exposing (wedge)
+import Placement exposing (defaultPlacement)
 import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube, cubeMesh)
 import Primitive.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Primitive.Sphere exposing (skySphere, cloudsSphere)
@@ -33,6 +35,7 @@ main =
           , backgroundColor = rgb 135 206 235
           , apps =
                 [ StaticGround.create Terrain.generate
+                , WaterWalls.create defaultPlacement
                 , Sky.create skySphere
                 , elmLogo
 
