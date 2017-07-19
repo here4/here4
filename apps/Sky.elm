@@ -35,7 +35,7 @@ create appear =
 
 init : Appearance -> ( Model, Cmd (CtrlMsg Msg) )
 init appear =
-    ( anchorSky <| resize 80 <| put (vec3 0 1 1) appear, Cmd.none )
+    ( anchorSky <| resize 300 <| put (vec3 0 0 0) appear, Cmd.none )
 
 
 update : CtrlMsg Msg -> Model -> ( Model, Cmd (CtrlMsg Msg) )
