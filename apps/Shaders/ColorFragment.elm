@@ -129,7 +129,7 @@ void texture(vec2 tc) {
 	vec4 fractalTexture = vec4(c * cos(1.57 * gl_FragCoord.y / iResolution.y), elm_FragColor.a);
         vec4 flatTexture = elm_FragColor;
         //gl_FragColor = mix(fractalTexture, flatTexture, iSmoothing);
-        float lightenDistance = clamp (0.9, 1.0, 1.0 - (float(worldPosition.w)/100.0));
+        float lightenDistance = clamp (0.9, 1.0, 1.0 - (float(worldPosition.w)/200.0));
         gl_FragColor = mix(fractalTexture, flatTexture, iSmoothing) * lightenDistance;
 }
 
