@@ -8,11 +8,15 @@ module Primitive.Cube exposing
     , voronoiCube
     , cube
     , walls
+    , wallsWith
     , floor
+    , floorWith
     , ceiling
     , cubeMesh
     , wallsMesh
+    , wallsMeshWith
     , floorMesh
+    , floorMeshWith
     , ceilingMesh
     )
 
@@ -73,15 +77,21 @@ walls : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appe
 walls = render wallsMesh
 
 
+-- wallsWith : (Vertex -> v) -> Shader v ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+wallsWith f = renderNSV (wallsMeshWith f)
+
+
 floor : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 floor = render floorMesh
+
+floorWith f = renderNSV (floorMeshWith f)
 
 
 ceiling : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 ceiling = render ceilingMesh
 
 
-render : Mesh Vertex -> Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+-- render : Mesh vertex -> Shader vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 render mesh vertexShader fragmentShader p =
     let
         resolution =
@@ -105,6 +115,37 @@ render mesh vertexShader fragmentShader p =
             , iLensDistort = p.lensDistort
             , iPerspective = p.perspective
             , iLookAt = p.lookAt
+            }
+        ]
+
+renderNSV mesh vertexShader fragmentShader p =
+    let
+        resolution =
+            vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
+
+        s =
+            p.globalTime
+
+        detail =
+            p.measuredFPS / 3.0
+
+        iHMD =
+            if p.cameraVR then
+                1.0
+            else
+                0.0
+    in
+        [ entity vertexShader
+            fragmentShader
+            mesh
+            { iResolution = resolution
+            , iHMD = iHMD
+            , iGlobalTime = s
+            , iLensDistort = p.lensDistort
+            , iPerspective = p.perspective
+            , iLookAt = p.lookAt
+            , iDetail = detail
+            , iGlobalTimeV = s
             }
         ]
 
@@ -133,6 +174,9 @@ textureCube texture p =
             }
         ]
 
+map3 : (a -> b) -> Triple a -> Triple b
+map3 f (v1, v2, v3) = (f v1, f v2, f v3)
+
 
 cubeMesh : Mesh Vertex
 cubeMesh =
@@ -143,10 +187,18 @@ wallsMesh : Mesh Vertex
 wallsMesh =
     triangles <| List.concatMap rotatedFace [ ( 0, 0, 0 ), ( 0, 90, 1 ), ( 0, 180, 2 ), ( 0, 270, 3 ) ]
 
+wallsMeshWith : (Vertex -> v) -> Mesh v
+wallsMeshWith f =
+    triangles <| List.map (map3 f) <| List.concatMap rotatedFace [ ( 0, 0, 0 ), ( 0, 90, 1 ), ( 0, 180, 2 ), ( 0, 270, 3 ) ]
+
 
 floorMesh : Mesh Vertex
 floorMesh =
     triangles <| List.concatMap rotatedFace [ ( 90, 0, 0 ) ]
+
+floorMeshWith : (Vertex -> v) -> Mesh v
+floorMeshWith f =
+    triangles <| List.map (map3 f) <| List.concatMap rotatedFace [ ( 90, 0, 0 ) ]
 
 
 ceilingMesh : Mesh Vertex

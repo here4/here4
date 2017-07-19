@@ -259,14 +259,17 @@ layoutSceneVR windowSize model view =
             ]
 
 
-bodyAppear : Mat4 -> Perception -> Body -> List WebGL.Entity
-bodyAppear skyLookAt p body =
+bodyAppear : Mat4 -> Mat4 -> Perception -> Body -> List WebGL.Entity
+bodyAppear elevLookAt skyLookAt p body =
     let
         rotate =
             Appearance.transform (Orientation.rotateLabM4 body.orientation)
 
         translate =
             Appearance.transform (M4.translate body.position)
+
+        translateY dy =
+            Appearance.transform (M4.translate (vec3 0 (getY body.position - dy) 0))
 
         scale =
             Appearance.transform (M4.scale body.scale)
@@ -279,6 +282,12 @@ bodyAppear skyLookAt p body =
                         >> rotate
                         >> translate
 
+                Body.AnchorElevation dy ->
+                    body.appear
+                        |> scale
+                        >> rotate
+                        >> translateY dy
+
                 Body.AnchorSky ->
                     body.appear
                         |> scale
@@ -288,12 +297,18 @@ bodyAppear skyLookAt p body =
                     body.appear
                         |> scale
 
+        elevPerception =
+            { p | lookAt = elevLookAt }
+
         skyPerception =
             { p | lookAt = skyLookAt }
     in
         case body.anchor of
             Body.AnchorGround ->
                 appear p
+
+            Body.AnchorElevation dy ->
+                appear elevPerception
 
             Body.AnchorSky ->
                 appear skyPerception
@@ -357,8 +372,11 @@ renderWorld globalTime world eye windowSize player =
         skyLookAt =
             lookAtSky windowSize player
 
+        elevLookAt =
+            lookAtElev windowSize player
+
         appears =
-            List.concat <| List.map (bodyAppear skyLookAt p) world.bodies
+            List.concat <| List.map (bodyAppear elevLookAt skyLookAt p) world.bodies
     in
         appears
 
@@ -376,6 +394,15 @@ lookAtBody { width, height } player eye =
         (add player.camera.position (scale 3 (Model.direction player.camera)))
         (cameraUp player.camera)
 
+
+lookAtElev : Window.Size -> Model.Player msg -> Mat4
+lookAtElev { width, height } player =
+    let
+        cameraY = vec3 0 (getY player.camera.position) 0
+    in
+        M4.makeLookAt cameraY
+            (add cameraY (scale 3 (Model.direction player.camera)))
+            (cameraUp player.camera)
 
 lookAtSky : Window.Size -> Model.Player msg -> Mat4
 lookAtSky { width, height } player =

@@ -9,6 +9,7 @@ import Orientation exposing (Orientation)
 
 type Anchor
     = AnchorGround
+    | AnchorElevation Float
     | AnchorSky
     | AnchorHUD
 
