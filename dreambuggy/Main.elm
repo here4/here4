@@ -283,12 +283,16 @@ elmLogo =
         Object.create
             [ id "elm-logo"
             , label "Elm Logo"
-            , position <| vec3 38 0 12
+            , position <| vec3 38 30 -112
             , overlay  <| html
-            , object   <| Object.texturedObj
-                 "meshes/elmLogo.obj"
-                 "textures/elmLogoDiffuse.png"
-                 "textures/elmLogoNorm.png"
+            -- , forward  <| V3.negate V3.k
+            , object   <| Object.texturedObjWith
+                "meshes/elmLogo.obj"
+                "textures/elmLogoDiffuse.png"
+                "textures/elmLogoNorm.png"
+                [ offset   <| Center -- WorldSpace 0 20 0
+                , scale    <| Height 20
+                ]
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
