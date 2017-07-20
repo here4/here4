@@ -133,7 +133,8 @@ void texture(vec2 tc) {
 
         float lightenDistance = worldPosition.w * 0.01;
 
-        gl_FragColor *= 1.0 - lightenDistance * vec4(0.07, 0.09, 0.10, 0.15);
+        //gl_FragColor *= 1.0 - lightenDistance * vec4(0.07, 0.09, 0.10, 0.15);
+        gl_FragColor *= 1.0 - lightenDistance * vec4(0.18, 0.21, 0.24, 0.15);
 }
 
 void hmd() {
