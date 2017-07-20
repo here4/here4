@@ -237,7 +237,7 @@ aston_martin =
         html =
             Html.div []
                 [ Html.h2 []
-                    [ Html.text "Aston Martin" ]
+                    [ Html.text "Aston Martin DB9" ]
                 , Html.br [] []
                 , Html.hr [] []
                 , DreamBuggy.overlay
@@ -245,7 +245,7 @@ aston_martin =
     in
         Object.create
             [ id "aston_martin"
-            , label "Aston Martin"
+            , label "Aston Martin DB9"
             , position <| vec3 -12 0 43
             , overlay  <| html
             , object   <| Object.texturedObjWith
