@@ -65,6 +65,7 @@ attribute vec4 tangent;
 varying vec2 vTexCoord;
 varying vec3 vLightDirection;
 varying vec3 vViewDirection;
+varying vec4 worldPosition;
 
 
 uniform mat4 modelViewProjectionMatrix;
@@ -95,6 +96,7 @@ void main()
     vViewDirection = tbn*(viewPosition - posWorld);
     vTexCoord = texCoord;
     gl_Position = modelViewProjectionMatrix * pos;
+    worldPosition = gl_Position;
 }
 |]
 
@@ -109,6 +111,7 @@ uniform sampler2D textureNorm;
 varying vec2 vTexCoord;
 varying vec3 vLightDirection;
 varying vec3 vViewDirection;
+varying vec4 worldPosition;
 
 void main() {
 
@@ -140,7 +143,11 @@ void main() {
     float attenuation = 1.0 / (1.0 + lightAttenuation * pow(length(vLightDirection), 2.0));
 
     vec3 final_color = ambient + (diffuse + specular) * attenuation;
+
     gl_FragColor = vec4(final_color, 1.0);
+
+    float lightenDistance = worldPosition.w * 0.01;
+    gl_FragColor *= 1.0 - lightenDistance * vec4(0.18, 0.21, 0.24, 0.15);
 }
 |]
 
@@ -157,6 +164,7 @@ varying vec2 vTexCoord;
 varying vec3 vLightDirection;
 varying vec3 vViewDirection;
 varying vec3 vNormal;
+varying vec4 worldPosition;
 
 uniform mat4 modelViewProjectionMatrix;
 uniform mat4 modelMatrix;
@@ -174,6 +182,7 @@ void main()
     // this is incorrect, it should use the normal matrix
     vNormal = mat3(modelMatrix) * normal;
     gl_Position = modelViewProjectionMatrix * pos;
+    worldPosition = gl_Position;
 }
 |]
 
@@ -188,6 +197,7 @@ varying vec2 vTexCoord;
 varying vec3 vLightDirection;
 varying vec3 vViewDirection;
 varying vec3 vNormal;
+varying vec4 worldPosition;
 
 void main()
 {
@@ -218,7 +228,11 @@ void main()
     float attenuation = 1.0 / (1.0 + lightAttenuation * pow(length(vLightDirection), 2.0));
 
     vec3 final_color = ambient + (diffuse + specular) * attenuation;
+
     gl_FragColor = vec4(final_color, 1.0);
+
+    float lightenDistance = worldPosition.w * 0.01;
+    gl_FragColor *= 1.0 - lightenDistance * vec4(0.18, 0.21, 0.24, 0.15);
 }
 |]
 
@@ -233,6 +247,7 @@ attribute vec3 normal;
 varying vec3 vLightDirection;
 varying vec3 vViewDirection;
 varying vec3 vNormal;
+varying vec4 worldPosition;
 
 uniform mat4 modelViewProjectionMatrix;
 uniform mat4 modelMatrix;
@@ -250,6 +265,7 @@ void main()
     vNormal = mat3(modelMatrix) * normal;
     vNormal = normal;
     gl_Position = modelViewProjectionMatrix * pos;
+    worldPosition = gl_Position;
 }
 |]
 
@@ -261,6 +277,7 @@ precision mediump float;
 varying vec3 vLightDirection;
 varying vec3 vViewDirection;
 varying vec3 vNormal;
+varying vec4 worldPosition;
 
 void main()
 {
@@ -292,5 +309,8 @@ void main()
 
     vec3 final_color = ambient + (diffuse + specular) * attenuation;
     gl_FragColor = vec4(final_color, 1.0);
+
+    float lightenDistance = worldPosition.w * 0.01;
+    gl_FragColor *= 1.0 - lightenDistance * vec4(0.18, 0.21, 0.24, 0.15);
 }
 |]
