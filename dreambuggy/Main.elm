@@ -319,19 +319,19 @@ avatar speed =
         Object.create
             [ id "avatar"
             , label "Walking"
-            , position <| vec3 0 10 0
+            , position <| vec3 0 0 0
             , overlay  <| html
             , object <| Object.reflectiveObjWith
                 "meshes/suzanne.obj"
                 "textures/elmLogoDiffuse.png"
                 [ offset   <| FloorCenter
-                , scale    <| Height 1.4
+                , scale    <| Height 0.6
                 ]
             , vehicle <|
                 { drive = Walking.drive
                 , vehicle =
                     { speed = speed
-                    , height = 0.0
+                    , height = 1.0
                     , radius = 0.5
                     }
                 }
