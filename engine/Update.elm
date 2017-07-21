@@ -610,17 +610,17 @@ updatePlayer terrain inputs dt label overlayContent mshot framing player0 =
 prevShot : Shot -> Shot
 prevShot shot =
     if shot.label == pov.label then
-        arc
+        zoom
     else if shot.label == tracking.label then
         pov
-    else if shot.label == dollyZoom.label then
+    else if shot.label == arc.label then
         tracking
     else if shot.label == dolly.label then
-        dollyZoom
-    else if shot.label == zoom.label then
+        arc
+    else if shot.label == dollyZoom.label then
         dolly
-    else if shot.label == arc.label then
-        zoom
+    else if shot.label == zoom.label then
+        dollyZoom
     else
         tracking
 
@@ -630,14 +630,14 @@ nextShot shot =
     if shot.label == pov.label then
         tracking
     else if shot.label == tracking.label then
-        dollyZoom
-    else if shot.label == dollyZoom.label then
-        dolly
-    else if shot.label == dolly.label then
-        zoom
-    else if shot.label == zoom.label then
         arc
     else if shot.label == arc.label then
+        dolly
+    else if shot.label == dolly.label then
+        dollyZoom
+    else if shot.label == dollyZoom.label then
+        zoom
+    else if shot.label == zoom.label then
         pov
     else
         tracking
