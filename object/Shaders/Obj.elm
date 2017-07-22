@@ -14,12 +14,18 @@ Here are some relevant links:
 
 -}
 reflectionVert =
-    GLSLPasta.combine [ Lighting.vertexReflection ]
-        |> WebGL.unsafeShader
+    GLSLPasta.combine
+        [ Lighting.vertexReflection
+        , Lighting.worldPosition
+        ]
+    |> WebGL.unsafeShader
 
 
 reflectionFrag =
-    GLSLPasta.combine [ Lighting.fragmentReflection ]
+    GLSLPasta.combine
+        [ Lighting.fragmentReflection
+        , Lighting.lightenDistance
+        ]
         |> WebGL.unsafeShader
 
 
@@ -27,34 +33,52 @@ reflectionFrag =
 <http://www.gamasutra.com/blogs/RobertBasler/20131122/205462/Three_Normal_Mapping_Techniques_Explained_For_the_Mathematically_Uninclined.php?print=1>
 -}
 normalVert =
-    GLSLPasta.combine [ Lighting.vertexNormal ]
+    GLSLPasta.combine
+        [ Lighting.vertexNormal
+        , Lighting.worldPosition
+        ]
         |> WebGL.unsafeShader
 
 
 normalFrag =
-    GLSLPasta.combine [ Lighting.fragmentNormal ]
+    GLSLPasta.combine
+        [ Lighting.fragmentNormal
+        , Lighting.lightenDistance
+        ]
         |> WebGL.unsafeShader
 
 
 {-| same as the normal mapping shader, but without deforming normals.
 -}
 noNormalVert =
-    GLSLPasta.combine [ Lighting.vertexNoNormal ]
+    GLSLPasta.combine
+        [ Lighting.vertexNoNormal
+        , Lighting.worldPosition
+        ]
         |> WebGL.unsafeShader
 
 
 noNormalFrag =
-    GLSLPasta.combine [ Lighting.fragmentNoNormal ]
+    GLSLPasta.combine
+        [ Lighting.fragmentNoNormal
+        , Lighting.lightenDistance
+        ]
         |> WebGL.unsafeShader
 
 
 {-| same as above, but without any textures.
 -}
 simpleVert =
-    GLSLPasta.combine [ Lighting.vertexSimple ]
+    GLSLPasta.combine
+        [ Lighting.vertexSimple
+        , Lighting.worldPosition
+        ]
         |> WebGL.unsafeShader
 
 
 simpleFrag =
-    GLSLPasta.combine [ Lighting.fragmentSimple ]
+    GLSLPasta.combine
+        [ Lighting.fragmentSimple
+        , Lighting.lightenDistance
+        ]
         |> WebGL.unsafeShader
