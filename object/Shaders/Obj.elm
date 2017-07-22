@@ -1,5 +1,7 @@
 module Shaders.Obj exposing (..)
 
+import GLSLPasta
+import GLSLPasta.Lighting as Lighting
 import WebGL
 
 
@@ -10,46 +12,12 @@ Here are some relevant links:
 * <http://www.ozone3d.net/tutorials/glsl_texturing_p04.php>
 -}
 reflectionVert =
-    [glsl|
-
-attribute vec3 position;
-attribute vec3 normal;
-uniform mat4 mvMat;
-uniform mat4 camera;
-varying vec3 vNormal;
-
-void main()
-{
-    vec4 vertex4 = mvMat * vec4(position, 1.0);
-    vNormal = vec3(mvMat * vec4(normal, 0.0));
-    vec3 nm_z = normalize(vec3(vertex4));
-    vec3 nm_x = cross(nm_z, vec3(0.0, 1.0, 0.0));
-    vec3 nm_y = cross(nm_x, nm_z);
-    vNormal = vec3(dot(vNormal, nm_x), dot(vNormal, nm_y), dot(vNormal, nm_z));
-    gl_Position = camera * vertex4;
-}
-
-|]
-
+    GLSLPasta.combine [ Lighting.vertexPosition, Lighting.vertexReflection ]
+    |> WebGL.unsafeShader
 
 reflectionFrag =
-    [glsl|
-precision mediump float;
-
-uniform sampler2D texture;
-
-varying vec3 vNormal;
-
-void main()
-{
-    vec2 texCoord = vec2(0.5 * vNormal.x + 0.5, - 0.5 * vNormal.y - 0.5);
-    vec4 fragColor = texture2D(texture, texCoord);
-    fragColor.a = 1.0;
-
-    gl_FragColor = fragColor;
-}
-
-|]
+    GLSLPasta.combine [ Lighting.fragmentReflection ]
+    |> WebGL.unsafeShader
 
 
 {-| normal mapping according to:
