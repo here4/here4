@@ -14,7 +14,7 @@ Here are some relevant links:
 
 -}
 reflectionVert =
-    GLSLPasta.combine [ Lighting.vertexPosition, Lighting.vertexReflection ]
+    GLSLPasta.combine [ Lighting.vertexReflection ]
         |> WebGL.unsafeShader
 
 
