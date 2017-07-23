@@ -30,7 +30,7 @@
         "jystic/elm-font-awesome": "2.0.0 <= v < 3.0.0",
         "kfish/dynamic": "2.1.0 <= v < 3.0.0",
         "kfish/elm-gamepad": "3.4.0 <= v < 4.0.0",
-        "kfish/glsl-pasta": "1.0.0 <= v < 2.0.0",
+        "kfish/glsl-pasta": "3.0.0 <= v < 4.0.0",
         "kfish/quaternion": "2.0.0 <= v < 3.0.0",
         "ohanhi/keyboard-extra": "3.0.4 <= v < 4.0.0"
     },
