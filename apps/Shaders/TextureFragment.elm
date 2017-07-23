@@ -1,19 +1,19 @@
 module Shaders.TextureFragment exposing (textureFragment, hmdTemplate)
 
 import GLSLPasta
-import GLSLPasta.Types exposing (Global(..), Template)
+import GLSLPasta.Core exposing (empty)
+import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (Vec3)
 import WebGL exposing (Shader, Texture)
 
 
-hmdTemplate : Template
+hmdTemplate : GLSLPasta.Template
 hmdTemplate =
     { id = "hmdTemplate"
     , globals =
         [ Uniform "vec3" "iResolution"
         , Uniform "float" "iHMD"
-        , Uniform "sampler2D" "iTexture"
         , Varying "vec3" "elm_FragColor"
         , Varying "vec2" "elm_FragCoord"
         , Const "vec2" "Scale" "vec2(0.1469278, 0.2350845)"
@@ -29,8 +29,6 @@ __PASTA_GLOBALS__
 
 __PASTA_FUNCTIONS__
 
-__PASTA_SPLICES__
-
 // Scales input texture coordinates for distortion.
 vec2 HmdWarp(vec2 in01, vec2 LensCenter)
 {
@@ -40,6 +38,11 @@ vec2 HmdWarp(vec2 in01, vec2 LensCenter)
         HmdWarpParam.z * rSq * rSq +
         HmdWarpParam.w * rSq * rSq * rSq);
     return LensCenter + Scale * rvector;
+}
+
+void paintFragCoord(vec2 fragCoord)
+{
+    __PASTA_SPLICES__
 }
 
 void hmd() {
@@ -55,19 +58,33 @@ void hmd() {
         return;
     }
 
-    gl_FragColor = texture2D(iTexture, tc);
+    paintFragCoord(tc);
 }
 
 void main() {
     if (iHMD == 1.0)
         hmd();
     else
-        gl_FragColor = texture2D(iTexture, elm_FragCoord);
+        paintFragCoord(elm_FragCoord);
 }
 """
     }
 
+textureCoord : GLSLPasta.Component
+textureCoord =
+    { empty
+        | id = "textureCoord"
+        , globals =
+            [ Uniform "sampler2D" "iTexture"
+            ]
+        , splices =
+            [ """
+            gl_FragColor = texture2D(iTexture, fragCoord);
+"""
+            ]
+    }
+
 textureFragment : Shader {} { u | iResolution : Vec3, iHMD : Float, iTexture : Texture } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
 textureFragment =
-    GLSLPasta.combineUsingTemplate hmdTemplate []
+    GLSLPasta.combineUsingTemplate hmdTemplate [ textureCoord ]
     |> WebGL.unsafeShader
