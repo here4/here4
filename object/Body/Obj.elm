@@ -25,7 +25,11 @@ reflective mesh texture p =
             Shaders.reflectionVert
             Shaders.reflectionFrag
             mesh
-            { camera = p.perspective, mvMat = p.lookAt, texture = texture }
+            { camera = p.perspective
+            , mvMat = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
+            , texture = texture
+            }
 
         {-
            { iResolution = resolution

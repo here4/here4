@@ -16,7 +16,7 @@ Here are some relevant links:
 reflectionVert =
     GLSLPasta.combine
         [ Lighting.vertexReflection
-        , Lighting.vertex_vertexPosition
+        , Lighting.vertex_clipPosition
         ]
     |> WebGL.unsafeShader
 
@@ -35,7 +35,7 @@ reflectionFrag =
 normalVert =
     GLSLPasta.combine
         [ Lighting.vertexNormal
-        , Lighting.vertex_vertexPosition
+        , Lighting.vertex_clipPosition
         ]
         |> WebGL.unsafeShader
 
@@ -53,7 +53,7 @@ normalFrag =
 noNormalVert =
     GLSLPasta.combine
         [ Lighting.vertexNoNormal
-        , Lighting.vertex_vertexPosition
+        , Lighting.vertex_clipPosition
         ]
         |> WebGL.unsafeShader
 
@@ -71,7 +71,7 @@ noNormalFrag =
 simpleVert =
     GLSLPasta.combine
         [ Lighting.vertexSimple
-        , Lighting.vertex_vertexPosition
+        , Lighting.vertex_clipPosition
         ]
         |> WebGL.unsafeShader
 
