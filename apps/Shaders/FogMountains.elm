@@ -236,9 +236,9 @@ vec4 fogMountains(vec2 tc)
     }
 
 
-fogMountains : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
+fogMountains : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 fogMountains =
-    GLSLPasta.combineUsingTemplate hmdTemplate
+    GLSLPasta.combineUsingTemplate hmdTemplate "fogMountains"
         [ fragment_fogMountains
         , Lighting.lightenDistance
         ]

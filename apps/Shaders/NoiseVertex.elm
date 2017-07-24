@@ -48,7 +48,7 @@ type alias RippleNoiseVertexInput =
 
 noiseVertex : Shader NoiseVertex NoiseVertexInput NoiseVertexOutput
 noiseVertex =
-    GLSLPasta.combine
+    GLSLPasta.combine "noiseVertex"
         [ perspective
         , vertex_elm_FragColor
         , vertex_elm_FragCoord
@@ -61,7 +61,7 @@ noiseVertex =
 
 rippleNoiseVertex : Shader NoiseVertex RippleNoiseVertexInput NoiseVertexOutput
 rippleNoiseVertex =
-    GLSLPasta.combine
+    GLSLPasta.combine "rippleNoiseVertex"
         [ vertex_ripple
         , perspective
         , vertex_elm_FragColor

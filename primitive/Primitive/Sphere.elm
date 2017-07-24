@@ -17,7 +17,7 @@ import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 spheres :
     Int
-    -> Shader {} ShaderPerception { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
+    -> Shader {} ShaderPerception { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
     -> List (Oriented (Visible {}))
 spheres n fragmentShader =
     map (always (sphere worldVertex fragmentShader)) (List.range 0 n)

@@ -9,7 +9,7 @@ import WebGL exposing (..)
 -- https://www.shadertoy.com/view/Xt33WX
 
 
-kintsugi : Shader {} { u | iResolution : Vec3, iGlobalTime : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
+kintsugi : Shader {} { u | iResolution : Vec3, iGlobalTime : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 kintsugi =
     [glsl|
 
@@ -19,6 +19,7 @@ uniform float iGlobalTime;
 
 varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
+varying vec4 clipPosition;
 
 //
 // Description : Array and textureless GLSL 2D simplex noise function.

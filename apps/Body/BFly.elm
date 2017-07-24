@@ -14,7 +14,7 @@ import Orientation
 type alias BoidVertex =
     { pos : Vec3, color : Vec4, coord : Vec3, wing : Vec3 }
 
-
+{-
 type alias BoidShaderInput =
     { flapL : Mat4
     , flapR : Mat4
@@ -29,14 +29,15 @@ type alias BoidShaderInput =
 
 type alias BoidVertexShader =
     Shader BoidVertex BoidShaderInput
+-}
 
 
-bfly : Shader {} BoidShaderInput { elm_FragColor : Vec4, elm_FragCoord : Vec2 } -> Float -> Oriented (Visible {})
+-- bfly : Shader {} BoidShaderInput { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 } -> Float -> Oriented (Visible {})
 bfly fragmentShader f01 =
     makeBFly bflyVertex fragmentShader (f01 * second * pi * 2)
 
 
-makeBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Oriented (Visible {})
+-- makeBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Oriented (Visible {})
 makeBFly vertexShader fragmentShader flapStart =
     let
         appear =
@@ -45,7 +46,7 @@ makeBFly vertexShader fragmentShader flapStart =
         { scale = vec3 1 1 1, position = (vec3 7 0 4), orientation = Orientation.initial, appear = appear }
 
 
-appearBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Appearance
+-- appearBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Appearance
 appearBFly vertexShader fragmentShader flapStart p =
     let
         resolution =
@@ -106,7 +107,7 @@ mesh =
         triangles <| [ ( bHead, bTail, bLeft ), ( bHead, bTail, bRight ) ]
 
 
-bflyVertex : Shader BoidVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
+bflyVertex : Shader BoidVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2 , clipPosition : Vec4 }
 bflyVertex =
     [glsl|
 
@@ -121,6 +122,7 @@ uniform mat4 flapL;
 uniform mat4 flapR;
 varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
+varying vec4 clipPosition;
 
 vec4 distort(vec4 p)
 {

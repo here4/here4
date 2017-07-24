@@ -70,11 +70,11 @@ voronoiCube =
 
 
 
-cube : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+-- cube : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 cube = render cubeMesh
 
 
-walls : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+-- walls : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 walls = render wallsMesh
 
 
@@ -82,13 +82,13 @@ walls = render wallsMesh
 wallsWith f = renderNSV (wallsMeshWith f)
 
 
-floor : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+-- floor : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 floor = render floorMesh
 
 floorWith f = renderNSV (floorMeshWith f)
 
 
-ceiling : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+-- ceiling : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 ceiling = render ceilingMesh
 
 

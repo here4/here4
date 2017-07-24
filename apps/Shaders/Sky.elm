@@ -102,9 +102,9 @@ vec4 sky(vec2 tc) {
     }
 
 
-sky : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
+sky : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 sky =
-    GLSLPasta.combineUsingTemplate hmdTemplate
+    GLSLPasta.combineUsingTemplate hmdTemplate "sky"
         [ fragment_sky
         , Lighting.lightenDistance
         ]

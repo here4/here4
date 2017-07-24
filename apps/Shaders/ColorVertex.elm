@@ -16,6 +16,10 @@ type alias ColorVertex =
 
 colorVertex : Shader ColorVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4 } { elm_FragColor : Vec4 }
 colorVertex =
-    GLSLPasta.combine [ perspective, distort, vertex_elm_FragColor ]
+    GLSLPasta.combine "colorVertex"
+        [ perspective
+        , distort
+        , vertex_elm_FragColor
+        ]
     |> WebGL.unsafeShader
 

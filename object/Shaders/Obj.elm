@@ -14,7 +14,7 @@ Here are some relevant links:
 
 -}
 reflectionVert =
-    GLSLPasta.combine
+    GLSLPasta.combine "reflectionVert"
         [ Lighting.vertexReflection
         , Lighting.vertex_clipPosition
         ]
@@ -22,7 +22,7 @@ reflectionVert =
 
 
 reflectionFrag =
-    GLSLPasta.combine
+    GLSLPasta.combine "reflectionFrag"
         [ Lighting.fragmentReflection
         , Lighting.lightenDistance
         ]
@@ -33,7 +33,7 @@ reflectionFrag =
 <http://www.gamasutra.com/blogs/RobertBasler/20131122/205462/Three_Normal_Mapping_Techniques_Explained_For_the_Mathematically_Uninclined.php?print=1>
 -}
 normalVert =
-    GLSLPasta.combine
+    GLSLPasta.combine "normalVert"
         [ Lighting.vertexNormal
         , Lighting.vertex_clipPosition
         ]
@@ -41,7 +41,7 @@ normalVert =
 
 
 normalFrag =
-    GLSLPasta.combine
+    GLSLPasta.combine "normalFrag"
         [ Lighting.fragmentNormal
         , Lighting.lightenDistance
         ]
@@ -51,7 +51,7 @@ normalFrag =
 {-| same as the normal mapping shader, but without deforming normals.
 -}
 noNormalVert =
-    GLSLPasta.combine
+    GLSLPasta.combine "noNormalVert"
         [ Lighting.vertexNoNormal
         , Lighting.vertex_clipPosition
         ]
@@ -59,7 +59,7 @@ noNormalVert =
 
 
 noNormalFrag =
-    GLSLPasta.combine
+    GLSLPasta.combine "noNormalFrag"
         [ Lighting.fragmentNoNormal
         , Lighting.lightenDistance
         ]
@@ -69,7 +69,7 @@ noNormalFrag =
 {-| same as above, but without any textures.
 -}
 simpleVert =
-    GLSLPasta.combine
+    GLSLPasta.combine "simpleVert"
         [ Lighting.vertexSimple
         , Lighting.vertex_clipPosition
         ]
@@ -77,7 +77,7 @@ simpleVert =
 
 
 simpleFrag =
-    GLSLPasta.combine
+    GLSLPasta.combine "simpleFrag"
         [ Lighting.fragmentSimple
         , Lighting.lightenDistance
         ]

@@ -32,7 +32,7 @@ fragment_elm_FragColor =
 
 colorFragment : Shader {} u { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
 colorFragment =
-    GLSLPasta.combineUsingTemplate hmdTemplate
+    GLSLPasta.combineUsingTemplate hmdTemplate "colorFragment"
         [ fragment_elm_FragColor
         , Lighting.lightenDistance
         ]
@@ -135,7 +135,7 @@ vec4 noise_texture(vec2 tc) {
 
 noiseColorFragment : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float, iDetail : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
 noiseColorFragment =
-    GLSLPasta.combineUsingTemplate hmdTemplate
+    GLSLPasta.combineUsingTemplate hmdTemplate "noiseColorFragment"
         [ fragment_noiseColor
         , Lighting.lightenDistance
         ]

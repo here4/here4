@@ -34,9 +34,9 @@ vertex_elm_FragColor =
     }
 
 
-worldVertex : Shader Vertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
+worldVertex : Shader Vertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 worldVertex =
-    GLSLPasta.combine
+    GLSLPasta.combine "worldVertex"
         [ perspective
         , vertex_elm_FragColor
         , vertex_elm_FragCoord

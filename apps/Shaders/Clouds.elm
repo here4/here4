@@ -142,9 +142,9 @@ vec4 clouds(vec2 tc)
     }
 
 
-clouds : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
+clouds : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 clouds =
-    GLSLPasta.combineUsingTemplate hmdTemplate
+    GLSLPasta.combineUsingTemplate hmdTemplate "clouds"
         [ fragment_clouds
         , Lighting.lightenDistance
         ]
