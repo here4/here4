@@ -102,7 +102,7 @@ vec4 distort(vec4 p)
             ]
     }
 
-{-| Forward the vertex color to the fragment shader, as vcolor
+{-| Forward the vertex color to the fragment shader, as vec4 elm_FragColor
 -}
 vertex_elm_FragColor : GLSLPasta.Component
 vertex_elm_FragColor =

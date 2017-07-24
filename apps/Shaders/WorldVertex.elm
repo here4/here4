@@ -1,8 +1,13 @@
 module Shaders.WorldVertex exposing (Vertex, worldVertex)
 
+import GLSLPasta
+import GLSLPasta.Core exposing (empty)
+import GLSLPasta.Lighting exposing (vertex_clipPosition)
+import GLSLPasta.Types as GLSLPasta exposing (Global(..), Dependencies(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Matrix4 exposing (..)
+import Shaders.VertexPasta exposing (..)
 import WebGL exposing (..)
 
 
@@ -10,46 +15,32 @@ type alias Vertex =
     { pos : Vec3, color : Vec3, coord : Vec3 }
 
 
+{-| Forward the vertex color to the fragment shader, as vec3 elm_FragColor
+-}
+vertex_elm_FragColor_vec3 : GLSLPasta.Component
+vertex_elm_FragColor_vec3 =
+    { empty
+        | id = "elm_FragColor"
+        , globals =
+            [ Attribute "vec3" "color"
+            , Varying "vec3" "elm_FragColor"
+            ]
+        , splices =
+            [ """
+        elm_FragColor = color;
+                """
+            ]
+    }
+
+
 worldVertex : Shader Vertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4 } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
 worldVertex =
-    [glsl|
-
-attribute vec3 pos;
-attribute vec3 color;
-attribute vec3 coord;
-uniform mat4 iPerspective;
-uniform mat4 iLookAt;
-uniform float iLensDistort;
-varying vec3 elm_FragColor;
-varying vec2 elm_FragCoord;
-
-vec4 distort(vec4 p)
-{
-  vec2 v = p.xy / p.w;
-
-  // Convert to polar coords
-  float theta = atan(v.y, v.x);
-  float radius = length(v);
-
-  // Distort
-  radius = pow(radius, iLensDistort);
-
-  // Convert back to Cartesian
-  v.x = radius * cos(theta);
-  v.y = radius * sin(theta);
-  p.xy = v.xy * p.w;
-  return p;
-}
-
-void main () {
-  vec4 p = iPerspective * iLookAt * vec4(pos, 1.0);
-  if (iLensDistort > 0.0) {
-    gl_Position = distort(p);
-  } else {
-    gl_Position = p;
-  }
-  elm_FragColor = color;
-  elm_FragCoord = coord.xy;
-}
-
-|]
+    GLSLPasta.combine
+        [ perspective
+        , vertex_elm_FragColor_vec3
+        , vertex_elm_FragCoord
+        , vertex_noise
+        , distort
+        , vertex_clipPosition
+        ]
+    |> WebGL.unsafeShader
