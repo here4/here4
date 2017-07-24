@@ -26,7 +26,7 @@ vertex_elm_FragColor =
             ]
         , splices =
             [ """
-        vcolor = color;
+        elm_FragColor = color;
                 """
             ]
     }
