@@ -1,7 +1,6 @@
 module Shaders.ColorFragment exposing (colorFragment, noiseColorFragment)
 
-import GLSLPasta
-import GLSLPasta.Core exposing (empty)
+import GLSLPasta exposing (empty)
 import GLSLPasta.Lighting as Lighting
 import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)

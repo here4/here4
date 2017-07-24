@@ -10,8 +10,7 @@ module Shaders.VertexPasta
         )
 
 
-import GLSLPasta
-import GLSLPasta.Core exposing (empty)
+import GLSLPasta exposing (empty)
 import GLSLPasta.Types as GLSLPasta exposing (Global(..), Dependencies(..))
 
 

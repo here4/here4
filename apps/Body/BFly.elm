@@ -2,8 +2,7 @@ module Body.BFly exposing (bfly)
 
 import Appearance exposing (..)
 import Body exposing (Oriented, Visible)
-import GLSLPasta
-import GLSLPasta.Core exposing (empty)
+import GLSLPasta exposing (empty)
 import GLSLPasta.Lighting exposing (vertex_clipPosition)
 import GLSLPasta.Types as GLSLPasta exposing (Global(..), Dependencies(..))
 import Math.Vector2 exposing (Vec2)

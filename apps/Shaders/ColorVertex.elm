@@ -3,7 +3,6 @@ module Shaders.ColorVertex exposing
 
 
 import GLSLPasta
-import GLSLPasta.Core exposing (empty)
 import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector3 exposing (Vec3)
 import Math.Matrix4 exposing (Mat4)

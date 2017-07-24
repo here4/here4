@@ -1,7 +1,6 @@
 module Shaders.HMD exposing (hmdTemplate)
 
 import GLSLPasta
-import GLSLPasta.Core exposing (empty)
 import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 
 hmdTemplate : GLSLPasta.Template
