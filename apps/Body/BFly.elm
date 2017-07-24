@@ -1,14 +1,19 @@
 module Body.BFly exposing (bfly)
 
+import Appearance exposing (..)
+import Body exposing (Oriented, Visible)
+import GLSLPasta
+import GLSLPasta.Core exposing (empty)
+import GLSLPasta.Lighting exposing (vertex_clipPosition)
+import GLSLPasta.Types as GLSLPasta exposing (Global(..), Dependencies(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4, vec4)
 import Math.Matrix4 exposing (..)
-import Time exposing (second)
-import WebGL exposing (..)
-import Appearance exposing (..)
-import Body exposing (Oriented, Visible)
 import Orientation
+import Time exposing (second)
+import Shaders.VertexPasta exposing (..)
+import WebGL exposing (..)
 
 
 type alias BoidVertex =
@@ -107,54 +112,38 @@ mesh =
         triangles <| [ ( bHead, bTail, bLeft ), ( bHead, bTail, bRight ) ]
 
 
+vertex_flap : GLSLPasta.Component
+vertex_flap =
+    { empty
+        | id = "vertex_flap"
+        , dependencies =
+            Dependencies
+                [ vertex_pos4
+                ]
+        , globals =
+            [ Attribute "vec3" "wing"
+            , Uniform "mat4" "flapL"
+            , Uniform "mat4" "flapR"
+            ]
+        , splices =
+            [ """
+        mat4 flap;
+        if (wing.x < 0.0) { flap = flapL; }
+        else if (wing.x > 0.0) { flap = flapR; }
+        else { flap = mat4(1.0); }
+        pos4 *= flap;
+"""
+            ]
+    }
+
 bflyVertex : Shader BoidVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2 , clipPosition : Vec4 }
 bflyVertex =
-    [glsl|
-
-attribute vec3 pos;
-attribute vec4 color;
-attribute vec3 coord;
-attribute vec3 wing;
-uniform float iLensDistort;
-uniform mat4 iPerspective;
-uniform mat4 iLookAt;
-uniform mat4 flapL;
-uniform mat4 flapR;
-varying vec4 elm_FragColor;
-varying vec2 elm_FragCoord;
-varying vec4 clipPosition;
-
-vec4 distort(vec4 p)
-{
-  vec2 v = p.xy / p.w;
-
-  // Convert to polar coords
-  float theta = atan(v.y, v.x);
-  float radius = length(v);
-
-  // Distort
-  radius = pow(radius, iLensDistort);
-
-  // Convert back to Cartesian
-  v.x = radius * cos(theta);
-  v.y = radius * sin(theta);
-  p.xy = v.xy * p.w;
-  return p;
-}
-
-void main () {
-  mat4 flap;
-  if (wing.x < 0.0) { flap = flapL; }
-  else if (wing.x > 0.0) { flap = flapR; }
-  else { flap = mat4(1.0); }
-  vec4 p = iPerspective * iLookAt * flap * vec4(pos, 1.0);
-  if (iLensDistort > 0.0) {
-    gl_Position = distort(p);
-  } else {
-    gl_Position = p;
-  }
-  elm_FragColor = color;
-  elm_FragCoord = coord.xy;
-}
-
-|]
+    GLSLPasta.combine "bflyVertex"
+        [ vertex_flap
+        , perspective
+        , vertex_elm_FragColor
+        , vertex_elm_FragCoord
+        , distort
+        , vertex_clipPosition
+        ]
+    |> WebGL.unsafeShader
