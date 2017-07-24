@@ -1,43 +1,31 @@
 module Shaders.Clouds exposing (clouds)
 
+import GLSLPasta
+import GLSLPasta.Core exposing (empty)
+import GLSLPasta.Lighting as Lighting
+import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4, vec4)
+import Shaders.HMD exposing (hmdTemplate)
 import WebGL exposing (..)
 
 
 -- https://www.shadertoy.com/view/XslGRr
 
-
-clouds : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
-clouds =
-    [glsl|
-
-precision mediump float;
-uniform vec3 iResolution;
-uniform float iGlobalTime;
-uniform float iHMD;
-
-varying vec4 elm_FragColor;
-varying vec2 elm_FragCoord;
-
-const vec2 Scale = vec2(0.1469278, 0.2350845);
-//const vec2 Scale = vec2(0.1469278, 0.2350845);
-const vec2 ScaleIn = vec2(3, 2.5);
-//const vec2 ScaleIn = vec2(2.5, 1.5);
-const vec4 HmdWarpParam   = vec4(1, 0.22, 0.24, 0);
-
-// Scales input texture coordinates for distortion.
-vec2 HmdWarp(vec2 in01, vec2 LensCenter)
-{
-	vec2 theta = (in01 - LensCenter) * ScaleIn; // Scales to [-1, 1]
-	float rSq = theta.x * theta.x + theta.y * theta.y;
-	vec2 rvector = theta * (HmdWarpParam.x + HmdWarpParam.y * rSq +
-		HmdWarpParam.z * rSq * rSq +
-		HmdWarpParam.w * rSq * rSq * rSq);
-	return LensCenter + Scale * rvector;
-}
-
+fragment_clouds : GLSLPasta.Component
+fragment_clouds =
+    { empty
+        | id = "fragment_clouds"
+        , provides = [ "gl_FragColor" ]
+        , globals =
+            [ Uniform "vec3" "iResolution"
+            , Uniform "float" "iGlobalTime"
+            , Varying "vec4" "elm_FragColor"
+            , Varying "vec2" "elm_FragCoord"
+            ]
+        , functions =
+            [ """
 // Created by inigo quilez - iq/2013
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 
@@ -115,7 +103,7 @@ vec4 raymarch( in vec3 ro, in vec3 rd )
     return clamp( sum, 0.0, 1.0 );
 }
 
-void clouds(vec2 tc)
+vec4 clouds(vec2 tc)
 {
     // vec2 q = gl_FragCoord.xy / iResolution.xy;
     vec2 q = tc.xy;
@@ -142,30 +130,23 @@ void clouds(vec2 tc)
     col = mix( col, res.xyz, res.w );
     col += 0.1*vec3(1.0,0.4,0.2)*pow( sun, 3.0 );
 
-    gl_FragColor = vec4( col, 1.0 );
+    return vec4( col, 1.0 );
 }
-
-void hmd(void)
-{
-    vec2 LensCenter = vec2(0.5, 0.5);
-    vec2 ScreenCenter = vec2(0.5, 0.5);
-
-    vec2 oTexCoord = gl_FragCoord.xy / iResolution.xy;
-
-    vec2 tc = HmdWarp(oTexCoord, LensCenter);
-    if (any(bvec2(clamp(tc,ScreenCenter-vec2(0.5,0.5), ScreenCenter+vec2(0.5,0.5)) - tc)))
-    {
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        return;
+"""
+            ]
+        , splices =
+            [ """
+            gl_FragColor = clouds(fragCoord);
+"""
+            ]
     }
 
-    clouds(tc);
-}
 
-void main() {
-    if (iHMD == 1.0)
-        hmd();
-    else
-        clouds(elm_FragCoord);
-}
-|]
+clouds : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
+clouds =
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        [ fragment_clouds
+        , Lighting.lightenDistance
+        ]
+    |> WebGL.unsafeShader
+
