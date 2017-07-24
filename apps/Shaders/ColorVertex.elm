@@ -1,5 +1,5 @@
 module Shaders.ColorVertex exposing
-    ( perspective, distort, vertex_elm_FragColor, ColorVertex, colorVertex)
+    ( ColorVertex, colorVertex)
 
 
 import GLSLPasta
@@ -12,24 +12,6 @@ import WebGL exposing (..)
 
 type alias ColorVertex =
     { pos : Vec3, color : Vec3 }
-
-
-{-| Forward the vertex color to the fragment shader, as vcolor
--}
-vertex_elm_FragColor : GLSLPasta.Component
-vertex_elm_FragColor =
-    { empty
-        | id = "vcolor"
-        , globals =
-            [ Attribute "vec3" "color"
-            , Varying "vec3" "elm_FragColor"
-            ]
-        , splices =
-            [ """
-        elm_FragColor = color;
-                """
-            ]
-    }
 
 
 colorVertex : Shader ColorVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4 } { elm_FragColor : Vec3 }

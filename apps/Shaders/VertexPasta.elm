@@ -3,7 +3,12 @@ module Shaders.VertexPasta
         ( perspective
         , distort
         , vertex_elm_FragColor
+        , vertex_elm_FragCoord
+        , vertex_pos4
+        , vertex_noise
+        , vertex_ripple
         )
+
 
 import GLSLPasta
 import GLSLPasta.Core exposing (empty)
@@ -96,3 +101,79 @@ vec4 distort(vec4 p)
 """
             ]
     }
+
+{-| Forward the vertex color to the fragment shader, as vcolor
+-}
+vertex_elm_FragColor : GLSLPasta.Component
+vertex_elm_FragColor =
+    { empty
+        | id = "elm_FragColor"
+        , globals =
+            [ Attribute "vec4" "color"
+            , Varying "vec4" "elm_FragColor"
+            ]
+        , splices =
+            [ """
+        elm_FragColor = color;
+                """
+            ]
+    }
+
+vertex_elm_FragCoord : GLSLPasta.Component
+vertex_elm_FragCoord =
+    { empty
+        | id = "elm_FragCoord"
+        , globals =
+            [ Attribute "vec3" "coord"
+            , Varying "vec2" "elm_FragCoord"
+            ]
+        , splices =
+            [ """
+        elm_FragCoord = coord.xy;
+"""
+            ]
+    }
+
+
+vertex_noise : GLSLPasta.Component
+vertex_noise =
+    { empty
+        | id = "vertex_noise"
+        , globals =
+            [ Attribute "float" "textureScale"
+            , Attribute "float" "timeScale"
+            , Attribute "float" "smoothing"
+            , Varying "float" "iTextureScale"
+            , Varying "float" "iTimeScale"
+            , Varying "float" "iSmoothing"
+            ]
+        , splices =
+            [ """
+        iTextureScale = textureScale;
+        iTimeScale = timeScale;
+        iSmoothing = smoothing;
+"""
+            ]
+    }
+
+vertex_ripple : GLSLPasta.Component
+vertex_ripple =
+    { empty
+        | id = "vertex_ripple"
+        , dependencies =
+            Dependencies
+                [ vertex_pos4
+                ]
+        , globals =
+            [ Attribute "vec3" "pos"
+            , Attribute "vec3" "coord"
+            , Uniform "float" "iGlobalTimeV"
+            , Uniform "float" "iRipple"
+            ]
+        , splices =
+            [ """
+        pos4.y += iRipple * sin(coord.x*coord.y + iGlobalTimeV);
+"""
+            ]
+    }
+

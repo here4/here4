@@ -30,7 +30,7 @@ void main () {
 -- TODO: make surface2D tile seamlessly
 
 
-noiseColorFragment : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float, iDetail : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, worldPosition : Vec4, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
+noiseColorFragment : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float, iDetail : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
 noiseColorFragment =
     [glsl|
 
@@ -42,7 +42,7 @@ uniform float iDetail;
 
 varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
-varying vec4 worldPosition;
+varying vec4 clipPosition;
 varying float iTextureScale;
 varying float iTimeScale;
 varying float iSmoothing;
@@ -131,7 +131,7 @@ void texture(vec2 tc) {
 
         gl_FragColor = mix(fractalTexture, flatTexture, iSmoothing);
 
-        float lightenDistance = worldPosition.w * 0.01;
+        float lightenDistance = clipPosition.w * 0.01;
 
         //gl_FragColor *= 1.0 - lightenDistance * vec4(0.07, 0.09, 0.10, 0.15);
         gl_FragColor *= 1.0 - lightenDistance * vec4(0.18, 0.21, 0.24, 0.15);
