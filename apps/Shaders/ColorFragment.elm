@@ -1,26 +1,38 @@
 module Shaders.ColorFragment exposing (colorFragment, noiseColorFragment)
 
+import GLSLPasta
+import GLSLPasta.Core exposing (empty)
+import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (Vec3)
 import Math.Vector4 exposing (Vec4)
+import Shaders.HMD exposing (hmdTemplate)
 import WebGL exposing (..)
 
 
+{-| Forward the vertex color to the fragment shader, as vec4 elm_FragColor
+-}
+fragment_elm_FragColor_vec3 : GLSLPasta.Component
+fragment_elm_FragColor_vec3 =
+    { empty
+        | id = "fragment_elm_FragColor_vec3"
+        , provides =
+            [ "gl_FragColor"
+            ]
+        , globals =
+            [ Varying "vec3" "elm_FragColor"
+            ]
+        , splices =
+            [ """
+        gl_FragColor = vec4(elm_FragColor, 1.0);
+                """
+            ]
+    }
+
 colorFragment : Shader {} u { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
 colorFragment =
-    [glsl|
-
-precision mediump float;
-
-varying vec3 elm_FragColor;
-varying vec2 elm_FragCoord;
-
-void main () {
-    gl_FragColor = vec4(elm_FragColor, 1.0);
-}
-
-|]
-
+    GLSLPasta.combineUsingTemplate hmdTemplate [ fragment_elm_FragColor_vec3 ]
+    |> WebGL.unsafeShader
 
 
 -- TODO: Configure
