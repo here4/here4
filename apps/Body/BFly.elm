@@ -2,6 +2,7 @@ module Body.BFly exposing (bfly)
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
+import Math.Vector4 exposing (Vec4, vec4)
 import Math.Matrix4 exposing (..)
 import Time exposing (second)
 import WebGL exposing (..)
@@ -11,7 +12,7 @@ import Orientation
 
 
 type alias BoidVertex =
-    { pos : Vec3, color : Vec3, coord : Vec3, wing : Vec3 }
+    { pos : Vec3, color : Vec4, coord : Vec3, wing : Vec3 }
 
 
 type alias BoidShaderInput =
@@ -30,7 +31,7 @@ type alias BoidVertexShader =
     Shader BoidVertex BoidShaderInput
 
 
-bfly : Shader {} BoidShaderInput { elm_FragColor : Vec3, elm_FragCoord : Vec2 } -> Float -> Oriented (Visible {})
+bfly : Shader {} BoidShaderInput { elm_FragColor : Vec4, elm_FragCoord : Vec2 } -> Float -> Oriented (Visible {})
 bfly fragmentShader f01 =
     makeBFly bflyVertex fragmentShader (f01 * second * pi * 2)
 
@@ -88,7 +89,7 @@ mesh : Mesh BoidVertex
 mesh =
     let
         white =
-            vec3 1 1 1
+            vec4 1 1 1 1
 
         bHead =
             { pos = vec3 0 0 0.5, color = white, coord = vec3 0.5 0 0, wing = vec3 0 0 0 }
@@ -105,12 +106,12 @@ mesh =
         triangles <| [ ( bHead, bTail, bLeft ), ( bHead, bTail, bRight ) ]
 
 
-bflyVertex : Shader BoidVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+bflyVertex : Shader BoidVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
 bflyVertex =
     [glsl|
 
 attribute vec3 pos;
-attribute vec3 color;
+attribute vec4 color;
 attribute vec3 coord;
 attribute vec3 wing;
 uniform float iLensDistort;
@@ -118,7 +119,7 @@ uniform mat4 iPerspective;
 uniform mat4 iLookAt;
 uniform mat4 flapL;
 uniform mat4 flapR;
-varying vec3 elm_FragColor;
+varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
 
 vec4 distort(vec4 p)

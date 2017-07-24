@@ -2,6 +2,7 @@ module Primitive.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamon
 
 import List exposing (map2, repeat)
 import Math.Vector3 exposing (..)
+import Math.Vector4 exposing (vec4)
 import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
 import Appearance exposing (..)
@@ -112,7 +113,7 @@ diamondMesh : Mesh Vertex
 diamondMesh =
     let
         white =
-            vec3 1 1 1
+            vec4 1 1 1 1
 
         yOffset =
             1.21

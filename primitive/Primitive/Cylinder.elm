@@ -3,6 +3,7 @@ module Primitive.Cylinder exposing (textureCylinder, skyCylinder, cloudsCylinder
 import List exposing (drop, concat, map, map2)
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
+import Math.Vector4 exposing (vec4)
 import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
 import Appearance exposing (..)
@@ -172,7 +173,7 @@ cylinderMesh : Mesh Vertex
 cylinderMesh =
     let
         white =
-            vec3 1 1 1
+            vec4 1 1 1 1
 
         yOffset =
             0.5

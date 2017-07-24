@@ -2,13 +2,14 @@ module Shaders.VoronoiDistances exposing (voronoiDistances)
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
+import Math.Vector4 exposing (Vec4)
 import WebGL exposing (..)
 
 
 -- https://www.shadertoy.com/view/ldl3W8
 
 
-voronoiDistances : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+voronoiDistances : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
 voronoiDistances =
     [glsl|
 
@@ -17,7 +18,7 @@ uniform vec3 iResolution;
 uniform float iGlobalTime;
 uniform float iHMD;
 
-varying vec3 elm_FragColor;
+varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
 
 const vec2 Scale = vec2(0.1469278, 0.2350845);

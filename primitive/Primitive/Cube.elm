@@ -21,6 +21,7 @@ module Primitive.Cube exposing
     )
 
 import Math.Vector3 exposing (..)
+import Math.Vector4 exposing (Vec4, vec4)
 import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
 import Appearance exposing (..)
@@ -229,7 +230,7 @@ face : List (Triple Vertex)
 face =
     let
         white =
-            vec3 1 1 1
+            vec4 1 1 1 1
 
         topLeft =
             -- { pos = vec3 -1 1 0, color = white, coord = vec3 0 1 0 }

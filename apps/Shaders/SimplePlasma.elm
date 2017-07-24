@@ -2,13 +2,14 @@ module Shaders.SimplePlasma exposing (simplePlasma)
 
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
+import Math.Vector4 exposing (Vec4)
 import WebGL exposing (..)
 
 
 -- https://www.shadertoy.com/view/ldBGRR
 
 
-simplePlasma : Shader {} { u | iResolution : Vec3, iGlobalTime : Float } { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+simplePlasma : Shader {} { u | iResolution : Vec3, iGlobalTime : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
 simplePlasma =
     [glsl|
 
@@ -16,7 +17,7 @@ precision mediump float;
 uniform vec3 iResolution;
 uniform float iGlobalTime;
 
-varying vec3 elm_FragColor;
+varying vec4 elm_FragColor;
 varying vec2 elm_FragCoord;
 
 void main(void)

@@ -62,7 +62,7 @@ topMesh : Mesh Vertex
 topMesh =
     let
         white =
-            vec3 1 1 1
+            vec4 1 1 1 1
 
         wHead =
             { pos = vec3 0 0 1, color = white, coord = vec3 0 0 0 }

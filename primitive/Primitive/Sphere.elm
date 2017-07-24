@@ -3,6 +3,7 @@ module Primitive.Sphere exposing (spheres, skySphere, cloudsSphere, fogMountains
 import List exposing (drop, concat, map, map2)
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
+import Math.Vector4 exposing (Vec4, vec4)
 import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
 import Appearance exposing (..)
@@ -16,7 +17,7 @@ import Shaders.WorldVertex exposing (Vertex, worldVertex)
 
 spheres :
     Int
-    -> Shader {} ShaderPerception { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
+    -> Shader {} ShaderPerception { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
     -> List (Oriented (Visible {}))
 spheres n fragmentShader =
     map (always (sphere worldVertex fragmentShader)) (List.range 0 n)
@@ -154,7 +155,7 @@ sphereMesh : Mesh Vertex
 sphereMesh =
     let
         white =
-            vec3 1 1 1
+            vec4 1 1 1 1
 
         npole =
             { pos = vec3 0 1 0, coord = vec3 0 0 0 }

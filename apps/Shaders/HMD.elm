@@ -10,7 +10,7 @@ hmdTemplate =
     , globals =
         [ Uniform "vec3" "iResolution"
         , Uniform "float" "iHMD"
-        , Varying "vec3" "elm_FragColor"
+        , Varying "vec4" "elm_FragColor"
         , Varying "vec2" "elm_FragCoord"
         , Const "vec2" "Scale" "vec2(0.1469278, 0.2350845)"
         -- , Const "vec2" "Scale" "vec2(0.1469278, 0.2350845)"
