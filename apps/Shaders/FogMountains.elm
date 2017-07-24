@@ -1,45 +1,31 @@
 module Shaders.FogMountains exposing (fogMountains)
 
+import GLSLPasta
+import GLSLPasta.Core exposing (empty)
+import GLSLPasta.Lighting as Lighting
+import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4)
+import Shaders.HMD exposing (hmdTemplate)
 import WebGL exposing (..)
 
 
 -- https://www.shadertoy.com/view/XdsGD7
 
-
-fogMountains : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
-fogMountains =
-    [glsl|
-
-precision mediump float;
-
-//uniform sampler2D crate;
-uniform vec3 iResolution;
-uniform float iGlobalTime;
-uniform float iHMD;
-
-varying vec4 elm_FragColor;
-varying vec2 elm_FragCoord;
-
-const vec2 Scale = vec2(0.1469278, 0.2350845);
-//const vec2 Scale = vec2(0.1469278, 0.2350845);
-const vec2 ScaleIn = vec2(3, 2.5);
-//const vec2 ScaleIn = vec2(2.5, 1.5);
-const vec4 HmdWarpParam   = vec4(1, 0.22, 0.24, 0);
-
-// Scales input texture coordinates for distortion.
-vec2 HmdWarp(vec2 in01, vec2 LensCenter)
-{
-	vec2 theta = (in01 - LensCenter) * ScaleIn; // Scales to [-1, 1]
-	float rSq = theta.x * theta.x + theta.y * theta.y;
-	vec2 rvector = theta * (HmdWarpParam.x + HmdWarpParam.y * rSq +
-		HmdWarpParam.z * rSq * rSq +
-		HmdWarpParam.w * rSq * rSq * rSq);
-	return LensCenter + Scale * rvector;
-}
-
+fragment_fogMountains : GLSLPasta.Component
+fragment_fogMountains =
+    { empty
+        | id = "fragment_fogMountains"
+        , provides = [ "gl_FragColor" ]
+        , globals =
+            [ Uniform "vec3" "iResolution"
+            , Uniform "float" "iGlobalTime"
+            , Varying "vec4" "elm_FragColor"
+            , Varying "vec2" "elm_FragCoord"
+            ]
+        , functions =
+            [ """
 const float dMax = 28.0;
 
 // Simple noise algorithm contributed by Trisomi21 (Thanks!)
@@ -212,7 +198,7 @@ vec3 render(vec3 ro, vec3 rd)
   return color;
 }
 
-void fogMountains(vec2 tc)
+vec4 fogMountains(vec2 tc)
 {
   //vec2 pos = 2.0 * ( gl_FragCoord.xy / iResolution.xy ) - 1.0; // bound screen coords to [0, 1]
   vec2 pos = 2.0 * ( tc.xy ) - 1.0; // bound screen coords to [0, 1]
@@ -238,31 +224,22 @@ void fogMountains(vec2 tc)
   // render
   vec3 color = render(cPos, rd);
 
-  gl_FragColor = vec4 (color, 1.0 );
+  return vec4 (color, 1.0 );
 }
-
-void hmd () {
-    vec2 LensCenter = vec2(0.5, 0.5);
-    vec2 ScreenCenter = vec2(0.5, 0.5);
-
-    vec2 oTexCoord = gl_FragCoord.xy / iResolution.xy;
-
-    vec2 tc = HmdWarp(oTexCoord, LensCenter);
-    if (any(bvec2(clamp(tc,ScreenCenter-vec2(0.5,0.5), ScreenCenter+vec2(0.5,0.5)) - tc)))
-    {
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        return;
+"""
+            ]
+        , splices =
+            [ """
+            gl_FragColor = fogMountains(fragCoord);
+"""
+            ]
     }
 
-  //fogMountains(elm_FragCoord);
-  fogMountains(tc);
-}
 
-void main() {
-    if (iHMD == 1.0)
-        hmd();
-    else
-        fogMountains(elm_FragCoord);
-}
-
-|]
+fogMountains : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
+fogMountains =
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        [ fragment_fogMountains
+        , Lighting.lightenDistance
+        ]
+    |> WebGL.unsafeShader
