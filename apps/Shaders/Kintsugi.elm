@@ -1,26 +1,31 @@
 module Shaders.Kintsugi exposing (kintsugi)
 
+import GLSLPasta
+import GLSLPasta.Core exposing (empty)
+import GLSLPasta.Lighting as Lighting
+import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4)
+import Shaders.HMD exposing (hmdTemplate)
 import WebGL exposing (..)
 
 
 -- https://www.shadertoy.com/view/Xt33WX
 
-
-kintsugi : Shader {} { u | iResolution : Vec3, iGlobalTime : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
-kintsugi =
-    [glsl|
-
-precision mediump float;
-uniform vec3 iResolution;
-uniform float iGlobalTime;
-
-varying vec4 elm_FragColor;
-varying vec2 elm_FragCoord;
-varying vec4 clipPosition;
-
+fragment_kintsugi : GLSLPasta.Component
+fragment_kintsugi =
+    { empty
+        | id = "fragment_kintsugi"
+        , provides = [ "gl_FragColor" ]
+        , globals =
+            [ Uniform "vec3" "iResolution"
+            , Uniform "float" "iGlobalTime"
+            , Varying "vec4" "elm_FragColor"
+            , Varying "vec2" "elm_FragCoord"
+            ]
+        , functions =
+            [ """
 //
 // Description : Array and textureless GLSL 2D simplex noise function.
 //      Author : Ian McEwan, Ashima Arts.
@@ -132,10 +137,8 @@ vec4 marble_color (float x)
     return col;
 }
 
-void main(void)
+vec4 kintsugi(vec2 uv)
 {
-    //vec2 uv = elm_FragCoord.xy / iResolution.xy;
-    vec2 uv = elm_FragCoord.xy;
     float amplitude = 2.0;
 
     vec2 m;
@@ -145,7 +148,21 @@ void main(void)
     float t = uv.x * 10.0;
     t += amplitude * turbulence (uv.xy + vec2(iGlobalTime / 80.0) - m );
     t = sin(t);
-    gl_FragColor = marble_color(t);
+    return marble_color(t);
 }
+"""
+            ]
+        , splices =
+            [ """
+            gl_FragColor = kintsugi(fragCoord);
+"""
+            ]
+    }
 
-|]
+kintsugi : Shader {} { u | iResolution : Vec3, iGlobalTime : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
+kintsugi =
+    GLSLPasta.combineUsingTemplate hmdTemplate "kintsugi"
+        [ fragment_kintsugi
+        , Lighting.lightenDistance
+        ]
+    |> WebGL.unsafeShader
