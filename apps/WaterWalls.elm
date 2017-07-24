@@ -17,12 +17,11 @@ import Primitive.Cube as Cube
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
-
 import Shaders.Clouds exposing (clouds)
 import Shaders.Kintsugi exposing (kintsugi)
 import Shaders.SimplePlasma exposing (simplePlasma)
-
 import Util exposing (hslToVec3)
+
 
 type alias Attributes =
     { dimensions : Vec3
@@ -74,7 +73,7 @@ init placement =
             x1 - x0
 
         xCenter =
-           (x0 + x1) / 2.0
+            (x0 + x1) / 2.0
 
         z0 =
             placement.zOffset
@@ -86,8 +85,7 @@ init placement =
             z1 - z0
 
         zCenter =
-           (z0 + z1) / 2.0
-
+            (z0 + z1) / 2.0
 
         -- How far the box extends below 0
         depth =
@@ -136,13 +134,16 @@ init placement =
             , smoothing = 0.1
             , textureScale = 1.0
             , timeScale = 0.1
-            } 
+            }
 
-        walls = followPlayer (Cube.wallsWith toNoiseVertex noiseVertex noiseColorFragment)
+        walls =
+            followPlayer (Cube.wallsWith toNoiseVertex noiseVertex noiseColorFragment)
 
-        floor = followPlayer (Cube.floorWith toNoiseVertex noiseVertex noiseColorFragment)
+        floor =
+            followPlayer (Cube.floorWith toNoiseVertex noiseVertex noiseColorFragment)
 
-        hardWalls = hard (Cube.wallsWith toNoiseVertex noiseVertex noiseColorFragment)
+        hardWalls =
+            hard (Cube.wallsWith toNoiseVertex noiseVertex noiseColorFragment)
     in
         ( { walls = walls
           , floor = floor
@@ -169,7 +170,7 @@ bodies model pos =
         [ model.walls, model.floor, model.hardWalls ]
         -- [ model.hardWalls ]
     else
-       []
+        []
 
 
 overlay : Model -> Html msg

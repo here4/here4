@@ -12,6 +12,7 @@ import WebGL exposing (..)
 
 -- https://www.shadertoy.com/view/ldBGRR
 
+
 fragment_simplePlasma : GLSLPasta.Component
 fragment_simplePlasma =
     { empty
@@ -49,10 +50,12 @@ vec4 plasma(vec2 uv)
             ]
     }
 
+
 simplePlasma : Shader {} { u | iResolution : Vec3, iGlobalTime : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 simplePlasma =
-    GLSLPasta.combineUsingTemplate hmdTemplate "simplePlasma"
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        "simplePlasma"
         [ fragment_simplePlasma
         , Lighting.lightenDistance
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader

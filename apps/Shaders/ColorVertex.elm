@@ -1,6 +1,4 @@
-module Shaders.ColorVertex exposing
-    ( ColorVertex, colorVertex)
-
+module Shaders.ColorVertex exposing (ColorVertex, colorVertex)
 
 import GLSLPasta
 import GLSLPasta.Types as GLSLPasta exposing (Global(..))
@@ -20,5 +18,4 @@ colorVertex =
         , distort
         , vertex_elm_FragColor
         ]
-    |> WebGL.unsafeShader
-
+        |> WebGL.unsafeShader

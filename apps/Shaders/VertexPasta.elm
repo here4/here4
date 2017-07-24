@@ -9,7 +9,6 @@ module Shaders.VertexPasta
         , vertex_ripple
         )
 
-
 import GLSLPasta exposing (empty)
 import GLSLPasta.Types as GLSLPasta exposing (Global(..), Dependencies(..))
 
@@ -33,12 +32,13 @@ vertex_pos4 =
             ]
     }
 
+
 perspective : GLSLPasta.Component
 perspective =
     { empty
         | id = "perspective"
         , dependencies =
-            Dependencies 
+            Dependencies
                 [ vertex_pos4
                 ]
         , provides =
@@ -54,6 +54,7 @@ perspective =
             """
             ]
     }
+
 
 distort : GLSLPasta.Component
 distort =
@@ -101,6 +102,7 @@ vec4 distort(vec4 p)
             ]
     }
 
+
 {-| Forward the vertex color to the fragment shader, as vec4 elm_FragColor
 -}
 vertex_elm_FragColor : GLSLPasta.Component
@@ -117,6 +119,7 @@ vertex_elm_FragColor =
                 """
             ]
     }
+
 
 vertex_elm_FragCoord : GLSLPasta.Component
 vertex_elm_FragCoord =
@@ -155,6 +158,7 @@ vertex_noise =
             ]
     }
 
+
 vertex_ripple : GLSLPasta.Component
 vertex_ripple =
     { empty
@@ -175,4 +179,3 @@ vertex_ripple =
 """
             ]
     }
-

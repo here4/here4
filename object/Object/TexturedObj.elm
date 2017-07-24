@@ -101,27 +101,31 @@ texturedObjUpdate msg model =
             case meshResult of
                 Ok mesh ->
                     let
-                        (newMeshes, worldDimensions) =
+                        ( newMeshes, worldDimensions ) =
                             toWorld_Mesh r.offset r.scale r.rotation mesh
 
                         makeAppearance mesh =
                             case mesh of
                                 Obj.WithoutTexture { vertices, indices } ->
                                     textured (indexedTriangles vertices indices)
-                                        Shaders.simpleVert Shaders.simpleFrag
+                                        Shaders.simpleVert
+                                        Shaders.simpleFrag
 
                                 Obj.WithTexture { vertices, indices } ->
                                     textured (indexedTriangles vertices indices)
-                                        Shaders.noNormalVert Shaders.noNormalFrag
+                                        Shaders.noNormalVert
+                                        Shaders.noNormalFrag
 
                                 Obj.WithTextureAndTangent { vertices, indices } ->
                                     textured (indexedTriangles vertices indices)
-                                        Shaders.normalVert Shaders.normalFrag
-
+                                        Shaders.normalVert
+                                        Shaders.normalFrag
                     in
-                        { r | meshes = List.map makeAppearance newMeshes
+                        { r
+                            | meshes = List.map makeAppearance newMeshes
                             , worldDimensions = Just worldDimensions
                         }
+
                 _ ->
                     r
     in

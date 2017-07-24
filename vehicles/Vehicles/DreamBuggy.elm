@@ -12,8 +12,8 @@ import Body exposing (..)
 import Model
 import Ground exposing (Ground)
 import Vehicle exposing (Driveable)
-
 import Debug
+
 
 ----------------------------------------------------------------------
 -- DreamBuggy
@@ -124,7 +124,7 @@ turn attributes dimensions eyeLevel dx dt motion =
                     if frontTireY > centerY then
                         perp2dCCW vehicleFwdLength (frontTireY - rearTireY)
                     else
-                        perp2dCCW (vehicleFwdLength/2.0) (centerY - rearTireY)
+                        perp2dCCW (vehicleFwdLength / 2.0) (centerY - rearTireY)
             in
                 vec3 0 y z
 
@@ -221,7 +221,7 @@ physics eyeLevel dt motion =
             getY motion.velocity
 
         ( pos_, dv ) =
-            if p.y < e+0.5 then
+            if p.y < e + 0.5 then
                 let
                     vy =
                         if ((e < (0.8 * 80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10 * dt) then

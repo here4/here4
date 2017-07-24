@@ -7,11 +7,13 @@ import Time exposing (Time)
 import Body exposing (..)
 import Ground exposing (Ground)
 
+
 type alias Attributes =
     { separation : Float
     , alignment : Float
     , cohesion : Float
     }
+
 
 default : Attributes
 default =
@@ -19,6 +21,7 @@ default =
     , alignment = 0.03 -- 0.07
     , cohesion = 0.01
     }
+
 
 type alias Boid a =
     Massive (Spherical (Moving a))

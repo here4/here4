@@ -5,7 +5,6 @@ import Location exposing (..)
 import Math.Vector3 as V3 exposing (vec3)
 import Navigator exposing (..)
 import RAM
-
 import Boids
 import BoxRoom
 import Balls
@@ -40,63 +39,58 @@ main =
                 , elmLogo
 
                 -- , Balls.create 30
-
                 , textureCube
-
                 , deltaWedge
-
                 , buggy
                 , aston_martin
 
-{-
-                , Object.create
-                    [ id "clouds-sphere"
-                    , label "Clouds Sphere"
-                    , position <| vec3 3 10 5
-                    , overlay  <| Html.text "Clouds sphere"
-                    , object   <| Appearance cloudsSphere (vec3 2 2 2)
-                    ]
+                {-
+                   , Object.create
+                       [ id "clouds-sphere"
+                       , label "Clouds Sphere"
+                       , position <| vec3 3 10 5
+                       , overlay  <| Html.text "Clouds sphere"
+                       , object   <| Appearance cloudsSphere (vec3 2 2 2)
+                       ]
 
-                , Object.create
-                    [ id "landscape-diamond"
-                    , label "Landscape Diamond"
-                    , position <| vec3 40 1.5 28
-                    , object   <| Appearance fogMountainsDiamond (vec3 2 2 2)
-                    ]
--}
+                   , Object.create
+                       [ id "landscape-diamond"
+                       , label "Landscape Diamond"
+                       , position <| vec3 40 1.5 28
+                       , object   <| Appearance fogMountainsDiamond (vec3 2 2 2)
+                       ]
+                -}
                 , Object.create
                     [ id "fire-cube"
                     , label "Fire Cube"
                     , position <| vec3 21 0 -25
-                    , object   <| Appearance fireCube (vec3 1 1 1)
-                    , portal   <| Remote "world2" (Facing "fire-cube")
+                    , object <| Appearance fireCube (vec3 1 1 1)
+                    , portal <| Remote "world2" (Facing "fire-cube")
                     ]
-
                 , Object.create
                     [ id "sky-diamond"
                     , label "Sky Diamond"
                     , position <| vec3 -15 1.5 21
-                    , object   <| Appearance cloudsDiamond (vec3 2 2 2)
-                    , portal   <| Remote "world2" (Behind "shufflepuck")
+                    , object <| Appearance cloudsDiamond (vec3 2 2 2)
+                    , portal <| Remote "world2" (Behind "shufflepuck")
                     ]
-
                 , Boids.create 100
-
                 , Object.create
                     [ id "voronoi-cube"
                     , label "Voronoi Cube"
                     , position <| vec3 10 0 10
-                    , object   <| Appearance voronoiCube (vec3 1 1 1)
-                    , portal   <| Local (Become "boids")
+                    , object <| Appearance voronoiCube (vec3 1 1 1)
+                    , portal <| Local (Become "boids")
                     ]
-{-
-                , Object.create
-                    [ id "landscape-cube"
-                    , label "Landscape Cube"
-                    , position <| vec3 10 1.5 -10
-                    , object   <| Appearance fogMountainsCube (vec3 1 1 1)
-                    ]
--}
+
+                {-
+                   , Object.create
+                       [ id "landscape-cube"
+                       , label "Landscape Cube"
+                       , position <| vec3 10 1.5 -10
+                       , object   <| Appearance fogMountainsCube (vec3 1 1 1)
+                       ]
+                -}
                 ]
           , defaultSelf = avatar 8.0
           }
@@ -105,7 +99,6 @@ main =
           , backgroundColor = rgb 255 255 255
           , apps =
                 [ BoxRoom.create { dimensions = vec3 20 50 30 }
-
                 , let
                     s =
                         Shufflepuck.default
@@ -115,13 +108,12 @@ main =
                             | id = "shufflepuck"
                             , position = vec3 0 0 0
                         }
-
                 , Object.create
                     [ id "fire-cube"
                     , label "Fire Cube"
                     , position <| vec3 9 0 -14
-                    , object   <| Appearance fireCube (vec3 1 1 1)
-                    , portal   <| Remote "world1" (Facing "fire-cube")
+                    , object <| Appearance fireCube (vec3 1 1 1)
+                    , portal <| Remote "world1" (Facing "fire-cube")
                     ]
                 ]
           , defaultSelf = avatar 5.7
@@ -133,6 +125,7 @@ main =
           -}
           }
         ]
+
 
 deltaWedge : ( App, Cmd AppMsg )
 deltaWedge =
@@ -151,9 +144,9 @@ deltaWedge =
             [ id "wedge"
             , label "Delta Wedge"
             , position <| vec3 23 0 12
-            , overlay  <| html
-            , object   <| Appearance wedge (vec3 1 1 1)
-            , vehicle  <|
+            , overlay <| html
+            , object <| Appearance wedge (vec3 1 1 1)
+            , vehicle <|
                 { drive = DreamBird.drive
                 , vehicle =
                     { speed = 20.0
@@ -162,6 +155,7 @@ deltaWedge =
                     }
                 }
             ]
+
 
 textureCube : ( App, Cmd AppMsg )
 textureCube =
@@ -181,10 +175,11 @@ textureCube =
             , label "Wooden crate"
             , position <| vec3 -2 0 17
             , overlay html
-            , object <| FlatTexture
-                { mesh = cubeMesh
-                , texturePath = "resources/woodCrate.jpg"
-                }
+            , object <|
+                FlatTexture
+                    { mesh = cubeMesh
+                    , texturePath = "resources/woodCrate.jpg"
+                    }
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
@@ -194,6 +189,7 @@ textureCube =
                     }
                 }
             ]
+
 
 buggy : ( App, Cmd AppMsg )
 buggy =
@@ -211,15 +207,16 @@ buggy =
             [ id "buggy"
             , label "Buggy"
             , position <| vec3 37 0 43
-            , overlay  <| html
-            , object   <| Object.texturedObjWith
-                "OffRoad Car/Models/OFF -Road car  3D Models.obj"
-                "textures/elmLogoDiffuse.png"
-                "textures/elmLogoNorm.png"
-                [ offset   <| FloorCenter
-                , scale    <| Width 1.6
-                , forward  <| V3.i
-                ]
+            , overlay <| html
+            , object <|
+                Object.texturedObjWith
+                    "OffRoad Car/Models/OFF -Road car  3D Models.obj"
+                    "textures/elmLogoDiffuse.png"
+                    "textures/elmLogoNorm.png"
+                    [ offset <| FloorCenter
+                    , scale <| Width 1.6
+                    , forward <| V3.i
+                    ]
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
@@ -247,15 +244,16 @@ aston_martin =
             [ id "aston_martin"
             , label "Aston Martin DB9"
             , position <| vec3 -12 0 43
-            , overlay  <| html
-            , object   <| Object.texturedObjWith
-                "aston_martin/DB9.obj"
-                "textures/elmLogoDiffuse.png"
-                "textures/elmLogoNorm.png"
-                [ offset   <| FloorCenter
-                , scale    <| Width 2.061
-                , forward  <| V3.j
-                ]
+            , overlay <| html
+            , object <|
+                Object.texturedObjWith
+                    "aston_martin/DB9.obj"
+                    "textures/elmLogoDiffuse.png"
+                    "textures/elmLogoNorm.png"
+                    [ offset <| FloorCenter
+                    , scale <| Width 2.061
+                    , forward <| V3.j
+                    ]
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
@@ -265,7 +263,6 @@ aston_martin =
                     }
                 }
             ]
-
 
 
 elmLogo : ( App, Cmd AppMsg )
@@ -284,15 +281,17 @@ elmLogo =
             [ id "elm-logo"
             , label "Elm Logo"
             , position <| vec3 38 30 -112
-            , overlay  <| html
+            , overlay <| html
+
             -- , forward  <| V3.negate V3.k
-            , object   <| Object.texturedObjWith
-                "meshes/elmLogo.obj"
-                "textures/elmLogoDiffuse.png"
-                "textures/elmLogoNorm.png"
-                [ offset   <| Center -- WorldSpace 0 20 0
-                , scale    <| Height 20
-                ]
+            , object <|
+                Object.texturedObjWith
+                    "meshes/elmLogo.obj"
+                    "textures/elmLogoDiffuse.png"
+                    "textures/elmLogoNorm.png"
+                    [ offset <| Center -- WorldSpace 0 20 0
+                    , scale <| Height 20
+                    ]
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
@@ -320,13 +319,14 @@ avatar speed =
             [ id "avatar"
             , label "Walking"
             , position <| vec3 0 0 0
-            , overlay  <| html
-            , object <| Object.reflectiveObjWith
-                "meshes/suzanne.obj"
-                "textures/elmLogoDiffuse.png"
-                [ offset   <| FloorCenter
-                , scale    <| Height 0.6
-                ]
+            , overlay <| html
+            , object <|
+                Object.reflectiveObjWith
+                    "meshes/suzanne.obj"
+                    "textures/elmLogoDiffuse.png"
+                    [ offset <| FloorCenter
+                    , scale <| Height 0.6
+                    ]
             , vehicle <|
                 { drive = Walking.drive
                 , vehicle =

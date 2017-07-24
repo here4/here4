@@ -1,6 +1,5 @@
 module World exposing (Attributes, Multiverse, create)
 
-
 import App.Control exposing (..)
 import App.Internal as App exposing (..)
 import Bag exposing (Bag)
@@ -32,7 +31,7 @@ type alias Attributes =
 
 
 type alias Multiverse state =
-    { state  : state
+    { state : state
     , worlds : Bag World
     }
 
@@ -104,7 +103,8 @@ worldApps (WorldKey worldKey ()) appsList =
 
                 m ->
                     let
-                        key = ToApp (WorldKey worldKey (AppKey appKey))
+                        key =
+                            ToApp (WorldKey worldKey (AppKey appKey))
                     in
                         toWorldMsg (WorldKey worldKey ()) (Send key m)
 
@@ -338,7 +338,8 @@ relativeAppPosition (WorldKey worldKey (PartyKey partyKey)) relative model =
 relativeRelocate : WorldKey PartyKey -> Relative -> Multiverse model -> ( Multiverse model, Cmd (WorldMsg msg) )
 relativeRelocate worldPartyKey relative model =
     let
-        (WorldKey worldKey (PartyKey partyKey)) = worldPartyKey
+        (WorldKey worldKey (PartyKey partyKey)) =
+            worldPartyKey
 
         updateRide party =
             case relativeAppPosition worldPartyKey relative model of

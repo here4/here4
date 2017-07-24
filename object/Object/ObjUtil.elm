@@ -1,8 +1,8 @@
-module Object.ObjUtil exposing
-    ( toWorld_Mesh
-    , toWorld_MeshWithVertexWithTexture
-    )
-
+module Object.ObjUtil
+    exposing
+        ( toWorld_Mesh
+        , toWorld_MeshWithVertexWithTexture
+        )
 
 import Dict exposing (Dict)
 import Location exposing (Scale(..), Offset(..))
@@ -14,7 +14,9 @@ import OBJ.Types as Obj exposing (ObjFile, Mesh(..), MeshWith, VertexWithTexture
 
 
 -- | Load a mesh into world coordinates, with given offset, scale, rotation
-toWorld_Mesh : Offset -> Scale -> Maybe Orientation -> ObjFile -> (List Obj.Mesh, Vec3)
+
+
+toWorld_Mesh : Offset -> Scale -> Maybe Orientation -> ObjFile -> ( List Obj.Mesh, Vec3 )
 toWorld_Mesh offset scale rotation mesh =
     let
         positions : Obj.Mesh -> List Vec3
@@ -28,7 +30,6 @@ toWorld_Mesh offset scale rotation mesh =
 
                 Obj.WithTextureAndTangent m ->
                     List.map .position m.vertices
-
 
         transform : (Vec3 -> Vec3) -> Mesh -> Mesh
         transform t mesh =
@@ -56,14 +57,16 @@ toWorld_Mesh offset scale rotation mesh =
         meshes =
             Dict.values mesh
                 |> List.concatMap Dict.values
-
     in
         toWorldCoords offset scale rotation (List.concatMap positions) transformMeshes meshes
 
 
-toWorld_MeshWithVertexWithTexture : Offset -> Scale -> Maybe Orientation
+toWorld_MeshWithVertexWithTexture :
+    Offset
+    -> Scale
+    -> Maybe Orientation
     -> MeshWith VertexWithTexture
-    -> (MeshWith VertexWithTexture, Vec3)
+    -> ( MeshWith VertexWithTexture, Vec3 )
 toWorld_MeshWithVertexWithTexture offset scale rotation mesh =
     let
         getModelCoords : MeshWith VertexWithTexture -> List Vec3
@@ -73,18 +76,22 @@ toWorld_MeshWithVertexWithTexture offset scale rotation mesh =
         transform : (Vec3 -> Vec3) -> MeshWith VertexWithTexture -> MeshWith VertexWithTexture
         transform t mesh =
             let
-                t_onto vertex = { vertex | position = t vertex.position }
+                t_onto vertex =
+                    { vertex | position = t vertex.position }
             in
                 { mesh | vertices = List.map t_onto mesh.vertices }
     in
         toWorldCoords offset scale rotation getModelCoords transform mesh
 
 
-toWorldCoords : Offset -> Scale -> Maybe Orientation
+toWorldCoords :
+    Offset
+    -> Scale
+    -> Maybe Orientation
     -> (a -> List Vec3)
     -> ((Vec3 -> Vec3) -> a -> a)
     -> a
-    -> (a, Vec3)
+    -> ( a, Vec3 )
 toWorldCoords offset scale rotation getModelCoords mapTransform model =
     let
         translate : (Vec3 -> Vec3) -> Vec3 -> Vec3 -> Offset -> Vec3 -> Vec3
@@ -130,8 +137,6 @@ toWorldCoords offset scale rotation getModelCoords mapTransform model =
         -- (centered worldPosition, worldOrientation)
         --
         newMeshes =
-           (mapTransform t) model
+            (mapTransform t) model
     in
-        (newMeshes, worldDimensions)
-
-
+        ( newMeshes, worldDimensions )

@@ -18,30 +18,35 @@ import WebGL exposing (..)
 type alias BoidVertex =
     { pos : Vec3, color : Vec4, coord : Vec3, wing : Vec3 }
 
+
+
 {-
-type alias BoidShaderInput =
-    { flapL : Mat4
-    , flapR : Mat4
-    , iGlobalTime : Float
-    , iHMD : Float
-    , iLensDistort : Float
-    , iResolution : Vec3
-    , iPerspective : Mat4
-    , iLookAt : Mat4
-    }
+   type alias BoidShaderInput =
+       { flapL : Mat4
+       , flapR : Mat4
+       , iGlobalTime : Float
+       , iHMD : Float
+       , iLensDistort : Float
+       , iResolution : Vec3
+       , iPerspective : Mat4
+       , iLookAt : Mat4
+       }
 
 
-type alias BoidVertexShader =
-    Shader BoidVertex BoidShaderInput
+   type alias BoidVertexShader =
+       Shader BoidVertex BoidShaderInput
 -}
-
-
 -- bfly : Shader {} BoidShaderInput { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 } -> Float -> Oriented (Visible {})
+
+
 bfly fragmentShader f01 =
     makeBFly bflyVertex fragmentShader (f01 * second * pi * 2)
 
 
+
 -- makeBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Oriented (Visible {})
+
+
 makeBFly vertexShader fragmentShader flapStart =
     let
         appear =
@@ -50,7 +55,10 @@ makeBFly vertexShader fragmentShader flapStart =
         { scale = vec3 1 1 1, position = (vec3 7 0 4), orientation = Orientation.initial, appear = appear }
 
 
+
 -- appearBFly : Shader BoidVertex BoidShaderInput a -> Shader {} BoidShaderInput a -> Float -> Appearance
+
+
 appearBFly vertexShader fragmentShader flapStart p =
     let
         resolution =
@@ -135,7 +143,8 @@ vertex_flap =
             ]
     }
 
-bflyVertex : Shader BoidVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2 , clipPosition : Vec4 }
+
+bflyVertex : Shader BoidVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 bflyVertex =
     GLSLPasta.combine "bflyVertex"
         [ vertex_flap
@@ -145,4 +154,4 @@ bflyVertex =
         , distort
         , vertex_clipPosition
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader

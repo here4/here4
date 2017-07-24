@@ -101,7 +101,6 @@ defaultMotion =
     }
 
 
-
 defaultPlayer : Player msg
 defaultPlayer =
     { partyKey = Nothing

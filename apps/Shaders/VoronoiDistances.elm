@@ -122,10 +122,12 @@ vec4 voronoiDistances(vec2 tc)
             ]
     }
 
+
 voronoiDistances : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 voronoiDistances =
-    GLSLPasta.combineUsingTemplate hmdTemplate "voronoiDistances"
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        "voronoiDistances"
         [ fragment_voronoiDistances
         , Lighting.lightenDistance
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader

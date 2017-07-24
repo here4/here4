@@ -14,7 +14,6 @@ import Setter exposing (..)
 import Tuple
 
 
-
 wrap :
     (result -> ObjectResult)
     -> (msg -> ObjectMsg)

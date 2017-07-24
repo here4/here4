@@ -3,6 +3,7 @@ module Shaders.HMD exposing (hmdTemplate)
 import GLSLPasta
 import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 
+
 hmdTemplate : GLSLPasta.Template
 hmdTemplate =
     { id = "hmdTemplate"
@@ -12,8 +13,10 @@ hmdTemplate =
         , Varying "vec4" "elm_FragColor"
         , Varying "vec2" "elm_FragCoord"
         , Const "vec2" "Scale" "vec2(0.1469278, 0.2350845)"
+
         -- , Const "vec2" "Scale" "vec2(0.1469278, 0.2350845)"
         , Const "vec2" "ScaleIn" "vec2(3, 2.5)"
+
         -- , Const "vec2" "ScaleIn" "vec2(2.5, 1.5)"
         , Const "vec4" "HmdWarpParam" "vec4(1, 0.22, 0.24, 0)"
         ]
@@ -64,4 +67,3 @@ void main() {
 }
 """
     }
-

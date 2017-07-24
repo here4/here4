@@ -25,10 +25,12 @@ textureCoord =
             ]
     }
 
+
 textureFragment : Shader {} { u | iResolution : Vec3, iHMD : Float, iTexture : Texture } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 textureFragment =
-    GLSLPasta.combineUsingTemplate hmdTemplate "textureFragment"
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        "textureFragment"
         [ textureCoord
         , Lighting.lightenDistance
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader

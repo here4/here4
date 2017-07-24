@@ -12,38 +12,68 @@ import Model exposing (PartyKey)
 import Task exposing (Task)
 import Time
 
-type alias App = Internal.App
-type alias AppMsg = Internal.AppMsg
 
-type alias AppPosition = Internal.AppPosition
-type alias Focus = Internal.Focus
+type alias App =
+    Internal.App
 
-type alias Framing = Camera.Types.Framing
 
-type alias Ground = Ground.Ground
+type alias AppMsg =
+    Internal.AppMsg
 
-type alias PartyKey = Model.PartyKey
 
-type alias Time = Time.Time
+type alias AppPosition =
+    Internal.AppPosition
+
+
+type alias Focus =
+    Internal.Focus
+
+
+type alias Framing =
+    Camera.Types.Framing
+
+
+type alias Ground =
+    Ground.Ground
+
+
+type alias PartyKey =
+    Model.PartyKey
+
+
+type alias Time =
+    Time.Time
+
 
 create : ( model, Cmd (CtrlMsg msg) ) -> Internal.Animated model (CtrlMsg msg) -> ( App, Cmd AppMsg )
-create = Internal.create
+create =
+    Internal.create
+
 
 createUncontrolled : ( model, Cmd msg ) -> Internal.Animated model msg -> ( App, Cmd AppMsg )
-createUncontrolled = Internal.createUncontrolled
+createUncontrolled =
+    Internal.createUncontrolled
+
 
 toFraming : Moving a -> Framing
-toFraming = Camera.toFraming
+toFraming =
+    Camera.toFraming
+
 
 appToFocus : Oriented a -> Focus
-appToFocus = Internal.appToFocus
+appToFocus =
+    Internal.appToFocus
+
 
 orientedToFocus : Oriented a -> Focus
-orientedToFocus = Internal.orientedToFocus
+orientedToFocus =
+    Internal.orientedToFocus
+
 
 noFraming : PartyKey -> model -> Maybe Framing
 noFraming _ _ =
     Nothing
+
 
 teleport : PartyKey -> Location -> Cmd (CtrlMsg a)
 teleport partyKey location =

@@ -80,7 +80,7 @@ reflectiveObjUpdate msg model =
             case ( r.mesh, r.reflectionTexture ) of
                 ( Ok mesh, Ok texture ) ->
                     let
-                        ( {vertices, indices } , worldDimensions) =
+                        ( { vertices, indices }, worldDimensions ) =
                             toWorld_MeshWithVertexWithTexture r.offset r.scale r.rotation mesh
 
                         newMesh =

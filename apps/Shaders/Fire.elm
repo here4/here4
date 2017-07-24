@@ -12,6 +12,7 @@ import WebGL exposing (..)
 
 -- https://www.shadertoy.com/view/Xsl3zN
 
+
 fragment_fire : GLSLPasta.Component
 fragment_fire =
     { empty
@@ -74,10 +75,12 @@ vec4 fire(vec2 tc)
             ]
     }
 
+
 fire : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 fire =
-    GLSLPasta.combineUsingTemplate hmdTemplate "fire"
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        "fire"
         [ fragment_fire
         , Lighting.lightenDistance
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader

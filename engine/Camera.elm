@@ -3,9 +3,9 @@ module Camera exposing (..)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Orientation exposing (Orientation)
 import Smooth
-
 import Body exposing (..)
 import Camera.Types exposing (..)
+
 
 toTarget : Moving a -> Target
 toTarget thing =
@@ -14,12 +14,14 @@ toTarget thing =
     , velocity = thing.velocity
     }
 
+
 toStationaryTarget : Oriented a -> Target
 toStationaryTarget thing =
     { position = thing.position
     , orientation = thing.orientation
     , velocity = vec3 0 0 0
     }
+
 
 toCamera : Oriented a -> Camera
 toCamera thing =
@@ -29,15 +31,17 @@ toCamera thing =
     , fovy = 45
     }
 
+
 toFraming : Moving a -> Framing
 toFraming thing =
     let
-        target = toTarget thing
+        target =
+            toTarget thing
 
         ahead =
-            V3.add thing.position
-            <| V3.scale 10.0
-            <| Orientation.rotateBodyV thing.orientation V3.k
+            V3.add thing.position <|
+                V3.scale 10.0 <|
+                    Orientation.rotateBodyV thing.orientation V3.k
     in
         { target = target
         , pov =
@@ -56,41 +60,54 @@ defaultCamera =
         , orientation = Orientation.initial
         }
 
+
 cameraUp : { a | orientation : Orientation } -> Vec3
 cameraUp thing =
     Orientation.rotateBodyV thing.orientation V3.j
 
 
+
 -- | Point the camera towards target
+
+
 retarget : Target -> Camera -> Camera
 retarget target camera =
     let
-        displacement = V3.sub target.position camera.position
+        displacement =
+            V3.sub target.position camera.position
 
         orientation =
             Orientation.fromTo V3.k displacement
     in
-        { camera | orientation = orientation
-                 , target = target }
+        { camera
+            | orientation = orientation
+            , target = target
+        }
+
+
 
 -- | Roll a cmaera to upright
+
+
 rollUpright : Camera -> Camera
-rollUpright camera = { camera | orientation = Orientation.rollUpright camera.orientation }
+rollUpright camera =
+    { camera | orientation = Orientation.rollUpright camera.orientation }
 
 
 interpolate : Float -> Camera -> Camera -> Camera
 interpolate alpha oldCamera newCamera =
     { position =
         V3.add
-            (V3.scale (1.0-alpha) oldCamera.position)
+            (V3.scale (1.0 - alpha) oldCamera.position)
             (V3.scale alpha newCamera.position)
     , orientation =
         newCamera.orientation
     , target =
         newCamera.target
     , fovy =
-        ((1.0-alpha) * oldCamera.fovy) + (alpha * newCamera.fovy)
+        ((1.0 - alpha) * oldCamera.fovy) + (alpha * newCamera.fovy)
     }
+
 
 
 -- | Given a list of coefficients, previous raw cameras and a new raw camera,
@@ -98,6 +115,8 @@ interpolate alpha oldCamera newCamera =
 --
 -- Assume the input cameras is already reversed, such
 -- that it can be built by prepending new elements
+
+
 smooth : List Float -> List Camera -> Camera
 smooth coeffs cameras =
     let
@@ -108,7 +127,6 @@ smooth coeffs cameras =
             , fovy = newCamera.fovy + oldCamera.fovy
             }
 
-
         scale f camera =
             { position = V3.scale f camera.position
             , orientation = camera.orientation
@@ -116,6 +134,7 @@ smooth coeffs cameras =
             , fovy = f * camera.fovy
             }
 
-        pad = Maybe.withDefault defaultCamera (List.head cameras)
+        pad =
+            Maybe.withDefault defaultCamera (List.head cameras)
     in
         Smooth.smooth sum scale pad coeffs cameras

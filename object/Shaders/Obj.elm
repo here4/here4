@@ -18,7 +18,7 @@ reflectionVert =
         [ Lighting.vertexReflection
         , Lighting.vertex_clipPosition
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader
 
 
 reflectionFrag =

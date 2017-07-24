@@ -12,6 +12,7 @@ import WebGL exposing (..)
 
 -- https://www.shadertoy.com/view/4sKGWt
 
+
 fragment_sky : GLSLPasta.Component
 fragment_sky =
     { empty
@@ -103,8 +104,9 @@ vec4 sky(vec2 tc) {
 
 sky : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 sky =
-    GLSLPasta.combineUsingTemplate hmdTemplate "sky"
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        "sky"
         [ fragment_sky
         , Lighting.lightenDistance
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader

@@ -1,6 +1,5 @@
 module View exposing (view)
 
-
 import App.Internal as App
 import Appearance exposing (Appearance, Perception)
 import Body exposing (Body)
@@ -117,42 +116,48 @@ type alias RenderWorld msg =
 rgbAttribute : Color -> String
 rgbAttribute color =
     let
-        rgb = Color.toRgb color
+        rgb =
+            Color.toRgb color
+
         s =
-            [rgb.red, rgb.green, rgb.blue]
-            |> List.map toString
-            |> String.join ","
+            [ rgb.red, rgb.green, rgb.blue ]
+                |> List.map toString
+                |> String.join ","
     in
         "rgb(" ++ s ++ ")"
 
 
+
 -- layoutScene1 : String -> Window.Size -> Model worldModel worldMsg -> String -> RenderWorld worldMsg -> Html (Msg worldMsg)
+
+
 layoutScene1 : Window.Size -> Model worldModel worldMsg -> String -> Model.World -> Html (Msg worldMsg)
 layoutScene1 windowSize model worldLabel view =
     let
-        render = renderWorld model.globalTime view
+        render =
+            renderWorld model.globalTime view
     in
-    div
-        [ style
-            [ ( "width", toString windowSize.width ++ "px" )
-            , ( "height", toString windowSize.height ++ "px" )
-            , ( "backgroundColor", rgbAttribute view.backgroundColor )
-            ]
-        ]
-        [ WebGL.toHtml
-            [ width windowSize.width
-            , height windowSize.height
-            , style
-                [ ( "display", "block" )
-                , ( "position", "absolute" )
-                , ( "top", "0px" )
-                , ( "left", "0px" )
-                , ( "right", "0px" )
+        div
+            [ style
+                [ ( "width", toString windowSize.width ++ "px" )
+                , ( "height", toString windowSize.height ++ "px" )
+                , ( "backgroundColor", rgbAttribute view.backgroundColor )
                 ]
             ]
-            (render Model.OneEye windowSize model.player1)
-        , hud worldLabel model.paused model.player1 0 0 (windowSize.width // 10) (windowSize.height // 10)
-        ]
+            [ WebGL.toHtml
+                [ width windowSize.width
+                , height windowSize.height
+                , style
+                    [ ( "display", "block" )
+                    , ( "position", "absolute" )
+                    , ( "top", "0px" )
+                    , ( "left", "0px" )
+                    , ( "right", "0px" )
+                    ]
+                ]
+                (render Model.OneEye windowSize model.player1)
+            , hud worldLabel model.paused model.player1 0 0 (windowSize.width // 10) (windowSize.height // 10)
+            ]
 
 
 layoutScene2 : Window.Size -> Model worldModel worldMsg -> String -> Model.World -> String -> Model.World -> Html (Msg worldMsg)
@@ -164,8 +169,11 @@ layoutScene2 windowSize model worldLabel1 view1 worldLabel2 view2 =
         ws2 =
             { windowSize | width = w2 }
 
-        render1 = renderWorld model.globalTime view1
-        render2 = renderWorld model.globalTime view2
+        render1 =
+            renderWorld model.globalTime view1
+
+        render2 =
+            renderWorld model.globalTime view2
     in
         div
             [ style
@@ -223,7 +231,8 @@ layoutScene2 windowSize model worldLabel1 view1 worldLabel2 view2 =
 layoutSceneVR : Window.Size -> Model worldModel worldMsg -> Model.World -> Html (Msg worldMsg)
 layoutSceneVR windowSize model view =
     let
-        render = renderWorld model.globalTime view
+        render =
+            renderWorld model.globalTime view
 
         w2 =
             windowSize.width // 2
@@ -398,11 +407,13 @@ lookAtBody { width, height } player eye =
 lookAtElev : Window.Size -> Model.Player msg -> Mat4
 lookAtElev { width, height } player =
     let
-        cameraY = vec3 0 (getY player.camera.position) 0
+        cameraY =
+            vec3 0 (getY player.camera.position) 0
     in
         M4.makeLookAt cameraY
             (add cameraY (scale 3 (Model.direction player.camera)))
             (cameraUp player.camera)
+
 
 lookAtSky : Window.Size -> Model.Player msg -> Mat4
 lookAtSky { width, height } player =

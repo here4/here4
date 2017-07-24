@@ -1,7 +1,9 @@
 module Vehicle exposing (..)
 
+
 type alias Driveable a =
-    { a | speed : Float
+    { a
+        | speed : Float
         , height : Float
         , radius : Float
     }

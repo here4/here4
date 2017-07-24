@@ -43,7 +43,10 @@ reflective mesh texture p =
         ]
 
 
+
 -- textured : WebGL.Mesh a -> Shader a u v -> Shader {} u v -> WebGL.Texture -> WebGL.Texture -> Appearance
+
+
 textured mesh vertexShader fragmentShader textureDiff textureNorm p =
     let
         resolution =
@@ -74,6 +77,8 @@ textured mesh vertexShader fragmentShader textureDiff textureNorm p =
             }
     in
         [ renderCullFace vertexShader fragmentShader mesh uniforms ]
+
+
 
 {-
            [ entityWith [ DepthTest.default, cullFace front ]

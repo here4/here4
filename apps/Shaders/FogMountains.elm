@@ -12,6 +12,7 @@ import WebGL exposing (..)
 
 -- https://www.shadertoy.com/view/XdsGD7
 
+
 fragment_fogMountains : GLSLPasta.Component
 fragment_fogMountains =
     { empty
@@ -237,8 +238,9 @@ vec4 fogMountains(vec2 tc)
 
 fogMountains : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 fogMountains =
-    GLSLPasta.combineUsingTemplate hmdTemplate "fogMountains"
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        "fogMountains"
         [ fragment_fogMountains
         , Lighting.lightenDistance
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader

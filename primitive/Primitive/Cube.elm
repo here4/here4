@@ -1,24 +1,25 @@
-module Primitive.Cube exposing
-    ( skyCube
-    , textureCube
-    , cloudsCube
-    , fireCube
-    , fogMountainsCube
-    , plasmaCube
-    , voronoiCube
-    , cube
-    , walls
-    , wallsWith
-    , floor
-    , floorWith
-    , ceiling
-    , cubeMesh
-    , wallsMesh
-    , wallsMeshWith
-    , floorMesh
-    , floorMeshWith
-    , ceilingMesh
-    )
+module Primitive.Cube
+    exposing
+        ( skyCube
+        , textureCube
+        , cloudsCube
+        , fireCube
+        , fogMountainsCube
+        , plasmaCube
+        , voronoiCube
+        , cube
+        , walls
+        , wallsWith
+        , floor
+        , floorWith
+        , ceiling
+        , cubeMesh
+        , wallsMesh
+        , wallsMeshWith
+        , floorMesh
+        , floorMeshWith
+        , ceilingMesh
+        )
 
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4, vec4)
@@ -71,28 +72,52 @@ voronoiCube =
 
 
 -- cube : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
-cube = render cubeMesh
+
+
+cube =
+    render cubeMesh
+
 
 
 -- walls : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
-walls = render wallsMesh
+
+
+walls =
+    render wallsMesh
+
 
 
 -- wallsWith : (Vertex -> v) -> Shader v ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
-wallsWith f = renderNSV (wallsMeshWith f)
+
+
+wallsWith f =
+    renderNSV (wallsMeshWith f)
+
 
 
 -- floor : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
-floor = render floorMesh
 
-floorWith f = renderNSV (floorMeshWith f)
+
+floor =
+    render floorMesh
+
+
+floorWith f =
+    renderNSV (floorMeshWith f)
+
 
 
 -- ceiling : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
-ceiling = render ceilingMesh
+
+
+ceiling =
+    render ceilingMesh
+
 
 
 -- render : Mesh vertex -> Shader vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
+
+
 render mesh vertexShader fragmentShader p =
     let
         resolution =
@@ -118,6 +143,7 @@ render mesh vertexShader fragmentShader p =
             , iLookAt = p.lookAt
             }
         ]
+
 
 renderNSV mesh vertexShader fragmentShader p =
     let
@@ -175,8 +201,10 @@ textureCube texture p =
             }
         ]
 
+
 map3 : (a -> b) -> Triple a -> Triple b
-map3 f (v1, v2, v3) = (f v1, f v2, f v3)
+map3 f ( v1, v2, v3 ) =
+    ( f v1, f v2, f v3 )
 
 
 cubeMesh : Mesh Vertex
@@ -188,6 +216,7 @@ wallsMesh : Mesh Vertex
 wallsMesh =
     triangles <| List.concatMap rotatedFace [ ( 0, 0, 0 ), ( 0, 90, 1 ), ( 0, 180, 2 ), ( 0, 270, 3 ) ]
 
+
 wallsMeshWith : (Vertex -> v) -> Mesh v
 wallsMeshWith f =
     triangles <| List.map (map3 f) <| List.concatMap rotatedFace [ ( 0, 0, 0 ), ( 0, 90, 1 ), ( 0, 180, 2 ), ( 0, 270, 3 ) ]
@@ -196,6 +225,7 @@ wallsMeshWith f =
 floorMesh : Mesh Vertex
 floorMesh =
     triangles <| List.concatMap rotatedFace [ ( 90, 0, 0 ) ]
+
 
 floorMeshWith : (Vertex -> v) -> Mesh v
 floorMeshWith f =

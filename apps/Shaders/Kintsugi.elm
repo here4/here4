@@ -12,6 +12,7 @@ import WebGL exposing (..)
 
 -- https://www.shadertoy.com/view/Xt33WX
 
+
 fragment_kintsugi : GLSLPasta.Component
 fragment_kintsugi =
     { empty
@@ -34,7 +35,7 @@ fragment_kintsugi =
 //               Distributed under the MIT License. See LICENSE file.
 //               https://github.com/ashima/webgl-noise
 //               https://github.com/stegu/webgl-noise
-// 
+//
 
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -117,22 +118,22 @@ vec4 marble_color (float x)
     for (int i=0; i<3; i++) { // make x fall of rapidly...
         x = sqrt(x);
     }
-    
+
     if(x <= 0.45) {
         col.r = 1.0;
         col.g = 0.84;
         col.b = 0.0;
         col *= vec4(1.95 - x) * 0.55;
         col.a = 1.0;
-    } 
+    }
     else {
         col = vec4(x);
     }
-   
+
     col.r = min(col.r, 1.0);
     col.g = min(col.g, 1.0);
     col.b = min(col.b, 1.0);
-    
+
     return col;
 }
 
@@ -143,7 +144,7 @@ vec4 kintsugi(vec2 uv)
     vec2 m;
     m.x = 10.0;
     m.y = 20.0;
-    
+
     float t = uv.x * 10.0;
     t += amplitude * turbulence (uv.xy + vec2(iGlobalTime / 80.0) - m );
     t = sin(t);
@@ -158,10 +159,12 @@ vec4 kintsugi(vec2 uv)
             ]
     }
 
+
 kintsugi : Shader {} { u | iResolution : Vec3, iGlobalTime : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 kintsugi =
-    GLSLPasta.combineUsingTemplate hmdTemplate "kintsugi"
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        "kintsugi"
         [ fragment_kintsugi
         , Lighting.lightenDistance
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader

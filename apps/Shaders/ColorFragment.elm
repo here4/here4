@@ -29,13 +29,16 @@ fragment_elm_FragColor =
             ]
     }
 
+
 colorFragment : Shader {} u { elm_FragColor : Vec3, elm_FragCoord : Vec2 }
 colorFragment =
-    GLSLPasta.combineUsingTemplate hmdTemplate "colorFragment"
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        "colorFragment"
         [ fragment_elm_FragColor
         , Lighting.lightenDistance
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader
+
 
 
 -- TODO: Configure
@@ -43,6 +46,7 @@ colorFragment =
 --  * speed of motion (multiplier on iGlobalTime): can be motionless for solid objects
 --  * swaying in the breeze (oscillate with sin)
 -- TODO: make surface2D tile seamlessly
+
 
 fragment_noiseColor : GLSLPasta.Component
 fragment_noiseColor =
@@ -132,10 +136,12 @@ vec4 noise_texture(vec2 tc) {
             ]
     }
 
+
 noiseColorFragment : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float, iDetail : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
 noiseColorFragment =
-    GLSLPasta.combineUsingTemplate hmdTemplate "noiseColorFragment"
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        "noiseColorFragment"
         [ fragment_noiseColor
         , Lighting.lightenDistance
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader

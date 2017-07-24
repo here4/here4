@@ -203,7 +203,6 @@ update world msg model =
 
                 gamepadUpdateMsg =
                     Gamepad.gamepads Model.GamepadUpdate
-
             in
                 ( newModel, Cmd.batch [ gamepadUpdateMsg, sequenceMsg ] )
 
@@ -249,32 +248,31 @@ animate world dt0 worldKey model0 =
                 multiverseA =
                     world.animate worldKey terrain dt model0.multiverse
 
-{-
-                -- Focus
-                ( multiverseF, multiverseFMsg, focPos ) =
-                    let
-                        key =
-                            player1.focusKey
-                    in
-                        case world.focus key model.multiverse of
-                            Just focus ->
-                                let
-                                    dp =
-                                        inputsToMove inputs1 player1
+                {-
+                   -- Focus
+                   ( multiverseF, multiverseFMsg, focPos ) =
+                       let
+                           key =
+                               player1.focusKey
+                       in
+                           case world.focus key model.multiverse of
+                               Just focus ->
+                                   let
+                                       dp =
+                                           inputsToMove inputs1 player1
 
-                                    ( multiverseF, multiverseFMsg ) =
-                                        world.update (Forward (ToApp key) (Control.Move dp)) multiverse2
-                                in
-                                    ( multiverseF, multiverseFMsg, Just focus.position )
+                                       ( multiverseF, multiverseFMsg ) =
+                                           world.update (Forward (ToApp key) (Control.Move dp)) multiverse2
+                                   in
+                                       ( multiverseF, multiverseFMsg, Just focus.position )
 
-                            _ ->
-                                ( multiverse2, Cmd.none, Nothing )
--}
-
-                (clearedInputs1, player1, multiverse1, multiverse1Msg) =
+                               _ ->
+                                   ( multiverse2, Cmd.none, Nothing )
+                -}
+                ( clearedInputs1, player1, multiverse1, multiverse1Msg ) =
                     animatePlayer world worldKey terrain dt0 model0.inputs model0.player1 multiverseA
 
-                (clearedInputs2, player2, multiverse2, multiverse2Msg) =
+                ( clearedInputs2, player2, multiverse2, multiverse2Msg ) =
                     animatePlayer world worldKey terrain dt0 model0.inputs2 model0.player2 multiverse1
 
                 newModel =
@@ -291,6 +289,7 @@ animate world dt0 worldKey model0 =
                 , Cmd.map Model.WorldMessage (Cmd.batch [ multiverse1Msg, multiverse2Msg ])
                 )
 
+
 animatePlayer :
     Methods worldModel worldMsg
     -> WorldKey ()
@@ -299,10 +298,11 @@ animatePlayer :
     -> Model.Inputs
     -> Model.Player (WorldMsg worldMsg)
     -> worldModel
-    -> (Model.Inputs, Model.Player (WorldMsg worldMsg), worldModel, Cmd (WorldMsg worldMsg))
+    -> ( Model.Inputs, Model.Player (WorldMsg worldMsg), worldModel, Cmd (WorldMsg worldMsg) )
 animatePlayer world (WorldKey worldKey ()) terrain dt0 inputs0 player0 model =
     let
-        inputs = timeToInputs dt0 inputs0
+        inputs =
+            timeToInputs dt0 inputs0
 
         justIfThisWorld (WorldKey wk p) =
             if wk == worldKey then
@@ -310,8 +310,8 @@ animatePlayer world (WorldKey worldKey ()) terrain dt0 inputs0 player0 model =
             else
                 Nothing
 
-        player = selectCamera terrain inputs player0
-
+        player =
+            selectCamera terrain inputs player0
     in
         case Maybe.andThen justIfThisWorld player.partyKey of
             Just worldPartyKey ->
@@ -327,14 +327,17 @@ animatePlayer world (WorldKey worldKey ()) terrain dt0 inputs0 player0 model =
                             (Forward (ToParty worldPartyKey) (Control.Drive terrain inputs))
                             rideModel
 
-                    label = world.partyLabel worldPartyKey fwdModel
+                    label =
+                        world.partyLabel worldPartyKey fwdModel
 
-                    overlay = world.overlay worldPartyKey fwdModel
+                    overlay =
+                        world.overlay worldPartyKey fwdModel
 
-                    framing = world.framing worldPartyKey fwdModel
+                    framing =
+                        world.framing worldPartyKey fwdModel
 
-                    newPlayer = updatePlayer terrain inputs dt0 label overlay player.shot framing player
-
+                    newPlayer =
+                        updatePlayer terrain inputs dt0 label overlay player.shot framing player
                 in
                     ( clearStationaryInputs inputs
                     , newPlayer
@@ -430,7 +433,7 @@ updateGamepads gps0 model =
                     | numPlayers = 1
                     , inputs = gamepadToInputs gp model.inputs
                     , gamepadIds = is
-                   }
+                  }
                 , Cmd.none
                 )
 
@@ -518,14 +521,15 @@ updatePlayer terrain inputs dt label overlayContent mshot framing player0 =
                             keepAboveGround camera =
                                 reposition (aboveGround eyeLevel camera.position) camera
 
-                            coeffs = [ 1.0 ]
+                            coeffs =
+                                [ 1.0 ]
+
                             -- coeffs = [ 0.9, 0.09, 0.01 ]
                             -- coeffs = [ 0.6, 0.2, 0.1, 0.07, 0.03 ]
                             -- coeffs = [ 0.35, 0.23, 0.16, 0.11, 0.07, 0.04, 0.02, 0.01, 0.008, 0.002 ]
-
                             rawCamera =
                                 shoot terrain inputs dt shot framing_ player.rawCamera
-                                |> keepAboveGround
+                                    |> keepAboveGround
 
                             newRecentRawCameras =
                                 List.take (List.length coeffs) (rawCamera :: player.recentRawCameras)
@@ -534,32 +538,32 @@ updatePlayer terrain inputs dt label overlayContent mshot framing player0 =
                                 -- Camera.interpolate 0.6 camera rawCamera
                                 Camera.smooth coeffs newRecentRawCameras
                         in
-                            { player | camera = newCamera
-                                     , rawCamera = rawCamera
-                                     , recentRawCameras = newRecentRawCameras
+                            { player
+                                | camera = newCamera
+                                , rawCamera = rawCamera
+                                , recentRawCameras = newRecentRawCameras
                             }
 
                     Nothing ->
                         player
 
-{-
-            mapCamera f player =
-                { player | camera = f player.camera }
+            {-
+               mapCamera f player =
+                   { player | camera = f player.camera }
 
-            smoothCamera player =
-                let
-                    cameraPos =
-                        -- (V3.add (V3.scale 0.9 player.camera.position) (V3.scale 0.1 player0.camera.position))
-                        player.camera.position
-                            |> aboveGround eyeLevel
+               smoothCamera player =
+                   let
+                       cameraPos =
+                           -- (V3.add (V3.scale 0.9 player.camera.position) (V3.scale 0.1 player0.camera.position))
+                           player.camera.position
+                               |> aboveGround eyeLevel
 
-                    -- TODO: slerp between old and new camera orientations
-                    -- (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
+                       -- TODO: slerp between old and new camera orientations
+                       -- (V3.add (V3.scale 0.1 newCameraUp) (V3.scale 0.9 player.cameraUp))
 
-                in
-                    mapCamera (reposition cameraPos) player
--}
-
+                   in
+                       mapCamera (reposition cameraPos) player
+            -}
             -- { player
             --     | camera = { c | position = cameraPos }
             --  }

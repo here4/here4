@@ -55,7 +55,7 @@ noiseVertex =
         , distort
         , vertex_clipPosition
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader
 
 
 rippleNoiseVertex : Shader NoiseVertex RippleNoiseVertexInput NoiseVertexOutput
@@ -69,4 +69,4 @@ rippleNoiseVertex =
         , distort
         , vertex_clipPosition
         ]
-    |> WebGL.unsafeShader
+        |> WebGL.unsafeShader

@@ -1,6 +1,4 @@
-module App.Internal exposing
-    (Animated, App, AppMsg, AppPosition, create, createUncontrolled, Focus, animate, bodies, reposition, id, label, overlay, framing, focus, update, appToFocus, orientedToFocus)
-
+module App.Internal exposing (Animated, App, AppMsg, AppPosition, create, createUncontrolled, Focus, animate, bodies, reposition, id, label, overlay, framing, focus, update, appToFocus, orientedToFocus)
 
 import App.Control exposing (..)
 import Html exposing (Html)
@@ -293,5 +291,3 @@ appToFocus body =
 orientedToFocus : Oriented a -> Focus
 orientedToFocus x =
     { position = x.position }
-
-
