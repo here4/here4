@@ -1,43 +1,33 @@
 module Shaders.Sky exposing (sky)
 
+import GLSLPasta
+import GLSLPasta.Core exposing (empty)
+import GLSLPasta.Lighting as Lighting
+import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4)
+import Shaders.HMD exposing (hmdTemplate)
 import WebGL exposing (..)
 
 
 -- https://www.shadertoy.com/view/4sKGWt
 
-
-sky : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
-sky =
-    [glsl|
-
-precision mediump float;
-uniform vec3 iResolution;
-uniform float iGlobalTime;
-uniform float iHMD;
-
-varying vec4 elm_FragColor;
-varying vec2 elm_FragCoord;
-
-const vec2 Scale = vec2(0.1469278, 0.2350845);
-//const vec2 Scale = vec2(0.1469278, 0.2350845);
-const vec2 ScaleIn = vec2(3, 2.5);
-//const vec2 ScaleIn = vec2(2.5, 1.5);
-const vec4 HmdWarpParam   = vec4(1, 0.22, 0.24, 0);
-
-// Scales input texture coordinates for distortion.
-vec2 HmdWarp(vec2 in01, vec2 LensCenter)
-{
-	vec2 theta = (in01 - LensCenter) * ScaleIn; // Scales to [-1, 1]
-	float rSq = theta.x * theta.x + theta.y * theta.y;
-	vec2 rvector = theta * (HmdWarpParam.x + HmdWarpParam.y * rSq +
-		HmdWarpParam.z * rSq * rSq +
-		HmdWarpParam.w * rSq * rSq * rSq);
-	return LensCenter + Scale * rvector;
-}
-
+fragment_sky : GLSLPasta.Component
+fragment_sky =
+    { empty
+        | id = "fragment_sky"
+        , provides =
+            [ "gl_FragColor"
+            ]
+        , globals =
+            [ Uniform "vec3" "iResolution"
+            , Uniform "float" "iGlobalTime"
+            , Varying "vec4" "elm_FragColor"
+            , Varying "vec2" "elm_FragCoord"
+            ]
+        , functions =
+            [ """
 // License: BSD
 // by Morgan McGuire, @CasualEffects
 
@@ -87,7 +77,7 @@ vec3 render(vec3 light, vec3 ro, vec3 rd, float resolution) {
     return col;
 }
 
-void sky(vec2 tc) {
+vec4 sky(vec2 tc) {
     const float verticalFieldOfView = 50.0 * 3.1415927 / 180.0;
     //vec3 rd = normalize(vec3(tc.xy - iResolution.xy / 2.0, iResolution.y * 0.5 / -tan(verticalFieldOfView * 0.5)));
     vec3 rd = normalize(vec3(tc.xy * 800.0, iResolution.y * 0.5 / -tan(verticalFieldOfView * 0.5)));
@@ -100,31 +90,22 @@ void sky(vec2 tc) {
     // Gamma encode
     col = pow(col, vec3(0.4545));
 
-    gl_FragColor = vec4( col, 1.0 );
+    return vec4( col, 1.0 );
 }
-
-void hmd() {
-    vec2 LensCenter = vec2(0.5, 0.5);
-    vec2 ScreenCenter = vec2(0.5, 0.5);
-
-    vec2 oTexCoord = gl_FragCoord.xy / iResolution.xy;
-
-    vec2 tc = HmdWarp(oTexCoord, LensCenter);
-    if (any(bvec2(clamp(tc,ScreenCenter-vec2(0.5,0.5), ScreenCenter+vec2(0.5,0.5)) - tc)))
-    {
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        return;
+"""
+            ]
+        , splices =
+            [ """
+            gl_FragColor = sky(fragCoord);
+"""
+            ]
     }
 
-    //sky(elm_FragCoord);
-    sky(tc);
-}
 
-void main() {
-    if (iHMD == 1.0)
-        hmd();
-    else
-        sky(elm_FragCoord);
-}
-
-|]
+sky : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2 }
+sky =
+    GLSLPasta.combineUsingTemplate hmdTemplate
+        [ fragment_sky
+        , Lighting.lightenDistance
+        ]
+    |> WebGL.unsafeShader
