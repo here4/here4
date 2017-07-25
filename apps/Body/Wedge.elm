@@ -69,22 +69,40 @@ topMesh =
             vec4 1 1 1 1
 
         wHead =
-            { position = vec3 0 0 1, color = white, coord = vec3 0 0 0 }
+            { position = vec3 0 0 1
+            , coord = vec3 0 0 0
+            , color = white
+            }
 
         wLB =
-            { position = vec3 -0.6 0 -0.1, color = white, coord = vec3 -1 1 0 }
+            { position = vec3 -0.6 0 -0.1
+            , coord = vec3 -1 1 0
+            , color = white
+            }
 
         wCB =
-            { position = vec3 0 0 -0.1, color = white, coord = vec3 0 1 0 }
+            { position = vec3 0 0 -0.1
+            , coord = vec3 0 1 0
+            , color = white
+            }
 
         wRB =
-            { position = vec3 0.6 0 -0.1, color = white, coord = vec3 1 1 0 }
+            { position = vec3 0.6 0 -0.1
+            , coord = vec3 1 1 0
+            , color = white
+            }
 
         wLT =
-            { position = vec3 -0.3 0.2 0, color = white, coord = vec3 -0.5 1 0 }
+            { position = vec3 -0.3 0.2 0
+            , coord = vec3 -0.5 1 0
+            , color = white 
+            }
 
         wRT =
-            { position = vec3 0.3 0.2 0, color = white, coord = vec3 0.5 1 0 }
+            { position = vec3 0.3 0.2 0
+            , coord = vec3 0.5 1 0
+            , color = white
+            }
     in
         triangles <|
             [ ( wHead, wLB, wLT )
