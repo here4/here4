@@ -259,7 +259,15 @@ rotatedFace ( angleX, angleY, coordX ) =
         each f ( a, b, c ) =
             ( f a, f b, f c )
     in
-        List.map (each (\x -> { x | position = t x.position, coord = add (vec3 coordX 0 0) x.coord })) face
+        List.map
+            ( each
+                (\x -> { x | position = t x.position
+                           , normal = t x.normal
+                           , coord = add (vec3 coordX 0 0) x.coord
+                       }
+                )
+            )
+            face
 
 
 face : List (Triple Vertex)
@@ -269,20 +277,28 @@ face =
             vec4 1 1 1 1
 
         topLeft =
-            -- { position = vec3 -1 1 0, color = white, coord = vec3 0 1 0 }
-            { position = vec3 -0.5 0.5 0, color = white, coord = vec3 0 1 0 }
+            { position = vec3 -0.5 0.5 0
+            , coord = vec3 0 1 0
+            , color = white
+            }
 
         topRight =
-            -- { position = vec3 1 1 0, color = white, coord = vec3 1 1 0 }
-            { position = vec3 0.5 0.5 0, color = white, coord = vec3 1 1 0 }
+            { position = vec3 0.5 0.5 0
+            , coord = vec3 1 1 0
+            , color = white
+            }
 
         bottomLeft =
-            -- { position = vec3 -1 -1 0, color = white, coord = vec3 0 0 0 }
-            { position = vec3 -0.5 -0.5 0, color = white, coord = vec3 0 0 0 }
+            { position = vec3 -0.5 -0.5 0
+            , coord = vec3 0 0 0
+            , color = white
+            }
 
         bottomRight =
-            -- { position = vec3 1 -1 0, color = white, coord = vec3 1 0 0 }
-            { position = vec3 0.5 -0.5 0, color = white, coord = vec3 1 0 0 }
+            { position = vec3 0.5 -0.5 0
+            , coord = vec3 1 0 0
+            , color = white
+            }
     in
         [ ( topLeft, topRight, bottomLeft )
         , ( bottomLeft, topRight, bottomRight )
