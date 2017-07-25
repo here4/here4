@@ -13,7 +13,13 @@ import WebGL exposing (..)
 
 
 type alias NoiseVertex =
-    { position : Vec3, color : Vec4, coord : Vec3, textureScale : Float, timeScale : Float, smoothing : Float }
+    { position : Vec3
+    , color : Vec4
+    , coord : Vec3
+    , textureScale : Float
+    , timeScale : Float
+    , smoothing : Float
+    }
 
 
 type alias NoiseVertexInput =
@@ -30,7 +36,13 @@ type alias NoiseVertexInput =
 
 
 type alias NoiseVertexOutput =
-    { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
+    { elm_FragColor : Vec4
+    , elm_FragCoord : Vec2
+    , clipPosition : Vec4
+    , iTextureScale : Float
+    , iTimeScale : Float
+    , iSmoothing : Float
+    }
 
 
 type alias RippleNoiseVertexInput =
