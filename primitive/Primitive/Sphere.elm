@@ -44,7 +44,11 @@ sphere vertexShader fragmentShader =
         appear =
             appearSphere vertexShader fragmentShader
     in
-        { scale = vec3 1 1 1, position = vec3 0 0 0, orientation = Orientation.initial, appear = appear }
+        { scale = vec3 1 1 1
+        , position = vec3 0 0 0
+        , orientation = Orientation.initial
+        , appear = appear
+        }
 
 
 appearSphere : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
@@ -159,25 +163,25 @@ sphereMesh =
         white =
             vec4 1 1 1 1
 
-        npole =
-            { position = vec3 0 1 0, coord = vec3 0 0 0 }
-
-        spole =
-            { position = vec3 0 -1 0, coord = vec3 0 1 0 }
-
         nlat q =
             let
                 x =
                     sqrt (1 - q * q)
             in
-                { position = vec3 x (-q) 0, color = white, coord = vec3 0 ((1 - q) / 2) 0 }
+                { position = vec3 x (-q) 0
+                , coord = vec3 0 ((1 - q) / 2) 0
+                , color = white
+                }
 
         slat q =
             let
                 x =
                     sqrt (1 - q * q)
             in
-                { position = vec3 x q 0, color = white, coord = vec3 0 ((1 + q) / 2) 0 }
+                { position = vec3 x q 0
+                , color = white
+                , coord = vec3 0 ((1 + q) / 2) 0
+                }
 
         nband q1 q2 =
             let
