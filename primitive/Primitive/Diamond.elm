@@ -125,10 +125,16 @@ diamondMesh =
 
         -- Vertices
         table0 =
-            { position = vec3 0 0 0, color = white, coord = vec3 0 (yMul * (0.0 - yOffset)) 0 }
+            { position = vec3 0 0 0
+            , coord = vec3 0 (yMul * (0.0 - yOffset)) 0
+            , color = white
+            }
 
         tableV =
-            { position = vec3 0.57 0 0, color = white, coord = vec3 0 (yMul * (0.57 - yOffset)) 0 }
+            { position = vec3 0.57 0 0
+            , coord = vec3 0 (yMul * (0.57 - yOffset)) 0
+            , color = white
+            }
 
         ( tableVS0, tableVS1 ) =
             eights tableV
@@ -137,7 +143,11 @@ diamondMesh =
             -0.2
 
         facet0 =
-            rotBoth -16 { position = vec3 0.8 facetY 0, color = white, coord = vec3 0.2 (yMul * (0.8 - yOffset)) 0 }
+            rotBoth -16
+                { position = vec3 0.8 facetY 0
+                , coord = vec3 0.2 (yMul * (0.8 - yOffset)) 0
+                , color = white
+                }
 
         ( facetVS0, facetVS1 ) =
             eights facet0
@@ -146,7 +156,10 @@ diamondMesh =
             -0.5
 
         girdleT0 =
-            { position = vec3 1 girdleY 0, color = white, coord = vec3 0.3 (yMul * (0.9 - yOffset)) 0 }
+            { position = vec3 1 girdleY 0
+            , coord = vec3 0.3 (yMul * (0.9 - yOffset)) 0
+            , color = white
+            }
 
         ( girdleTS0, girdleTS1 ) =
             eights girdleT0
@@ -161,7 +174,10 @@ diamondMesh =
             -1.3
 
         pavilionT0 =
-            { position = vec3 0.2 pavilionY 0, color = white, coord = vec3 0.4 (yMul * (1.3 - yOffset)) 0 }
+            { position = vec3 0.2 pavilionY 0
+            , coord = vec3 0.4 (yMul * (1.3 - yOffset)) 0
+            , color = white
+            }
 
         pavilionF0 =
             rotBoth -16 pavilionT0
@@ -170,7 +186,10 @@ diamondMesh =
             eights pavilionF0
 
         cutlet =
-            { position = vec3 0 -1.6 0, color = white, coord = vec3 0.41 (yMul * (0.87 - yOffset)) 0 }
+            { position = vec3 0 -1.6 0
+            , coord = vec3 0.41 (yMul * (0.87 - yOffset)) 0
+            , color = white
+            }
 
         --- Triangles
         mkTable v1 v2 =
