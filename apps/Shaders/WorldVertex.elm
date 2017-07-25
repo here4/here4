@@ -18,24 +18,6 @@ type alias Vertex =
     }
 
 
-{-| Forward the vertex color to the fragment shader, as vec4 elm_FragColor
--}
-vertex_elm_FragColor : GLSLPasta.Component
-vertex_elm_FragColor =
-    { empty
-        | id = "elm_FragColor"
-        , globals =
-            [ Attribute "vec4" "color"
-            , Varying "vec4" "elm_FragColor"
-            ]
-        , splices =
-            [ """
-        elm_FragColor = color;
-                """
-            ]
-    }
-
-
 worldVertex : Shader Vertex { u | iLensDistort : Float, modelViewProjectionMatrix : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 worldVertex =
     GLSLPasta.combine "worldVertex"
