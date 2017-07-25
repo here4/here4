@@ -367,6 +367,13 @@ renderWorld globalTime world eye windowSize player =
             else
                 0.95
 
+        -- some random lightpos, get this from apps instead
+        t =
+            pi / 4
+
+        lightPos =
+            vec3 (0.5 * cos (2 * t)) (1 + 0.5 * sin (2 * t)) 0.5
+
         p =
             { cameraPos = player.camera.position
             , perspective = perspective windowSize player
@@ -376,6 +383,7 @@ renderWorld globalTime world eye windowSize player =
             , lensDistort = lensDistort
             , cameraVR = player.cameraVR
             , measuredFPS = 30.0
+            , lightPosition = lightPos
             }
 
         skyLookAt =

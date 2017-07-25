@@ -16,6 +16,7 @@ type alias Perception =
     , lensDistort : Float
     , cameraVR : Bool
     , measuredFPS : Float
+    , lightPosition : Vec3
     }
 
 

@@ -48,13 +48,6 @@ textured mesh vertexShader fragmentShader textureDiff textureNorm p =
             else
                 0.0
 
-        -- some random lightpos, get this from the environment instead
-        t =
-            pi / 4
-
-        lightPos =
-            vec3 (0.5 * cos (2 * t)) (1 + 0.5 * sin (2 * t)) 0.5
-
         uniforms =
             { camera = p.perspective
             , mvMat = p.lookAt
@@ -63,7 +56,7 @@ textured mesh vertexShader fragmentShader textureDiff textureNorm p =
             , viewPosition = p.cameraPos
             , textureDiff = textureDiff
             , textureNorm = textureNorm
-            , lightPosition = lightPos
+            , lightPosition = p.lightPosition
             }
     in
         [ renderCullFace vertexShader fragmentShader mesh uniforms ]
