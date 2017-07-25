@@ -32,6 +32,7 @@ type alias ShaderPerception =
     , modelViewProjectionMatrix : Mat4
     , modelMatrix : Mat4
     , viewPosition : Vec3
+    , lightPosition : Vec3
     }
 
 

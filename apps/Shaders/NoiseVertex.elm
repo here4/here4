@@ -32,6 +32,7 @@ type alias NoiseVertexInput =
     , modelViewProjectionMatrix : Mat4
     , modelMatrix : Mat4
     , viewPosition : Vec3
+    , lightPosition : Vec3
     }
 
 
@@ -56,6 +57,7 @@ type alias RippleNoiseVertexInput =
     , modelViewProjectionMatrix : Mat4
     , modelMatrix : Mat4
     , viewPosition : Vec3
+    , lightPosition : Vec3
     }
 
 
