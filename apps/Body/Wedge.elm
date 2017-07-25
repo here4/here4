@@ -42,6 +42,7 @@ wedge p =
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             , modelMatrix = M4.identity
+            , viewPosition = p.cameraPos
             }
         , entity noiseVertex
             noiseColorFragment
@@ -54,6 +55,7 @@ wedge p =
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             , modelMatrix = M4.identity
+            , viewPosition = p.cameraPos
             }
         ]
 

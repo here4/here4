@@ -110,6 +110,7 @@ appearSurface vertexShader fragmentShader mesh p =
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             , modelMatrix = M4.identity
+            , viewPosition = p.cameraPos
             }
         ]
 
@@ -174,6 +175,7 @@ rippleAppearSurface vertexShader fragmentShader ripple mesh p =
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             , modelMatrix = M4.identity
+            , viewPosition = p.cameraPos
             , iRipple = ripple
             }
         ]

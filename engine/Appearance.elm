@@ -30,6 +30,7 @@ type alias ShaderPerception =
     , iLensDistort : Float
     , modelViewProjectionMatrix : Mat4
     , modelMatrix : Mat4
+    , viewPosition : Vec3
     }
 
 
