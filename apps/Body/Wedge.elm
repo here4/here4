@@ -3,7 +3,7 @@ module Body.Wedge exposing (wedge)
 import List exposing (concatMap, map)
 import Time exposing (Time)
 import Math.Vector2 exposing (Vec2)
-import Math.Vector3 exposing (..)
+import Math.Vector3 as V3 exposing (..)
 import Math.Vector4 exposing (vec4)
 import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
@@ -70,47 +70,72 @@ topMesh =
 
         wHead =
             { position = vec3 0 0 1
+            , normal = vec3 0 0 1
             , coord = vec3 0 0 0
             , color = white
             }
 
         wLB =
             { position = vec3 -0.6 0 -0.1
+            , normal = V3.normalize (vec3 -0.6 0 0)
             , coord = vec3 -1 1 0
             , color = white
             }
 
         wCB =
             { position = vec3 0 0 -0.1
+            , normal = vec3 0 0 -1
             , coord = vec3 0 1 0
             , color = white
             }
 
         wRB =
             { position = vec3 0.6 0 -0.1
+            , normal = V3.normalize (vec3 0.6 0 0)
             , coord = vec3 1 1 0
             , color = white
             }
 
         wLT =
             { position = vec3 -0.3 0.2 0
+            , normal = V3.normalize (vec3 -0.3 0.2 0)
             , coord = vec3 -0.5 1 0
             , color = white 
             }
 
         wRT =
             { position = vec3 0.3 0.2 0
+            , normal = V3.normalize (vec3 0.3 0.2 0)
             , coord = vec3 0.5 1 0
             , color = white
             }
+
+        -- Make a triangle joining wHead to v2 and v3
+        headTriangle v2 v3 =
+            let
+                headNormal =
+                    V3.scale 0.5 (V3.add v2.normal v3.normal)
+            in
+                ( { wHead | normal = headNormal }, v2, v3 )
+
+        rearNormal =
+            V3.cross
+                (V3.sub wLT.position wLB.position)
+                (V3.sub wCB.position wLB.position)
+
+        rearTriangle v1 v2 v3 =
+            ( { v1 | normal = rearNormal }
+            , { v2 | normal = rearNormal }
+            , { v2 | normal = rearNormal }
+            )
     in
         triangles <|
-            [ ( wHead, wLB, wLT )
-            , ( wHead, wLT, wRT )
-            , ( wHead, wRT, wRB )
-            , ( wLT, wLB, wCB )
-            , ( wLT, wCB, wRT )
-            , ( wRT, wCB, wRB )
+            [ headTriangle wLB wLT
+            , headTriangle wLT wRT
+            , headTriangle wRT wRB
+            , rearTriangle wLT wLB wCB
+            , rearTriangle wLT wCB wRT
+            , rearTriangle wRT wCB wRB
             ]
 
 
@@ -122,6 +147,7 @@ bottomMesh =
 
         wHead =
             { position = vec3 0 0 1
+            , normal = vec3 0 -1 0
             , color = white
             , coord = vec3 0 0 0
             , smoothing = 0.1
@@ -131,6 +157,7 @@ bottomMesh =
 
         wLB =
             { position = vec3 -0.6 0 -0.1
+            , normal = vec3 0 -1 0
             , color = white
             , coord = vec3 -1 1 0
             , smoothing = 0.1
@@ -140,6 +167,7 @@ bottomMesh =
 
         wRB =
             { position = vec3 0.6 0 -0.1
+            , normal = vec3 0 -1 0
             , color = white
             , coord = vec3 1 1 0
             , smoothing = 0.1

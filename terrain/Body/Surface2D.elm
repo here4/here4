@@ -8,7 +8,7 @@ module Body.Surface2D
         )
 
 import List exposing (..)
-import Math.Vector3 exposing (..)
+import Math.Vector3 as V3 exposing (..)
 import Math.Vector4 exposing (Vec4)
 import Math.Matrix4 as M4
 import Util exposing (subsample)
@@ -194,10 +194,33 @@ rippleAppearSurface vertexShader fragmentShader ripple mesh p =
 
 ----------------------------------------------------------------------
 
+type alias VertexLike v =
+    { v | position : Vec3
+        , normal : Vec3
+    }
 
-mkStrip : List v -> List v -> List ( v, v, v )
+-- Make a triangle facet, with normals at all vertices pointing in the
+-- same direction
+makeFacet :
+    VertexLike v -> VertexLike v -> VertexLike v
+    -> ( VertexLike v, VertexLike v, VertexLike v )
+makeFacet v1 v2 v3 =
+    let
+        p1 = v1.position
+        p2 = v2.position
+        p3 = v3.position
+        normal = V3.cross (V3.sub p2 p1) (V3.sub p3 p1)
+
+        setNormal v =
+            { v | normal = normal }
+    in
+        ( setNormal v1, setNormal v2, setNormal v3)
+
+mkStrip :
+    List (VertexLike v) -> List (VertexLike v)
+    -> List ( VertexLike v, VertexLike v, VertexLike v )
 mkStrip vs1 vs2 =
-    map3 (,,) vs1 vs2 (drop 1 vs1) ++ map3 (,,) vs2 (drop 1 vs1) (drop 1 vs2)
+    map3 makeFacet vs1 vs2 (drop 1 vs1) ++ map3 makeFacet vs2 (drop 1 vs1) (drop 1 vs2)
 
 
 matRow : ( Float, Float ) -> Int -> Placement -> Float -> List NoiseSurfaceVertex -> List NoiseVertex
@@ -210,6 +233,7 @@ matRow ( rx, rz ) skip placement z =
                         vec3 (placement.xOffset + posOffset)
                             (placement.yOffset + y * placement.yMult)
                             z
+                     , normal = vec3 0 1 0 -- placeholder
                      , color = rgb
                      , coord = vec3 coordOffset (rz + z) 0
                      , textureScale = tex
@@ -249,13 +273,14 @@ surfaceMesh ( rx, rz ) skip placement m =
 ----------------------------------------------------------------------
 
 
-mkStripMaybe : List (Maybe v) -> List (Maybe v) -> List ( v, v, v )
+mkStripMaybe : List (Maybe (VertexLike v)) -> List (Maybe (VertexLike v))
+    -> List ( VertexLike v, VertexLike v, VertexLike v )
 mkStripMaybe vs1 vs2 =
     let
         mkMaybe triangle =
             case triangle of
                 ( Just v1, Just v2, Just v3 ) ->
-                    Just ( v1, v2, v3 )
+                    Just ( makeFacet v1 v2 v3 )
 
                 _ ->
                     Nothing
@@ -277,6 +302,7 @@ matRowMaybe ( rx, rz ) skip placement z =
                             vec3 (placement.xOffset + posOffset)
                                 (placement.yOffset + y * placement.yMult)
                                 z
+                        , normal = vec3 0 1 0 -- placeholder
                         , color = rgb
                         , coord = vec3 coordOffset (rz + z) 0
                         , textureScale = tex

@@ -276,26 +276,33 @@ face =
         white =
             vec4 1 1 1 1
 
+        normal = 
+            vec3 0 0 1
+
         topLeft =
             { position = vec3 -0.5 0.5 0
+            , normal = normal
             , coord = vec3 0 1 0
             , color = white
             }
 
         topRight =
             { position = vec3 0.5 0.5 0
+            , normal = normal
             , coord = vec3 1 1 0
             , color = white
             }
 
         bottomLeft =
             { position = vec3 -0.5 -0.5 0
+            , normal = normal
             , coord = vec3 0 0 0
             , color = white
             }
 
         bottomRight =
             { position = vec3 0.5 -0.5 0
+            , normal = normal
             , coord = vec3 1 0 0
             , color = white
             }

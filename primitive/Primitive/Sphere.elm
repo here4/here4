@@ -115,18 +115,26 @@ rotZ n =
 
 rotBoth : Float -> Vertex -> Vertex
 rotBoth n x =
-    { x
-        | position = M4.transform (rotY n) x.position
-        , coord = M4.transform (rotZ n) x.coord
-    }
+    let
+        position = M4.transform (rotY n) x.position
+    in
+        { x
+            | position = position
+            , normal = position
+            , coord = M4.transform (rotZ n) x.coord
+        }
 
 
 rotMercator : Float -> Vertex -> Vertex
 rotMercator n v =
-    { v
-        | position = M4.transform (rotY n) v.position
-        , coord = vec3 (getX v.coord + (1.0 / n)) (getY v.coord) 0
-    }
+    let
+        position = M4.transform (rotY n) v.position
+    in
+        { v
+            | position = position
+            , normal = position
+            , coord = vec3 (getX v.coord + (1.0 / n)) (getY v.coord) 0
+        }
 
 
 seven : Vertex -> List Vertex
@@ -167,8 +175,12 @@ sphereMesh =
             let
                 x =
                     sqrt (1 - q * q)
+
+                position =
+                    vec3 x (-q) 0
             in
-                { position = vec3 x (-q) 0
+                { position = position
+                , normal = position
                 , coord = vec3 0 ((1 - q) / 2) 0
                 , color = white
                 }
@@ -177,8 +189,12 @@ sphereMesh =
             let
                 x =
                     sqrt (1 - q * q)
+
+                position =
+                    vec3 x q 0
             in
-                { position = vec3 x q 0
+                { position = position
+                , normal = position
                 , color = white
                 , coord = vec3 0 ((1 + q) / 2) 0
                 }

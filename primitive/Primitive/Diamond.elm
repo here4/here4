@@ -1,7 +1,7 @@
 module Primitive.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, diamond)
 
 import List exposing (map2, repeat)
-import Math.Vector3 exposing (..)
+import Math.Vector3 as V3 exposing (..)
 import Math.Vector4 exposing (vec4)
 import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
@@ -68,12 +68,26 @@ unfold n f x =
         in
             (res :: unfold (n - 1) f res)
 
+-- Make a triangle facet, with normals at all vertices pointing in the
+-- same direction
+makeFacet : Vertex -> Vertex -> Vertex -> ( Vertex, Vertex, Vertex )
+makeFacet v1 v2 v3 =
+    let
+        p1 = v1.position
+        p2 = v2.position
+        p3 = v3.position
+        normal = V3.cross (V3.sub p2 p1) (V3.sub p3 p1)
 
-zip3 : List a -> List b -> List c -> List ( a, b, c )
-zip3 xs ys zs =
+        setNormal v =
+            { v | normal = normal }
+    in
+        ( setNormal v1, setNormal v2, setNormal v3)
+
+zipFacets : List Vertex -> List Vertex -> List Vertex -> List ( Vertex, Vertex, Vertex )
+zipFacets xs ys zs =
     case ( xs, ys, zs ) of
         ( x :: xs1, y :: ys1, z :: zs1 ) ->
-            ( x, y, z ) :: zip3 xs1 ys1 zs1
+            makeFacet x y z :: zipFacets xs1 ys1 zs1
 
         _ ->
             []
@@ -126,12 +140,14 @@ diamondMesh =
         -- Vertices
         table0 =
             { position = vec3 0 0 0
+            , normal = vec3 0 1 0
             , coord = vec3 0 (yMul * (0.0 - yOffset)) 0
             , color = white
             }
 
         tableV =
             { position = vec3 0.57 0 0
+            , normal = vec3 0 1 0
             , coord = vec3 0 (yMul * (0.57 - yOffset)) 0
             , color = white
             }
@@ -145,6 +161,7 @@ diamondMesh =
         facet0 =
             rotBoth -16
                 { position = vec3 0.8 facetY 0
+                , normal = vec3 1 0 0 -- placeholder
                 , coord = vec3 0.2 (yMul * (0.8 - yOffset)) 0
                 , color = white
                 }
@@ -157,6 +174,7 @@ diamondMesh =
 
         girdleT0 =
             { position = vec3 1 girdleY 0
+            , normal = vec3 1 0 0 -- placeholder
             , coord = vec3 0.3 (yMul * (0.9 - yOffset)) 0
             , color = white
             }
@@ -175,6 +193,7 @@ diamondMesh =
 
         pavilionT0 =
             { position = vec3 0.2 pavilionY 0
+            , normal = vec3 1 0 0 -- placeholder
             , coord = vec3 0.4 (yMul * (1.3 - yOffset)) 0
             , color = white
             }
@@ -187,6 +206,7 @@ diamondMesh =
 
         cutlet =
             { position = vec3 0 -1.6 0
+            , normal = vec3 1 0 0 -- placeholder
             , coord = vec3 0.41 (yMul * (0.87 - yOffset)) 0
             , color = white
             }
@@ -199,31 +219,31 @@ diamondMesh =
             map2 mkTable tableVS1 tableVS0
 
         stars =
-            zip3 tableVS0 tableVS1 facetVS1
+            zipFacets tableVS0 tableVS1 facetVS1
 
         bezelL =
-            zip3 facetVS0 tableVS0 girdleTS0
+            zipFacets facetVS0 tableVS0 girdleTS0
 
         bezelR =
-            zip3 facetVS1 girdleTS0 tableVS0
+            zipFacets facetVS1 girdleTS0 tableVS0
 
         upperGirdleL =
-            zip3 girdleTS0 facetVS1 girdleFS
+            zipFacets girdleTS0 facetVS1 girdleFS
 
         upperGirdleR =
-            zip3 girdleFS facetVS1 girdleTS1
+            zipFacets girdleFS facetVS1 girdleTS1
 
         lowerGirdleL =
-            zip3 girdleTS0 girdleFS pavilionVS1
+            zipFacets girdleTS0 girdleFS pavilionVS1
 
         lowerGirdleR =
-            zip3 girdleFS pavilionVS1 girdleTS1
+            zipFacets girdleFS pavilionVS1 girdleTS1
 
         pavilionFacetL =
-            zip3 pavilionVS0 girdleTS0 (repeat 8 cutlet)
+            zipFacets pavilionVS0 girdleTS0 (repeat 8 cutlet)
 
         pavilionFacetR =
-            zip3 girdleTS0 pavilionVS1 (repeat 8 cutlet)
+            zipFacets girdleTS0 pavilionVS1 (repeat 8 cutlet)
     in
         triangles <|
             table

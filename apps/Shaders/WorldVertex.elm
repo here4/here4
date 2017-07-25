@@ -13,6 +13,7 @@ import WebGL exposing (..)
 
 type alias Vertex =
     { position : Vec3
+    , normal : Vec3
     , color : Vec4
     , coord : Vec3
     }

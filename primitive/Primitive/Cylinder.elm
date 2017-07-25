@@ -137,6 +137,7 @@ rotBoth : Float -> Vertex -> Vertex
 rotBoth n x =
     { x
         | position = M4.transform (rotY n) x.position
+        , normal = M4.transform (rotY n) x.normal
         , coord = M4.transform (rotZ n) x.coord
     }
 
@@ -145,6 +146,7 @@ rotMercator : Float -> Vertex -> Vertex
 rotMercator n v =
     { v
         | position = M4.transform (rotY n) v.position
+        , normal = M4.transform (rotY n) v.normal
         , coord = vec3 (getX v.coord + (1.0 / n)) (getY v.coord) 0
     }
 
@@ -189,12 +191,14 @@ cylinderMesh =
         -- Vertices
         top0 =
             { position = vec3 0 0.5 0
+            , normal = vec3 0 1 0
             , coord = vec3 0 (0.0 - yOffset) 0
             , color = white
             }
 
         topV =
             { position = vec3 1 0.5 0
+            , normal = vec3 1 0 0
             , coord = vec3 0 (1.0 - yOffset) 0
             , color = white
             }
@@ -204,12 +208,14 @@ cylinderMesh =
 
         bottom0 =
             { position = vec3 0 -0.5 0
+            , normal = vec3 0 -1 0
             , coord = vec3 0 (0.0 - yOffset) 0
             , color = white
             }
 
         bottomV =
             { position = vec3 1 -0.5 0
+            , normal = vec3 1 0 0
             , coord = vec3 0 (1.0 - yOffset) 0
             , color = white
             }
