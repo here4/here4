@@ -69,8 +69,7 @@ appearSphere vertexShader fragmentShader p =
             , iGlobalTime = s
             , iHMD = iHMD
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             }
         ]
 
@@ -110,7 +109,7 @@ rotZ n =
 rotBoth : Float -> Vertex -> Vertex
 rotBoth n x =
     { x
-        | pos = M4.transform (rotY n) x.pos
+        | position = M4.transform (rotY n) x.position
         , coord = M4.transform (rotZ n) x.coord
     }
 
@@ -118,7 +117,7 @@ rotBoth n x =
 rotMercator : Float -> Vertex -> Vertex
 rotMercator n v =
     { v
-        | pos = M4.transform (rotY n) v.pos
+        | position = M4.transform (rotY n) v.position
         , coord = vec3 (getX v.coord + (1.0 / n)) (getY v.coord) 0
     }
 
@@ -158,24 +157,24 @@ sphereMesh =
             vec4 1 1 1 1
 
         npole =
-            { pos = vec3 0 1 0, coord = vec3 0 0 0 }
+            { position = vec3 0 1 0, coord = vec3 0 0 0 }
 
         spole =
-            { pos = vec3 0 -1 0, coord = vec3 0 1 0 }
+            { position = vec3 0 -1 0, coord = vec3 0 1 0 }
 
         nlat q =
             let
                 x =
                     sqrt (1 - q * q)
             in
-                { pos = vec3 x (-q) 0, color = white, coord = vec3 0 ((1 - q) / 2) 0 }
+                { position = vec3 x (-q) 0, color = white, coord = vec3 0 ((1 - q) / 2) 0 }
 
         slat q =
             let
                 x =
                     sqrt (1 - q * q)
             in
-                { pos = vec3 x q 0, color = white, coord = vec3 0 ((1 + q) / 2) 0 }
+                { position = vec3 x q 0, color = white, coord = vec3 0 ((1 + q) / 2) 0 }
 
         nband q1 q2 =
             let

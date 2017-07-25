@@ -139,8 +139,7 @@ render mesh vertexShader fragmentShader p =
             , iHMD = iHMD
             , iGlobalTime = s
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             }
         ]
 
@@ -169,8 +168,7 @@ renderNSV mesh vertexShader fragmentShader p =
             , iHMD = iHMD
             , iGlobalTime = s
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             , iDetail = detail
             , iGlobalTimeV = s
             }
@@ -196,8 +194,7 @@ textureCube texture p =
             , iHMD = iHMD
             , iTexture = texture
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             }
         ]
 
@@ -253,7 +250,7 @@ rotatedFace ( angleX, angleY, coordX ) =
         each f ( a, b, c ) =
             ( f a, f b, f c )
     in
-        List.map (each (\x -> { x | pos = t x.pos, coord = add (vec3 coordX 0 0) x.coord })) face
+        List.map (each (\x -> { x | position = t x.position, coord = add (vec3 coordX 0 0) x.coord })) face
 
 
 face : List (Triple Vertex)
@@ -263,20 +260,20 @@ face =
             vec4 1 1 1 1
 
         topLeft =
-            -- { pos = vec3 -1 1 0, color = white, coord = vec3 0 1 0 }
-            { pos = vec3 -0.5 0.5 0, color = white, coord = vec3 0 1 0 }
+            -- { position = vec3 -1 1 0, color = white, coord = vec3 0 1 0 }
+            { position = vec3 -0.5 0.5 0, color = white, coord = vec3 0 1 0 }
 
         topRight =
-            -- { pos = vec3 1 1 0, color = white, coord = vec3 1 1 0 }
-            { pos = vec3 0.5 0.5 0, color = white, coord = vec3 1 1 0 }
+            -- { position = vec3 1 1 0, color = white, coord = vec3 1 1 0 }
+            { position = vec3 0.5 0.5 0, color = white, coord = vec3 1 1 0 }
 
         bottomLeft =
-            -- { pos = vec3 -1 -1 0, color = white, coord = vec3 0 0 0 }
-            { pos = vec3 -0.5 -0.5 0, color = white, coord = vec3 0 0 0 }
+            -- { position = vec3 -1 -1 0, color = white, coord = vec3 0 0 0 }
+            { position = vec3 -0.5 -0.5 0, color = white, coord = vec3 0 0 0 }
 
         bottomRight =
-            -- { pos = vec3 1 -1 0, color = white, coord = vec3 1 0 0 }
-            { pos = vec3 0.5 -0.5 0, color = white, coord = vec3 1 0 0 }
+            -- { position = vec3 1 -1 0, color = white, coord = vec3 1 0 0 }
+            { position = vec3 0.5 -0.5 0, color = white, coord = vec3 1 0 0 }
     in
         [ ( topLeft, topRight, bottomLeft )
         , ( bottomLeft, topRight, bottomRight )

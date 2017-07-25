@@ -49,8 +49,7 @@ diamond vertexShader fragmentShader p =
             , iGlobalTime = s
             , iHMD = iHMD
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             }
         ]
 
@@ -90,7 +89,7 @@ rotZ n =
 rotBoth : Float -> Vertex -> Vertex
 rotBoth n x =
     { x
-        | pos = M4.transform (rotY n) x.pos
+        | position = M4.transform (rotY n) x.position
         , coord = M4.transform (rotZ n) x.coord
     }
 
@@ -123,10 +122,10 @@ diamondMesh =
 
         -- Vertices
         table0 =
-            { pos = vec3 0 0 0, color = white, coord = vec3 0 (yMul * (0.0 - yOffset)) 0 }
+            { position = vec3 0 0 0, color = white, coord = vec3 0 (yMul * (0.0 - yOffset)) 0 }
 
         tableV =
-            { pos = vec3 0.57 0 0, color = white, coord = vec3 0 (yMul * (0.57 - yOffset)) 0 }
+            { position = vec3 0.57 0 0, color = white, coord = vec3 0 (yMul * (0.57 - yOffset)) 0 }
 
         ( tableVS0, tableVS1 ) =
             eights tableV
@@ -135,7 +134,7 @@ diamondMesh =
             -0.2
 
         facet0 =
-            rotBoth -16 { pos = vec3 0.8 facetY 0, color = white, coord = vec3 0.2 (yMul * (0.8 - yOffset)) 0 }
+            rotBoth -16 { position = vec3 0.8 facetY 0, color = white, coord = vec3 0.2 (yMul * (0.8 - yOffset)) 0 }
 
         ( facetVS0, facetVS1 ) =
             eights facet0
@@ -144,7 +143,7 @@ diamondMesh =
             -0.5
 
         girdleT0 =
-            { pos = vec3 1 girdleY 0, color = white, coord = vec3 0.3 (yMul * (0.9 - yOffset)) 0 }
+            { position = vec3 1 girdleY 0, color = white, coord = vec3 0.3 (yMul * (0.9 - yOffset)) 0 }
 
         ( girdleTS0, girdleTS1 ) =
             eights girdleT0
@@ -159,7 +158,7 @@ diamondMesh =
             -1.3
 
         pavilionT0 =
-            { pos = vec3 0.2 pavilionY 0, color = white, coord = vec3 0.4 (yMul * (1.3 - yOffset)) 0 }
+            { position = vec3 0.2 pavilionY 0, color = white, coord = vec3 0.4 (yMul * (1.3 - yOffset)) 0 }
 
         pavilionF0 =
             rotBoth -16 pavilionT0
@@ -168,7 +167,7 @@ diamondMesh =
             eights pavilionF0
 
         cutlet =
-            { pos = vec3 0 -1.6 0, color = white, coord = vec3 0.41 (yMul * (0.87 - yOffset)) 0 }
+            { position = vec3 0 -1.6 0, color = white, coord = vec3 0.41 (yMul * (0.87 - yOffset)) 0 }
 
         --- Triangles
         mkTable v1 v2 =

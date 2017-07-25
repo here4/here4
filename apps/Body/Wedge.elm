@@ -5,7 +5,7 @@ import Time exposing (Time)
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (vec4)
-import Math.Matrix4 exposing (..)
+import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
 import Appearance exposing (..)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
@@ -40,8 +40,7 @@ wedge p =
             , iHMD = iHMD
             , iGlobalTime = s
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             }
         , entity noiseVertex
             noiseColorFragment
@@ -52,8 +51,7 @@ wedge p =
             , iGlobalTime = s
             , iGlobalTimeV = s
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             }
         ]
 
@@ -65,22 +63,22 @@ topMesh =
             vec4 1 1 1 1
 
         wHead =
-            { pos = vec3 0 0 1, color = white, coord = vec3 0 0 0 }
+            { position = vec3 0 0 1, color = white, coord = vec3 0 0 0 }
 
         wLB =
-            { pos = vec3 -0.6 0 -0.1, color = white, coord = vec3 -1 1 0 }
+            { position = vec3 -0.6 0 -0.1, color = white, coord = vec3 -1 1 0 }
 
         wCB =
-            { pos = vec3 0 0 -0.1, color = white, coord = vec3 0 1 0 }
+            { position = vec3 0 0 -0.1, color = white, coord = vec3 0 1 0 }
 
         wRB =
-            { pos = vec3 0.6 0 -0.1, color = white, coord = vec3 1 1 0 }
+            { position = vec3 0.6 0 -0.1, color = white, coord = vec3 1 1 0 }
 
         wLT =
-            { pos = vec3 -0.3 0.2 0, color = white, coord = vec3 -0.5 1 0 }
+            { position = vec3 -0.3 0.2 0, color = white, coord = vec3 -0.5 1 0 }
 
         wRT =
-            { pos = vec3 0.3 0.2 0, color = white, coord = vec3 0.5 1 0 }
+            { position = vec3 0.3 0.2 0, color = white, coord = vec3 0.5 1 0 }
     in
         triangles <|
             [ ( wHead, wLB, wLT )
@@ -99,7 +97,7 @@ bottomMesh =
             vec4 0.1 0.1 0.7 1.7
 
         wHead =
-            { pos = vec3 0 0 1
+            { position = vec3 0 0 1
             , color = white
             , coord = vec3 0 0 0
             , smoothing = 0.1
@@ -108,7 +106,7 @@ bottomMesh =
             }
 
         wLB =
-            { pos = vec3 -0.6 0 -0.1
+            { position = vec3 -0.6 0 -0.1
             , color = white
             , coord = vec3 -1 1 0
             , smoothing = 0.1
@@ -117,7 +115,7 @@ bottomMesh =
             }
 
         wRB =
-            { pos = vec3 0.6 0 -0.1
+            { position = vec3 0.6 0 -0.1
             , color = white
             , coord = vec3 1 1 0
             , smoothing = 0.1

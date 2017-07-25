@@ -11,6 +11,7 @@ import Appearance exposing (Appearance)
 import Body.Obj exposing (reflective)
 import Dict exposing (Dict)
 import Math.Vector3 as V3 exposing (vec3)
+import Math.Matrix4 as M4
 import Object.Types exposing (Load(..))
 import Object.Util exposing (..)
 import OBJ
@@ -104,7 +105,6 @@ makeAppearance mesh texture p =
             , iHMD = iHMD
             , iTexture = texture
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             }
         ]

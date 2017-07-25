@@ -1,7 +1,7 @@
 module Shaders.NoiseVertex exposing (NoiseVertex, NoiseVertexInput, NoiseVertexOutput, RippleNoiseVertexInput, noiseVertex, rippleNoiseVertex)
 
 import GLSLPasta
-import GLSLPasta.Lighting exposing (vertex_clipPosition)
+import GLSLPasta.Lighting as Lighting
 import GLSLPasta.Types as GLSLPasta exposing (Global(..), Dependencies(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (Vec3)
@@ -13,7 +13,7 @@ import WebGL exposing (..)
 
 
 type alias NoiseVertex =
-    { pos : Vec3, color : Vec4, coord : Vec3, textureScale : Float, timeScale : Float, smoothing : Float }
+    { position : Vec3, color : Vec4, coord : Vec3, textureScale : Float, timeScale : Float, smoothing : Float }
 
 
 type alias NoiseVertexInput =
@@ -23,8 +23,7 @@ type alias NoiseVertexInput =
     , iHMD : Float
     , iLensDistort : Float
     , iResolution : Vec3
-    , iPerspective : Mat4
-    , iLookAt : Mat4
+    , modelViewProjectionMatrix : Mat4
     }
 
 
@@ -40,20 +39,19 @@ type alias RippleNoiseVertexInput =
     , iLensDistort : Float
     , iResolution : Vec3
     , iRipple : Float
-    , iPerspective : Mat4
-    , iLookAt : Mat4
+    , modelViewProjectionMatrix : Mat4
     }
 
 
 noiseVertex : Shader NoiseVertex NoiseVertexInput NoiseVertexOutput
 noiseVertex =
     GLSLPasta.combine "noiseVertex"
-        [ perspective
+        [ Lighting.vertex_gl_Position
         , vertex_elm_FragColor
         , vertex_elm_FragCoord
         , vertex_noise
         , distort
-        , vertex_clipPosition
+        , Lighting.vertex_clipPosition
         ]
         |> WebGL.unsafeShader
 
@@ -62,11 +60,11 @@ rippleNoiseVertex : Shader NoiseVertex RippleNoiseVertexInput NoiseVertexOutput
 rippleNoiseVertex =
     GLSLPasta.combine "rippleNoiseVertex"
         [ vertex_ripple
-        , perspective
+        , Lighting.vertex_gl_Position
         , vertex_elm_FragColor
         , vertex_elm_FragCoord
         , vertex_noise
         , distort
-        , vertex_clipPosition
+        , Lighting.vertex_clipPosition
         ]
         |> WebGL.unsafeShader

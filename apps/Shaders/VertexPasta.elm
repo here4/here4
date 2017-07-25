@@ -1,59 +1,15 @@
 module Shaders.VertexPasta
     exposing
-        ( perspective
-        , distort
+        ( distort
         , vertex_elm_FragColor
         , vertex_elm_FragCoord
-        , vertex_pos4
         , vertex_noise
         , vertex_ripple
         )
 
 import GLSLPasta exposing (empty)
+import GLSLPasta.Lighting as Lighting
 import GLSLPasta.Types as GLSLPasta exposing (Global(..), Dependencies(..))
-
-
-{-| Generates position4
--}
-vertex_pos4 : GLSLPasta.Component
-vertex_pos4 =
-    { empty
-        | id = "vertex_pos4"
-        , provides =
-            [ "position4"
-            ]
-        , globals =
-            [ Attribute "vec3" "pos"
-            ]
-        , splices =
-            [ """
-        vec4 pos4 = vec4(pos, 1.0);
-            """
-            ]
-    }
-
-
-perspective : GLSLPasta.Component
-perspective =
-    { empty
-        | id = "perspective"
-        , dependencies =
-            Dependencies
-                [ vertex_pos4
-                ]
-        , provides =
-            [ "gl_Position"
-            ]
-        , globals =
-            [ Uniform "mat4" "iPerspective"
-            , Uniform "mat4" "iLookAt"
-            ]
-        , splices =
-            [ """
-        vec4 p = iPerspective * iLookAt * pos4;
-            """
-            ]
-    }
 
 
 distort : GLSLPasta.Component
@@ -62,7 +18,7 @@ distort =
         | id = "lighting.vertex_position4"
         , dependencies =
             Dependencies
-                [ perspective
+                [ Lighting.vertex_gl_Position
                 ]
         , requires =
             [ "gl_Position"
@@ -94,9 +50,7 @@ vec4 distort(vec4 p)
         , splices =
             [ """
         if (iLensDistort > 0.0) {
-          gl_Position = distort(p);
-        } else {
-          gl_Position = p;
+          gl_Position = distort(gl_Position);
         }
 """
             ]
@@ -165,17 +119,16 @@ vertex_ripple =
         | id = "vertex_ripple"
         , dependencies =
             Dependencies
-                [ vertex_pos4
+                [ Lighting.vertex_position4
                 ]
         , globals =
-            [ Attribute "vec3" "pos"
-            , Attribute "vec3" "coord"
+            [ Attribute "vec3" "coord"
             , Uniform "float" "iGlobalTimeV"
             , Uniform "float" "iRipple"
             ]
         , splices =
             [ """
-        pos4.y += iRipple * sin(coord.x*coord.y + iGlobalTimeV);
+        position4.y += iRipple * sin(coord.x*coord.y + iGlobalTimeV);
 """
             ]
     }

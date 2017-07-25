@@ -10,6 +10,7 @@ module Body.Surface2D
 import List exposing (..)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4)
+import Math.Matrix4 as M4
 import Util exposing (subsample)
 import WebGL exposing (..)
 import Appearance exposing (..)
@@ -107,8 +108,7 @@ appearSurface vertexShader fragmentShader mesh p =
             , iDetail = detail
             , iGlobalTimeV = s
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             }
         ]
 
@@ -171,8 +171,7 @@ rippleAppearSurface vertexShader fragmentShader ripple mesh p =
             , iDetail = detail
             , iGlobalTimeV = s
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             , iRipple = ripple
             }
         ]
@@ -193,7 +192,7 @@ matRow ( rx, rz ) skip placement z =
         m posOffset coordOffset ys0 =
             case ys0 of
                 ( y, rgb, tex, tim, smoo ) :: ys ->
-                    ({ pos =
+                    ({ position =
                         vec3 (placement.xOffset + posOffset)
                             (placement.yOffset + y * placement.yMult)
                             z
@@ -260,7 +259,7 @@ matRowMaybe ( rx, rz ) skip placement z =
             case ys0 of
                 (Just ( y, rgb, tex, tim, smoo )) :: ys ->
                     (Just
-                        { pos =
+                        { position =
                             vec3 (placement.xOffset + posOffset)
                                 (placement.yOffset + y * placement.yMult)
                                 z

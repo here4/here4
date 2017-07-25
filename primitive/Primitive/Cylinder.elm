@@ -62,8 +62,7 @@ appearCylinder vertexShader fragmentShader p =
             , iGlobalTime = s
             , iHMD = iHMD
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             }
         ]
 
@@ -87,8 +86,7 @@ textureCylinder texture p =
             , iHMD = iHMD
             , iTexture = texture
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             }
         ]
 
@@ -128,7 +126,7 @@ rotZ n =
 rotBoth : Float -> Vertex -> Vertex
 rotBoth n x =
     { x
-        | pos = M4.transform (rotY n) x.pos
+        | position = M4.transform (rotY n) x.position
         , coord = M4.transform (rotZ n) x.coord
     }
 
@@ -136,7 +134,7 @@ rotBoth n x =
 rotMercator : Float -> Vertex -> Vertex
 rotMercator n v =
     { v
-        | pos = M4.transform (rotY n) v.pos
+        | position = M4.transform (rotY n) v.position
         , coord = vec3 (getX v.coord + (1.0 / n)) (getY v.coord) 0
     }
 
@@ -180,19 +178,19 @@ cylinderMesh =
 
         -- Vertices
         top0 =
-            { pos = vec3 0 0.5 0, color = white, coord = vec3 0 (0.0 - yOffset) 0 }
+            { position = vec3 0 0.5 0, color = white, coord = vec3 0 (0.0 - yOffset) 0 }
 
         topV =
-            { pos = vec3 1 0.5 0, color = white, coord = vec3 0 (1.0 - yOffset) 0 }
+            { position = vec3 1 0.5 0, color = white, coord = vec3 0 (1.0 - yOffset) 0 }
 
         ( topVS0, topVS1 ) =
             circlePair topV
 
         bottom0 =
-            { pos = vec3 0 -0.5 0, color = white, coord = vec3 0 (0.0 - yOffset) 0 }
+            { position = vec3 0 -0.5 0, color = white, coord = vec3 0 (0.0 - yOffset) 0 }
 
         bottomV =
-            { pos = vec3 1 -0.5 0, color = white, coord = vec3 0 (1.0 - yOffset) 0 }
+            { position = vec3 1 -0.5 0, color = white, coord = vec3 0 (1.0 - yOffset) 0 }
 
         ( bottomVS0, bottomVS1 ) =
             circlePair bottomV

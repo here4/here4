@@ -128,7 +128,7 @@ init placement =
                 V4.fromTuple ( v.x, v.y, v.z, 1.0 )
 
         toNoiseVertex v =
-            { pos = v.pos
+            { position = v.position
             , coord = V3.scale 10 v.coord
             , color = alpha1 sea -- vec4 0.1 0.1 0.7 1.7
             , smoothing = 0.1

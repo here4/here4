@@ -30,16 +30,6 @@ reflective mesh texture p =
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             , texture = texture
             }
-
-        {-
-           { iResolution = resolution
-           , iHMD = iHMD
-           , iTexture = texture
-           , iLensDistort = p.lensDistort
-           , iPerspective = p.perspective
-           , iLookAt = p.lookAt
-           }
-        -}
         ]
 
 
@@ -77,26 +67,6 @@ textured mesh vertexShader fragmentShader textureDiff textureNorm p =
             }
     in
         [ renderCullFace vertexShader fragmentShader mesh uniforms ]
-
-
-
-{-
-           [ entityWith [ DepthTest.default, cullFace front ]
-               reflectionVert
-               reflectionFrag
-               mesh
-               { camera = p.perspective, mvMat = p.lookAt, texture = texture }
-   {-
-               { iResolution = resolution
-               , iHMD = iHMD
-               , iTexture = texture
-               , iLensDistort = p.lensDistort
-               , iPerspective = p.perspective
-               , iLookAt = p.lookAt
-               }
-   -}
-           ]
--}
 
 
 renderCullFace : Shader a u v -> Shader {} u v -> WebGL.Mesh a -> u -> Entity

@@ -3,12 +3,12 @@ module Body.BFly exposing (bfly)
 import Appearance exposing (..)
 import Body exposing (Oriented, Visible)
 import GLSLPasta exposing (empty)
-import GLSLPasta.Lighting exposing (vertex_clipPosition)
+import GLSLPasta.Lighting as Lighting
 import GLSLPasta.Types as GLSLPasta exposing (Global(..), Dependencies(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4, vec4)
-import Math.Matrix4 exposing (..)
+import Math.Matrix4 as M4 exposing (..)
 import Orientation
 import Time exposing (second)
 import Shaders.VertexPasta exposing (..)
@@ -16,7 +16,11 @@ import WebGL exposing (..)
 
 
 type alias BoidVertex =
-    { pos : Vec3, color : Vec4, coord : Vec3, wing : Vec3 }
+    { position : Vec3
+    , color : Vec4
+    , coord : Vec3
+    , wing : Vec3
+    }
 
 
 
@@ -28,8 +32,7 @@ type alias BoidVertex =
        , iHMD : Float
        , iLensDistort : Float
        , iResolution : Vec3
-       , iPerspective : Mat4
-       , iLookAt : Mat4
+       , modelViewProjectionMatrix : Mat4
        }
 
 
@@ -90,8 +93,7 @@ appearBFly vertexShader fragmentShader flapStart p =
             , iGlobalTime = s
             , iHMD = iHMD
             , iLensDistort = p.lensDistort
-            , iPerspective = p.perspective
-            , iLookAt = p.lookAt
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             , flapL = flapL
             , flapR = flapR
             }
@@ -105,16 +107,16 @@ mesh =
             vec4 1 1 1 1
 
         bHead =
-            { pos = vec3 0 0 0.5, color = white, coord = vec3 0.5 0 0, wing = vec3 0 0 0 }
+            { position = vec3 0 0 0.5, color = white, coord = vec3 0.5 0 0, wing = vec3 0 0 0 }
 
         bTail =
-            { pos = vec3 0 0 -0.5, color = white, coord = vec3 0.5 1 0, wing = vec3 0 0 0 }
+            { position = vec3 0 0 -0.5, color = white, coord = vec3 0.5 1 0, wing = vec3 0 0 0 }
 
         bLeft =
-            { pos = vec3 -0.7 0 -0.7, color = white, coord = vec3 0 0.5 0, wing = vec3 -1 0 0 }
+            { position = vec3 -0.7 0 -0.7, color = white, coord = vec3 0 0.5 0, wing = vec3 -1 0 0 }
 
         bRight =
-            { pos = vec3 0.7 0 -0.7, color = white, coord = vec3 1 0.5 0, wing = vec3 1 0 0 }
+            { position = vec3 0.7 0 -0.7, color = white, coord = vec3 1 0.5 0, wing = vec3 1 0 0 }
     in
         triangles <| [ ( bHead, bTail, bLeft ), ( bHead, bTail, bRight ) ]
 
@@ -125,7 +127,7 @@ vertex_flap =
         | id = "vertex_flap"
         , dependencies =
             Dependencies
-                [ vertex_pos4
+                [ Lighting.vertex_position4
                 ]
         , globals =
             [ Attribute "vec3" "wing"
@@ -138,20 +140,20 @@ vertex_flap =
         if (wing.x < 0.0) { flap = flapL; }
         else if (wing.x > 0.0) { flap = flapR; }
         else { flap = mat4(1.0); }
-        pos4 *= flap;
+        position4 *= flap;
 """
             ]
     }
 
 
-bflyVertex : Shader BoidVertex { u | iLensDistort : Float, iPerspective : Mat4, iLookAt : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
+bflyVertex : Shader BoidVertex { u | iLensDistort : Float, modelViewProjectionMatrix : Mat4, flapL : Mat4, flapR : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
 bflyVertex =
     GLSLPasta.combine "bflyVertex"
         [ vertex_flap
-        , perspective
+        , Lighting.vertex_gl_Position
         , vertex_elm_FragColor
         , vertex_elm_FragCoord
         , distort
-        , vertex_clipPosition
+        , Lighting.vertex_clipPosition
         ]
         |> WebGL.unsafeShader
