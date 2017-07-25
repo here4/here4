@@ -29,6 +29,7 @@ type alias ShaderPerception =
     , iResolution : Vec3
     , iLensDistort : Float
     , modelViewProjectionMatrix : Mat4
+    , modelMatrix : Mat4
     }
 
 

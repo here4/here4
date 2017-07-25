@@ -140,6 +140,7 @@ render mesh vertexShader fragmentShader p =
             , iGlobalTime = s
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
+            , modelMatrix = M4.identity
             }
         ]
 
@@ -169,6 +170,7 @@ renderNSV mesh vertexShader fragmentShader p =
             , iGlobalTime = s
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
+            , modelMatrix = M4.identity
             , iDetail = detail
             , iGlobalTimeV = s
             }
@@ -195,6 +197,7 @@ textureCube texture p =
             , iTexture = texture
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
+            , modelMatrix = M4.identity
             }
         ]
 

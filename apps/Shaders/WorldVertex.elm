@@ -18,7 +18,17 @@ type alias Vertex =
     }
 
 
-worldVertex : Shader Vertex { u | iLensDistort : Float, modelViewProjectionMatrix : Mat4 } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4 }
+worldVertex :
+    Shader
+        Vertex
+        { u | iLensDistort : Float
+            , modelViewProjectionMatrix : Mat4
+            , modelMatrix : Mat4
+        }
+        { elm_FragColor : Vec4
+        , elm_FragCoord : Vec2
+        , clipPosition : Vec4
+        }
 worldVertex =
     GLSLPasta.combine "worldVertex"
         [ Lighting.vertex_gl_Position

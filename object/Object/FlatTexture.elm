@@ -106,5 +106,6 @@ makeAppearance mesh texture p =
             , iTexture = texture
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
+            , modelMatrix = M4.identity
             }
         ]

@@ -63,6 +63,7 @@ appearCylinder vertexShader fragmentShader p =
             , iHMD = iHMD
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
+            , modelMatrix = M4.identity
             }
         ]
 
@@ -87,6 +88,7 @@ textureCylinder texture p =
             , iTexture = texture
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
+            , modelMatrix = M4.identity
             }
         ]
 

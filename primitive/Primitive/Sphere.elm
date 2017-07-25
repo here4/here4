@@ -70,6 +70,7 @@ appearSphere vertexShader fragmentShader p =
             , iHMD = iHMD
             , iLensDistort = p.lensDistort
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
+            , modelMatrix = M4.identity
             }
         ]
 

@@ -24,6 +24,7 @@ type alias NoiseVertexInput =
     , iLensDistort : Float
     , iResolution : Vec3
     , modelViewProjectionMatrix : Mat4
+    , modelMatrix : Mat4
     }
 
 
@@ -40,6 +41,7 @@ type alias RippleNoiseVertexInput =
     , iResolution : Vec3
     , iRipple : Float
     , modelViewProjectionMatrix : Mat4
+    , modelMatrix : Mat4
     }
 
 
