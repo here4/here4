@@ -219,13 +219,19 @@ cylinderMesh =
 
         --- Triangles
         mkTop v1 v2 =
-            ( top0, v1, v2 )
+            ( top0
+            , { v1 | normal = top0.normal }
+            , { v2 | normal = top0.normal }
+            )
 
         top =
             map2 mkTop topVS1 topVS0
 
         mkBottom v1 v2 =
-            ( bottom0, v1, v2 )
+            ( bottom0
+            , { v1 | normal = bottom0.normal }
+            , { v2 | normal = bottom0.normal }
+            )
 
         bottom =
             map2 mkBottom bottomVS1 bottomVS0
