@@ -74,7 +74,11 @@ surface vertexShader fragmentShader mesh =
         appear =
             appearSurface vertexShader fragmentShader mesh
     in
-        { scale = vec3 1 1 1, position = vec3 0 0 0, orientation = Orientation.initial, appear = appear }
+        { scale = vec3 1 1 1
+        , position = vec3 0 0 0
+        , orientation = Orientation.initial
+        , appear = appear
+        }
 
 
 appearSurface :
@@ -139,7 +143,11 @@ rippleSurface vertexShader fragmentShader ripple mesh =
         appear =
             rippleAppearSurface vertexShader fragmentShader ripple mesh
     in
-        { scale = vec3 1 1 1, position = vec3 0 0 0, orientation = Orientation.initial, appear = appear }
+        { scale = vec3 1 1 1
+        , position = vec3 0 0 0
+        , orientation = Orientation.initial
+        , appear = appear
+        }
 
 
 rippleAppearSurface :
