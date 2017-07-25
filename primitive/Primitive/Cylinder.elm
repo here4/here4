@@ -37,7 +37,11 @@ cylinder vertexShader fragmentShader =
         appear =
             appearCylinder vertexShader fragmentShader
     in
-        { scale = vec3 1 1 1, position = vec3 0 0 0, orientation = Orientation.initial, appear = appear }
+        { scale = vec3 1 1 1
+        , position = vec3 0 0 0
+        , orientation = Orientation.initial
+        , appear = appear
+        }
 
 
 appearCylinder : Shader Vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
@@ -184,19 +188,31 @@ cylinderMesh =
 
         -- Vertices
         top0 =
-            { position = vec3 0 0.5 0, color = white, coord = vec3 0 (0.0 - yOffset) 0 }
+            { position = vec3 0 0.5 0
+            , coord = vec3 0 (0.0 - yOffset) 0
+            , color = white
+            }
 
         topV =
-            { position = vec3 1 0.5 0, color = white, coord = vec3 0 (1.0 - yOffset) 0 }
+            { position = vec3 1 0.5 0
+            , coord = vec3 0 (1.0 - yOffset) 0
+            , color = white
+            }
 
         ( topVS0, topVS1 ) =
             circlePair topV
 
         bottom0 =
-            { position = vec3 0 -0.5 0, color = white, coord = vec3 0 (0.0 - yOffset) 0 }
+            { position = vec3 0 -0.5 0
+            , coord = vec3 0 (0.0 - yOffset) 0
+            , color = white
+            }
 
         bottomV =
-            { position = vec3 1 -0.5 0, color = white, coord = vec3 0 (1.0 - yOffset) 0 }
+            { position = vec3 1 -0.5 0
+            , coord = vec3 0 (1.0 - yOffset) 0
+            , color = white
+            }
 
         ( bottomVS0, bottomVS1 ) =
             circlePair bottomV
