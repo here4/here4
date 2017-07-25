@@ -68,6 +68,7 @@ noiseVertex =
         [ Lighting.vertex_gl_Position
         , vertex_elm_FragColor
         , vertex_elm_FragCoord
+        , Lighting.vertexNoTangent
         , vertex_noise
         , distort
         , Lighting.vertex_clipPosition
@@ -82,6 +83,7 @@ rippleNoiseVertex =
         , Lighting.vertex_gl_Position
         , vertex_elm_FragColor
         , vertex_elm_FragCoord
+        , Lighting.vertexNoTangent
         , vertex_noise
         , distort
         , Lighting.vertex_clipPosition

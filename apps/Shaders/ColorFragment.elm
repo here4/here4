@@ -52,7 +52,7 @@ fragment_noiseColor : GLSLPasta.Component
 fragment_noiseColor =
     { empty
         | id = "fragment_noiseColor"
-        , provides = [ "gl_FragColor" ]
+        , provides = [ "diffuseColor" ]
         , globals =
             [ Uniform "vec3" "iResolution"
             , Uniform "float" "iGlobalTime"
@@ -131,17 +131,42 @@ vec4 noise_texture(vec2 tc) {
             ]
         , splices =
             [ """
-            gl_FragColor = noise_texture(fragCoord);
+            vec3 diffuseColor = noise_texture(fragCoord).rgb;
+"""
+            ]
+    }
+
+{-| Provides constant ambient
+-}
+fragment_ambient_07 : GLSLPasta.Component
+fragment_ambient_07 =
+    { empty
+        | id = "lighting.fragment_ambient_03"
+        , provides = [ "ambient" ]
+        , requires = [ "diffuseColor" ]
+        , globals = []
+        , splices =
+            [ """
+            // ambient
+            vec3 ambient = 0.7 * diffuseColor;
 """
             ]
     }
 
 
-noiseColorFragment : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float, iDetail : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
+-- noiseColorFragment : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float, iDetail : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
 noiseColorFragment =
     GLSLPasta.combineUsingTemplate hmdTemplate
         "noiseColorFragment"
-        [ fragment_noiseColor
+        [ Lighting.fragment_lightDir
+        , Lighting.fragment_interpolatedNormal
+        , Lighting.fragment_lambert
+        , fragment_noiseColor
+        , Lighting.fragment_diffuse
+        , fragment_ambient_07
+        , Lighting.fragment_specular
+        , Lighting.fragment_attenuation
+        , Lighting.fragment_phong
         , Lighting.lightenDistance
         ]
         |> WebGL.unsafeShader
