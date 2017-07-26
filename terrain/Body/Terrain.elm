@@ -192,7 +192,7 @@ nearby placement terrain pos appears =
         r =
             -- max 12 (floor ((getY pos - approxElevation placement terrain pos) / 10))
             -- max 20 (floor ((getY pos - approxElevation placement terrain pos) / toFloat (placement.tileSize)))
-            max 6 (floor ((getY pos - approxElevation placement terrain pos) / toFloat (placement.tileSize)))
+            max 4 (floor ((getY pos - approxElevation placement terrain pos) / toFloat (placement.tileSize)))
 
         -- r = (max 64 (floor ((getY pos - approxElevation placement terrain pos)))) // placement.tileSize
         ir =
