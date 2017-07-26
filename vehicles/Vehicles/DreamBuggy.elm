@@ -156,7 +156,7 @@ goForward eyeLevel speed inputs motion =
     let
         accel =
             if getY motion.position > (eyeLevel motion.position) + 0.5 then
-                -0.4
+                -0.1
             else
                 clamp -1.0 1.0 <|
                     inputs.y
