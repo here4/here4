@@ -257,7 +257,7 @@ aston_martin =
             , vehicle <|
                 { drive = DreamBuggy.drive
                 , vehicle =
-                    { speed = 30.0
+                    { speed = 20.0
                     , height = 1.2
                     , radius = 0.0
                     }
