@@ -6,6 +6,7 @@ import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4)
+import Shaders.FragmentPasta exposing (..)
 import Shaders.HMD exposing (hmdTemplate)
 import WebGL exposing (..)
 
@@ -17,12 +18,11 @@ fragment_simplePlasma : GLSLPasta.Component
 fragment_simplePlasma =
     { empty
         | id = "fragment_simplePlasma"
-        , provides = [ "gl_FragColor" ]
+        , provides = [ "diffuseColor" ]
         , globals =
             [ Uniform "vec3" "iResolution"
             , Uniform "float" "iGlobalTime"
             , Varying "vec4" "elm_FragColor"
-            , Varying "vec2" "elm_FragCoord"
             ]
         , functions =
             [ """
@@ -45,7 +45,7 @@ vec4 plasma(vec2 uv)
             ]
         , splices =
             [ """
-            gl_FragColor = plasma(fragCoord);
+            vec3 diffuseColor = plasma(fragCoord).rgb;
 """
             ]
     }
@@ -55,7 +55,15 @@ simplePlasma : Shader {} { u | iResolution : Vec3, iGlobalTime : Float } { elm_F
 simplePlasma =
     GLSLPasta.combineUsingTemplate hmdTemplate
         "simplePlasma"
-        [ fragment_simplePlasma
+        [ Lighting.fragment_lightDir
+        , Lighting.fragment_interpolatedNormal
+        , Lighting.fragment_lambert
+        , fragment_simplePlasma
+        , Lighting.fragment_diffuse
+        , fragment_ambient_07
+        , Lighting.fragment_specular
+        , Lighting.fragment_attenuation
+        , Lighting.fragment_phong
         , Lighting.lightenDistance
         ]
         |> WebGL.unsafeShader
