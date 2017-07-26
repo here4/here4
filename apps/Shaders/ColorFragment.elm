@@ -6,6 +6,7 @@ import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (Vec3)
 import Math.Vector4 exposing (Vec4)
+import Shaders.FragmentPasta exposing (..)
 import Shaders.HMD exposing (hmdTemplate)
 import WebGL exposing (..)
 
@@ -132,23 +133,6 @@ vec4 noise_texture(vec2 tc) {
         , splices =
             [ """
             vec3 diffuseColor = noise_texture(fragCoord).rgb;
-"""
-            ]
-    }
-
-{-| Provides constant ambient
--}
-fragment_ambient_07 : GLSLPasta.Component
-fragment_ambient_07 =
-    { empty
-        | id = "lighting.fragment_ambient_03"
-        , provides = [ "ambient" ]
-        , requires = [ "diffuseColor" ]
-        , globals = []
-        , splices =
-            [ """
-            // ambient
-            vec3 ambient = 0.7 * diffuseColor;
 """
             ]
     }
