@@ -20,11 +20,11 @@ type alias Placement =
 defaultPlacement : Placement
 defaultPlacement =
     { xOffset = -256
-    , xDelta = 2
+    , xDelta = 4
     , yOffset = 0
-    , yMult = 50
+    , yMult = 120
     , zOffset = -256
-    , zDelta = 2
-    , tileSize = 8
+    , zDelta = 4
+    , tileSize = 32
     , bigSide = 512
     }
