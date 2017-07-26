@@ -6,6 +6,7 @@ import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4)
+import Shaders.FragmentPasta exposing (..)
 import Shaders.HMD exposing (hmdTemplate)
 import WebGL exposing (..)
 
@@ -17,7 +18,7 @@ fragment_kintsugi : GLSLPasta.Component
 fragment_kintsugi =
     { empty
         | id = "fragment_kintsugi"
-        , provides = [ "gl_FragColor" ]
+        , provides = [ "diffuseColor" ]
         , globals =
             [ Uniform "vec3" "iResolution"
             , Uniform "float" "iGlobalTime"
@@ -154,7 +155,7 @@ vec4 kintsugi(vec2 uv)
             ]
         , splices =
             [ """
-            gl_FragColor = kintsugi(fragCoord);
+            vec3 diffuseColor = kintsugi(fragCoord).rgb;
 """
             ]
     }
@@ -164,7 +165,15 @@ kintsugi : Shader {} { u | iResolution : Vec3, iGlobalTime : Float } { elm_FragC
 kintsugi =
     GLSLPasta.combineUsingTemplate hmdTemplate
         "kintsugi"
-        [ fragment_kintsugi
+        [ Lighting.fragment_lightDir
+        , Lighting.fragment_interpolatedNormal
+        , Lighting.fragment_lambert
+        , fragment_kintsugi
+        , Lighting.fragment_diffuse
+        , fragment_ambient_07
+        , Lighting.fragment_specular
+        , Lighting.fragment_attenuation
+        , Lighting.fragment_phong
         , Lighting.lightenDistance
         ]
         |> WebGL.unsafeShader
