@@ -6,6 +6,7 @@ import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (Vec3)
 import Math.Vector4 exposing (Vec4)
+import Shaders.FragmentPasta exposing (..)
 import Shaders.HMD exposing (hmdTemplate)
 import WebGL exposing (Shader, Texture)
 
@@ -14,13 +15,13 @@ textureCoord : GLSLPasta.Component
 textureCoord =
     { empty
         | id = "textureCoord"
-        , provides = [ "gl_FragColor" ]
+        , provides = [ "diffuseColor" ]
         , globals =
             [ Uniform "sampler2D" "iTexture"
             ]
         , splices =
             [ """
-            gl_FragColor = texture2D(iTexture, fragCoord);
+            vec3 diffuseColor = texture2D(iTexture, fragCoord).rgb;
 """
             ]
     }
@@ -30,7 +31,15 @@ textureFragment : Shader {} { u | iResolution : Vec3, iHMD : Float, iTexture : T
 textureFragment =
     GLSLPasta.combineUsingTemplate hmdTemplate
         "textureFragment"
-        [ textureCoord
+        [ Lighting.fragment_lightDir
+        , Lighting.fragment_interpolatedNormal
+        , Lighting.fragment_lambert
+        , textureCoord
+        , Lighting.fragment_diffuse
+        , fragment_ambient_07
+        , Lighting.fragment_specular
+        , Lighting.fragment_attenuation
+        , Lighting.fragment_phong
         , Lighting.lightenDistance
         ]
         |> WebGL.unsafeShader
