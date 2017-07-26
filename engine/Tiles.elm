@@ -67,7 +67,7 @@ tileElevation : Tiles -> Vec3 -> Float
 tileElevation { placement, elevations } pos =
     let
         ix0 =
-            (getX pos + 256) / 2
+            (getX pos - placement.xOffset) / placement.xDelta
 
         ix =
             floor ix0
@@ -76,7 +76,7 @@ tileElevation { placement, elevations } pos =
             ix0 - toFloat ix
 
         iz0 =
-            (getZ pos + 256) / 2
+            (getZ pos - placement.zOffset) / placement.zDelta
 
         iz =
             floor iz0
