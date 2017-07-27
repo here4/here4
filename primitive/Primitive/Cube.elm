@@ -143,6 +143,7 @@ render mesh vertexShader fragmentShader p =
             , modelMatrix = M4.identity
             , viewPosition = p.cameraPos
             , lightPosition = p.lightPosition
+            , ambientColor = p.ambientColor
             }
         ]
 
@@ -175,6 +176,7 @@ renderNSV mesh vertexShader fragmentShader p =
             , modelMatrix = M4.identity
             , viewPosition = p.cameraPos
             , lightPosition = p.lightPosition
+            , ambientColor = p.ambientColor
             , iDetail = detail
             , iGlobalTimeV = s
             }
@@ -204,6 +206,7 @@ textureCube texture p =
             , modelMatrix = M4.identity
             , viewPosition = p.cameraPos
             , lightPosition = p.lightPosition
+            , ambientColor = p.ambientColor
             }
         ]
 

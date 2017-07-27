@@ -13,6 +13,7 @@ import Html.Attributes exposing (width, height, style)
 import List.Extra as List
 import Math.Matrix4 as M4 exposing (Mat4)
 import Math.Vector3 as V3 exposing (..)
+import Math.Vector4 as V4 exposing (vec4)
 import Methods exposing (..)
 import Model exposing (Model, Msg(..), WorldKey(..))
 import Orientation
@@ -367,6 +368,9 @@ renderWorld globalTime world eye windowSize player =
             else
                 0.95
 
+        ambientColor =
+            vec4 0.7 0.65 0.6 1.0
+
         -- some random lightpos, get this from apps instead
         t =
             pi / 4
@@ -383,6 +387,7 @@ renderWorld globalTime world eye windowSize player =
             , lensDistort = lensDistort
             , cameraVR = player.cameraVR
             , measuredFPS = 30.0
+            , ambientColor = ambientColor
             , lightPosition = lightPos
             }
 

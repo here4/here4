@@ -96,6 +96,8 @@ appearBFly vertexShader fragmentShader flapStart p =
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
             , flapL = flapL
             , flapR = flapR
+            , ambientColor = p.ambientColor
+            , lightPosition = p.lightPosition
             }
         ]
 

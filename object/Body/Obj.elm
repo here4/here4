@@ -28,6 +28,10 @@ reflective mesh texture p =
             { camera = p.perspective
             , mvMat = p.lookAt
             , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
+            , modelMatrix = M4.identity
+            , viewPosition = p.cameraPos
+            , lightPosition = p.lightPosition
+            , ambientColor = p.ambientColor
             , texture = texture
             }
         ]
@@ -56,6 +60,7 @@ textured mesh vertexShader fragmentShader textureDiff textureNorm p =
             , viewPosition = p.cameraPos
             , textureDiff = textureDiff
             , textureNorm = textureNorm
+            , ambientColor = p.ambientColor
             , lightPosition = p.lightPosition
             }
     in

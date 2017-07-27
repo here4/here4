@@ -9,7 +9,7 @@ import GLSLPasta.Types as GLSLPasta exposing (Global(..))
 fragment_ambient_07 : GLSLPasta.Component
 fragment_ambient_07 =
     { empty
-        | id = "lighting.fragment_ambient_03"
+        | id = "lighting.fragment_ambient_07"
         , provides = [ "ambient" ]
         , requires = [ "diffuseColor" ]
         , globals = []
@@ -21,4 +21,22 @@ fragment_ambient_07 =
             ]
     }
 
+{-| Provides constant ambient
+-}
+fragment_ambient : GLSLPasta.Component
+fragment_ambient =
+    { empty
+        | id = "lighting.fragment_ambient"
+        , provides = [ "ambient" ]
+        , requires = [ "diffuseColor" ]
+        , globals =
+            [ Uniform "vec4" "ambientColor"
+            ]
+        , splices =
+            [ """
+            // ambient
+            vec3 ambient = ambientColor.rgb * diffuseColor;
+"""
+            ]
+    }
 

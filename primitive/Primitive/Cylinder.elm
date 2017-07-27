@@ -70,6 +70,7 @@ appearCylinder vertexShader fragmentShader p =
             , modelMatrix = M4.identity
             , viewPosition = p.cameraPos
             , lightPosition = p.lightPosition
+            , ambientColor = p.ambientColor
             }
         ]
 
@@ -97,6 +98,7 @@ textureCylinder texture p =
             , modelMatrix = M4.identity
             , viewPosition = p.cameraPos
             , lightPosition = p.lightPosition
+            , ambientColor = p.ambientColor
             }
         ]
 

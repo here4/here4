@@ -1,6 +1,7 @@
 module Appearance exposing (..)
 
 import Math.Vector3 exposing (Vec3, vec3)
+import Math.Vector4 exposing (Vec4)
 import Math.Matrix4 exposing (Mat4)
 import Time exposing (Time)
 import WebGL exposing (Entity)
@@ -16,6 +17,7 @@ type alias Perception =
     , lensDistort : Float
     , cameraVR : Bool
     , measuredFPS : Float
+    , ambientColor : Vec4
     , lightPosition : Vec3
     }
 
@@ -33,6 +35,7 @@ type alias ShaderPerception =
     , modelMatrix : Mat4
     , viewPosition : Vec3
     , lightPosition : Vec3
+    , ambientColor : Vec4
     }
 
 
