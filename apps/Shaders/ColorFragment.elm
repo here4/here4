@@ -147,7 +147,7 @@ noiseColorFragment =
         , Lighting.fragment_lambert
         , fragment_noiseColor
         , Lighting.fragment_diffuse
-        , fragment_ambient_07
+        , fragment_ambient
         , Lighting.fragment_specular
         , Lighting.fragment_attenuation
         , Lighting.fragment_phong
