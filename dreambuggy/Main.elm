@@ -144,6 +144,7 @@ deltaWedge =
             [ id "wedge"
             , label "Delta Wedge"
             , position <| vec3 23 0 12
+            , scale <| Scale 7.0
             , overlay <| html
             , object <| Appearance wedge (vec3 1 1 1)
             , vehicle <|

@@ -126,7 +126,7 @@ topMesh =
         rearTriangle v1 v2 v3 =
             ( { v1 | normal = rearNormal }
             , { v2 | normal = rearNormal }
-            , { v2 | normal = rearNormal }
+            , { v3 | normal = rearNormal }
             )
     in
         triangles <|
