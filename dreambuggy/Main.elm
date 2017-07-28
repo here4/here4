@@ -42,7 +42,6 @@ main =
                 , textureCube
                 , deltaWedge
                 , buggy
-                , aston_martin
 
                 {-
                    , Object.create
@@ -223,43 +222,6 @@ buggy =
                 , vehicle =
                     { speed = 10.0
                     , height = 0.6
-                    , radius = 0.0
-                    }
-                }
-            ]
-
-
-aston_martin : ( App, Cmd AppMsg )
-aston_martin =
-    let
-        html =
-            Html.div []
-                [ Html.h2 []
-                    [ Html.text "Aston Martin DB9" ]
-                , Html.br [] []
-                , Html.hr [] []
-                , DreamBuggy.overlay
-                ]
-    in
-        Object.create
-            [ id "aston_martin"
-            , label "Aston Martin DB9"
-            , position <| vec3 -12 0 43
-            , overlay <| html
-            , object <|
-                Object.texturedObjWith
-                    "aston_martin/DB9.obj"
-                    "textures/elmLogoDiffuse.png"
-                    "textures/elmLogoNorm.png"
-                    [ offset <| FloorCenter
-                    , scale <| Width 2.061
-                    , forward <| V3.j
-                    ]
-            , vehicle <|
-                { drive = DreamBuggy.drive
-                , vehicle =
-                    { speed = 20.0
-                    , height = 1.2
                     , radius = 0.0
                     }
                 }
