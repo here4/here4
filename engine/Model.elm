@@ -214,7 +214,7 @@ noInput =
     }
 
 
-{-| This type is returned by the fullscreen JS api in PointerLock.js
+{- This type is returned by the fullscreen JS api in PointerLock.js
 for mouse movement
 -}
 {-
