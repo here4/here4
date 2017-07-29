@@ -22,7 +22,7 @@ import Ground exposing (Ground)
 import Methods exposing (Methods)
 import Model exposing (Model, Msg, GlobalMsg(..), WorldKey(..), AppKey(..), PartyKey(..), PlayerKey(..))
 import Orientation exposing (fromVec3)
-import Ports
+-- import Ports
 
 
 {-| Take a Msg and a Model and return an updated Model
@@ -98,6 +98,7 @@ update world msg model =
         Model.GamepadUpdate gps0 ->
             updateGamepads gps0 model
 
+{-
         Model.LockRequest wantToBeLocked ->
             ( { model | wantToBeLocked = wantToBeLocked }
             , if model.wantToBeLocked == model.isLocked then
@@ -107,6 +108,7 @@ update world msg model =
               else
                 Ports.exitPointerLock ()
             )
+-}
 
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )

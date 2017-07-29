@@ -16,7 +16,7 @@ import KeyboardInput
 import Mouse
 import Time exposing (Time)
 import Window
-import Ports
+-- import Ports
 import Control exposing (WorldMsg)
 import Dispatch exposing (..)
 import Methods exposing (..)
@@ -43,11 +43,13 @@ subscriptions model =
     , Keyboard.Extra.downs (KeyboardInput.keyChange True)
     , Keyboard.Extra.ups (KeyboardInput.keyChange False)
     , Window.resizes Model.Resize
-    , Ports.isLocked Model.LockUpdate
+    -- , Ports.isLocked Model.LockUpdate
     ]
+{-
         ++ (if model.isLocked then
                 [ Ports.movement Model.MouseMove ]
             else
                 [ Mouse.clicks (\_ -> Model.LockRequest True) ]
+-}
            )
         |> Sub.batch
