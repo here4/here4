@@ -110,10 +110,10 @@ update world msg model =
               else
                 Ports.exitPointerLock ()
             )
--}
 
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
+-}
 
         Model.JoinWorld worldKey playerKey ->
             let
