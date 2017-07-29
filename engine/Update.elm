@@ -92,8 +92,10 @@ update world msg model =
         Model.Resize windowSize ->
             ( { model | maybeWindowSize = Just windowSize }, Cmd.none )
 
+{-
         Model.MouseMove movement ->
             ( { model | inputs = mouseToInputs movement model.inputs }, Cmd.none )
+-}
 
         Model.GamepadUpdate gps0 ->
             updateGamepads gps0 model
@@ -369,9 +371,11 @@ timeToInputs dt inputs0 =
     { inputs0 | dt = dt }
 
 
+{-
 mouseToInputs : Model.MouseMovement -> Model.Inputs -> Model.Inputs
 mouseToInputs ( mx, my ) inputs =
     { inputs | mx = 0.5 * inputs.dt * toFloat mx, my = -0.5 * inputs.dt * toFloat my }
+-}
 
 
 clearStationaryInputs : Model.Inputs -> Model.Inputs

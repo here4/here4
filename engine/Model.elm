@@ -34,7 +34,7 @@ type PlayerKey
 
 type Msg worldMsg
     = KeyChange (Keys -> Keys)
-    | MouseMove MouseMovement
+    -- | MouseMove MouseMovement
     | GamepadUpdate (List Gamepad)
     -- | LockRequest Bool
     -- | LockUpdate Bool
