@@ -50,6 +50,6 @@ subscriptions model =
                 [ Ports.movement Model.MouseMove ]
             else
                 [ Mouse.clicks (\_ -> Model.LockRequest True) ]
--}
            )
+-}
         |> Sub.batch
