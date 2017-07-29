@@ -32,19 +32,23 @@ type PlayerKey
     = PlayerKey Bag.Key
 
 
-type Msg worldMsg
+type Msg navMsg worldMsg
     = KeyChange (Keys -> Keys)
-    | MouseMove MouseMovement
+    -- | MouseMove MouseMovement
     | GamepadUpdate (List Gamepad)
-    | LockRequest Bool
-    | LockUpdate Bool
+    -- | LockRequest Bool
+    -- | LockUpdate Bool
     | JoinWorld (WorldKey ()) PlayerKey -- should these be multiworld hub messages?
     | LeaveWorld (WorldKey PlayerKey) -- should these be multiworld hub messages?
     | Animate Time
     | Resize Window.Size
     | WorldMessage worldMsg
     | WorldEffect GlobalMsg
+    | NavigatorMessage navMsg
+    | NavigatorEffect NavMsg
 
+type NavMsg
+    = ProvideInputs Inputs
 
 type GlobalMsg
     = PlayerUpdate (WorldKey PartyKey) (WorldKey PartyKey)
@@ -234,35 +238,29 @@ type alias Model worldModel worldMsg =
     , gamepadIds : List String
     , inputs : Inputs
     , inputs2 : Inputs
-    , wantToBeLocked : Bool
-    , isLocked : Bool
+    -- , wantToBeLocked : Bool
+    -- , isLocked : Bool
     , message : String
     , multiverse : worldModel
     }
 
 
-type alias Args =
-    { movement : MouseMovement
-    , isLocked : Bool
-    }
-
-
-playerJoin : PlayerKey -> Cmd (Msg worldMsg)
+playerJoin : PlayerKey -> Cmd (Msg navMsg worldMsg)
 playerJoin playerKey =
     Task.succeed playerKey |> Task.perform (JoinWorld (WorldKey 0 ()))
 
 
 {-| When the application first starts, this is the initial state of the Model.
-Not using the movement attribute of Args at this time;
-it's a carryover from the original, and the additional complexity
-to actually use it is probably not worth it in this case.
-It's still a useful example using Html.programWithFlags though.
 -}
-init : ( worldModel, Cmd worldMsg ) -> Args -> ( Model worldModel worldMsg, Cmd (Msg worldMsg) )
-init worldInit { movement, isLocked } =
+init :
+    (flags -> ( worldModel, Cmd worldMsg ))
+    -> flags
+    -> ( Model worldModel worldMsg, Cmd (Msg navMsg worldMsg) )
+-- init worldInit { movement, isLocked } =
+init worldInit flags =
     let
         ( worldModel, worldCmdMsg ) =
-            worldInit
+            worldInit flags
     in
         ( { numPlayers = 1
           , player1 = defaultPlayer
@@ -274,8 +272,8 @@ init worldInit { movement, isLocked } =
           , gamepadIds = []
           , inputs = noInput
           , inputs2 = noInput
-          , wantToBeLocked = True
-          , isLocked = isLocked
+          -- , wantToBeLocked = True
+          -- , isLocked = isLocked
           , message = "No texture yet"
           , multiverse = worldModel
           }

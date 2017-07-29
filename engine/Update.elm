@@ -28,10 +28,10 @@ import Ports
 {-| Take a Msg and a Model and return an updated Model
 -}
 update :
-    Methods worldModel worldMsg
-    -> Model.Msg (WorldMsg worldMsg)
+    Methods worldFlags worldModel worldMsg
+    -> Model.Msg navMsg (WorldMsg worldMsg)
     -> Model worldModel (WorldMsg worldMsg)
-    -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
+    -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg navMsg (WorldMsg worldMsg)) )
 update world msg model =
     case msg of
         Model.WorldMessage worldMsg ->
@@ -64,6 +64,27 @@ update world msg model =
                 else
                     ( model, Cmd.none )
 
+        Model.NavigatorMessage navMsg ->
+            ( model, Cmd.none )
+{-
+            let
+                ( navigator, navCmdMsg ) =
+                    nav.update navMsg model.navigator
+
+                response x =
+                    case x of
+                        GlobalEffect e ->
+                            Model.NavigatorEffect e
+
+                        m ->
+                            Model.NavigatorMessage m
+            in
+                ( { model | navigator = navigator }, Cmd.map response navCmdMsg )
+-}
+
+        Model.NavigatorEffect (Model.ProvideInputs inputs) ->
+            ( model, Cmd.none )
+
         Model.KeyChange keyfunc ->
             let
                 risingEdge old new =
@@ -92,12 +113,15 @@ update world msg model =
         Model.Resize windowSize ->
             ( { model | maybeWindowSize = Just windowSize }, Cmd.none )
 
+{-
         Model.MouseMove movement ->
             ( { model | inputs = mouseToInputs movement model.inputs }, Cmd.none )
+-}
 
         Model.GamepadUpdate gps0 ->
             updateGamepads gps0 model
 
+{-
         Model.LockRequest wantToBeLocked ->
             ( { model | wantToBeLocked = wantToBeLocked }
             , if model.wantToBeLocked == model.isLocked then
@@ -110,6 +134,7 @@ update world msg model =
 
         Model.LockUpdate isLocked ->
             ( { model | isLocked = isLocked }, Cmd.none )
+-}
 
         Model.JoinWorld worldKey playerKey ->
             let
@@ -226,11 +251,11 @@ sequenceUpdates =
 
 
 animate :
-    Methods worldModel worldMsg
+    Methods worldFlags worldModel worldMsg
     -> Time
     -> WorldKey ()
     -> Model worldModel (WorldMsg worldMsg)
-    -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
+    -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg navMsg (WorldMsg worldMsg)) )
 animate world dt0 worldKey model0 =
     case world.ground worldKey model0.multiverse of
         Nothing ->
@@ -291,7 +316,7 @@ animate world dt0 worldKey model0 =
 
 
 animatePlayer :
-    Methods worldModel worldMsg
+    Methods worldFlags worldModel worldMsg
     -> WorldKey ()
     -> Ground
     -> Time
@@ -412,7 +437,7 @@ gamepadToInputs gamepad inputs0 =
 updateGamepads :
     List Gamepad.Gamepad
     -> Model worldModel worldMsg
-    -> ( Model worldModel worldMsg, Cmd (Msg wordlMsg) )
+    -> ( Model worldModel worldMsg, Cmd (Msg navMsg worldMsg) )
 updateGamepads gps0 model =
     let
         ( gps, is ) =

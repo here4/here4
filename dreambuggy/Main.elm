@@ -4,10 +4,10 @@ import Html exposing (Html)
 import Location exposing (..)
 import Math.Vector3 as V3 exposing (vec3)
 import Navigator exposing (..)
-import RAM
 import Boids
 import BoxRoom
 import Balls
+import Mau5
 import Object
 import Object.Attributes exposing (..)
 import Orientation
@@ -26,9 +26,9 @@ import Vehicles.DreamBuggy as DreamBuggy
 import Vehicles.Walking as Walking
 
 
-main : Navigator RAM.Model RAM.Msg
+-- main : Navigator Mau5.Flags Mau5.Model Mau5.Msg ()
 main =
-    RAM.create
+    Mau5.create
         [ { id = "world1"
           , label = "Dreambuggy"
           , backgroundColor = rgb 135 206 235

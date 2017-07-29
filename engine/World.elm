@@ -14,7 +14,7 @@ import Html exposing (Html)
 import Location exposing (..)
 import Math.Vector3 as V3 exposing (vec3)
 import Maybe.Extra exposing (isJust)
-import Model exposing (Args, GlobalMsg, WorldKey(..), AppKey(..), PartyKey(..))
+import Model exposing (GlobalMsg, WorldKey(..), AppKey(..), PartyKey(..))
 import Orientation exposing (Orientation)
 import Space
 import Task
@@ -56,10 +56,10 @@ type alias Party =
 
 
 create :
-    ( model, Cmd msg )
+    (flags -> ( model, Cmd msg ))
     -> (msg -> model -> ( model, Cmd msg ))
     -> List Attributes
-    -> Program Args (Model.Model (Multiverse model) (WorldMsg msg)) (Model.Msg (WorldMsg msg))
+    -> Program flags (Model.Model (Multiverse model) (WorldMsg msg)) (Model.Msg navMsg (WorldMsg msg))
 create hubInit hubUpdate attributes =
     Space.programWithFlags
         { init = worldInit hubInit attributes
@@ -153,13 +153,14 @@ oneWorldInit attributes ( oldWorlds, oldCmds ) =
 
 
 worldInit :
-    ( model, Cmd msg )
+    (flags -> ( model, Cmd msg ))
     -> List Attributes
+    -> flags
     -> ( Multiverse model, Cmd (WorldMsg msg) )
-worldInit hubInit attributes =
+worldInit hubInit attributes flags =
     let
         ( hubModel, hubCmd ) =
-            hubInit
+            hubInit flags
 
         ( worldsBag, worldsCmds ) =
             List.foldl oneWorldInit ( Bag.empty, [] ) attributes

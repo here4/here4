@@ -7,11 +7,13 @@ import Model
 {- Subscribe to keychange events. -}
 
 
-keyChange : Bool -> Key -> Model.Msg worldMsg
+keyChange : Bool -> Key -> Model.Msg navMsg worldMsg
 keyChange on key =
+{-
     if key == Escape && on then
         Model.LockRequest False
     else
+-}
         (case key of
             Tab ->
                 \k -> { k | tab = on }

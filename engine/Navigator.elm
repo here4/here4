@@ -2,11 +2,11 @@ module Navigator exposing (..)
 
 import App
 import Color
-import Model exposing (Args)
+import Model
 
 
-type alias Navigator model msg =
-    Program Args (Model.Model model msg) (Model.Msg msg)
+type alias Navigator flags model navMsg msg =
+    Program flags (Model.Model model msg) (Model.Msg navMsg msg)
 
 
 type alias App =
