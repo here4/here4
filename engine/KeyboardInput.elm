@@ -9,9 +9,11 @@ import Model
 
 keyChange : Bool -> Key -> Model.Msg worldMsg
 keyChange on key =
+{-
     if key == Escape && on then
         Model.LockRequest False
     else
+-}
         (case key of
             Tab ->
                 \k -> { k | tab = on }

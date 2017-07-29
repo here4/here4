@@ -36,8 +36,8 @@ type Msg worldMsg
     = KeyChange (Keys -> Keys)
     | MouseMove MouseMovement
     | GamepadUpdate (List Gamepad)
-    | LockRequest Bool
-    | LockUpdate Bool
+    -- | LockRequest Bool
+    -- | LockUpdate Bool
     | JoinWorld (WorldKey ()) PlayerKey -- should these be multiworld hub messages?
     | LeaveWorld (WorldKey PlayerKey) -- should these be multiworld hub messages?
     | Animate Time
@@ -217,8 +217,10 @@ noInput =
 {-| This type is returned by the fullscreen JS api in PointerLock.js
 for mouse movement
 -}
+{-
 type alias MouseMovement =
     ( Int, Int )
+-}
 
 
 {-| This is the application's Model data structure
@@ -234,17 +236,19 @@ type alias Model worldModel worldMsg =
     , gamepadIds : List String
     , inputs : Inputs
     , inputs2 : Inputs
-    , wantToBeLocked : Bool
-    , isLocked : Bool
+    -- , wantToBeLocked : Bool
+    -- , isLocked : Bool
     , message : String
     , multiverse : worldModel
     }
 
 
-type alias Args =
+type alias Args = ()
+{-
     { movement : MouseMovement
     , isLocked : Bool
     }
+-}
 
 
 playerJoin : PlayerKey -> Cmd (Msg worldMsg)
@@ -259,7 +263,8 @@ to actually use it is probably not worth it in this case.
 It's still a useful example using Html.programWithFlags though.
 -}
 init : ( worldModel, Cmd worldMsg ) -> Args -> ( Model worldModel worldMsg, Cmd (Msg worldMsg) )
-init worldInit { movement, isLocked } =
+-- init worldInit { movement, isLocked } =
+init worldInit _ =
     let
         ( worldModel, worldCmdMsg ) =
             worldInit
@@ -274,8 +279,8 @@ init worldInit { movement, isLocked } =
           , gamepadIds = []
           , inputs = noInput
           , inputs2 = noInput
-          , wantToBeLocked = True
-          , isLocked = isLocked
+          -- , wantToBeLocked = True
+          -- , isLocked = isLocked
           , message = "No texture yet"
           , multiverse = worldModel
           }
