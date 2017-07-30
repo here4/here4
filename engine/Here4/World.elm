@@ -11,7 +11,7 @@ import Here4.Control exposing (..)
 import Here4.Dispatch exposing (..)
 import Here4.Ground exposing (Ground)
 import Here4.Location exposing (..)
-import Here4.Model as Model exposing (GlobalMsg, WorldKey(..), AppKey(..), PartyKey(..))
+import Here4.Model as Model exposing (GlobalMsg, NavigatorMsg, WorldKey(..), AppKey(..), PartyKey(..))
 import Here4.Navigator.Control exposing (NavMsg)
 import Here4.Orientation as Orientation exposing (Orientation)
 import Here4.Space as Space
@@ -220,8 +220,8 @@ toWorldEffect worldKey e =
 
 toWorldMsg :
     WorldKey ()
-    -> DispatchHub Route (EffectMsg ()) Msg Dynamic GlobalMsg a
-    -> DispatchHub Route (EffectMsg (WorldKey ())) Msg Dynamic GlobalMsg a
+    -> DispatchHub Route (EffectMsg ()) Msg Dynamic GlobalMsg NavigatorMsg a
+    -> DispatchHub Route (EffectMsg (WorldKey ())) Msg Dynamic GlobalMsg NavigatorMsg a
 toWorldMsg worldKey msg =
     let
         toWorldDispatch d =
@@ -250,6 +250,9 @@ toWorldMsg worldKey msg =
 
             GlobalEffect globalMsg ->
                 GlobalEffect globalMsg
+
+            NavEffect navMsg ->
+                NavEffect navMsg
 
 
 toAppMsg : Dispatch (EffectMsg (WorldKey ())) Msg Dynamic -> AppMsg
@@ -447,8 +450,16 @@ worldUpdate hubUpdate msg model =
             let
                 ( hubModel, hubCmd ) =
                     hubUpdate hubMsg model.state
+
+                response m =
+                    case m of
+                        Effect e ->
+                            NavEffect e
+
+                        _ ->
+                            Hub m                        
             in
-                ( { model | state = hubModel }, Cmd.map Hub hubCmd )
+                ( { model | state = hubModel }, Cmd.map response hubCmd )
 
         HubEff (AppControl.UpdateGround (WorldKey worldKey ()) ground) ->
             let

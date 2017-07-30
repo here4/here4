@@ -7,9 +7,10 @@ type Dispatch effectMsg ctrlMsg nodeMsg
     | Effect effectMsg
 
 
-type DispatchHub key effectMsg ctrlMsg nodeMsg globalMsg hubMsg
+type DispatchHub key effectMsg ctrlMsg nodeMsg globalMsg navMsg hubMsg
     = Hub hubMsg
     | Send key (Dispatch effectMsg ctrlMsg nodeMsg)
     | Forward key ctrlMsg
     | HubEff effectMsg
     | GlobalEffect globalMsg
+    | NavEffect navMsg

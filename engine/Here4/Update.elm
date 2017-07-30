@@ -26,6 +26,7 @@ import Ports
 import Task
 import Time exposing (Time)
 
+import Debug
 
 {-| Take a Msg and a Model and return an updated Model
 -}
@@ -45,6 +46,9 @@ update world msg model =
                     case x of
                         GlobalEffect e ->
                             Model.WorldEffect e
+
+                        NavEffect e ->
+                            Model.NavigatorEffect e
 
                         m ->
                             Model.WorldMessage m
@@ -68,19 +72,15 @@ update world msg model =
 
         Model.NavigatorMessage navMsg ->
             let
-{-
-                ( navigator, navCmdMsg ) =
-                    nav.update navMsg model.navigator
--}
                 response m =
                     Task.succeed m |> Task.perform (Model.WorldMessage << Hub)
-                    -- Model.WorldMessage (Hub m)
             in
-                -- ( { model | navigator = navigator }, Cmd.map response navCmdMsg )
                 ( model, response navMsg )
 
         Model.NavigatorEffect (Model.ProvideInputs inputs) ->
-            ( model, Cmd.none )
+            ( { model | inputs = mergeInputs inputs model.inputs }
+            , Cmd.none
+            )
 
         Model.KeyChange keyfunc ->
             let
@@ -397,6 +397,30 @@ mouseToInputs ( mx, my ) inputs =
 clearStationaryInputs : Model.Inputs -> Model.Inputs
 clearStationaryInputs inputs0 =
     { inputs0 | mx = 0, my = 0 }
+
+
+mergeInputs : Model.Inputs -> Model.Inputs -> Model.Inputs
+mergeInputs inputs1 inputs0 =
+    { inputs0
+        | reset = inputs0.reset || inputs1.reset
+        , changeVR = inputs0.changeVR || inputs1.changeVR
+        , prevCamera = inputs0.prevCamera || inputs1.prevCamera
+        , nextCamera = inputs0.nextCamera || inputs1.nextCamera
+        , toggleOverlay = inputs0.toggleOverlay || inputs1.toggleOverlay
+        , prevOverlay = inputs0.prevOverlay || inputs1.prevOverlay
+        , nextOverlay = inputs0.nextOverlay || inputs1.nextOverlay
+        , isJumping = inputs0.isJumping || inputs1.isJumping
+        , button_X = inputs0.button_X || inputs1.button_X
+        , rightTrigger = inputs0.rightTrigger + inputs1.rightTrigger
+        , leftTrigger = inputs0.leftTrigger + inputs1.leftTrigger
+        , x = inputs0.x + inputs1.x
+        , y = inputs0.y + inputs1.y
+        , mx = inputs0.mx + inputs1.mx
+        , my = inputs0.my + inputs1.my
+        , cx = inputs0.cx + inputs1.cx
+        , cy = inputs0.cy + inputs1.cy
+        , dt = max inputs0.dt inputs1.dt
+    }
 
 
 gamepadToInputs : Gamepad.Gamepad -> Model.Inputs -> Model.Inputs

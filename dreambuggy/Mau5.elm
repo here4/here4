@@ -8,6 +8,7 @@ import Here4.Model as Model
 import Here4.World as World exposing (..)
 import Mouse
 import Ports
+import Task
 
 
 type alias Flags =
@@ -60,8 +61,15 @@ update : NavMsg Mau5Msg -> Mau5Model -> ( Mau5Model, Cmd (NavMsg Mau5Msg) )
 update msg model =
     case msg of
         Self (MouseMove movement) ->
-            -- ( { model | inputs = mouseToInputs movement model.inputs }, Cmd.none )
-            ( model, Cmd.none )
+            let
+                inputs =
+                    mouseToInputs movement Model.noInput
+
+                cmd =
+                    Task.succeed inputs
+                    |> Task.perform (Effect << Model.ProvideInputs)
+            in
+                ( model, cmd )
 
         Self (LockRequest wantToBeLocked) ->
             ( { model | wantToBeLocked = wantToBeLocked }
@@ -94,4 +102,4 @@ subscriptions model =
 
 mouseToInputs : Model.MouseMovement -> Model.Inputs -> Model.Inputs
 mouseToInputs ( mx, my ) inputs =
-    { inputs | mx = 0.5 * inputs.dt * toFloat mx, my = -0.5 * inputs.dt * toFloat my }
+    { inputs | mx = 0.5 * toFloat mx, my = -0.5 * toFloat my }
