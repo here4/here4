@@ -1,11 +1,11 @@
-module Vehicles.DreamBuggy exposing (drive, overlay)
+module Here4.Vehicle.Walking exposing (drive, overlay)
 
 import Color exposing (white)
 import FontAwesome
-import Here4.Body exposing (..)
-import Here4.Ground exposing (Ground)
-import Here4.Model as Model
 import Here4.Orientation as Orientation exposing (..)
+import Here4.Body exposing (..)
+import Here4.Model as Model
+import Here4.Ground exposing (Ground)
 import Here4.Vehicle exposing (Driveable)
 import Html exposing (Html)
 import Html.Attributes as Html
@@ -16,152 +16,51 @@ import Debug
 
 
 ----------------------------------------------------------------------
--- DreamBuggy
-
-
-welcome : Model.Motion -> Model.Motion
-welcome motion =
-    { motion | orientation = clampBuggy motion.orientation }
+-- Walking
 
 
 drive : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 drive attributes dimensions ground inputs thing =
     let
         eyeLevel pos =
-            ground.elevation pos
+            ground.elevation pos + attributes.height
     in
-        move attributes dimensions ground eyeLevel inputs thing
+        move attributes ground eyeLevel inputs thing
 
 
-move : Driveable vehicle -> Vec3 -> Ground -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
-move attributes dimensions terrain eyeLevel inputs motion =
+move : Driveable vehicle -> Ground -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
+move attributes terrain eyeLevel inputs motion =
     motion
-        |> turn attributes dimensions eyeLevel inputs.x inputs.dt
+        |> turn eyeLevel attributes.speed inputs.x inputs.dt
         |> goForward eyeLevel attributes.speed inputs
         |> gravity eyeLevel inputs.dt
         |> physics eyeLevel inputs.dt
         |> keepWithinbounds terrain attributes.radius
 
 
-clampBuggy : Orientation -> Orientation
-clampBuggy o =
-    o
-
-
-
-{-
-   let (roll, pitch, yaw) = Orientation.toRollPitchYaw o
-       roll_ = clamp (degrees -10) (degrees 10) (roll/2)
-       pitch_ = clamp (degrees -15) (degrees 15) (pitch/2)
-   in Orientation.fromRollPitchYaw (roll_, pitch_, yaw)
--}
-
-
-flatten : Vec3 -> Vec3
-flatten v =
+turn : Model.EyeLevel -> Float -> Float -> Float -> Moving a -> Moving a
+turn eyeLevel speed dx dt motion =
     let
-        r =
-            V3.toRecord v
-    in
-        normalize (vec3 r.x 0 r.z)
-
-
-turn : Driveable vehicle -> Vec3 -> Model.EyeLevel -> Float -> Float -> Moving a -> Moving a
-turn attributes dimensions eyeLevel dx dt motion =
-    let
-        vehicleWidth =
-            V3.getX dimensions
-
-        vehicleFwdLength =
-            V3.getZ dimensions
-
-        w =
-            vehicleWidth / 2.0
-
-        l =
-            vehicleFwdLength / 2.0
-
-        centerY =
-            eyeLevel motion.position
-
-        frontRightTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 w 0 l)))
-
-        frontLeftTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 w 0 -l)))
-
-        rearRightTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -w 0 l)))
-
-        rearLeftTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -w 0 -l)))
-
-        frontTireY =
-            max frontLeftTireY frontRightTireY
-
-        rearTireY =
-            max rearLeftTireY rearRightTireY
-
-        rightTireY =
-            max frontRightTireY rearRightTireY
-
-        leftTireY =
-            max frontRightTireY rearRightTireY
-
-        perp2dCCW x y =
-            ( -y, x )
-
-        targetUpRoll =
-            let
-                ( x, y ) =
-                    perp2dCCW vehicleWidth (rightTireY - leftTireY)
-            in
-                vec3 x y 0
-
-        targetUpPitch =
-            let
-                ( z, y ) =
-                    if frontTireY > centerY then
-                        perp2dCCW vehicleFwdLength (frontTireY - rearTireY)
-                    else
-                        perp2dCCW (vehicleFwdLength / 2.0) (centerY - rearTireY)
-            in
-                vec3 0 y z
-
         steer =
-            0.4 * dx * dt
-
-        targetOrientation =
-            if getY motion.position > (eyeLevel motion.position) + 0.5 then
-                -- spin if in the air
-                motion.orientation
-                    |> rollUpright
-                    |> pitchUpright
-                    |> followedBy (fromAngleAxis (5.0 * steer) V3.j)
-            else
-                motion.orientation
-                    |> rollTo targetUpRoll
-                    |> pitchTo targetUpPitch
-                    |> followedBy (fromAngleAxis steer V3.j)
+            0.1 * speed * dx * dt
 
         orientation =
-            targetOrientation
+            motion.orientation
+                |> rollUpright
+                |> pitchUpright
+                |> followedBy (fromAngleAxis steer V3.j)
     in
         { motion | orientation = orientation }
 
 
 goForward : Model.EyeLevel -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
 goForward eyeLevel speed inputs motion =
-    -- if getY motion.position > eyeLevel motion.position then motion else
     let
         accel =
-            if getY motion.position > (eyeLevel motion.position) + 0.5 then
-                -0.1
-            else
-                clamp -1.0 1.0 <|
-                    inputs.y
-                        + inputs.rightTrigger
-                        - inputs.leftTrigger
+            clamp -1.0 1.0 <|
+                inputs.y
+                    + inputs.rightTrigger
+                    - inputs.leftTrigger
 
         move =
             V3.scale (speed * accel) V3.k
@@ -171,7 +70,7 @@ goForward eyeLevel speed inputs motion =
 
         -- e = (eyeLevel motion.position) / 80.0 -- placement.yMult
         e =
-            (eyeLevel motion.position) / 50.0
+            (eyeLevel motion.position) / 120.0
 
         friction =
             if e > 0.8 then
@@ -197,7 +96,7 @@ goForward eyeLevel speed inputs motion =
             else
                 20
     in
-        { motion | velocity = adjustVelocity ((sqrt speed) * maxSpeed) friction (add move strafe) inputs.dt motion.velocity }
+        { motion | velocity = adjustVelocity maxSpeed (8.0 * friction) (add move strafe) inputs.dt motion.velocity }
 
 
 adjustVelocity : Float -> Float -> Vec3 -> Float -> Vec3 -> Vec3
@@ -221,7 +120,7 @@ physics eyeLevel dt motion =
             getY motion.velocity
 
         ( pos_, dv ) =
-            if p.y < e + 0.5 then
+            if p.y < e then
                 let
                     vy =
                         if ((e < (0.8 * 80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10 * dt) then
@@ -233,7 +132,7 @@ physics eyeLevel dt motion =
             else
                 ( pos, vec3 0 0 0 )
     in
-        { motion | position = pos_, velocity = add motion.velocity dv }
+        { motion | position = pos_, velocity = V3.add motion.velocity dv }
 
 
 
@@ -289,8 +188,7 @@ overlay =
                 , Html.style
                     [ ( "margin-left", "3em" ) ]
                 ]
-                [ Html.i [] [ Html.text "Dreambuggy" ]
-                , Html.text " controls:"
+                [ Html.text "Walking controls:"
                 ]
             , Html.table
                 [ textStyle

@@ -10,7 +10,6 @@
         "terrain",
         "apps",
         "object",
-        "vehicles",
         "shufflepuck"
     ],
     "exposed-modules": [],

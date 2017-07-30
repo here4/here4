@@ -1,4 +1,4 @@
-module Vehicles.DreamBird exposing (drive, overlay)
+module Here4.Vehicle.DreamBird exposing (drive, overlay)
 
 import Here4.Orientation as Orientation exposing (..)
 import Here4.Body exposing (..)

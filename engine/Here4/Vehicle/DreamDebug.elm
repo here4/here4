@@ -1,4 +1,4 @@
-module Vehicles.DreamDebug exposing (dreamDebug)
+module Here4.Vehicle.DreamDebug exposing (dreamDebug)
 
 import Here4.Orientation as Orientation exposing (..)
 import Here4.Model as Model
