@@ -31,9 +31,9 @@ import Here4.Setter exposing (..)
 import Here4.Object.FlatTexture exposing (..)
 import Here4.Object.ReflectiveObj exposing (..)
 import Here4.Object.TexturedObj as TexturedObj exposing (..)
+import Here4.Vehicle exposing (Driveable)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Html exposing (Html)
-import Vehicle exposing (Driveable)
 
 
 type alias VehicleAttributes vehicle =

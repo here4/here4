@@ -1,4 +1,4 @@
-module Vehicle exposing (..)
+module Here4.Vehicle exposing (..)
 
 
 type alias Driveable a =

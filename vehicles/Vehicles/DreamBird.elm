@@ -4,13 +4,13 @@ import Here4.Orientation as Orientation exposing (..)
 import Here4.Body exposing (..)
 import Here4.Model as Model
 import Here4.Ground exposing (Ground)
+import Here4.Vehicle exposing (Driveable)
 import Html exposing (Html)
 import Html.Attributes as Html
 import FontAwesome
 import Color exposing (white)
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
-import Vehicle exposing (Driveable)
 
 
 ----------------------------------------------------------------------
