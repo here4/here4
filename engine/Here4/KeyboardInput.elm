@@ -108,12 +108,12 @@ keysToInputs keys inputs0 =
             x && keys.shift
     in
         { inputs0
-            | x = minusPlus 1.0 keys.kA keys.kD
-            , y = minusPlus 1.0 keys.kS keys.kW
-            , mx = minusPlus 1.0 keys.left keys.right
-            , my = minusPlus 1.0 keys.down keys.up
-            , cx = minusPlus 1.0 keys.kH keys.kL
-            , cy = minusPlus 1.0 keys.kJ keys.kK
+            | x = inputs0.x + minusPlus 1.0 keys.kA keys.kD
+            , y = inputs0.y + minusPlus 1.0 keys.kS keys.kW
+            , mx = inputs0.mx + minusPlus 1.0 keys.left keys.right
+            , my = inputs0.my + minusPlus 1.0 keys.down keys.up
+            , cx = inputs0.cx + minusPlus 1.0 keys.kH keys.kL
+            , cy = inputs0.cy + minusPlus 1.0 keys.kJ keys.kK
             , button_X = risingEdge inputs0.button_X keys.space
             , prevCamera = shifted <| risingEdge inputs0.prevCamera keys.kC
             , nextCamera = unshifted <| risingEdge inputs0.nextCamera keys.kC
