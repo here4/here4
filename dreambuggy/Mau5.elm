@@ -3,6 +3,7 @@ module Mau5 exposing (create, Flags, Model, Msg)
 import Here4.App exposing (..)
 import Here4.Control exposing (..)
 import Here4.Dispatch exposing (..)
+import Here4.Navigator.Control exposing (NavMsg)
 import Here4.Model as Model
 import Here4.World as World exposing (..)
 import Ports
@@ -27,7 +28,7 @@ type Mau5Msg
 
 
 type alias Msg =
-    WorldMsg Mau5Msg
+    WorldMsg (NavMsg Mau5Msg)
 
 
 type alias Mau5Model =
@@ -47,21 +48,21 @@ create attributes =
     World.create init update attributes
 
 
-init : Flags -> ( Mau5Model, Cmd Mau5Msg )
+init : Flags -> ( Mau5Model, Cmd (NavMsg Mau5Msg) )
 init flags =
     ( { wantToBeLocked = True
       , isLocked = flags.isLocked
       }
     , Cmd.none )
 
-update : Mau5Msg -> Mau5Model -> ( Mau5Model, Cmd Mau5Msg )
+update : NavMsg Mau5Msg -> Mau5Model -> ( Mau5Model, Cmd (NavMsg Mau5Msg) )
 update msg model =
     case msg of
-        MouseMove movement ->
+        Self (MouseMove movement) ->
             -- ( { model | inputs = mouseToInputs movement model.inputs }, Cmd.none )
             ( model, Cmd.none )
 
-        LockRequest wantToBeLocked ->
+        Self (LockRequest wantToBeLocked) ->
             ( { model | wantToBeLocked = wantToBeLocked }
             , if model.wantToBeLocked == model.isLocked then
                 Cmd.none
@@ -71,8 +72,11 @@ update msg model =
                 Ports.exitPointerLock ()
             )
 
-        LockUpdate isLocked ->
+        Self (LockUpdate isLocked) ->
             ( { model | isLocked = isLocked }, Cmd.none )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 -- subscriptions : Mau5Model -> Sub Mau5Msg

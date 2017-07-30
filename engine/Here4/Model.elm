@@ -45,9 +45,10 @@ type Msg navMsg worldMsg
     | WorldMessage worldMsg
     | WorldEffect GlobalMsg
     | NavigatorMessage navMsg
-    | NavigatorEffect NavMsg
+    | NavigatorEffect NavigatorMsg
 
-type NavMsg
+
+type NavigatorMsg
     = ProvideInputs Inputs
 
 type GlobalMsg
