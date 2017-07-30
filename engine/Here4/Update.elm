@@ -16,22 +16,24 @@ import Here4.KeyboardInput as KeyboardInput
 import Here4.Ground exposing (Ground)
 import Here4.Methods exposing (Methods)
 import Here4.Model as Model exposing (Model, Msg, GlobalMsg(..), WorldKey(..), AppKey(..), PartyKey(..), PlayerKey(..))
+import Here4.Navigator.Control exposing (NavMsg)
 import Here4.Orientation as Orientation exposing (fromVec3)
 import Html exposing (Html)
 import List.Extra as List
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Ports
+import Task
 import Time exposing (Time)
 
 
 {-| Take a Msg and a Model and return an updated Model
 -}
 update :
-    Methods worldFlags worldModel worldMsg
-    -> Model.Msg navMsg (WorldMsg worldMsg)
-    -> Model worldModel (WorldMsg worldMsg)
-    -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg navMsg (WorldMsg worldMsg)) )
+    Methods worldFlags worldModel (NavMsg navMsg)
+    -> Model.Msg (NavMsg navMsg) (WorldMsg (NavMsg navMsg))
+    -> Model worldModel (WorldMsg (NavMsg navMsg))
+    -> ( Model worldModel (WorldMsg (NavMsg navMsg)), Cmd (Msg (NavMsg navMsg) (WorldMsg (NavMsg navMsg))) )
 update world msg model =
     case msg of
         Model.WorldMessage worldMsg ->
@@ -65,22 +67,17 @@ update world msg model =
                     ( model, Cmd.none )
 
         Model.NavigatorMessage navMsg ->
-            ( model, Cmd.none )
-{-
             let
+{-
                 ( navigator, navCmdMsg ) =
                     nav.update navMsg model.navigator
-
-                response x =
-                    case x of
-                        GlobalEffect e ->
-                            Model.NavigatorEffect e
-
-                        m ->
-                            Model.NavigatorMessage m
-            in
-                ( { model | navigator = navigator }, Cmd.map response navCmdMsg )
 -}
+                response m =
+                    Task.succeed m |> Task.perform (Model.WorldMessage << Hub)
+                    -- Model.WorldMessage (Hub m)
+            in
+                -- ( { model | navigator = navigator }, Cmd.map response navCmdMsg )
+                ( model, response navMsg )
 
         Model.NavigatorEffect (Model.ProvideInputs inputs) ->
             ( model, Cmd.none )

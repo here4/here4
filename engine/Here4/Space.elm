@@ -28,8 +28,8 @@ import Window
 
 programWithFlags :
     (model -> Sub (NavMsg navMsg))
-    -> Methods flags model msg
-    -> Program flags (Model.Model model (WorldMsg msg)) (Model.Msg (NavMsg navMsg) (WorldMsg msg))
+    -> Methods flags model (NavMsg navMsg)
+    -> Program flags (Model.Model model (WorldMsg (NavMsg navMsg))) (Model.Msg (NavMsg navMsg) (WorldMsg (NavMsg navMsg)))
 programWithFlags navSubscriptions methods =
     Html.programWithFlags
         { init = Model.init methods.init
