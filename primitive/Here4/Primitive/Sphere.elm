@@ -1,4 +1,4 @@
-module Primitive.Sphere exposing (spheres, skySphere, cloudsSphere, fogMountainsSphere, sphere)
+module Here4.Primitive.Sphere exposing (spheres, skySphere, cloudsSphere, fogMountainsSphere, sphere)
 
 import Here4.Appearance exposing (..)
 import Here4.Body exposing (Oriented, Visible)

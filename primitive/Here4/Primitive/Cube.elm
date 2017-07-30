@@ -1,4 +1,4 @@
-module Primitive.Cube
+module Here4.Primitive.Cube
     exposing
         ( skyCube
         , textureCube

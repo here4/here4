@@ -4,11 +4,11 @@ import Here4.App as App exposing (..)
 import Here4.Body exposing (..)
 import Here4.Physics.Collisions exposing (collisions)
 import Here4.Physics.Gravity exposing (gravity)
+import Here4.Primitive.Sphere exposing (fogMountainsSphere)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.RandomVector exposing (randomVec3)
 import Math.Vector3 exposing (Vec3, add, vec3)
-import Primitive.Sphere exposing (fogMountainsSphere)
 import Random
 
 

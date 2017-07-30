@@ -5,6 +5,9 @@ import Here4.Location exposing (..)
 import Here4.Navigator exposing (..)
 import Here4.Orientation
 import Here4.Placement exposing (defaultPlacement)
+import Here4.Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube, cubeMesh)
+import Here4.Primitive.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
+import Here4.Primitive.Sphere exposing (skySphere, cloudsSphere)
 import Math.Vector3 as V3 exposing (vec3)
 import Boids
 import BoxRoom
@@ -18,9 +21,6 @@ import StaticGround
 import WaterWalls
 import Body.Terrain as Terrain
 import Body.Wedge exposing (wedge)
-import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube, cubeMesh)
-import Primitive.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
-import Primitive.Sphere exposing (skySphere, cloudsSphere)
 import Vehicles.DreamBird as DreamBird
 import Vehicles.DreamBuggy as DreamBuggy
 import Vehicles.Walking as Walking

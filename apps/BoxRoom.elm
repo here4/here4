@@ -8,10 +8,10 @@ import Here4.Bounding exposing (emplace)
 import Here4.Bounding.Box exposing (boundingBox)
 import Here4.Dispatch exposing (..)
 import Here4.Orientation as Orientation
+import Here4.Primitive.Cube as Cube
 import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Task exposing (Task)
-import Primitive.Cube as Cube
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 import Shaders.Clouds exposing (clouds)
 import Shaders.Kintsugi exposing (kintsugi)

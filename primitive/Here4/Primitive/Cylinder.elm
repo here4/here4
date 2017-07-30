@@ -1,4 +1,4 @@
-module Primitive.Cylinder exposing (textureCylinder, skyCylinder, cloudsCylinder, fogMountainsCylinder, cylinder)
+module Here4.Primitive.Cylinder exposing (textureCylinder, skyCylinder, cloudsCylinder, fogMountainsCylinder, cylinder)
 
 import Here4.Appearance exposing (..)
 import Here4.Body exposing (Oriented, Visible)

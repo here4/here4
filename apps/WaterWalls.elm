@@ -9,11 +9,11 @@ import Here4.Bounding.Box exposing (boundingBox)
 import Here4.Dispatch exposing (..)
 import Here4.Orientation as Orientation
 import Here4.Placement exposing (Placement)
+import Here4.Primitive.Cube as Cube
 import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Math.Vector4 as V4 exposing (vec4)
 import Task exposing (Task)
-import Primitive.Cube as Cube
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)

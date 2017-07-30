@@ -1,4 +1,4 @@
-module Primitive.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, diamond)
+module Here4.Primitive.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, diamond)
 
 import Here4.Appearance exposing (..)
 import List exposing (map2, repeat)
