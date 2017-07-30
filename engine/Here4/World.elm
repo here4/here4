@@ -12,6 +12,7 @@ import Here4.Dispatch exposing (..)
 import Here4.Ground exposing (Ground)
 import Here4.Location exposing (..)
 import Here4.Model as Model exposing (GlobalMsg, WorldKey(..), AppKey(..), PartyKey(..))
+import Here4.Navigator.Control exposing (NavMsg)
 import Here4.Orientation as Orientation exposing (Orientation)
 import Here4.Space as Space
 import Html exposing (Html)
@@ -54,14 +55,14 @@ type alias Party =
     -- , focusKey : Bag.Key
     }
 
-
 create :
-    (flags -> ( model, Cmd msg ))
-    -> (msg -> model -> ( model, Cmd msg ))
+    (flags -> ( model, Cmd (NavMsg msg) ))
+    -> (NavMsg msg -> model -> ( model, Cmd (NavMsg msg) ))
+    -> (Multiverse model -> Sub (NavMsg msg))
     -> List Attributes
-    -> Program flags (Model.Model (Multiverse model) (WorldMsg msg)) (Model.Msg navMsg (WorldMsg msg))
-create hubInit hubUpdate attributes =
-    Space.programWithFlags
+    -> Program flags (Model.Model (Multiverse model) (WorldMsg (NavMsg msg))) (Model.Msg (NavMsg msg) (WorldMsg (NavMsg msg)))
+create hubInit hubUpdate navSubscriptions attributes =
+    Space.programWithFlags navSubscriptions
         { init = worldInit hubInit attributes
         , view = worldView
         , update = worldUpdate hubUpdate
@@ -436,10 +437,10 @@ relocate worldPartyKey location model =
 
 
 worldUpdate :
-    (msg -> model -> ( model, Cmd msg ))
-    -> WorldMsg msg
+    (NavMsg msg -> model -> ( model, Cmd (NavMsg msg) ))
+    -> WorldMsg (NavMsg msg)
     -> Multiverse model
-    -> ( Multiverse model, Cmd (WorldMsg msg) )
+    -> ( Multiverse model, Cmd (WorldMsg (NavMsg msg)) )
 worldUpdate hubUpdate msg model =
     case msg of
         Hub hubMsg ->

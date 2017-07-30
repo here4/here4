@@ -44,9 +44,9 @@ type alias Model =
 
 create :
     List World.Attributes
-    -> Program Flags (Model.Model Model Msg) (Model.Msg navMsg Msg)
+    -> Program Flags (Model.Model Model Msg) (Model.Msg (NavMsg Mau5Msg) Msg)
 create attributes =
-    World.create init update attributes
+    World.create init update subscriptions attributes
 
 
 init : Flags -> ( Mau5Model, Cmd (NavMsg Mau5Msg) )
@@ -80,11 +80,11 @@ update msg model =
             ( model, Cmd.none )
 
 
-subscriptions : Mau5Model -> Sub (NavMsg Mau5Msg)
+subscriptions : Multiverse Mau5Model -> Sub (NavMsg Mau5Msg)
 subscriptions model =
     [ Ports.isLocked (\x -> Self (LockUpdate x))
     ]
-        ++ (if model.isLocked then
+        ++ (if model.state.isLocked then
                 [ Ports.movement (\x -> Self (MouseMove x)) ]
             else
                 [ Mouse.clicks (\_ -> Self (LockRequest True)) ]
