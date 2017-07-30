@@ -3,7 +3,7 @@ module Object.Types
         ( Load(..)
         )
 
-import Appearance exposing (Appearance)
+import Here4.Appearance exposing (Appearance)
 import Math.Vector3 exposing (Vec3)
 
 

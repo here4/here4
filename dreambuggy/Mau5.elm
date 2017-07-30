@@ -1,11 +1,11 @@
 module Mau5 exposing (create, Flags, Model, Msg)
 
-import Control exposing (..)
-import Dispatch exposing (..)
-import Model
+import Here4.App exposing (..)
+import Here4.Control exposing (..)
+import Here4.Dispatch exposing (..)
+import Here4.Model as Model
+import Here4.World as World exposing (..)
 import Ports
-import World exposing (..)
-import App exposing (..)
 
 
 type alias Flags =

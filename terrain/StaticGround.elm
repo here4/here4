@@ -1,9 +1,9 @@
 module StaticGround exposing (create)
 
-import App exposing (..)
-import App.Control exposing (..)
-import Body exposing (Body)
-import Dispatch exposing (..)
+import Here4.App as App exposing (..)
+import Here4.App.Control exposing (..)
+import Here4.Body exposing (Body)
+import Here4.Dispatch exposing (..)
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3, vec3)
 import Task exposing (Task)

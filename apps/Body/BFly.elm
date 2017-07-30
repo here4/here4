@@ -1,15 +1,15 @@
 module Body.BFly exposing (bfly)
 
-import Appearance exposing (..)
-import Body exposing (Oriented, Visible)
 import GLSLPasta exposing (empty)
 import GLSLPasta.Lighting as Lighting
 import GLSLPasta.Types as GLSLPasta exposing (Global(..), Dependencies(..))
+import Here4.Appearance exposing (..)
+import Here4.Body exposing (Oriented, Visible)
+import Here4.Orientation as Orientation
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4, vec4)
 import Math.Matrix4 as M4 exposing (..)
-import Orientation
 import Time exposing (second)
 import Shaders.VertexPasta exposing (..)
 import WebGL exposing (..)

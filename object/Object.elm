@@ -7,14 +7,16 @@ module Object
         , reflectiveObjWith
         )
 
-import App exposing (..)
-import App.Control exposing (..)
-import Appearance exposing (Appearance)
-import Body exposing (..)
-import Dispatch exposing (..)
+import Here4.App as App exposing (..)
+import Here4.App.Control exposing (..)
+import Here4.Appearance exposing (Appearance)
+import Here4.Body exposing (..)
+import Here4.Dispatch exposing (..)
+import Here4.Location exposing (Scale(..))
+import Here4.Orientation as Orientation exposing (Orientation)
+import Here4.Setter exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
-import Location exposing (Scale(..))
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Object.Attributes exposing (..)
 import Object.ReflectiveObj as ReflectiveObj exposing (ReflectiveObjAttributes)
@@ -22,8 +24,6 @@ import Object.TexturedObj as TexturedObj exposing (TexturedObjAttributes)
 import Object.Types exposing (Load(..))
 import Object.Util exposing (scaleToVec3)
 import Object.Wrapper exposing (..)
-import Orientation exposing (Orientation)
-import Setter exposing (..)
 
 
 type alias Model vehicle =

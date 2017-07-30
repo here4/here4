@@ -1,23 +1,23 @@
 module Main exposing (main)
 
 import Html exposing (Html)
-import Location exposing (..)
+import Here4.Location exposing (..)
+import Here4.Navigator exposing (..)
+import Here4.Orientation
+import Here4.Placement exposing (defaultPlacement)
 import Math.Vector3 as V3 exposing (vec3)
-import Navigator exposing (..)
 import Boids
 import BoxRoom
 import Balls
 import Mau5
 import Object
 import Object.Attributes exposing (..)
-import Orientation
 import Shufflepuck
 import Sky
 import StaticGround
 import WaterWalls
 import Body.Terrain as Terrain
 import Body.Wedge exposing (wedge)
-import Placement exposing (defaultPlacement)
 import Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube, cubeMesh)
 import Primitive.Diamond exposing (cloudsDiamond, fogMountainsDiamond)
 import Primitive.Sphere exposing (skySphere, cloudsSphere)

@@ -21,11 +21,10 @@ module Primitive.Cube
         , ceilingMesh
         )
 
+import Here4.Appearance exposing (..)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4, vec4)
 import Math.Matrix4 as M4 exposing (..)
-import WebGL exposing (..)
-import Appearance exposing (..)
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
 import Shaders.Fire exposing (fire)
@@ -34,6 +33,7 @@ import Shaders.SimplePlasma exposing (simplePlasma)
 import Shaders.VoronoiDistances exposing (voronoiDistances)
 import Shaders.TextureFragment exposing (textureFragment)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
+import WebGL exposing (..)
 
 
 type alias Triple a =

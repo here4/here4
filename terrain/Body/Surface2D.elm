@@ -7,18 +7,18 @@ module Body.Surface2D
         , rippleNoiseSurface2D
         )
 
+import Here4.Appearance exposing (..)
+import Here4.Body exposing (Oriented, Visible)
+import Here4.Orientation as Orientation
+import Here4.Placement exposing (..)
 import List exposing (..)
 import Math.Vector3 as V3 exposing (..)
 import Math.Vector4 exposing (Vec4)
 import Math.Matrix4 as M4
-import Util exposing (subsample)
-import WebGL exposing (..)
-import Appearance exposing (..)
-import Body exposing (Oriented, Visible)
-import Orientation
-import Placement exposing (..)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
+import Util exposing (subsample)
+import WebGL exposing (..)
 
 
 -- import Model

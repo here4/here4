@@ -1,11 +1,11 @@
 module Body.Obj exposing (reflective, textured)
 
+import Here4.Appearance exposing (..)
 import Math.Vector3 as V3 exposing (..)
 import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
 import WebGL.Settings exposing (cullFace, front)
 import WebGL.Settings.DepthTest as DepthTest
-import Appearance exposing (..)
 import Shaders.Obj as Shaders
 
 

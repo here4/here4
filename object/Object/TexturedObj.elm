@@ -8,16 +8,16 @@ module Object.TexturedObj
         , texturedObjUpdate
         )
 
-import Appearance exposing (Appearance)
-import Body.Obj exposing (textured)
 import Dict exposing (Dict)
-import Location exposing (Offset(..), Scale(..))
+import Body.Obj exposing (textured)
+import Here4.Appearance exposing (Appearance)
+import Here4.Location exposing (Offset(..), Scale(..))
+import Here4.Orientation exposing (Orientation)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Object.ObjUtil exposing (toWorld_Mesh)
 import Object.Types exposing (..)
 import OBJ
 import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
-import Orientation exposing (Orientation)
 import Shaders.Obj as Shaders
 import Task exposing (Task)
 import WebGL exposing (indexedTriangles)

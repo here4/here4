@@ -1,8 +1,8 @@
 module Boids exposing (create)
 
-import App exposing (..)
 import Behavior.Boids as Boids exposing (..)
-import Body exposing (..)
+import Here4.App as App exposing (..)
+import Here4.Body exposing (..)
 import Body.BFly exposing (bfly)
 import Color exposing (white)
 import FontAwesome

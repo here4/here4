@@ -1,15 +1,15 @@
 module Primitive.Diamond exposing (skyDiamond, cloudsDiamond, fogMountainsDiamond, diamond)
 
+import Here4.Appearance exposing (..)
 import List exposing (map2, repeat)
 import Math.Vector3 as V3 exposing (..)
 import Math.Vector4 exposing (vec4)
 import Math.Matrix4 as M4 exposing (..)
-import WebGL exposing (..)
-import Appearance exposing (..)
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
 import Shaders.FogMountains exposing (fogMountains)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
+import WebGL exposing (..)
 
 
 skyDiamond : Appearance

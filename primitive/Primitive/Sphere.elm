@@ -1,18 +1,18 @@
 module Primitive.Sphere exposing (spheres, skySphere, cloudsSphere, fogMountainsSphere, sphere)
 
+import Here4.Appearance exposing (..)
+import Here4.Body exposing (Oriented, Visible)
+import Here4.Orientation as Orientation
 import List exposing (drop, concat, map, map2)
 import Math.Vector2 exposing (Vec2)
 import Math.Vector3 exposing (..)
 import Math.Vector4 exposing (Vec4, vec4)
 import Math.Matrix4 as M4 exposing (..)
-import WebGL exposing (..)
-import Appearance exposing (..)
-import Body exposing (Oriented, Visible)
-import Orientation
 import Shaders.Clouds exposing (clouds)
 import Shaders.Sky exposing (sky)
 import Shaders.FogMountains exposing (fogMountains)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
+import WebGL exposing (..)
 
 
 spheres :

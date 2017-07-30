@@ -20,19 +20,19 @@ module Object.Attributes
         , vehicle
         )
 
-import App exposing (..)
-import App.Control exposing (CtrlMsg)
-import Appearance exposing (Appearance)
-import Body exposing (..)
+import Here4.App exposing (..)
+import Here4.App.Control exposing (CtrlMsg)
+import Here4.Appearance exposing (Appearance)
+import Here4.Body exposing (..)
+import Here4.Location exposing (..)
+import Here4.Model exposing (Inputs)
+import Here4.Orientation as Orientation exposing (Orientation)
+import Here4.Setter exposing (..)
 import Html exposing (Html)
-import Location exposing (..)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Model exposing (Inputs)
 import Object.FlatTexture exposing (..)
 import Object.ReflectiveObj exposing (..)
 import Object.TexturedObj as TexturedObj exposing (..)
-import Orientation exposing (Orientation)
-import Setter exposing (..)
 import Vehicle exposing (Driveable)
 
 

@@ -7,8 +7,8 @@ module Object.FlatTexture
         , flatTextureUpdate
         )
 
-import Appearance exposing (Appearance)
 import Body.Obj exposing (reflective)
+import Here4.Appearance exposing (Appearance)
 import Dict exposing (Dict)
 import Math.Vector3 as V3 exposing (vec3)
 import Math.Matrix4 as M4

@@ -4,13 +4,13 @@ module Object.Wrapper
         , objectUpdate
         )
 
+import Here4.Setter exposing (..)
 import Math.Vector3 exposing (Vec3)
 import Object.Attributes exposing (ObjectAttributes(..), ObjectResult(..), ObjectMsg(..))
 import Object.FlatTexture exposing (flatTextureInit, flatTextureUpdate)
 import Object.ReflectiveObj exposing (reflectiveObjInit, reflectiveObjUpdate)
 import Object.TexturedObj exposing (texturedObjInit, texturedObjUpdate)
 import Object.Types exposing (Load(..))
-import Setter exposing (..)
 import Tuple
 
 

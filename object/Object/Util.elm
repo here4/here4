@@ -1,7 +1,7 @@
 module Object.Util exposing (..)
 
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Location exposing (Scale(..), Offset(..))
+import Here4.Location exposing (Scale(..), Offset(..))
 
 
 debugBounds : List Vec3 -> List Vec3

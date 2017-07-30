@@ -1,5 +1,7 @@
 module Body.Wedge exposing (wedge)
 
+import Here4.Appearance exposing (..)
+-- import Here4.Model
 import List exposing (concatMap, map)
 import Time exposing (Time)
 import Math.Vector2 exposing (Vec2)
@@ -7,12 +9,10 @@ import Math.Vector3 as V3 exposing (..)
 import Math.Vector4 exposing (vec4)
 import Math.Matrix4 as M4 exposing (..)
 import WebGL exposing (..)
-import Appearance exposing (..)
 import Shaders.WorldVertex exposing (Vertex, worldVertex)
 import Shaders.VoronoiDistances exposing (voronoiDistances)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
-import Model
 
 
 wedge : Perception -> List Entity

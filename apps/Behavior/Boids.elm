@@ -1,11 +1,11 @@
 module Behavior.Boids exposing (..)
 
-import Orientation exposing (..)
+import Here4.Body exposing (..)
+import Here4.Ground exposing (Ground)
+import Here4.Orientation exposing (..)
 import Math.Vector3 as V3
 import Math.Vector3 exposing (Vec3, vec3)
 import Time exposing (Time)
-import Body exposing (..)
-import Ground exposing (Ground)
 
 
 type alias Attributes =

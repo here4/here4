@@ -8,17 +8,17 @@ module Object.ReflectiveObj
         , reflectiveObjUpdate
         )
 
-import Appearance exposing (Appearance)
-import Body.Obj exposing (reflective)
 import Dict exposing (Dict)
-import Location exposing (..)
+import Body.Obj exposing (reflective)
+import Here4.Appearance exposing (Appearance)
+import Here4.Location exposing (..)
+import Here4.Orientation exposing (Orientation)
 import Math.Vector3 as V3 exposing (vec3)
 import Object.ObjUtil exposing (toWorld_MeshWithVertexWithTexture)
 import Object.Types exposing (Load(..))
 import Object.Util exposing (..)
 import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
-import Orientation exposing (Orientation)
 import Task exposing (Task)
 import WebGL exposing (indexedTriangles)
 import WebGL.Texture as Texture exposing (Texture, Error)

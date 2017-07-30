@@ -2,15 +2,15 @@ module Vehicles.DreamBuggy exposing (drive, overlay)
 
 import Color exposing (white)
 import FontAwesome
+import Here4.Body exposing (..)
+import Here4.Ground exposing (Ground)
+import Here4.Model as Model
+import Here4.Orientation as Orientation exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Math.Matrix4 exposing (..)
-import Orientation exposing (..)
-import Body exposing (..)
-import Model
-import Ground exposing (Ground)
 import Vehicle exposing (Driveable)
 import Debug
 
