@@ -7,10 +7,7 @@ import Here4.Navigator.Control exposing (NavMsg)
 
 
 type alias Navigator flags model msg =
-    Program
-        flags
-        (Model.Model model msg)
-        (Model.Msg (NavMsg msg) msg)
+    Program flags (Model.Model model msg) (Model.Msg msg)
 
 
 type alias App =

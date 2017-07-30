@@ -26,7 +26,7 @@ import Body.Terrain as Terrain
 import Body.Wedge exposing (wedge)
 
 
--- main : Navigator Mau5.Flags Mau5.Model Mau5.Msg
+main : Navigator Mau5.Flags Mau5.Model Mau5.Msg
 main =
     Mau5.create
         [ { id = "world1"
