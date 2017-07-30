@@ -6,6 +6,7 @@ import Here4.Dispatch exposing (..)
 import Here4.Navigator.Control exposing (NavMsg)
 import Here4.Model as Model
 import Here4.World as World exposing (..)
+import Mouse
 import Ports
 
 
@@ -79,7 +80,16 @@ update msg model =
             ( model, Cmd.none )
 
 
--- subscriptions : Mau5Model -> Sub Mau5Msg
+subscriptions : Mau5Model -> Sub (NavMsg Mau5Msg)
+subscriptions model =
+    [ Ports.isLocked (\x -> Self (LockUpdate x))
+    ]
+        ++ (if model.isLocked then
+                [ Ports.movement (\x -> Self (MouseMove x)) ]
+            else
+                [ Mouse.clicks (\_ -> Self (LockRequest True)) ]
+           )
+        |> Sub.batch
 
 
 mouseToInputs : Model.MouseMovement -> Model.Inputs -> Model.Inputs
