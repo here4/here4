@@ -7,7 +7,7 @@ import Keyboard.Extra exposing (Key(..))
 {- Subscribe to keychange events. -}
 
 
-keyChange : Bool -> Key -> Model.Msg navMsg worldMsg
+keyChange : Bool -> Key -> Model.Msg worldMsg
 keyChange on key =
 {-
     if key == Escape && on then

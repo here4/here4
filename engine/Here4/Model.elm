@@ -32,7 +32,7 @@ type PlayerKey
     = PlayerKey Bag.Key
 
 
-type Msg navMsg worldMsg
+type Msg worldMsg
     = KeyChange (Keys -> Keys)
     | GamepadUpdate (List Gamepad)
     | JoinWorld (WorldKey ()) PlayerKey -- should these be multiworld hub messages?
@@ -240,7 +240,7 @@ type alias Model worldModel worldMsg =
     }
 
 
-playerJoin : PlayerKey -> Cmd (Msg navMsg worldMsg)
+playerJoin : PlayerKey -> Cmd (Msg worldMsg)
 playerJoin playerKey =
     Task.succeed playerKey |> Task.perform (JoinWorld (WorldKey 0 ()))
 
@@ -250,7 +250,7 @@ playerJoin playerKey =
 init :
     (flags -> ( worldModel, Cmd worldMsg ))
     -> flags
-    -> ( Model worldModel worldMsg, Cmd (Msg navMsg worldMsg) )
+    -> ( Model worldModel worldMsg, Cmd (Msg worldMsg) )
 init worldInit flags =
     let
         ( worldModel, worldCmdMsg ) =

@@ -31,9 +31,9 @@ import Debug
 -}
 update :
     Methods worldFlags worldModel (NavMsg navMsg)
-    -> Model.Msg (NavMsg navMsg) (WorldMsg (NavMsg navMsg))
+    -> Model.Msg (WorldMsg (NavMsg navMsg))
     -> Model worldModel (WorldMsg (NavMsg navMsg))
-    -> ( Model worldModel (WorldMsg (NavMsg navMsg)), Cmd (Msg (NavMsg navMsg) (WorldMsg (NavMsg navMsg))) )
+    -> ( Model worldModel (WorldMsg (NavMsg navMsg)), Cmd (Msg (WorldMsg (NavMsg navMsg))) )
 update world msg model =
     case msg of
         Model.WorldMessage worldMsg ->
@@ -227,7 +227,7 @@ animate :
     -> Time
     -> WorldKey ()
     -> Model worldModel (WorldMsg worldMsg)
-    -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg navMsg (WorldMsg worldMsg)) )
+    -> ( Model worldModel (WorldMsg worldMsg), Cmd (Msg (WorldMsg worldMsg)) )
 animate world dt0 worldKey model0 =
     case world.ground worldKey model0.multiverse of
         Nothing ->
@@ -433,7 +433,7 @@ gamepadToInputs gamepad inputs0 =
 updateGamepads :
     List Gamepad.Gamepad
     -> Model worldModel worldMsg
-    -> ( Model worldModel worldMsg, Cmd (Msg navMsg worldMsg) )
+    -> ( Model worldModel worldMsg, Cmd (Msg worldMsg) )
 updateGamepads gps0 model =
     let
         ( gps, is ) =

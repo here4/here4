@@ -28,7 +28,7 @@ import Window
 programWithFlags :
     (model -> Sub (NavMsg navMsg))
     -> Methods flags model (NavMsg navMsg)
-    -> Program flags (Model.Model model (WorldMsg (NavMsg navMsg))) (Model.Msg (NavMsg navMsg) (WorldMsg (NavMsg navMsg)))
+    -> Program flags (Model.Model model (WorldMsg (NavMsg navMsg))) (Model.Msg (WorldMsg (NavMsg navMsg)))
 programWithFlags navSubscriptions methods =
     Html.programWithFlags
         { init = Model.init methods.init
@@ -41,7 +41,7 @@ programWithFlags navSubscriptions methods =
 subscriptions :
     (worldModel -> Sub (NavMsg navMsg))
     -> Model.Model worldModel worldMsg
-    -> Sub (Model.Msg (NavMsg navMsg) (WorldMsg (NavMsg navMsg)))
+    -> Sub (Model.Msg (WorldMsg (NavMsg navMsg)))
 subscriptions navSubscriptions model =
     [ AnimationFrame.diffs (Model.Animate << Time.inSeconds)
     , Keyboard.Extra.downs (KeyboardInput.keyChange True)

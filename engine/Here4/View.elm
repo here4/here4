@@ -27,7 +27,7 @@ import Window
 view :
     Methods flags model msg
     -> Model model (WorldMsg msg)
-    -> Html (Msg navMsg (WorldMsg msg))
+    -> Html (Msg (WorldMsg msg))
 view methods model =
     case model.maybeWindowSize of
         Nothing ->
@@ -41,7 +41,7 @@ layoutScene :
     Window.Size
     -> Methods flags worldModel msg
     -> Model worldModel (WorldMsg msg)
-    -> Html (Msg navMsg (WorldMsg msg))
+    -> Html (Msg (WorldMsg msg))
 layoutScene windowSize methods model =
     let
         toUnit (WorldKey n _) =
@@ -89,7 +89,7 @@ layoutScene windowSize methods model =
             orLoading (layoutScene1 windowSize model worldLabel1) mView1
 
 
-loading : Window.Size -> Html (Msg navMsg worldMsg)
+loading : Window.Size -> Html (Msg worldMsg)
 loading windowSize =
     let
         left =
@@ -129,7 +129,7 @@ rgbAttribute color =
 
 
 
-layoutScene1 : Window.Size -> Model worldModel worldMsg -> String -> Model.World -> Html (Msg navMsg worldMsg)
+layoutScene1 : Window.Size -> Model worldModel worldMsg -> String -> Model.World -> Html (Msg worldMsg)
 layoutScene1 windowSize model worldLabel view =
     let
         render =
@@ -158,7 +158,7 @@ layoutScene1 windowSize model worldLabel view =
             ]
 
 
-layoutScene2 : Window.Size -> Model worldModel worldMsg -> String -> Model.World -> String -> Model.World -> Html (Msg navMsg worldMsg)
+layoutScene2 : Window.Size -> Model worldModel worldMsg -> String -> Model.World -> String -> Model.World -> Html (Msg worldMsg)
 layoutScene2 windowSize model worldLabel1 view1 worldLabel2 view2 =
     let
         w2 =
@@ -226,7 +226,7 @@ layoutScene2 windowSize model worldLabel1 view1 worldLabel2 view2 =
             ]
 
 
-layoutSceneVR : Window.Size -> Model worldModel worldMsg -> Model.World -> Html (Msg navMsg worldMsg)
+layoutSceneVR : Window.Size -> Model worldModel worldMsg -> Model.World -> Html (Msg worldMsg)
 layoutSceneVR windowSize model view =
     let
         render =
@@ -432,7 +432,7 @@ lookAtSky { width, height } player =
         (cameraUp player.camera)
 
 
-hud : String -> Bool -> Model.Player worldMsg -> Int -> Int -> Int -> Int -> Html (Msg navMsg worldMsg)
+hud : String -> Bool -> Model.Player worldMsg -> Int -> Int -> Int -> Int -> Html (Msg worldMsg)
 hud worldLabel paused player left right helpHMargin helpVMargin =
     let
         shotLabel =
@@ -487,7 +487,7 @@ hud worldLabel paused player left right helpHMargin helpVMargin =
             ]
 
 
-overlay : Int -> Int -> Int -> Int -> Html worldMsg -> Html (Msg navMsg worldMsg)
+overlay : Int -> Int -> Int -> Int -> Html worldMsg -> Html (Msg worldMsg)
 overlay left right hMargin vMargin content =
     div
         [ style

@@ -60,7 +60,7 @@ create :
     -> (NavMsg msg -> model -> ( model, Cmd (NavMsg msg) ))
     -> (Multiverse model -> Sub (NavMsg msg))
     -> List Attributes
-    -> Program flags (Model.Model (Multiverse model) (WorldMsg (NavMsg msg))) (Model.Msg (NavMsg msg) (WorldMsg (NavMsg msg)))
+    -> Program flags (Model.Model (Multiverse model) (WorldMsg (NavMsg msg))) (Model.Msg (WorldMsg (NavMsg msg)))
 create hubInit hubUpdate navSubscriptions attributes =
     Space.programWithFlags navSubscriptions
         { init = worldInit hubInit attributes

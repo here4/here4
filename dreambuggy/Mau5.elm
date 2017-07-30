@@ -45,7 +45,7 @@ type alias Model =
 
 create :
     List World.Attributes
-    -> Program Flags (Model.Model Model Msg) (Model.Msg (NavMsg Mau5Msg) Msg)
+    -> Program Flags (Model.Model Model Msg) (Model.Msg Msg)
 create attributes =
     World.create init update subscriptions attributes
 
