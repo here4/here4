@@ -1,16 +1,16 @@
-module Object.Wrapper
+module Here4.Object.Wrapper
     exposing
         ( objectInit
         , objectUpdate
         )
 
 import Here4.Setter exposing (..)
+import Here4.Object.Attributes exposing (ObjectAttributes(..), ObjectResult(..), ObjectMsg(..))
+import Here4.Object.FlatTexture exposing (flatTextureInit, flatTextureUpdate)
+import Here4.Object.ReflectiveObj exposing (reflectiveObjInit, reflectiveObjUpdate)
+import Here4.Object.TexturedObj exposing (texturedObjInit, texturedObjUpdate)
+import Here4.Object.Types exposing (Load(..))
 import Math.Vector3 exposing (Vec3)
-import Object.Attributes exposing (ObjectAttributes(..), ObjectResult(..), ObjectMsg(..))
-import Object.FlatTexture exposing (flatTextureInit, flatTextureUpdate)
-import Object.ReflectiveObj exposing (reflectiveObjInit, reflectiveObjUpdate)
-import Object.TexturedObj exposing (texturedObjInit, texturedObjUpdate)
-import Object.Types exposing (Load(..))
 import Tuple
 
 

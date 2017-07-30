@@ -1,4 +1,4 @@
-module Body.Obj exposing (reflective, textured)
+module Here4.Body.Obj exposing (reflective, textured)
 
 import Here4.Appearance exposing (..)
 import Math.Vector3 as V3 exposing (..)

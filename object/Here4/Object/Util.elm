@@ -1,4 +1,4 @@
-module Object.Util exposing (..)
+module Here4.Object.Util exposing (..)
 
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Here4.Location exposing (Scale(..), Offset(..))

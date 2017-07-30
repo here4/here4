@@ -1,4 +1,4 @@
-module Object.Attributes
+module Here4.Object.Attributes
     exposing
         ( VehicleAttributes
         , Action(..)
@@ -28,11 +28,11 @@ import Here4.Location exposing (..)
 import Here4.Model exposing (Inputs)
 import Here4.Orientation as Orientation exposing (Orientation)
 import Here4.Setter exposing (..)
-import Html exposing (Html)
+import Here4.Object.FlatTexture exposing (..)
+import Here4.Object.ReflectiveObj exposing (..)
+import Here4.Object.TexturedObj as TexturedObj exposing (..)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Object.FlatTexture exposing (..)
-import Object.ReflectiveObj exposing (..)
-import Object.TexturedObj as TexturedObj exposing (..)
+import Html exposing (Html)
 import Vehicle exposing (Driveable)
 
 

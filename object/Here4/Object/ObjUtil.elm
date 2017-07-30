@@ -1,4 +1,4 @@
-module Object.ObjUtil
+module Here4.Object.ObjUtil
     exposing
         ( toWorld_Mesh
         , toWorld_MeshWithVertexWithTexture
@@ -7,9 +7,9 @@ module Object.ObjUtil
 import Dict exposing (Dict)
 import Here4.Location exposing (Scale(..), Offset(..))
 import Here4.Orientation as Orientation exposing (Orientation)
+import Here4.Object.Util exposing (..)
 import Math.Matrix4 as M4
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Object.Util exposing (..)
 import OBJ.Types as Obj exposing (ObjFile, Mesh(..), MeshWith, VertexWithTexture)
 
 

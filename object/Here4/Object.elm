@@ -1,4 +1,4 @@
-module Object
+module Here4.Object
     exposing
         ( create
         , texturedObj
@@ -15,15 +15,15 @@ import Here4.Dispatch exposing (..)
 import Here4.Location exposing (Scale(..))
 import Here4.Orientation as Orientation exposing (Orientation)
 import Here4.Setter exposing (..)
+import Here4.Object.Attributes exposing (..)
+import Here4.Object.ReflectiveObj as ReflectiveObj exposing (ReflectiveObjAttributes)
+import Here4.Object.TexturedObj as TexturedObj exposing (TexturedObjAttributes)
+import Here4.Object.Types exposing (Load(..))
+import Here4.Object.Util exposing (scaleToVec3)
+import Here4.Object.Wrapper exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Object.Attributes exposing (..)
-import Object.ReflectiveObj as ReflectiveObj exposing (ReflectiveObjAttributes)
-import Object.TexturedObj as TexturedObj exposing (TexturedObjAttributes)
-import Object.Types exposing (Load(..))
-import Object.Util exposing (scaleToVec3)
-import Object.Wrapper exposing (..)
 
 
 type alias Model vehicle =

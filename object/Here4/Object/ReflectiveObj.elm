@@ -1,4 +1,4 @@
-module Object.ReflectiveObj
+module Here4.Object.ReflectiveObj
     exposing
         ( ReflectiveObjAttributes
         , ReflectiveObjResult
@@ -9,14 +9,14 @@ module Object.ReflectiveObj
         )
 
 import Dict exposing (Dict)
-import Body.Obj exposing (reflective)
 import Here4.Appearance exposing (Appearance)
+import Here4.Body.Obj exposing (reflective)
 import Here4.Location exposing (..)
 import Here4.Orientation exposing (Orientation)
+import Here4.Object.ObjUtil exposing (toWorld_MeshWithVertexWithTexture)
+import Here4.Object.Types exposing (Load(..))
+import Here4.Object.Util exposing (..)
 import Math.Vector3 as V3 exposing (vec3)
-import Object.ObjUtil exposing (toWorld_MeshWithVertexWithTexture)
-import Object.Types exposing (Load(..))
-import Object.Util exposing (..)
 import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
 import Task exposing (Task)

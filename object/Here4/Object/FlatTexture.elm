@@ -1,4 +1,4 @@
-module Object.FlatTexture
+module Here4.Object.FlatTexture
     exposing
         ( FlatTextureAttributes
         , FlatTextureResult
@@ -7,13 +7,13 @@ module Object.FlatTexture
         , flatTextureUpdate
         )
 
-import Body.Obj exposing (reflective)
 import Here4.Appearance exposing (Appearance)
+import Here4.Body.Obj exposing (reflective)
+import Here4.Object.Types exposing (Load(..))
+import Here4.Object.Util exposing (..)
 import Dict exposing (Dict)
 import Math.Vector3 as V3 exposing (vec3)
 import Math.Matrix4 as M4
-import Object.Types exposing (Load(..))
-import Object.Util exposing (..)
 import OBJ
 import OBJ.Types exposing (MeshWith, VertexWithTexture)
 import Shaders.TextureFragment exposing (textureFragment)

@@ -1,4 +1,4 @@
-module Object.TexturedObj
+module Here4.Object.TexturedObj
     exposing
         ( TexturedObjAttributes
         , TexturedObjResult
@@ -9,13 +9,13 @@ module Object.TexturedObj
         )
 
 import Dict exposing (Dict)
-import Body.Obj exposing (textured)
+import Here4.Body.Obj exposing (textured)
 import Here4.Appearance exposing (Appearance)
 import Here4.Location exposing (Offset(..), Scale(..))
 import Here4.Orientation exposing (Orientation)
+import Here4.Object.ObjUtil exposing (toWorld_Mesh)
+import Here4.Object.Types exposing (..)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Object.ObjUtil exposing (toWorld_Mesh)
-import Object.Types exposing (..)
 import OBJ
 import OBJ.Types as Obj exposing (ObjFile, Mesh(..))
 import Shaders.Obj as Shaders

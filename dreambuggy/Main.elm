@@ -3,6 +3,8 @@ module Main exposing (main)
 import Html exposing (Html)
 import Here4.Location exposing (..)
 import Here4.Navigator exposing (..)
+import Here4.Object as Object
+import Here4.Object.Attributes exposing (..)
 import Here4.Orientation
 import Here4.Placement exposing (defaultPlacement)
 import Here4.Primitive.Cube exposing (skyCube, fireCube, fogMountainsCube, voronoiCube, cubeMesh)
@@ -13,8 +15,6 @@ import Boids
 import BoxRoom
 import Balls
 import Mau5
-import Object
-import Object.Attributes exposing (..)
 import Shufflepuck
 import Sky
 import StaticGround

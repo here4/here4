@@ -1,4 +1,4 @@
-module Object.Types
+module Here4.Object.Types
     exposing
         ( Load(..)
         )
