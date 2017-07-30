@@ -34,17 +34,13 @@ type PlayerKey
 
 type Msg navMsg worldMsg
     = KeyChange (Keys -> Keys)
-    -- | MouseMove MouseMovement
     | GamepadUpdate (List Gamepad)
-    -- | LockRequest Bool
-    -- | LockUpdate Bool
     | JoinWorld (WorldKey ()) PlayerKey -- should these be multiworld hub messages?
     | LeaveWorld (WorldKey PlayerKey) -- should these be multiworld hub messages?
     | Animate Time
     | Resize Window.Size
     | WorldMessage worldMsg
     | WorldEffect GlobalMsg
-    | NavigatorMessage navMsg
     | NavigatorEffect NavigatorMsg
 
 
@@ -239,8 +235,6 @@ type alias Model worldModel worldMsg =
     , gamepadIds : List String
     , inputs : Inputs
     , inputs2 : Inputs
-    -- , wantToBeLocked : Bool
-    -- , isLocked : Bool
     , message : String
     , multiverse : worldModel
     }
@@ -257,7 +251,6 @@ init :
     (flags -> ( worldModel, Cmd worldMsg ))
     -> flags
     -> ( Model worldModel worldMsg, Cmd (Msg navMsg worldMsg) )
--- init worldInit { movement, isLocked } =
 init worldInit flags =
     let
         ( worldModel, worldCmdMsg ) =
@@ -273,8 +266,6 @@ init worldInit flags =
           , gamepadIds = []
           , inputs = noInput
           , inputs2 = noInput
-          -- , wantToBeLocked = True
-          -- , isLocked = isLocked
           , message = "No texture yet"
           , multiverse = worldModel
           }

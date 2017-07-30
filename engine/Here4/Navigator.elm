@@ -3,10 +3,14 @@ module Here4.Navigator exposing (..)
 import Color
 import Here4.App as App
 import Here4.Model as Model
+import Here4.Navigator.Control exposing (NavMsg)
 
 
-type alias Navigator flags model navMsg msg =
-    Program flags (Model.Model model msg) (Model.Msg navMsg msg)
+type alias Navigator flags model msg =
+    Program
+        flags
+        (Model.Model model msg)
+        (Model.Msg (NavMsg msg) msg)
 
 
 type alias App =

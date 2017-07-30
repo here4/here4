@@ -22,7 +22,6 @@ import Html exposing (Html)
 import List.Extra as List
 import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
-import Ports
 import Task
 import Time exposing (Time)
 
@@ -70,12 +69,6 @@ update world msg model =
                 else
                     ( model, Cmd.none )
 
-        Model.NavigatorMessage navMsg ->
-            let
-                response m =
-                    Task.succeed m |> Task.perform (Model.WorldMessage << Hub)
-            in
-                ( model, response navMsg )
 
         Model.NavigatorEffect (Model.ProvideInputs inputs) ->
             ( { model | inputs = mergeInputs inputs model.inputs }
@@ -110,28 +103,10 @@ update world msg model =
         Model.Resize windowSize ->
             ( { model | maybeWindowSize = Just windowSize }, Cmd.none )
 
-{-
-        Model.MouseMove movement ->
-            ( { model | inputs = mouseToInputs movement model.inputs }, Cmd.none )
--}
 
         Model.GamepadUpdate gps0 ->
             updateGamepads gps0 model
 
-{-
-        Model.LockRequest wantToBeLocked ->
-            ( { model | wantToBeLocked = wantToBeLocked }
-            , if model.wantToBeLocked == model.isLocked then
-                Cmd.none
-              else if model.wantToBeLocked then
-                Ports.requestPointerLock ()
-              else
-                Ports.exitPointerLock ()
-            )
-
-        Model.LockUpdate isLocked ->
-            ( { model | isLocked = isLocked }, Cmd.none )
--}
 
         Model.JoinWorld worldKey playerKey ->
             let

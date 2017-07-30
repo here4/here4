@@ -21,7 +21,6 @@ import Here4.View as View
 import Html
 import Keyboard.Extra
 import Mouse
-import Ports
 import Time exposing (Time)
 import Window
 
@@ -42,12 +41,12 @@ programWithFlags navSubscriptions methods =
 subscriptions :
     (worldModel -> Sub (NavMsg navMsg))
     -> Model.Model worldModel worldMsg
-    -> Sub (Model.Msg (NavMsg navMsg) worldMsg)
+    -> Sub (Model.Msg (NavMsg navMsg) (WorldMsg (NavMsg navMsg)))
 subscriptions navSubscriptions model =
     [ AnimationFrame.diffs (Model.Animate << Time.inSeconds)
     , Keyboard.Extra.downs (KeyboardInput.keyChange True)
     , Keyboard.Extra.ups (KeyboardInput.keyChange False)
     , Window.resizes Model.Resize
-    , Sub.map Model.NavigatorMessage (navSubscriptions model.multiverse)
+    , Sub.map (Model.WorldMessage << Hub) (navSubscriptions model.multiverse)
     ]
         |> Sub.batch
