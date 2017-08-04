@@ -379,7 +379,6 @@ mergeInputs inputs1 inputs0 =
         , toggleOverlay = inputs0.toggleOverlay || inputs1.toggleOverlay
         , prevOverlay = inputs0.prevOverlay || inputs1.prevOverlay
         , nextOverlay = inputs0.nextOverlay || inputs1.nextOverlay
-        , isJumping = inputs0.isJumping || inputs1.isJumping
         , button_X = inputs0.button_X || inputs1.button_X
         , rightTrigger = inputs0.rightTrigger + inputs1.rightTrigger
         , leftTrigger = inputs0.leftTrigger + inputs1.leftTrigger

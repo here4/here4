@@ -178,7 +178,6 @@ type alias Inputs =
     , toggleOverlay : Bool
     , prevOverlay : Bool
     , nextOverlay : Bool
-    , isJumping : Bool
     , button_X : Bool
     , rightTrigger : Float
     , leftTrigger : Float
@@ -201,7 +200,6 @@ noInput =
     , toggleOverlay = False
     , prevOverlay = False
     , nextOverlay = False
-    , isJumping = False
     , button_X = False
     , rightTrigger = 0.0
     , leftTrigger = 0.0
