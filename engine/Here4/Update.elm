@@ -336,7 +336,7 @@ animatePlayer world (WorldKey worldKey ()) terrain dt0 inputs0 player0 model =
                     newPlayer =
                         updatePlayer terrain inputs dt0 label overlay player.shot framing player
                 in
-                    ( clearStationaryInputs inputs
+                    ( Model.noInput
                     , newPlayer
                     , fwdModel
                     , Cmd.batch [ rideMsg, fwdMsg ]
@@ -367,11 +367,6 @@ timeToInputs dt inputs0 =
 mouseToInputs : Model.MouseMovement -> Model.Inputs -> Model.Inputs
 mouseToInputs ( mx, my ) inputs =
     { inputs | mx = 0.5 * inputs.dt * toFloat mx, my = -0.5 * inputs.dt * toFloat my }
-
-
-clearStationaryInputs : Model.Inputs -> Model.Inputs
-clearStationaryInputs inputs0 =
-    { inputs0 | mx = 0, my = 0 }
 
 
 mergeInputs : Model.Inputs -> Model.Inputs -> Model.Inputs
