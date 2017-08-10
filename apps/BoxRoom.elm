@@ -11,11 +11,10 @@ import Here4.Orientation as Orientation
 import Here4.Primitive.Cube as Cube
 import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
+import Math.Vector4 as V4 exposing (vec4)
 import Task exposing (Task)
-import Shaders.WorldVertex exposing (Vertex, worldVertex)
-import Shaders.Clouds exposing (clouds)
-import Shaders.Kintsugi exposing (kintsugi)
-import Shaders.SimplePlasma exposing (simplePlasma)
+import Shaders.ColorFragment exposing (..)
+import Shaders.NoiseVertex exposing (..)
 
 
 type alias Attributes =
@@ -69,14 +68,24 @@ init attributes =
             , appear = appear
             }
 
+        toNoiseVertex v =
+            { position = v.position
+            , normal = v.normal
+            , coord = V3.scale 10 v.coord
+            , color = vec4 1.0 1.0 1.0 1.0
+            , smoothing = 0.1
+            , textureScale = 1.0
+            , timeScale = 0.001
+            }
+
         walls =
-            make (Cube.walls worldVertex simplePlasma)
+            make (Cube.wallsWith toNoiseVertex noiseVertex noiseColorFragment)
 
         floor =
-            make (Cube.floor worldVertex kintsugi)
+            make (Cube.floorWith toNoiseVertex noiseVertex noiseColorFragment)
 
         ceiling =
-            make (Cube.ceiling worldVertex clouds)
+            make (Cube.ceilingWith toNoiseVertex noiseVertex noiseColorFragment)
 
         box =
             { position = originPosition

@@ -13,12 +13,14 @@ module Here4.Primitive.Cube
         , floor
         , floorWith
         , ceiling
+        , ceilingWith
         , cubeMesh
         , wallsMesh
         , wallsMeshWith
         , floorMesh
         , floorMeshWith
         , ceilingMesh
+        , ceilingMeshWith
         )
 
 import Here4.Appearance exposing (..)
@@ -114,6 +116,8 @@ ceiling =
     render ceilingMesh
 
 
+ceilingWith f =
+    renderNSV (ceilingMeshWith f)
 
 -- render : Mesh vertex -> Shader vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 
@@ -244,6 +248,11 @@ floorMeshWith f =
 ceilingMesh : Mesh Vertex
 ceilingMesh =
     triangles <| List.concatMap rotatedFace [ ( -90, 0, 0 ) ]
+
+
+ceilingMeshWith : (Vertex -> v) -> Mesh v
+ceilingMeshWith f =
+    triangles <| List.map (map3 f) <| List.concatMap rotatedFace [ ( -90, 0, 0 ) ]
 
 
 rotatedFace : ( Float, Float, Float ) -> List (Triple Vertex)
