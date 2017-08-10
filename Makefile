@@ -1,11 +1,11 @@
 
-GHUSER=kfish
-PROJECT=dreambuggy
+GHUSER=here4
+PROJECT=here4
 
 REMOTE=${GHUSER}-${PROJECT}
 
-SOURCE=dreambuggy/Main.elm
-SCRIPT=dreambuggy.js
+SOURCE=demo/Main.elm
+SCRIPT=here4-demo.js
 TARGET=build/${SCRIPT}
 DEPLOY=scripts/${SCRIPT}
 
