@@ -14,12 +14,8 @@ import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Math.Vector4 as V4 exposing (vec4)
 import Task exposing (Task)
-import Shaders.WorldVertex exposing (Vertex, worldVertex)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
-import Shaders.Clouds exposing (clouds)
-import Shaders.Kintsugi exposing (kintsugi)
-import Shaders.SimplePlasma exposing (simplePlasma)
 import Util exposing (hslToVec3)
 
 
