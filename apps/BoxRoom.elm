@@ -71,11 +71,11 @@ init attributes =
         toNoiseVertex v =
             { position = v.position
             , normal = v.normal
-            , coord = V3.scale 10 v.coord
+            , coord = V3.scale 1.0 v.coord
             , color = vec4 1.0 1.0 1.0 1.0
-            , smoothing = 0.1
-            , textureScale = 1.0
-            , timeScale = 0.001
+            , smoothing = 0.3
+            , textureScale = 0.1
+            , timeScale = 0.0
             }
 
         walls =
