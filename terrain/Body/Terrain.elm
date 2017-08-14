@@ -102,13 +102,33 @@ mountains h =
                 V4.fromTuple ( v.x, v.y, v.z, 1.0 )
     in
         if h > 0.8 then
-            ( h, alpha1 snow, 0.8, 0.0, 0.3 )
+            { height = h
+            , color = alpha1 snow
+            , textureScale = 0.8
+            , timeScale = 0.0
+            , smoothing = 0.3
+            }
         else if h < 0.0 then
-            ( h, alpha1 seafloor, 20.0, 0.0, 0.7 )
+            { height = h
+            , color = alpha1 seafloor
+            , textureScale = 20.0
+            , timeScale = 0.0
+            , smoothing = 0.7
+            }
         else if h < 0.15 then
-            ( h, alpha1 sand, 80.0, 0.0, 0.7 )
+            { height = h
+            , color = alpha1 sand
+            , textureScale = 80.0
+            , timeScale = 0.0
+            , smoothing = 0.7
+            }
         else
-            ( h, alpha1 green, 0.8, 0.001, 0.3 )
+            { height = h
+            , color = alpha1 green
+            , textureScale = 0.8
+            , timeScale = 0.001
+            , smoothing = 0.3
+            }
 
 
 sea : Float -> Maybe NoiseSurfaceVertex
@@ -128,9 +148,21 @@ sea h =
                 V4.fromTuple ( v.x, v.y, v.z, 1.0 )
     in
         if h < 0.0 then
-            Just ( 0.1, alpha1 sea, 1.0, 0.7, 0.5 )
+            Just
+                { height = 0.1
+                , color = alpha1 sea
+                , textureScale = 1.0
+                , timeScale = 0.7
+                , smoothing = 0.5
+                }
         else if h < 0.2 then
-            Just ( 0.1, alpha1 blue, 1.0, 0.7, 0.5 )
+            Just
+                { height = 0.1
+                , color = alpha1 blue
+                , textureScale = 1.0
+                , timeScale = 0.7
+                , smoothing = 0.5
+                }
         else
             Nothing
 

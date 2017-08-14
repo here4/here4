@@ -28,17 +28,23 @@ type alias SurfaceVertex =
     ( Float, Vec4 )
 
 
-
--- (height, color, textureScale, timeScale, smoothing)
-
-
 type alias NoiseSurfaceVertex =
-    ( Float, Vec4, Float, Float, Float )
+    { height : Float
+    , color : Vec4
+    , textureScale : Float
+    , timeScale : Float
+    , smoothing : Float
+    }
 
 
 toNSV : ( Float, Vec4 ) -> NoiseSurfaceVertex
 toNSV ( y, rgb ) =
-    ( y, rgb, 0.0, 0.0, 0.0 )
+    { height = y
+    , color = rgb
+    , textureScale = 0.0
+    , timeScale = 0.0
+    , smoothing = 0.0
+    }
 
 
 surface2D :
@@ -231,22 +237,23 @@ matRow ( rx, rz ) skip placement z =
     let
         m posOffset coordOffset ys0 =
             case ys0 of
-                ( y, rgb, tex, tim, smoo ) :: ys ->
+                -- ( y, rgb, tex, tim, smoo ) :: rest ->
+                nsv :: rest ->
                     ({ position =
                         vec3 (placement.xOffset + posOffset)
-                            (placement.yOffset + y * placement.yMult)
+                            (placement.yOffset + nsv.height * placement.yMult)
                             z
                      , normal = vec3 0 1 0 -- placeholder
-                     , color = rgb
+                     , color = nsv.color
                      , coord = vec3 coordOffset (rz + z) 0
-                     , textureScale = tex
-                     , timeScale = tim
-                     , smoothing = smoo
+                     , textureScale = nsv.textureScale
+                     , timeScale = nsv.timeScale
+                     , smoothing = nsv.smoothing
                      }
                     )
                         :: (m (posOffset + toFloat skip * placement.xDelta)
                                 (coordOffset + toFloat skip * placement.xDelta)
-                                ys
+                                rest
                            )
 
                 _ ->
@@ -315,27 +322,28 @@ matRowMaybe ( rx, rz ) skip placement z =
     let
         m posOffset coordOffset ys0 =
             case ys0 of
-                (Just ( y, rgb, tex, tim, smoo )) :: ys ->
+                -- (Just ( y, rgb, tex, tim, smoo )) :: rest ->
+                Just nsv :: rest ->
                     (Just
                         { position =
                             vec3 (placement.xOffset + posOffset)
-                                (placement.yOffset + y * placement.yMult)
+                                (placement.yOffset + nsv.height * placement.yMult)
                                 z
                         , normal = vec3 0 1 0 -- placeholder
-                        , color = rgb
+                        , color = nsv.color
                         , coord = vec3 coordOffset (rz + z) 0
-                        , textureScale = tex
-                        , timeScale = tim
-                        , smoothing = smoo
+                        , textureScale = nsv.textureScale
+                        , timeScale = nsv.timeScale
+                        , smoothing = nsv.smoothing
                         }
                     )
                         :: (m (posOffset + toFloat skip * placement.xDelta)
                                 (coordOffset + toFloat skip * placement.xDelta)
-                                ys
+                                rest
                            )
 
-                Nothing :: ys ->
-                    Nothing :: (m (posOffset + toFloat skip * placement.xDelta) (coordOffset + toFloat skip * placement.xDelta) ys)
+                Nothing :: rest ->
+                    Nothing :: (m (posOffset + toFloat skip * placement.xDelta) (coordOffset + toFloat skip * placement.xDelta) rest)
 
                 _ ->
                     []
