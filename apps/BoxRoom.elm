@@ -1,4 +1,4 @@
-module BoxRoom exposing (create)
+module BoxRoom exposing (default, create)
 
 import Here4.App as App exposing (..)
 import Here4.App.Control exposing (..)
@@ -11,7 +11,7 @@ import Here4.Orientation as Orientation
 import Here4.Primitive.Cube as Cube
 import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import Math.Vector4 as V4 exposing (vec4)
+import Math.Vector4 as V4 exposing (Vec4, vec4)
 import Task exposing (Task)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
@@ -19,8 +19,20 @@ import Shaders.NoiseVertex exposing (..)
 
 type alias Attributes =
     { dimensions : Vec3
+    , color : Vec4
+    , textureScale : Float
+    , timeScale : Float
+    , smoothing : Float
     }
 
+default : Attributes
+default =
+    { dimensions = vec3 10 3 10
+    , color = vec4 1.0 1.0 1.0 1.0
+    , textureScale = 0.1
+    , timeScale = 0.0
+    , smoothing = 0.3
+    }
 
 type alias Model =
     { walls : Body
@@ -71,11 +83,11 @@ init attributes =
         toNoiseVertex v =
             { position = v.position
             , normal = v.normal
-            , coord = V3.scale 1.0 v.coord
-            , color = vec4 1.0 1.0 1.0 1.0
-            , smoothing = 0.3
-            , textureScale = 0.1
-            , timeScale = 0.0
+            , coord = v.coord
+            , color = attributes.color
+            , textureScale = attributes.textureScale
+            , timeScale = attributes.timeScale
+            , smoothing = attributes.smoothing
             }
 
         walls =
