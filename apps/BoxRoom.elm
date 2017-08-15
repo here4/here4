@@ -1,4 +1,11 @@
-module BoxRoom exposing (default, create)
+module BoxRoom exposing
+    ( create
+    , dimensions
+    , color
+    , textureScale
+    , timeScale
+    , smoothing
+    )
 
 import Here4.App as App exposing (..)
 import Here4.App.Control exposing (..)
@@ -9,6 +16,7 @@ import Here4.Bounding.Box exposing (boundingBox)
 import Here4.Dispatch exposing (..)
 import Here4.Orientation as Orientation
 import Here4.Primitive.Cube as Cube
+import Here4.Setter exposing (..)
 import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Math.Vector4 as V4 exposing (Vec4, vec4)
@@ -18,21 +26,52 @@ import Shaders.NoiseVertex exposing (..)
 
 
 type alias Attributes =
-    { dimensions : Vec3
+    { id : String
+    , label : String
+    , dimensions : Vec3
     , color : Vec4
     , textureScale : Float
     , timeScale : Float
     , smoothing : Float
     }
 
-default : Attributes
-default =
-    { dimensions = vec3 10 3 10
+
+dimensions : Vec3 -> Update Attributes
+dimensions dim attr =
+    { attr | dimensions = dim }
+
+
+color : Vec4 -> Update Attributes
+color c attr =
+    { attr | color = c }
+
+
+textureScale : Float -> Update Attributes
+textureScale s attr =
+    { attr | textureScale = s }
+
+
+timeScale : Float -> Update Attributes
+timeScale s attr =
+    { attr | timeScale = s }
+
+
+smoothing : Float -> Update Attributes
+smoothing s attr =
+    { attr | smoothing = s }
+
+
+defaultAttributes : Attributes
+defaultAttributes =
+    { id = "_room"
+    , label = "Room"
+    , dimensions = vec3 10 3 10
     , color = vec4 1.0 1.0 1.0 1.0
     , textureScale = 0.1
     , timeScale = 0.0
     , smoothing = 0.3
     }
+
 
 type alias Model =
     { walls : Body
@@ -45,19 +84,23 @@ type alias Msg =
     ()
 
 
-create : Attributes -> ( App, Cmd AppMsg )
-create attributes =
-    App.create (init attributes)
-        { id = always "_room"
-        , label = always "Box_Room"
-        , update = update
-        , animate = animate
-        , bodies = bodies
-        , framing = noFraming
-        , focus = always Nothing
-        , overlay = overlay
-        , reposition = always identity
-        }
+create : List (Update Attributes) -> ( App, Cmd AppMsg )
+create updates =
+    let
+        create_ attributes =
+            App.create (init attributes)
+                { id = always attributes.id
+                , label = always attributes.label
+                , update = update
+                , animate = animate
+                , bodies = bodies
+                , framing = noFraming
+                , focus = always Nothing
+                , overlay = overlay
+                , reposition = always identity
+                }
+    in
+        create_ (applyUpdates updates defaultAttributes)
 
 
 init : Attributes -> ( Model, Cmd (CtrlMsg Msg) )
