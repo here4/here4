@@ -314,7 +314,7 @@ animatePlayer world (WorldKey worldKey ()) terrain dt0 inputs0 player0 model =
             Just worldPartyKey ->
                 let
                     ( rideModel, rideMsg ) =
-                        if inputs.button_X then
+                        if inputs.button_Y then
                             world.changeRide worldPartyKey model
                         else
                             ( model, Cmd.none )
@@ -380,6 +380,7 @@ mergeInputs inputs1 inputs0 =
         , prevOverlay = inputs0.prevOverlay || inputs1.prevOverlay
         , nextOverlay = inputs0.nextOverlay || inputs1.nextOverlay
         , button_X = inputs0.button_X || inputs1.button_X
+        , button_Y = inputs0.button_Y || inputs1.button_Y
         , rightTrigger = inputs0.rightTrigger + inputs1.rightTrigger
         , leftTrigger = inputs0.leftTrigger + inputs1.leftTrigger
         , x = inputs0.x + inputs1.x
@@ -417,6 +418,7 @@ gamepadToInputs gamepad inputs0 =
             , cx = inputs0.cx + cx
             , cy = inputs0.cy + cy
             , button_X = risingEdge inputs0.button_X bs.bX
+            , button_Y = risingEdge inputs0.button_Y bs.bY
             , rightTrigger = rightTrigger
             , leftTrigger = leftTrigger
 
@@ -681,7 +683,7 @@ selectCamera ground inputs player =
                         nextShot ensureShot
                 in
                     ( Just shot, shot.init ground player.camera )
-            else if inputs.button_X then
+            else if inputs.button_Y then
                 ( Just ensureShot, ensureShot.init ground player.camera )
             else
                 ( Just ensureShot, player.camera )

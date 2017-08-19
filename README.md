@@ -33,7 +33,7 @@ Everything in Here4 is an independent app. For example, apps in dreambuggy inclu
  * a shufflepuck table
 
 To enter an app (ie. start driving a car, controlling a game or go through a
-portal), go near it and press space on the keyboard, or X on your gamepad.
+portal), go near it and press space on the keyboard, or Y on your gamepad.
 Press the same again to return to walking around.
 
 ## Worlds
