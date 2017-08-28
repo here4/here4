@@ -1,4 +1,4 @@
-module Here4.Vehicle.DreamBuggy exposing (drive, overlay)
+module Here4.Vehicle.DreamBuggy exposing (drive, hovercraft, overlay)
 
 import Color exposing (white)
 import FontAwesome
@@ -31,6 +31,26 @@ drive attributes dimensions ground inputs thing =
             ground.elevation pos
     in
         move attributes dimensions ground eyeLevel inputs thing
+
+hovercraft : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+hovercraft attributes dimensions ground inputs thing =
+    let
+        eyeLevel pos =
+            max 0 (ground.elevation pos)
+
+        waterBounds : Float -> Vec3 -> Vec3
+        waterBounds radius pos =
+            let
+                (px, py, pz) = V3.toTuple (ground.bounds radius pos)
+            in
+                vec3 px (max 0 py) pz
+
+        aboveWater =
+            { bounds = waterBounds
+            , elevation = eyeLevel
+            }
+    in
+        move attributes dimensions aboveWater eyeLevel inputs thing
 
 
 move : Driveable vehicle -> Vec3 -> Ground -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
