@@ -36,18 +36,19 @@ hovercraft : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> 
 hovercraft attributes dimensions ground inputs thing =
     let
         eyeLevel pos =
-            max 0 (ground.elevation pos)
+            max ground.seaLevel (ground.elevation pos)
 
         waterBounds : Float -> Vec3 -> Vec3
         waterBounds radius pos =
             let
                 (px, py, pz) = V3.toTuple (ground.bounds radius pos)
             in
-                vec3 px (max 0 py) pz
+                vec3 px (max (ground.seaLevel + radius) py) pz
 
         aboveWater =
-            { bounds = waterBounds
-            , elevation = eyeLevel
+            { ground
+                | bounds = waterBounds
+                , elevation = eyeLevel
             }
     in
         move attributes dimensions aboveWater eyeLevel inputs thing

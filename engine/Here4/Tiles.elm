@@ -22,6 +22,7 @@ createTileGround : Tiles -> ( Ground, List Body )
 createTileGround tiles =
     ( { bounds = tileBounds tiles
       , elevation = tileElevation tiles
+      , seaLevel = 0.1 * tiles.placement.yMult
       }
     , tiles.bodies
     )

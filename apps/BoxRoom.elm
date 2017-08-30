@@ -150,6 +150,7 @@ init attributes =
         ground =
             { bounds = emplace (boundingBox box)
             , elevation = always 0.0
+            , seaLevel = 0.0
             }
 
         groundEffect =
