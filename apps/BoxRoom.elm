@@ -151,6 +151,8 @@ init attributes =
             { bounds = emplace (boundingBox box)
             , elevation = always 0.0
             , seaLevel = 0.0
+            , coordRangeX = let minX = V3.getX originPosition in (minX, minX+width)
+            , coordRangeZ = let minZ = V3.getZ originPosition in (minZ, minZ+length)
             }
 
         groundEffect =

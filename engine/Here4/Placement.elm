@@ -2,6 +2,8 @@ module Here4.Placement
     exposing
         ( Placement
         , defaultPlacement
+        , coordRangeX
+        , coordRangeZ
         )
 
 
@@ -28,3 +30,11 @@ defaultPlacement =
     , tileSize = 32
     , bigSide = 512
     }
+
+coordRangeX : Placement -> (Float, Float)
+coordRangeX placement =
+    (placement.xOffset, placement.xOffset + toFloat placement.bigSide * placement.xDelta)
+
+coordRangeZ : Placement -> (Float, Float)
+coordRangeZ placement =
+    (placement.zOffset, placement.zOffset + toFloat placement.bigSide * placement.zDelta)

@@ -7,7 +7,7 @@ module Here4.Tiles
 import Array2D exposing (Array2D)
 import Here4.Body exposing (Body)
 import Here4.Ground exposing (Ground)
-import Here4.Placement exposing (Placement)
+import Here4.Placement as Placement exposing (Placement)
 import Math.Vector3 as V3 exposing (Vec3, vec3, getX, getZ)
 
 
@@ -23,6 +23,8 @@ createTileGround tiles =
     ( { bounds = tileBounds tiles
       , elevation = tileElevation tiles
       , seaLevel = 0.1 * tiles.placement.yMult
+      , coordRangeX = Placement.coordRangeX tiles.placement
+      , coordRangeZ = Placement.coordRangeZ tiles.placement
       }
     , tiles.bodies
     )
@@ -48,10 +50,12 @@ tileBounds tiles radius pos =
             V3.toTuple pos
 
         newX =
-            bound x (placement.xOffset + 10) (placement.xOffset + toFloat placement.bigSide * placement.xDelta - 10)
+            let (xMin, xMax) = Placement.coordRangeX placement in
+            bound x (xMin + 10) (xMax - 10)
 
         newZ =
-            bound z (placement.zOffset + 10) (placement.zOffset + toFloat placement.bigSide * placement.zDelta - 10)
+            let (zMin, zMax) = Placement.coordRangeZ placement in
+            bound z (zMin + 10) (zMax - 10)
 
         newY =
             bound y (tileElevation tiles (vec3 newX y newZ)) 1000
