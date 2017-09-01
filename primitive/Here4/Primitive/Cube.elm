@@ -119,6 +119,8 @@ ceiling =
 ceilingWith f =
     renderNSV (ceilingMeshWith f)
 
+
+
 -- render : Mesh vertex -> Shader vertex ShaderPerception a -> Shader {} ShaderPerception a -> Appearance
 
 
@@ -272,11 +274,13 @@ rotatedFace ( angleX, angleY, coordX ) =
             ( f a, f b, f c )
     in
         List.map
-            ( each
-                (\x -> { x | position = t x.position
-                           , normal = t x.normal
-                           , coord = add (vec3 coordX 0 0) x.coord
-                       }
+            (each
+                (\x ->
+                    { x
+                        | position = t x.position
+                        , normal = t x.normal
+                        , coord = add (vec3 coordX 0 0) x.coord
+                    }
                 )
             )
             face
@@ -288,7 +292,7 @@ face =
         white =
             vec4 1 1 1 1
 
-        normal = 
+        normal =
             vec3 0 0 1
 
         topLeft =

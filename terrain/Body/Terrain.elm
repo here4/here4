@@ -317,11 +317,14 @@ placeTerrain toSurface2D placement terrainsCoords =
     in
         Array2D.map
             (\( l, ( x, z ) ) ->
-                (List.map (\s -> toBody
-                    { s
-                        | scale = vec3 1 1 1
-                        , position = vec3 (toFloat x * placement.xDelta) 0 (toFloat z * placement.zDelta)
-                    })
+                (List.map
+                    (\s ->
+                        toBody
+                            { s
+                                | scale = vec3 1 1 1
+                                , position = vec3 (toFloat x * placement.xDelta) 0 (toFloat z * placement.zDelta)
+                            }
+                    )
                     l
                 )
             )

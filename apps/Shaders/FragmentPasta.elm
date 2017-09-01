@@ -23,4 +23,3 @@ fragment_ambient =
 """
             ]
     }
-

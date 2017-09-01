@@ -24,8 +24,8 @@ import Math.Vector3 exposing (..)
 import Math.Vector3 as V3
 import Task
 import Time exposing (Time)
-
 import Debug
+
 
 {-| Take a Msg and a Model and return an updated Model
 -}
@@ -69,7 +69,6 @@ update world msg model =
                 else
                     ( model, Cmd.none )
 
-
         Model.NavigatorEffect (Model.ProvideInputs inputs) ->
             ( { model | inputs = mergeInputs inputs model.inputs }
             , Cmd.none
@@ -103,10 +102,8 @@ update world msg model =
         Model.Resize windowSize ->
             ( { model | maybeWindowSize = Just windowSize }, Cmd.none )
 
-
         Model.GamepadUpdate gps0 ->
             updateGamepads gps0 model
-
 
         Model.JoinWorld worldKey playerKey ->
             let

@@ -117,7 +117,8 @@ rotZ n =
 rotBoth : Float -> Vertex -> Vertex
 rotBoth n x =
     let
-        position = M4.transform (rotY n) x.position
+        position =
+            M4.transform (rotY n) x.position
     in
         { x
             | position = position
@@ -129,7 +130,8 @@ rotBoth n x =
 rotMercator : Float -> Vertex -> Vertex
 rotMercator n v =
     let
-        position = M4.transform (rotY n) v.position
+        position =
+            M4.transform (rotY n) v.position
     in
         { v
             | position = position

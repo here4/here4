@@ -9,82 +9,82 @@ import Keyboard.Extra exposing (Key(..))
 
 keyChange : Bool -> Key -> Model.Msg worldMsg
 keyChange on key =
-{-
-    if key == Escape && on then
-        Model.LockRequest False
-    else
--}
-        (case key of
-            Tab ->
-                \k -> { k | tab = on }
+    {-
+       if key == Escape && on then
+           Model.LockRequest False
+       else
+    -}
+    (case key of
+        Tab ->
+            \k -> { k | tab = on }
 
-            Shift ->
-                \k -> { k | shift = on }
+        Shift ->
+            \k -> { k | shift = on }
 
-            Space ->
-                \k -> { k | space = on }
+        Space ->
+            \k -> { k | space = on }
 
-            PageUp ->
-                \k -> { k | pageUp = on }
+        PageUp ->
+            \k -> { k | pageUp = on }
 
-            PageDown ->
-                \k -> { k | pageDown = on }
+        PageDown ->
+            \k -> { k | pageDown = on }
 
-            CharH ->
-                \k -> { k | kH = on }
+        CharH ->
+            \k -> { k | kH = on }
 
-            CharJ ->
-                \k -> { k | kJ = on }
+        CharJ ->
+            \k -> { k | kJ = on }
 
-            CharK ->
-                \k -> { k | kK = on }
+        CharK ->
+            \k -> { k | kK = on }
 
-            CharL ->
-                \k -> { k | kL = on }
+        CharL ->
+            \k -> { k | kL = on }
 
-            CharW ->
-                \k -> { k | kW = on }
+        CharW ->
+            \k -> { k | kW = on }
 
-            CharA ->
-                \k -> { k | kA = on }
+        CharA ->
+            \k -> { k | kA = on }
 
-            CharS ->
-                \k -> { k | kS = on }
+        CharS ->
+            \k -> { k | kS = on }
 
-            CharD ->
-                \k -> { k | kD = on }
+        CharD ->
+            \k -> { k | kD = on }
 
-            ArrowLeft ->
-                \k -> { k | left = on }
+        ArrowLeft ->
+            \k -> { k | left = on }
 
-            ArrowRight ->
-                \k -> { k | right = on }
+        ArrowRight ->
+            \k -> { k | right = on }
 
-            ArrowUp ->
-                \k -> { k | up = on }
+        ArrowUp ->
+            \k -> { k | up = on }
 
-            ArrowDown ->
-                \k -> { k | down = on }
+        ArrowDown ->
+            \k -> { k | down = on }
 
-            Comma ->
-                \k -> { k | kComma = on }
+        Comma ->
+            \k -> { k | kComma = on }
 
-            Period ->
-                \k -> { k | kPeriod = on }
+        Period ->
+            \k -> { k | kPeriod = on }
 
-            CharI ->
-                \k -> { k | kI = on }
+        CharI ->
+            \k -> { k | kI = on }
 
-            CharC ->
-                \k -> { k | kC = on }
+        CharC ->
+            \k -> { k | kC = on }
 
-            CharP ->
-                \k -> { k | kP = on }
+        CharP ->
+            \k -> { k | kP = on }
 
-            _ ->
-                Basics.identity
-        )
-            |> Model.KeyChange
+        _ ->
+            Basics.identity
+    )
+        |> Model.KeyChange
 
 
 keysToInputs : Model.Keys -> Model.Inputs -> Model.Inputs

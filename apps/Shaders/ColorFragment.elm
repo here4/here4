@@ -138,7 +138,10 @@ vec4 noise_texture(vec2 tc) {
     }
 
 
+
 -- noiseColorFragment : Shader {} { u | iResolution : Vec3, iGlobalTime : Float, iHMD : Float, iDetail : Float } { elm_FragColor : Vec4, elm_FragCoord : Vec2, clipPosition : Vec4, iTextureScale : Float, iTimeScale : Float, iSmoothing : Float }
+
+
 noiseColorFragment =
     GLSLPasta.combineUsingTemplate hmdTemplate
         "noiseColorFragment"

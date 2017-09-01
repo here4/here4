@@ -50,12 +50,18 @@ tileBounds tiles radius pos =
             V3.toTuple pos
 
         newX =
-            let (xMin, xMax) = Placement.coordRangeX placement in
-            bound x (xMin + 10) (xMax - 10)
+            let
+                ( xMin, xMax ) =
+                    Placement.coordRangeX placement
+            in
+                bound x (xMin + 10) (xMax - 10)
 
         newZ =
-            let (zMin, zMax) = Placement.coordRangeZ placement in
-            bound z (zMin + 10) (zMax - 10)
+            let
+                ( zMin, zMax ) =
+                    Placement.coordRangeZ placement
+            in
+                bound z (zMin + 10) (zMax - 10)
 
         newY =
             bound y (tileElevation tiles (vec3 newX y newZ)) 1000

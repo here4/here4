@@ -20,9 +20,9 @@ type alias Vertex =
 
 
 worldVertex :
-    Shader
-        Vertex
-        { u | iLensDistort : Float
+    Shader Vertex
+        { u
+            | iLensDistort : Float
             , modelViewProjectionMatrix : Mat4
             , modelMatrix : Mat4
         }

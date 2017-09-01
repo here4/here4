@@ -69,20 +69,32 @@ unfold n f x =
         in
             (res :: unfold (n - 1) f res)
 
+
+
 -- Make a triangle facet, with normals at all vertices pointing in the
 -- same direction
+
+
 makeFacet : Vertex -> Vertex -> Vertex -> ( Vertex, Vertex, Vertex )
 makeFacet v1 v2 v3 =
     let
-        p1 = v1.position
-        p2 = v2.position
-        p3 = v3.position
-        normal = V3.cross (V3.sub p2 p1) (V3.sub p3 p1)
+        p1 =
+            v1.position
+
+        p2 =
+            v2.position
+
+        p3 =
+            v3.position
+
+        normal =
+            V3.cross (V3.sub p2 p1) (V3.sub p3 p1)
 
         setNormal v =
             { v | normal = normal }
     in
-        ( setNormal v1, setNormal v2, setNormal v3)
+        ( setNormal v1, setNormal v2, setNormal v3 )
+
 
 zipFacets : List Vertex -> List Vertex -> List Vertex -> List ( Vertex, Vertex, Vertex )
 zipFacets xs ys zs =

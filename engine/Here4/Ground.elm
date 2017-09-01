@@ -10,6 +10,6 @@ type alias Ground =
     { bounds : Float {- Radius -} -> Vec3 -> Vec3
     , elevation : Vec3 -> Float
     , seaLevel : Float
-    , coordRangeX : (Float, Float)
-    , coordRangeZ : (Float, Float)
+    , coordRangeX : ( Float, Float )
+    , coordRangeZ : ( Float, Float )
     }

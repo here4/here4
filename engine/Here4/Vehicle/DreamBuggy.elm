@@ -32,6 +32,7 @@ drive attributes dimensions ground inputs thing =
     in
         move attributes dimensions ground eyeLevel inputs thing
 
+
 hovercraft : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 hovercraft attributes dimensions ground inputs thing =
     let
@@ -41,7 +42,8 @@ hovercraft attributes dimensions ground inputs thing =
         waterBounds : Float -> Vec3 -> Vec3
         waterBounds radius pos =
             let
-                (px, py, pz) = V3.toTuple (ground.bounds radius pos)
+                ( px, py, pz ) =
+                    V3.toTuple (ground.bounds radius pos)
             in
                 vec3 px (max (ground.seaLevel + radius) py) pz
 

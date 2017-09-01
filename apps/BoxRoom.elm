@@ -1,11 +1,12 @@
-module BoxRoom exposing
-    ( create
-    , dimensions
-    , color
-    , textureScale
-    , timeScale
-    , smoothing
-    )
+module BoxRoom
+    exposing
+        ( create
+        , dimensions
+        , color
+        , textureScale
+        , timeScale
+        , smoothing
+        )
 
 import Here4.App as App exposing (..)
 import Here4.App.Control exposing (..)
@@ -151,8 +152,18 @@ init attributes =
             { bounds = emplace (boundingBox box)
             , elevation = always 0.0
             , seaLevel = 0.0
-            , coordRangeX = let minX = V3.getX originPosition in (minX, minX+width)
-            , coordRangeZ = let minZ = V3.getZ originPosition in (minZ, minZ+length)
+            , coordRangeX =
+                let
+                    minX =
+                        V3.getX originPosition
+                in
+                    ( minX, minX + width )
+            , coordRangeZ =
+                let
+                    minZ =
+                        V3.getZ originPosition
+                in
+                    ( minZ, minZ + length )
             }
 
         groundEffect =

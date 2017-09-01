@@ -55,6 +55,7 @@ type alias Party =
     -- , focusKey : Bag.Key
     }
 
+
 create :
     (flags -> ( model, Cmd (NavMsg msg) ))
     -> (NavMsg msg -> model -> ( model, Cmd (NavMsg msg) ))
@@ -457,7 +458,7 @@ worldUpdate hubUpdate msg model =
                             NavEffect e
 
                         _ ->
-                            Hub m                        
+                            Hub m
             in
                 ( { model | state = hubModel }, Cmd.map response hubCmd )
 

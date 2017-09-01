@@ -128,7 +128,6 @@ rgbAttribute color =
         "rgb(" ++ s ++ ")"
 
 
-
 layoutScene1 : Window.Size -> Model worldModel worldMsg -> String -> Model.World -> Html (Msg worldMsg)
 layoutScene1 windowSize model worldLabel view =
     let
@@ -510,20 +509,22 @@ overlay left right hMargin vMargin content =
         [ Html.map WorldMessage content
         ]
 
+
+
 {-
-enterMsg : List (Html Msg)
-enterMsg =
-    message "Click to go full screen and move your head with the mouse."
+   enterMsg : List (Html Msg)
+   enterMsg =
+       message "Click to go full screen and move your head with the mouse."
 
 
-exitMsg : List (Html Msg)
-exitMsg =
-    message "Press <escape> to exit full screen."
+   exitMsg : List (Html Msg)
+   exitMsg =
+       message "Press <escape> to exit full screen."
 
 
-message : String -> List (Html Msg)
-message msg =
-    [ p [] [ Html.text "Use gamepad, arrows or WASD keys to move." ]
-    , p [] [ Html.text msg ]
-    ]
+   message : String -> List (Html Msg)
+   message msg =
+       [ p [] [ Html.text "Use gamepad, arrows or WASD keys to move." ]
+       , p [] [ Html.text msg ]
+       ]
 -}

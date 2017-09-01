@@ -12,11 +12,4 @@ type Route
 
 
 type alias WorldMsg a =
-    DispatchHub
-        Route
-        (Control.EffectMsg (WorldKey ()))
-        Control.Msg
-        Dynamic
-        GlobalMsg
-        NavigatorMsg
-        a
+    DispatchHub Route (Control.EffectMsg (WorldKey ())) Control.Msg Dynamic GlobalMsg NavigatorMsg a

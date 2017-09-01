@@ -1,7 +1,10 @@
 module Body.Wedge exposing (wedge)
 
 import Here4.Appearance exposing (..)
+
+
 -- import Here4.Model
+
 import List exposing (concatMap, map)
 import Time exposing (Time)
 import Math.Vector2 exposing (Vec2)
@@ -102,7 +105,7 @@ topMesh =
             { position = vec3 -0.3 0.2 0
             , normal = V3.normalize (vec3 -0.3 0.2 0)
             , coord = vec3 -0.5 1 0
-            , color = white 
+            , color = white
             }
 
         wRT =

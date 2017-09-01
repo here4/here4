@@ -47,6 +47,7 @@ type Msg worldMsg
 type NavigatorMsg
     = ProvideInputs Inputs
 
+
 type GlobalMsg
     = PlayerUpdate (WorldKey PartyKey) (WorldKey PartyKey)
 
