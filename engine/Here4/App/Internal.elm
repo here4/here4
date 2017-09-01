@@ -2,6 +2,7 @@ module Here4.App.Internal exposing (Animated, App, AppMsg, AppPosition, create, 
 
 import Dynamic exposing (Dynamic)
 import Here4.App.Control exposing (..)
+import Here4.App.Types as Types
 import Here4.Appearance exposing (..)
 import Here4.Body exposing (..)
 import Here4.Camera.Types exposing (Framing, Shot)
@@ -18,36 +19,23 @@ import WebGL exposing (Entity)
 
 
 type alias Animated model msg =
-    { id : model -> String
-    , label : model -> String
-    , update : msg -> model -> ( model, Cmd msg )
-    , bodies : model -> (Vec3 -> List Body)
-    , animate : Ground -> Time -> model -> model
-    , framing : PartyKey -> model -> Maybe Framing
-    , focus : model -> Maybe Focus
-    , overlay : model -> Html msg
-    , reposition : Maybe AppPosition -> model -> model
-    }
+    Types.Animated model msg
 
 
 type alias AppPosition =
-    { position : Vec3
-    , orientation : Orientation
-    }
+    Types.AppPosition
 
 
 type alias AppModel =
-    Dynamic
+    Types.AppModel
 
 
 type alias AppMsg =
-    CtrlMsg Dynamic
+    Types.AppMsg
 
 
 type alias App =
-    { methods : Animated AppModel AppMsg
-    , model : AppModel
-    }
+    Types.App
 
 
 msgUnpack : CtrlMsg Dynamic -> CtrlMsg a
@@ -279,8 +267,7 @@ overlay { methods, model } =
 
 
 type alias Focus =
-    { position : Vec3
-    }
+    Types.Focus
 
 
 appToFocus : Oriented a -> Focus
