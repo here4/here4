@@ -12,6 +12,7 @@
         "shufflepuck"
     ],
     "exposed-modules": [
+        "AddApps",
         "Balls",
         "Body.Terrain",
         "Body.Wedge",
