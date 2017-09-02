@@ -18,7 +18,7 @@
         "Boids",
         "BoxRoom",
         "Here4.App",
-        "Here4.App.Control",
+        "Here4.App.Types",
         "Here4.Body",
         "Here4.Bounding",
         "Here4.Bounding.Box",

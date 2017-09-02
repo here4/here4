@@ -1,6 +1,7 @@
 module Balls exposing (create)
 
 import Here4.App as App exposing (..)
+import Here4.App.Types exposing (..)
 import Here4.Body exposing (..)
 import Here4.Physics.Collisions exposing (collisions)
 import Here4.Physics.Gravity exposing (gravity)

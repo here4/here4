@@ -1,14 +1,13 @@
 module Here4.Update exposing (update)
 
 import Gamepad
-import Here4.App exposing (Focus)
+import Here4.App.Types as App exposing (Focus)
 import Here4.Body exposing (reposition)
 import Here4.Camera.Types exposing (..)
 import Here4.Camera.POV exposing (pov)
 import Here4.Camera.DollyArc exposing (dollyZoom, dolly, zoom, arc)
 import Here4.Camera.Tracking exposing (tracking)
 import Here4.Camera as Camera
-import Here4.App.Control as Control
 import Here4.Control exposing (WorldMsg, Route(..))
 import Here4.Dispatch exposing (..)
 import Here4.GamepadInputs as GamepadInputs
@@ -256,7 +255,7 @@ animate world dt0 worldKey model0 =
                                            inputsToMove inputs1 player1
 
                                        ( multiverseF, multiverseFMsg ) =
-                                           world.update (Forward (ToApp key) (Control.Move dp)) multiverse2
+                                           world.update (Forward (ToApp key) (App.Move dp)) multiverse2
                                    in
                                        ( multiverseF, multiverseFMsg, Just focus.position )
 
@@ -318,7 +317,7 @@ animatePlayer world (WorldKey worldKey ()) terrain dt0 inputs0 player0 model =
 
                     ( fwdModel, fwdMsg ) =
                         world.update
-                            (Forward (ToParty worldPartyKey) (Control.Drive terrain inputs))
+                            (Forward (ToParty worldPartyKey) (App.Drive terrain inputs))
                             rideModel
 
                     label =

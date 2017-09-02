@@ -1,6 +1,6 @@
 module Here4.Methods exposing (..)
 
-import Here4.App exposing (Focus)
+import Here4.App.Types exposing (Focus)
 import Here4.Camera.Types exposing (Framing, Shot)
 import Here4.Control exposing (..)
 import Here4.Ground exposing (Ground)

@@ -9,7 +9,7 @@ module BoxRoom
         )
 
 import Here4.App as App exposing (..)
-import Here4.App.Control exposing (..)
+import Here4.App.Types exposing (..)
 import Here4.Appearance exposing (Appearance)
 import Here4.Body exposing (..)
 import Here4.Bounding exposing (emplace)

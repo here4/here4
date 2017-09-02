@@ -1,11 +1,22 @@
-module Here4.App.Types exposing (Animated, App, AppModel, AppMsg, AppPosition, Focus)
+module Here4.App.Types exposing
+    ( Animated
+    , App
+    , AppModel
+    , AppMsg
+    , AppPosition
+    , CtrlMsg
+    , Msg (..)
+    , EffectMsg (..)
+    , Focus
+    )
 
 import Dynamic exposing (Dynamic)
-import Here4.App.Control exposing (..)
 import Here4.Body exposing (..)
 import Here4.Camera.Types exposing (Framing)
+import Here4.Dispatch exposing (..)
 import Here4.Ground exposing (Ground)
-import Here4.Model exposing (PartyKey)
+import Here4.Location exposing (Location)
+import Here4.Model exposing (Inputs, PartyKey)
 import Here4.Orientation exposing (Orientation)
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3)
@@ -44,6 +55,23 @@ type alias App =
     , model : AppModel
     }
 
+type alias CtrlMsg a =
+    Dispatch (EffectMsg ()) Msg a
+
+
+type Msg
+    = Move Vec3
+    | Enter PartyKey -- Player @key enters the receiving app
+    | Leave PartyKey -- Player @key leaves the receiving app
+    | Drive Ground Inputs
+
+
+type EffectMsg worldKey
+    = UpdateGround worldKey Ground
+    | RelocateParty worldKey PartyKey Location
+
+
 type alias Focus =
     { position : Vec3
     }
+

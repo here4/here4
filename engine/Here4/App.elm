@@ -1,6 +1,6 @@
 module Here4.App exposing (..)
 
-import Here4.App.Control exposing (..)
+import Here4.App.Types as Types exposing (..)
 import Here4.App.Internal as Internal
 import Here4.Body exposing (..)
 import Here4.Camera as Camera
@@ -11,22 +11,6 @@ import Here4.Location exposing (Location)
 import Here4.Model as Model exposing (PartyKey)
 import Task exposing (Task)
 import Time
-
-
-type alias App =
-    Internal.App
-
-
-type alias AppMsg =
-    Internal.AppMsg
-
-
-type alias AppPosition =
-    Internal.AppPosition
-
-
-type alias Focus =
-    Internal.Focus
 
 
 type alias Framing =
@@ -45,12 +29,12 @@ type alias Time =
     Time.Time
 
 
-create : ( model, Cmd (CtrlMsg msg) ) -> Internal.Animated model (CtrlMsg msg) -> ( App, Cmd AppMsg )
+create : ( model, Cmd (CtrlMsg msg) ) -> Types.Animated model (CtrlMsg msg) -> ( App, Cmd AppMsg )
 create =
     Internal.create
 
 
-createUncontrolled : ( model, Cmd msg ) -> Internal.Animated model msg -> ( App, Cmd AppMsg )
+createUncontrolled : ( model, Cmd msg ) -> Types.Animated model msg -> ( App, Cmd AppMsg )
 createUncontrolled =
     Internal.createUncontrolled
 

@@ -1,7 +1,7 @@
 module Here4.Navigator exposing (..)
 
 import Color
-import Here4.App as App
+import Here4.App.Types as App
 import Here4.Model as Model
 import Here4.Navigator.Control exposing (NavMsg)
 

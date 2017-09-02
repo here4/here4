@@ -1,7 +1,7 @@
 module Here4.Control exposing (..)
 
 import Dynamic exposing (Dynamic)
-import Here4.App.Control as Control
+import Here4.App.Types as App
 import Here4.Dispatch exposing (..)
 import Here4.Model exposing (GlobalMsg, NavigatorMsg, Inputs, WorldKey(..), AppKey, PartyKey)
 
@@ -12,4 +12,4 @@ type Route
 
 
 type alias WorldMsg a =
-    DispatchHub Route (Control.EffectMsg (WorldKey ())) Control.Msg Dynamic GlobalMsg NavigatorMsg a
+    DispatchHub Route (App.EffectMsg (WorldKey ())) App.Msg Dynamic GlobalMsg NavigatorMsg a

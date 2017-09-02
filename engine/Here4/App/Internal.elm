@@ -1,8 +1,22 @@
-module Here4.App.Internal exposing (Animated, App, AppMsg, AppPosition, create, createUncontrolled, Focus, animate, bodies, reposition, id, label, overlay, framing, focus, update, appToFocus, orientedToFocus)
+module Here4.App.Internal
+    exposing
+        ( create
+        , createUncontrolled
+        , animate
+        , bodies
+        , reposition
+        , id
+        , label
+        , overlay
+        , framing
+        , focus
+        , update
+        , appToFocus
+        , orientedToFocus
+        )
 
 import Dynamic exposing (Dynamic)
-import Here4.App.Control exposing (..)
-import Here4.App.Types as Types
+import Here4.App.Types as Types exposing (..)
 import Here4.Appearance exposing (..)
 import Here4.Body exposing (..)
 import Here4.Camera.Types exposing (Framing, Shot)
@@ -16,26 +30,6 @@ import Math.Vector3 as V3
 import Math.Matrix4 exposing (Mat4)
 import Time exposing (Time)
 import WebGL exposing (Entity)
-
-
-type alias Animated model msg =
-    Types.Animated model msg
-
-
-type alias AppPosition =
-    Types.AppPosition
-
-
-type alias AppModel =
-    Types.AppModel
-
-
-type alias AppMsg =
-    Types.AppMsg
-
-
-type alias App =
-    Types.App
 
 
 msgUnpack : CtrlMsg Dynamic -> CtrlMsg a
@@ -264,10 +258,6 @@ overlay { methods, model } =
 
 
 -- TODO: focus on a plane/surface/controls
-
-
-type alias Focus =
-    Types.Focus
 
 
 appToFocus : Oriented a -> Focus

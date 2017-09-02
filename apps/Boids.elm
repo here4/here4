@@ -2,6 +2,7 @@ module Boids exposing (create)
 
 import Behavior.Boids as Boids exposing (..)
 import Here4.App as App exposing (..)
+import Here4.App.Types exposing (..)
 import Here4.Body exposing (..)
 import Body.BFly exposing (bfly)
 import Color exposing (white)

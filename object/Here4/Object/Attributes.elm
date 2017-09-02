@@ -21,7 +21,7 @@ module Here4.Object.Attributes
         )
 
 import Here4.App exposing (..)
-import Here4.App.Control exposing (CtrlMsg)
+import Here4.App.Types exposing (CtrlMsg)
 import Here4.Appearance exposing (Appearance)
 import Here4.Body exposing (..)
 import Here4.Location exposing (..)

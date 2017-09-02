@@ -1,7 +1,7 @@
 module StaticGround exposing (create)
 
 import Here4.App as App exposing (..)
-import Here4.App.Control exposing (..)
+import Here4.App.Types exposing (..)
 import Here4.Body exposing (Body)
 import Here4.Dispatch exposing (..)
 import Html exposing (Html)

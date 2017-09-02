@@ -2,7 +2,7 @@ module Here4.World exposing (Attributes, Multiverse, create)
 
 import Color exposing (Color)
 import Dynamic exposing (Dynamic)
-import Here4.App.Control as AppControl exposing (..)
+import Here4.App.Types exposing (..)
 import Here4.App.Internal as App exposing (..)
 import Here4.Bag as Bag exposing (Bag)
 import Here4.Body exposing (Body)
@@ -462,7 +462,7 @@ worldUpdate hubUpdate msg model =
             in
                 ( { model | state = hubModel }, Cmd.map response hubCmd )
 
-        HubEff (AppControl.UpdateGround (WorldKey worldKey ()) ground) ->
+        HubEff (UpdateGround (WorldKey worldKey ()) ground) ->
             let
                 updateGround world =
                     { world | maybeGround = Just ground }
@@ -471,7 +471,7 @@ worldUpdate hubUpdate msg model =
                 , Cmd.none
                 )
 
-        HubEff (AppControl.RelocateParty (WorldKey worldKey ()) (PartyKey partyKey) location) ->
+        HubEff (RelocateParty (WorldKey worldKey ()) (PartyKey partyKey) location) ->
             relocate (WorldKey worldKey (PartyKey partyKey)) location model
 
         Send key appMsg ->
