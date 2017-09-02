@@ -95,8 +95,8 @@ worldParty (WorldKey worldKey (PartyKey partyKey)) model =
         |> Maybe.andThen (Bag.get partyKey)
 
 
-worldApps : WorldKey () -> List ( App, Cmd AppMsg ) -> ( Bag App, List (Cmd (WorldMsg msg)) )
-worldApps (WorldKey worldKey ()) appsList =
+worldAddApps : WorldKey () -> List ( App, Cmd AppMsg ) -> Bag App -> ( Bag App, List (Cmd (WorldMsg msg)) )
+worldAddApps (WorldKey worldKey ()) appsList apps0 =
     let
         response appKey x =
             case x of
@@ -118,7 +118,7 @@ worldApps (WorldKey worldKey ()) appsList =
                 ( newBag, Cmd.map (response appKey) newCmdMsg :: oldCmdMsgs )
 
         ( appsBag, worldCmds ) =
-            List.foldl f ( Bag.empty, [] ) appsList
+            List.foldl f ( apps0, [] ) appsList
     in
         ( appsBag, worldCmds )
 
@@ -143,7 +143,7 @@ oneWorldInit attributes ( oldWorlds, oldCmds ) =
             Bag.insert emptyWorld oldWorlds
 
         ( appsBag, appCmds ) =
-            worldApps (WorldKey worldKey ()) attributes.apps
+            worldAddApps (WorldKey worldKey ()) attributes.apps Bag.empty
 
         updateApps world =
             { world | apps = appsBag }
@@ -218,6 +218,9 @@ toWorldEffect worldKey e =
         RelocateParty () partyKey location ->
             RelocateParty worldKey partyKey location
 
+        AddApp () app ->
+            AddApp worldKey app
+
 
 toWorldMsg :
     WorldKey ()
@@ -266,6 +269,9 @@ toAppMsg dispatch =
 
                 RelocateParty _ partyKey location ->
                     RelocateParty () partyKey location
+
+                AddApp _ app ->
+                    AddApp () app
     in
         case dispatch of
             Self nodeMsg ->
@@ -473,6 +479,31 @@ worldUpdate hubUpdate msg model =
 
         HubEff (RelocateParty (WorldKey worldKey ()) (PartyKey partyKey) location) ->
             relocate (WorldKey worldKey (PartyKey partyKey)) location model
+
+
+        HubEff (AddApp (WorldKey worldKey ()) app) ->
+            let
+                addApp world =
+                    let
+                        ( newApps, newCmdMsgs ) =
+                            worldAddApps (WorldKey worldKey ()) [app] world.apps
+                    in
+                        ( { world | apps = newApps }
+                        , Cmd.batch newCmdMsgs
+                        )
+
+                replaceWorld w =
+                    Bag.replace worldKey w model.worlds
+
+                updateModel ws =
+                    { model | worlds = ws }
+
+            in
+                Bag.get worldKey model.worlds
+                |> Maybe.map
+                    ( addApp >> Tuple.mapFirst (replaceWorld >> updateModel))
+                |> Maybe.withDefault (model, Cmd.none)
+
 
         Send key appMsg ->
             let

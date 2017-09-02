@@ -69,6 +69,7 @@ type Msg
 type EffectMsg worldKey
     = UpdateGround worldKey Ground
     | RelocateParty worldKey PartyKey Location
+    | AddApp worldKey (App, Cmd AppMsg)
 
 
 type alias Focus =
