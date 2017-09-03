@@ -65,10 +65,15 @@ addAppEffect app =
     Task.succeed app
         |> Task.perform (Effect << AddApp ())
 
+removeSelf : Cmd (CtrlMsg msg)
+removeSelf =
+    Task.succeed ()
+        |> Task.perform (Effect << RemoveApp ())
+
 init : List ( App, Cmd AppMsg ) -> ( Model, Cmd AppMsg )
 init apps =
     ( () 
-    , Cmd.batch (List.map addAppEffect apps)
+    , Cmd.batch (removeSelf :: List.map addAppEffect apps)
     )
 
 update : AppMsg -> Model -> ( Model, Cmd AppMsg )
@@ -81,7 +86,7 @@ updateRandom msg model =
     case msg of
         Self (AppGenerated app) ->
             ( model
-            , addAppEffect app
+            , Cmd.batch [ removeSelf, addAppEffect app ]
             )
         _ ->
             ( model, Cmd.none )
