@@ -1,6 +1,7 @@
 module AddApps
     exposing
         ( addApps
+        , addRandom
         )
 
 import Here4.App as App exposing (..)
@@ -16,6 +17,7 @@ import Here4.Setter exposing (..)
 import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Math.Vector4 as V4 exposing (Vec4, vec4)
+import Random
 import Task exposing (Task)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
@@ -29,29 +31,43 @@ type alias Msg =
     ()
 
 
+type RandomAppMsg
+    = AppGenerated ( App, Cmd AppMsg )
+
+
+noApp =
+    { id = always ""
+    , label = always ""
+    , update = update
+    , animate = animate
+    , bodies = bodies
+    , framing = noFraming
+    , focus = always Nothing
+    , overlay = overlay
+    , reposition = always identity
+    }
+
+
 addApps : List ( App, Cmd AppMsg ) -> ( App, Cmd AppMsg )
 addApps apps =
-    App.createUncontrolled (init apps)
-        { id = always ""
-        , label = always ""
-        , update = update
-        , animate = animate
-        , bodies = bodies
-        , framing = noFraming
-        , focus = always Nothing
-        , overlay = overlay
-        , reposition = always identity
-        }
+    App.create (init apps) noApp
 
 
-addAppEffect : ( App, Cmd AppMsg ) -> Cmd AppMsg
+addRandom : Random.Generator ( App, Cmd AppMsg ) -> ( App, Cmd AppMsg )
+addRandom gen =
+    App.create
+        ((), Cmd.map Self (Random.generate AppGenerated gen))
+        { noApp | update = updateRandom }
+
+
+addAppEffect : ( App, Cmd AppMsg ) -> Cmd (CtrlMsg msg)
 addAppEffect app =
     Task.succeed app
         |> Task.perform (Effect << AddApp ())
 
 init : List ( App, Cmd AppMsg ) -> ( Model, Cmd AppMsg )
 init apps =
-    ( ()
+    ( () 
     , Cmd.batch (List.map addAppEffect apps)
     )
 
@@ -59,6 +75,16 @@ update : AppMsg -> Model -> ( Model, Cmd AppMsg )
 update msg model =
     ( model, Cmd.none )
 
+
+updateRandom : CtrlMsg RandomAppMsg -> Model -> ( Model, Cmd (CtrlMsg RandomAppMsg) )
+updateRandom msg model =
+    case msg of
+        Self (AppGenerated app) ->
+            ( model
+            , addAppEffect app
+            )
+        _ ->
+            ( model, Cmd.none )
 
 animate : Ground -> Time -> Model -> Model
 animate ground dt model =
