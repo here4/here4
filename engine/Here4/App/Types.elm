@@ -16,7 +16,7 @@ import Here4.Camera.Types exposing (Framing)
 import Here4.Dispatch exposing (..)
 import Here4.Ground exposing (Ground)
 import Here4.Location exposing (Location)
-import Here4.Model exposing (Inputs, PartyKey)
+import Here4.Model exposing (Inputs, AppKey, PartyKey)
 import Here4.Orientation exposing (Orientation)
 import Html exposing (Html)
 import Math.Vector3 exposing (Vec3)
@@ -56,7 +56,7 @@ type alias App =
     }
 
 type alias CtrlMsg a =
-    Dispatch (EffectMsg ()) Msg a
+    Dispatch (EffectMsg () ()) Msg a
 
 
 type Msg
@@ -66,10 +66,11 @@ type Msg
     | Drive Ground Inputs
 
 
-type EffectMsg worldKey
+type EffectMsg worldKey appKey
     = UpdateGround worldKey Ground
     | RelocateParty worldKey PartyKey Location
     | AddApp worldKey (App, Cmd AppMsg)
+    | RemoveApp worldKey appKey
 
 
 type alias Focus =

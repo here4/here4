@@ -101,21 +101,21 @@ worldAddApps (WorldKey worldKey ()) appsList apps0 =
         response appKey x =
             case x of
                 Effect e ->
-                    HubEff (toWorldEffect (WorldKey worldKey ()) e)
+                    HubEff (toWorldEffect (WorldKey worldKey ()) (Just appKey) e)
 
                 m ->
                     let
                         key =
-                            ToApp (WorldKey worldKey (AppKey appKey))
+                            ToApp (WorldKey worldKey appKey)
                     in
-                        toWorldMsg (WorldKey worldKey ()) (Send key m)
+                        toWorldMsg (WorldKey worldKey ()) (Just appKey) (Send key m)
 
         f ( newApps, newCmdMsg ) ( oldBag, oldCmdMsgs ) =
             let
                 ( appKey, newBag ) =
                     Bag.insert newApps oldBag
             in
-                ( newBag, Cmd.map (response appKey) newCmdMsg :: oldCmdMsgs )
+                ( newBag, Cmd.map (response (AppKey appKey)) newCmdMsg :: oldCmdMsgs )
 
         ( appsBag, worldCmds ) =
             List.foldl f ( apps0, [] ) appsList
@@ -209,8 +209,8 @@ makeWorld ground world =
         }
 
 
-toWorldEffect : WorldKey () -> EffectMsg () -> EffectMsg (WorldKey ())
-toWorldEffect worldKey e =
+toWorldEffect : WorldKey () -> Maybe AppKey -> EffectMsg () () -> EffectMsg (WorldKey ()) (Maybe AppKey)
+toWorldEffect worldKey appKey e =
     case e of
         UpdateGround () ground ->
             UpdateGround worldKey ground
@@ -221,12 +221,16 @@ toWorldEffect worldKey e =
         AddApp () app ->
             AddApp worldKey app
 
+        RemoveApp () () ->
+            RemoveApp worldKey appKey
+
 
 toWorldMsg :
     WorldKey ()
-    -> DispatchHub Route (EffectMsg ()) Msg Dynamic GlobalMsg NavigatorMsg a
-    -> DispatchHub Route (EffectMsg (WorldKey ())) Msg Dynamic GlobalMsg NavigatorMsg a
-toWorldMsg worldKey msg =
+    -> Maybe AppKey
+    -> DispatchHub Route (EffectMsg () ()) Msg Dynamic GlobalMsg NavigatorMsg a
+    -> DispatchHub Route (EffectMsg (WorldKey ()) (Maybe AppKey)) Msg Dynamic GlobalMsg NavigatorMsg a
+toWorldMsg worldKey appKey msg =
     let
         toWorldDispatch d =
             case d of
@@ -237,7 +241,7 @@ toWorldMsg worldKey msg =
                     Ctrl ctrlMsg
 
                 Effect e ->
-                    Effect (toWorldEffect worldKey e)
+                    Effect (toWorldEffect worldKey appKey e)
     in
         case msg of
             Hub hubMsg ->
@@ -250,7 +254,7 @@ toWorldMsg worldKey msg =
                 Forward key ctrlMsg
 
             HubEff e ->
-                HubEff (toWorldEffect worldKey e)
+                HubEff (toWorldEffect worldKey appKey e)
 
             GlobalEffect globalMsg ->
                 GlobalEffect globalMsg
@@ -259,7 +263,7 @@ toWorldMsg worldKey msg =
                 NavEffect navMsg
 
 
-toAppMsg : Dispatch (EffectMsg (WorldKey ())) Msg Dynamic -> AppMsg
+toAppMsg : Dispatch (EffectMsg (WorldKey ()) appKey) Msg Dynamic -> AppMsg
 toAppMsg dispatch =
     let
         toAppEffect e =
@@ -272,6 +276,9 @@ toAppMsg dispatch =
 
                 AddApp _ app ->
                     AddApp () app
+
+                RemoveApp _ _ ->
+                    RemoveApp () ()
     in
         case dispatch of
             Self nodeMsg ->
@@ -505,6 +512,16 @@ worldUpdate hubUpdate msg model =
                 |> Maybe.withDefault (model, Cmd.none)
 
 
+        HubEff (RemoveApp (WorldKey worldKey ()) (Just (AppKey appKey))) ->
+            let
+                updateApps f world =
+                    { world | apps = f world.apps }
+                newModel =
+                    { model | worlds = Bag.update worldKey (Maybe.map (updateApps (Bag.remove appKey))) model.worlds }
+            in
+                ( newModel, Cmd.none )
+
+
         Send key appMsg ->
             let
                 ( mApp, worldKey, updateModel ) =
@@ -538,10 +555,10 @@ worldUpdate hubUpdate msg model =
                 response x =
                     case x of
                         Effect e ->
-                            HubEff (toWorldEffect (WorldKey worldKey ()) e)
+                            HubEff (toWorldEffect (WorldKey worldKey ()) Nothing e)
 
                         m ->
-                            toWorldMsg (WorldKey worldKey ()) (Send key m)
+                            toWorldMsg (WorldKey worldKey ()) Nothing (Send key m)
             in
                 case mApp of
                     Nothing ->
@@ -574,7 +591,7 @@ worldUpdate hubUpdate msg model =
                                             { model | worlds = Bag.update worldKey (Maybe.map updateApps) model.worlds }
                                     in
                                         ( newModel
-                                        , Cmd.map (Send (ToApp (WorldKey worldKey (AppKey rideKey))) >> toWorldMsg (WorldKey worldKey ())) appCmdMsg
+                                        , Cmd.map (Send (ToApp (WorldKey worldKey (AppKey rideKey))) >> toWorldMsg (WorldKey worldKey ()) Nothing) appCmdMsg
                                         )
 
                                 Nothing ->
@@ -595,7 +612,7 @@ worldUpdate hubUpdate msg model =
                                     { model | worlds = Bag.update worldKey (Maybe.map updateParties) model.worlds }
                             in
                                 ( newModel
-                                , Cmd.map (Send (ToParty (WorldKey worldKey (PartyKey partyKey))) >> toWorldMsg (WorldKey worldKey ())) appCmdMsg
+                                , Cmd.map (Send (ToParty (WorldKey worldKey (PartyKey partyKey))) >> toWorldMsg (WorldKey worldKey ()) Nothing) appCmdMsg
                                 )
 
                 Nothing ->
@@ -669,7 +686,7 @@ worldJoin (WorldKey worldKey ()) model =
                 in
                     ( Just worldPartyKey
                     , newModel
-                    , Cmd.map (Send (ToParty worldPartyKey) >> toWorldMsg (WorldKey worldKey ())) selfCmd
+                    , Cmd.map (Send (ToParty worldPartyKey) >> toWorldMsg (WorldKey worldKey ()) Nothing) selfCmd
                     )
 
             Nothing ->
@@ -840,13 +857,13 @@ worldOverlay worldPartyKey model =
                         in
                             case worldApp worldAppKey model of
                                 Just app ->
-                                    Html.map (Send (ToApp worldAppKey) >> toWorldMsg (WorldKey worldKey ())) (App.overlay app)
+                                    Html.map (Send (ToApp worldAppKey) >> toWorldMsg (WorldKey worldKey ()) Nothing) (App.overlay app)
 
                                 Nothing ->
                                     Html.text "App not found"
 
                     Nothing ->
-                        Html.map (Send (ToParty worldPartyKey) >> toWorldMsg (WorldKey worldKey ())) (App.overlay party.self)
+                        Html.map (Send (ToParty worldPartyKey) >> toWorldMsg (WorldKey worldKey ()) Nothing) (App.overlay party.self)
 
             Nothing ->
                 Html.text "Party not found"
