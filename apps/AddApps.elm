@@ -2,6 +2,7 @@ module AddApps
     exposing
         ( addApps
         , addRandom
+        , addAnywhere
         )
 
 import Here4.App as App exposing (..)
@@ -57,13 +58,13 @@ addRandom gen =
         ( Nothing, Cmd.map Self (Random.generate AppGenerated gen) )
         methods
 
-{-
+
 addAnywhere : (Vec3 -> (App, Cmd AppMsg) ) -> ( App, Cmd AppMsg )
 addAnywhere placer =
     App.create
-        ( Just placer, Cmd.map Self (Random.generate PosGenerated randomPosition
+        ( Just placer, Cmd.none )
         methods
--}
+
 
 addAppEffect : ( App, Cmd AppMsg ) -> Cmd (CtrlMsg msg)
 addAppEffect app =
@@ -75,6 +76,16 @@ removeSelf : Cmd (CtrlMsg msg)
 removeSelf =
     Task.succeed ()
         |> Task.perform (Effect << RemoveApp ())
+
+
+randomPosition : Ground -> Random.Generator Vec3
+randomPosition ground =
+    let
+        fromXZ x z = vec3 x 0 z
+        (minX, maxX) = ground.coordRangeX
+        (minZ, maxZ) = ground.coordRangeZ
+    in
+        Random.map2 fromXZ (Random.float minX maxX) (Random.float minZ maxZ)
 
 
 update : CtrlMsg Msg -> Model -> ( Model, Cmd (CtrlMsg Msg) )
@@ -90,7 +101,14 @@ update msg model =
 
 animate : Ground -> Time -> Model -> ( Model, Cmd (CtrlMsg Msg) )
 animate ground dt model =
-    ( model, Cmd.none )
+    case model of
+        Just placer ->
+            let
+                gen = Random.map placer (randomPosition ground)
+            in
+                ( Nothing, Cmd.map Self (Random.generate AppGenerated gen) )
+        Nothing ->
+            ( model, Cmd.none )
 
 
 bodies : Model -> Vec3 -> List Body
