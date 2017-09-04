@@ -17,7 +17,7 @@ type alias Methods worldFlags worldModel worldMsg =
     , partyLabel : WorldKey PartyKey -> worldModel -> String
     , overlay : WorldKey PartyKey -> worldModel -> Html (WorldMsg worldMsg)
     , view : WorldKey () -> worldModel -> Maybe Model.World
-    , animate : WorldKey () -> Ground -> Time -> worldModel -> worldModel
+    , animate : WorldKey () -> Ground -> Time -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg) )
     , join : WorldKey () -> worldModel -> ( Maybe (WorldKey PartyKey), worldModel, Cmd (WorldMsg worldMsg) )
     , leave : WorldKey PartyKey -> worldModel -> worldModel
     , changeRide : WorldKey PartyKey -> worldModel -> ( worldModel, Cmd (WorldMsg worldMsg) )

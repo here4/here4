@@ -1,4 +1,4 @@
-module Here4.Bag exposing (Bag, Key, size, maxKey, empty, insert, remove, replace, update, get, keys, items, map, toList, find)
+module Here4.Bag exposing (Bag, Key, size, maxKey, empty, insert, remove, replace, update, get, keys, items, map, foldl, toList, find)
 
 import Dict exposing (Dict)
 
@@ -69,6 +69,11 @@ items (Bag _ dict) =
 map : (a -> b) -> Bag a -> Bag b
 map f (Bag n dict) =
     Bag n (Dict.map (\_ -> f) dict)
+
+
+foldl : (v -> b -> b) -> b -> Bag v -> b
+foldl f acc (Bag _ dict) =
+    Dict.foldl (\_ -> f) acc dict
 
 
 toList : Bag a -> List ( Key, a )

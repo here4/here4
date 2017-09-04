@@ -110,10 +110,10 @@ worldAddApps (WorldKey worldKey ()) appsList apps0 =
                     in
                         toWorldMsg (WorldKey worldKey ()) (Just appKey) (Send key m)
 
-        f ( newApps, newCmdMsg ) ( oldBag, oldCmdMsgs ) =
+        f ( newApp, newCmdMsg ) ( oldBag, oldCmdMsgs ) =
             let
                 ( appKey, newBag ) =
-                    Bag.insert newApps oldBag
+                    Bag.insert newApp oldBag
             in
                 ( newBag, Cmd.map (response (AppKey appKey)) newCmdMsg :: oldCmdMsgs )
 
@@ -622,16 +622,49 @@ worldUpdate hubUpdate msg model =
             ( model, Cmd.none )
 
 
-worldAnimate : WorldKey () -> Ground -> Time -> Multiverse a -> Multiverse a
+worldAnimate : WorldKey () -> Ground -> Time -> Multiverse model
+    -> ( Multiverse model, Cmd (WorldMsg (NavMsg msg)) )
 worldAnimate (WorldKey worldKey ()) ground dt model =
     let
-        animate app =
-            Tuple.first (App.animate ground dt app)
+        response appKey x =
+            case x of
+                Effect e ->
+                    HubEff (toWorldEffect (WorldKey worldKey ()) (Just appKey) e)
 
+                m ->
+                    let
+                        key =
+                            ToApp (WorldKey worldKey appKey)
+                    in
+                        toWorldMsg (WorldKey worldKey ()) (Just appKey) (Send key m)
+
+        animate app ( apps, appCmds ) =
+            let
+                ( newApp, appCmd ) =
+                    App.animate ground dt app
+
+                ( appKey, newBag ) =
+                    Bag.insert newApp apps
+            in
+                ( newBag, Cmd.map (response (AppKey appKey)) appCmd :: appCmds )
+       
         updateApps world =
-            { world | apps = Bag.map animate world.apps }
+            let
+                ( newApps, newAppCmds ) =
+                    Bag.foldl animate ( Bag.empty, [] ) world.apps
+            in
+                ( { world | apps = newApps }, Cmd.batch newAppCmds )
+
+        replaceWorld w =
+            Bag.replace worldKey w model.worlds
+
+        updateModel ws =
+            { model | worlds = ws }
     in
-        { model | worlds = Bag.update worldKey (Maybe.map updateApps) model.worlds }
+        Bag.get worldKey model.worlds
+        |> Maybe.map
+            ( updateApps >> Tuple.mapFirst (replaceWorld >> updateModel))
+        |> Maybe.withDefault (model, Cmd.none)
 
 
 worldJoin : WorldKey () -> Multiverse model -> ( Maybe (WorldKey PartyKey), Multiverse model, Cmd (WorldMsg msg) )

@@ -238,7 +238,7 @@ animate world dt0 worldKey model0 =
                         dt0
 
                 -- Animate
-                multiverseA =
+                ( multiverseA, multiverseAMsg) =
                     world.animate worldKey terrain dt model0.multiverse
 
                 {-
@@ -279,7 +279,7 @@ animate world dt0 worldKey model0 =
                     }
             in
                 ( newModel
-                , Cmd.map Model.WorldMessage (Cmd.batch [ multiverse1Msg, multiverse2Msg ])
+                , Cmd.map Model.WorldMessage (Cmd.batch [ multiverse2Msg, multiverse1Msg, multiverseAMsg ])
                 )
 
 
