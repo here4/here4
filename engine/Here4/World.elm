@@ -625,8 +625,11 @@ worldUpdate hubUpdate msg model =
 worldAnimate : WorldKey () -> Ground -> Time -> Multiverse a -> Multiverse a
 worldAnimate (WorldKey worldKey ()) ground dt model =
     let
+        animate app =
+            Tuple.first (App.animate ground dt app)
+
         updateApps world =
-            { world | apps = Bag.map (App.animate ground dt) world.apps }
+            { world | apps = Bag.map animate world.apps }
     in
         { model | worlds = Bag.update worldKey (Maybe.map updateApps) model.worlds }
 

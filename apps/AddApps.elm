@@ -24,7 +24,7 @@ import Shaders.NoiseVertex exposing (..)
 
 
 type alias Model =
-    ()
+    Maybe (Vec3 -> ( App, Cmd AppMsg ))
 
 
 type Msg
@@ -46,15 +46,24 @@ methods =
 
 addApps : List ( App, Cmd AppMsg ) -> ( App, Cmd AppMsg )
 addApps apps =
-    App.create (init apps) methods
+    App.create
+        ( Nothing , Cmd.batch (removeSelf :: List.map addAppEffect apps) )
+        methods
 
 
 addRandom : Random.Generator ( App, Cmd AppMsg ) -> ( App, Cmd AppMsg )
 addRandom gen =
     App.create
-        ((), Cmd.map Self (Random.generate AppGenerated gen))
+        ( Nothing, Cmd.map Self (Random.generate AppGenerated gen) )
         methods
 
+{-
+addAnywhere : (Vec3 -> (App, Cmd AppMsg) ) -> ( App, Cmd AppMsg )
+addAnywhere placer =
+    App.create
+        ( Just placer, Cmd.map Self (Random.generate PosGenerated randomPosition
+        methods
+-}
 
 addAppEffect : ( App, Cmd AppMsg ) -> Cmd (CtrlMsg msg)
 addAppEffect app =
@@ -68,13 +77,6 @@ removeSelf =
         |> Task.perform (Effect << RemoveApp ())
 
 
-init : List ( App, Cmd AppMsg ) -> ( Model, Cmd AppMsg )
-init apps =
-    ( () 
-    , Cmd.batch (removeSelf :: List.map addAppEffect apps)
-    )
-
-
 update : CtrlMsg Msg -> Model -> ( Model, Cmd (CtrlMsg Msg) )
 update msg model =
     case msg of
@@ -86,9 +88,9 @@ update msg model =
             ( model, Cmd.none )
 
 
-animate : Ground -> Time -> Model -> Model
+animate : Ground -> Time -> Model -> ( Model, Cmd (CtrlMsg Msg) )
 animate ground dt model =
-    model
+    ( model, Cmd.none )
 
 
 bodies : Model -> Vec3 -> List Body

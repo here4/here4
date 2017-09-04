@@ -69,9 +69,9 @@ update msg model =
             ( newBoids, Cmd.none )
 
 
-animate : Ground -> Time -> Boids -> Boids
+animate : Ground -> Time -> Boids -> ( Boids, Cmd Msg )
 animate ground dt boids =
-    moveBoids Boids.default ground dt boids
+    ( moveBoids Boids.default ground dt boids, Cmd.none )
 
 
 bodies : Boids -> Vec3 -> List Body

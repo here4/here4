@@ -156,9 +156,9 @@ update msg model =
     ( model, Cmd.none )
 
 
-animate : Ground -> Time -> Model -> Model
+animate : Ground -> Time -> Model -> ( Model, Cmd (CtrlMsg Msg) )
 animate ground dt model =
-    model
+    ( model, Cmd.none )
 
 
 bodies : Model -> Vec3 -> List Body

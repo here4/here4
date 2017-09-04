@@ -209,7 +209,7 @@ update scale action msg model =
             ( model, Cmd.none )
 
 
-animate : Ground -> Time -> Model vehicle -> Model vehicle
+animate : Ground -> Time -> Model vehicle -> ( Model vehicle, Cmd (CtrlMsg Msg) )
 animate ground dt model =
     let
         aboveGround pos =
@@ -230,7 +230,7 @@ animate ground dt model =
                 | position = aboveGround motion.position
             }
     in
-        setMotion newMotion model
+        ( setMotion newMotion model, Cmd.none )
 
 
 bodies : Model vehicle -> Vec3 -> List Body

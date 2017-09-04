@@ -82,9 +82,13 @@ packUpdate f msg dyn =
         ( Dynamic.pack newModel, Cmd.map msgPack newCmdMsg )
 
 
-packAnimate : (Ground -> Time -> model -> model) -> Ground -> Time -> AppModel -> AppModel
+packAnimate : (Ground -> Time -> model -> ( model, Cmd (CtrlMsg msg) )) -> Ground -> Time -> AppModel -> ( AppModel, Cmd AppMsg )
 packAnimate f ground dt dyn =
-    Dynamic.pack (f ground dt (Dynamic.unpack dyn))
+    let
+        ( newModel, newCmdMsg ) =
+            f ground dt (Dynamic.unpack dyn)
+    in
+        ( Dynamic.pack newModel, Cmd.map msgPack newCmdMsg )
 
 
 packBodies : (a -> (Vec3 -> List Body)) -> AppModel -> (Vec3 -> List Body)
@@ -149,6 +153,7 @@ createUncontrolled ( model, msg ) methods =
         ( model, Cmd.map Self msg )
         { methods
             | update = updateSelf methods.update
+            , animate = animateSelf methods.animate
             , overlay = overlaySelf methods.overlay
         }
 
@@ -179,6 +184,19 @@ updateSelf f msg model =
         _ ->
             ( model, Cmd.none )
 
+
+animateSelf :
+    (Ground -> Time -> model -> ( model, Cmd msg ))
+    -> Ground
+    -> Time
+    -> model
+    -> ( model, Cmd (CtrlMsg msg) )
+animateSelf f ground dt model =
+    let
+        ( newModel, newMsg ) =
+            f ground dt model
+    in
+        ( newModel, Cmd.map Self newMsg )
 
 
 {-
@@ -219,16 +237,13 @@ update msg { methods, model } =
 
 
 
--- animate : Ground -> Time -> App -> (App, Cmd AppMsg)
-
-
-animate : Ground -> Time -> App -> App
+animate : Ground -> Time -> App -> ( App, Cmd AppMsg )
 animate ground dt { methods, model } =
     let
-        newModel =
+        ( newModel, newCmdMsg ) =
             methods.animate ground dt model
     in
-        { methods = methods, model = newModel }
+        ( { methods = methods, model = newModel }, newCmdMsg )
 
 
 bodies : App -> (Vec3 -> List Body)

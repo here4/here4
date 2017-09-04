@@ -28,7 +28,7 @@ type alias Animated model msg =
     , label : model -> String
     , update : msg -> model -> ( model, Cmd msg )
     , bodies : model -> (Vec3 -> List Body)
-    , animate : Ground -> Time -> model -> model
+    , animate : Ground -> Time -> model -> ( model, Cmd msg )
     , framing : PartyKey -> model -> Maybe Framing
     , focus : model -> Maybe Focus
     , overlay : model -> Html msg

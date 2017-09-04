@@ -77,9 +77,9 @@ update msg balls =
             ( newBalls, Cmd.none )
 
 
-animate : Ground -> Time -> Balls -> Balls
+animate : Ground -> Time -> Balls -> ( Balls, Cmd Msg )
 animate ground dt balls =
-    collisions dt (gravity ground dt balls)
+    ( collisions dt (gravity ground dt balls), Cmd.none )
 
 
 bodies : Balls -> Vec3 -> List Body
