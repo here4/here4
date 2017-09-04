@@ -27,15 +27,11 @@ type alias Model =
     ()
 
 
-type alias Msg =
-    ()
-
-
-type RandomAppMsg
+type Msg
     = AppGenerated ( App, Cmd AppMsg )
 
 
-noApp =
+methods =
     { id = always ""
     , label = always ""
     , update = update
@@ -50,14 +46,14 @@ noApp =
 
 addApps : List ( App, Cmd AppMsg ) -> ( App, Cmd AppMsg )
 addApps apps =
-    App.create (init apps) noApp
+    App.create (init apps) methods
 
 
 addRandom : Random.Generator ( App, Cmd AppMsg ) -> ( App, Cmd AppMsg )
 addRandom gen =
     App.create
         ((), Cmd.map Self (Random.generate AppGenerated gen))
-        { noApp | update = updateRandom }
+        methods
 
 
 addAppEffect : ( App, Cmd AppMsg ) -> Cmd (CtrlMsg msg)
@@ -65,10 +61,12 @@ addAppEffect app =
     Task.succeed app
         |> Task.perform (Effect << AddApp ())
 
+
 removeSelf : Cmd (CtrlMsg msg)
 removeSelf =
     Task.succeed ()
         |> Task.perform (Effect << RemoveApp ())
+
 
 init : List ( App, Cmd AppMsg ) -> ( Model, Cmd AppMsg )
 init apps =
@@ -76,13 +74,9 @@ init apps =
     , Cmd.batch (removeSelf :: List.map addAppEffect apps)
     )
 
-update : AppMsg -> Model -> ( Model, Cmd AppMsg )
+
+update : CtrlMsg Msg -> Model -> ( Model, Cmd (CtrlMsg Msg) )
 update msg model =
-    ( model, Cmd.none )
-
-
-updateRandom : CtrlMsg RandomAppMsg -> Model -> ( Model, Cmd (CtrlMsg RandomAppMsg) )
-updateRandom msg model =
     case msg of
         Self (AppGenerated app) ->
             ( model
@@ -90,6 +84,7 @@ updateRandom msg model =
             )
         _ ->
             ( model, Cmd.none )
+
 
 animate : Ground -> Time -> Model -> Model
 animate ground dt model =
