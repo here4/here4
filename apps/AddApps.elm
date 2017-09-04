@@ -3,6 +3,7 @@ module AddApps
         ( addApps
         , addRandom
         , addAnywhere
+        , addSomewhere
         )
 
 import Here4.App as App exposing (..)
@@ -19,13 +20,17 @@ import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Math.Vector4 as V4 exposing (Vec4, vec4)
 import Random
+import Random.Extra as Random
 import Task exposing (Task)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
 
 
 type alias Model =
-    Maybe (Vec3 -> ( App, Cmd AppMsg ))
+    Maybe
+        { check : Ground -> Vec3 -> Bool
+        , placer : Vec3 -> ( App, Cmd AppMsg )
+        }
 
 
 type Msg
@@ -62,7 +67,14 @@ addRandom gen =
 addAnywhere : (Vec3 -> (App, Cmd AppMsg) ) -> ( App, Cmd AppMsg )
 addAnywhere placer =
     App.create
-        ( Just placer, Cmd.none )
+        ( Just { check = \_ _ -> True, placer = placer }, Cmd.none )
+        methods
+
+
+addSomewhere : (Ground -> Vec3 -> Bool) -> (Vec3 -> (App, Cmd AppMsg) ) -> ( App, Cmd AppMsg )
+addSomewhere check placer =
+    App.create
+        ( Just { check = check, placer = placer }, Cmd.none )
         methods
 
 
@@ -104,7 +116,7 @@ animate ground dt model =
     case model of
         Just placer ->
             let
-                gen = Random.map placer (randomPosition ground)
+                gen = Random.map placer.placer (Random.filter (placer.check ground) (randomPosition ground))
             in
                 ( Nothing, Cmd.map Self (Random.generate AppGenerated gen) )
         Nothing ->
