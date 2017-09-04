@@ -26,6 +26,7 @@
         "Here4.Camera",
         "Here4.Control",
         "Here4.Dispatch",
+        "Here4.Ground",
         "Here4.Location",
         "Here4.Navigator",
         "Here4.Navigator.Control",
