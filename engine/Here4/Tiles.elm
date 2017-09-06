@@ -6,7 +6,7 @@ module Here4.Tiles
 
 import Array2D exposing (Array2D)
 import Here4.Body exposing (Body)
-import Here4.Ground exposing (Ground)
+import Here4.Ground exposing (..)
 import Here4.Placement as Placement exposing (Placement)
 import Math.Vector3 as V3 exposing (Vec3, vec3, getX, getZ)
 
@@ -20,14 +20,38 @@ type alias Tiles =
 
 createTileGround : Tiles -> ( Ground, List Body )
 createTileGround tiles =
-    ( { bounds = tileBounds tiles
-      , elevation = tileElevation tiles
-      , seaLevel = 0.1 * tiles.placement.yMult
-      , coordRangeX = Placement.coordRangeX tiles.placement
-      , coordRangeZ = Placement.coordRangeZ tiles.placement
-      }
-    , tiles.bodies
-    )
+    let
+        yMult = tiles.placement.yMult
+
+        snowLevel = 0.8 * yMult
+        beachLevel = 0.15 * yMult
+        seaLevel = 0.0 * yMult
+        deepSeaLevel = -0.4 * yMult
+
+        surface pos =
+            let
+                h = tileElevation tiles pos
+            in
+                if h > snowLevel then
+                    Snow
+                else if h < deepSeaLevel then
+                    DeepWater
+                else if h <= seaLevel then
+                    ShallowWater
+                else if h < beachLevel then
+                    Beach
+                else
+                    Grass
+    in
+        ( { bounds = tileBounds tiles
+          , elevation = tileElevation tiles
+          , seaLevel = seaLevel
+          , surface = surface
+          , coordRangeX = Placement.coordRangeX tiles.placement
+          , coordRangeZ = Placement.coordRangeZ tiles.placement
+          }
+        , tiles.bodies
+        )
 
 
 tileBounds : Tiles -> Float -> Vec3 -> Vec3

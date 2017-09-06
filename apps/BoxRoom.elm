@@ -15,6 +15,7 @@ import Here4.Body exposing (..)
 import Here4.Bounding exposing (emplace)
 import Here4.Bounding.Box exposing (boundingBox)
 import Here4.Dispatch exposing (..)
+import Here4.Ground as Ground
 import Here4.Orientation as Orientation
 import Here4.Primitive.Cube as Cube
 import Here4.Setter exposing (..)
@@ -152,6 +153,7 @@ init attributes =
             { bounds = emplace (boundingBox box)
             , elevation = always 0.0
             , seaLevel = 0.0
+            , surface = always Ground.Grass
             , coordRangeX =
                 let
                     minX =
