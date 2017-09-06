@@ -53,7 +53,8 @@ methods =
 addApps : List ( App, Cmd AppMsg ) -> ( App, Cmd AppMsg )
 addApps apps =
     App.create
-        ( Nothing , Cmd.batch (removeSelf :: List.map addAppEffect apps) )
+        -- ( Nothing , Cmd.batch (removeSelf :: List.map addAppEffect apps) )
+        ( Nothing , Cmd.batch (List.map addAppEffect apps) )
         methods
 
 
