@@ -1,4 +1,4 @@
-module Here4.Vehicle.DreamBuggy exposing (drive, hovercraft, overlay)
+module Here4.Vehicle.DreamBuggy exposing (drive, hovercraft, boat, overlay)
 
 import Color exposing (white)
 import FontAwesome
@@ -25,12 +25,11 @@ welcome motion =
 
 
 drive : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
-drive attributes dimensions ground inputs thing =
-    move attributes dimensions ground inputs thing
+drive = move Nothing
 
 
-hovercraft : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
-hovercraft attributes dimensions ground inputs thing =
+aboveWater : Ground -> Ground
+aboveWater ground =
     let
         eyeLevel pos =
             max ground.seaLevel (ground.elevation pos)
@@ -42,30 +41,35 @@ hovercraft attributes dimensions ground inputs thing =
                     V3.toTuple (ground.bounds radius pos)
             in
                 vec3 px (max (ground.seaLevel + radius) py) pz
-
-        aboveWater =
-            { ground
-                | bounds = waterBounds
-                , elevation = eyeLevel
-            }
     in
-        move attributes dimensions aboveWater inputs thing
+        { ground
+            | bounds = waterBounds
+            , elevation = eyeLevel
+        }
+
+hovercraft : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+hovercraft attributes dimensions ground inputs thing =
+        move Nothing attributes dimensions (aboveWater ground) inputs thing
 
 
-move : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
-move attributes dimensions terrain inputs motion =
+boat : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+boat attributes dimensions ground inputs thing =
+        move (Just [DeepWater, ShallowWater]) attributes dimensions (aboveWater ground) inputs thing
+
+
+move : Maybe (List GroundSurface) -> Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+move surfaces attributes dimensions terrain inputs motion =
     motion
         |> turn attributes dimensions terrain.elevation inputs.x inputs.dt
         |> goForward terrain attributes.speed inputs
         |> gravity terrain.elevation inputs.dt
-        |> physics terrain.elevation inputs.dt
+        |> physics surfaces terrain inputs.dt
         |> keepWithinbounds terrain attributes.radius
 
 
 clampBuggy : Orientation -> Orientation
 clampBuggy o =
     o
-
 
 
 {-
@@ -223,17 +227,20 @@ adjustVelocity maxSpeed friction dv dt v =
     v3_clamp maxSpeed <| add (V3.scale dt dv) (V3.scale (1.0 - (friction * dt)) v)
 
 
-physics : Model.EyeLevel -> Float -> Moving a -> Moving a
-physics eyeLevel dt motion =
+physics : Maybe (List GroundSurface) -> Ground -> Float -> Moving a -> Moving a
+physics mSurfaces ground dt motion =
     let
         pos =
             add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
+
+        targetSurface =
+            ground.surface pos
 
         p =
             V3.toRecord pos
 
         e =
-            eyeLevel pos
+            ground.elevation pos
 
         vy0 =
             getY motion.velocity
@@ -250,8 +257,18 @@ physics eyeLevel dt motion =
                     ( vec3 p.x e p.z, vec3 0 vy 0 )
             else
                 ( pos, vec3 0 0 0 )
+
+        newMotion =
+            { motion | position = pos_, velocity = add motion.velocity dv }
     in
-        { motion | position = pos_, velocity = add motion.velocity dv }
+        case mSurfaces of
+            Just surfaces ->
+                if List.member targetSurface surfaces then
+                    newMotion
+                else
+                    motion
+            Nothing ->
+                newMotion
 
 
 
