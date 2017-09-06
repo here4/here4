@@ -3,7 +3,7 @@ module Here4.Vehicle.DreamBuggy exposing (drive, hovercraft, overlay)
 import Color exposing (white)
 import FontAwesome
 import Here4.Body exposing (..)
-import Here4.Ground exposing (Ground)
+import Here4.Ground exposing (..)
 import Here4.Model as Model
 import Here4.Orientation as Orientation exposing (..)
 import Here4.Vehicle exposing (Driveable)
@@ -26,11 +26,7 @@ welcome motion =
 
 drive : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 drive attributes dimensions ground inputs thing =
-    let
-        eyeLevel pos =
-            ground.elevation pos
-    in
-        move attributes dimensions ground eyeLevel inputs thing
+    move attributes dimensions ground inputs thing
 
 
 hovercraft : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
@@ -53,16 +49,16 @@ hovercraft attributes dimensions ground inputs thing =
                 , elevation = eyeLevel
             }
     in
-        move attributes dimensions aboveWater eyeLevel inputs thing
+        move attributes dimensions aboveWater inputs thing
 
 
-move : Driveable vehicle -> Vec3 -> Ground -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
-move attributes dimensions terrain eyeLevel inputs motion =
+move : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
+move attributes dimensions terrain inputs motion =
     motion
-        |> turn attributes dimensions eyeLevel inputs.x inputs.dt
-        |> goForward eyeLevel attributes.speed inputs
-        |> gravity eyeLevel inputs.dt
-        |> physics eyeLevel inputs.dt
+        |> turn attributes dimensions terrain.elevation inputs.x inputs.dt
+        |> goForward terrain attributes.speed inputs
+        |> gravity terrain.elevation inputs.dt
+        |> physics terrain.elevation inputs.dt
         |> keepWithinbounds terrain attributes.radius
 
 
@@ -173,12 +169,12 @@ turn attributes dimensions eyeLevel dx dt motion =
         { motion | orientation = orientation }
 
 
-goForward : Model.EyeLevel -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
-goForward eyeLevel speed inputs motion =
+goForward : Ground -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
+goForward ground speed inputs motion =
     -- if getY motion.position > eyeLevel motion.position then motion else
     let
         accel =
-            if getY motion.position > (eyeLevel motion.position) + 0.5 then
+            if getY motion.position > (ground.elevation motion.position) + 0.5 then
                 -0.1
             else
                 clamp -1.0 1.0 <|
@@ -192,30 +188,29 @@ goForward eyeLevel speed inputs motion =
         strafe =
             V3.scale (0.1 * speed * -inputs.mx) V3.i
 
-        -- e = (eyeLevel motion.position) / 80.0 -- placement.yMult
-        e =
-            (eyeLevel motion.position) / 50.0
+        surface =
+            ground.surface motion.position
 
         friction =
-            if e > 0.8 then
+            if surface == Snow then
                 -0.1
-            else if e < 0.0 then
+            else if surface == DeepWater then
                 0.8
-            else if e < 0.1 then
+            else if surface == ShallowWater then
                 0.6
-            else if e < 0.15 then
+            else if surface == Beach then
                 0.5
             else
                 0.2
 
         maxSpeed =
-            if e > 0.8 then
+            if surface == Snow then
                 30
-            else if e < 0.0 then
+            else if surface == DeepWater then
                 3
-            else if e < 0.1 then
+            else if surface == ShallowWater then
                 10
-            else if e < 0.15 then
+            else if surface == Beach then
                 15
             else
                 20
