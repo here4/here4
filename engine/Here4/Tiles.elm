@@ -25,7 +25,7 @@ createTileGround tiles =
 
         snowLevel = 0.8 * yMult
         beachLevel = 0.15 * yMult
-        seaLevel = 0.0 * yMult
+        seaLevel = 0.1 * yMult
         deepSeaLevel = -0.4 * yMult
 
         surface pos =
