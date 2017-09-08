@@ -83,7 +83,7 @@ create updates =
                 { id = always attributes.id
                 , label = always attributes.label
                 , update = update attributes.scale attributes.action
-                , animate = animate
+                , animate = animate attributes.canFloat
                 , bodies = bodies
                 , framing = framing
                 , focus = focus
@@ -209,13 +209,16 @@ update scale action msg model =
             ( model, Cmd.none )
 
 
-animate : Ground -> Time -> Model vehicle -> ( Model vehicle, Cmd (CtrlMsg Msg) )
-animate ground dt model =
+animate : Bool -> Ground -> Time -> Model vehicle -> ( Model vehicle, Cmd (CtrlMsg Msg) )
+animate canFloat ground dt model =
     let
         aboveGround pos =
             let
                 minY =
-                    ground.elevation pos
+                    if canFloat then
+                        max ground.seaLevel (ground.elevation pos)
+                    else
+                        ground.elevation pos
             in
                 if V3.getY pos > minY then
                     pos

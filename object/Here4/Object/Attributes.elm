@@ -9,6 +9,7 @@ module Here4.Object.Attributes
         , defaultAttributes
         , id
         , label
+        , canFloat
         , position
         , scale
         , offset
@@ -51,6 +52,7 @@ type Action vehicle
 type alias Attributes vehicle msg =
     { id : String
     , label : String
+    , canFloat : Bool
     , position : Vec3
     , scale : Scale
     , offset : Offset
@@ -86,6 +88,7 @@ defaultAttributes : Attributes vehicle msg
 defaultAttributes =
     { id = ""
     , label = ""
+    , canFloat = False
     , position = vec3 0 0 0
     , scale = Scale 1.0
     , offset = WorldSpace 0 0 0
@@ -104,6 +107,11 @@ id s attr =
 label : String -> Update { a | label : String }
 label l attr =
     { attr | label = l }
+
+
+canFloat : Bool -> Update { a | canFloat : Bool }
+canFloat b attr =
+    { attr | canFloat = b }
 
 
 position : Vec3 -> Update { a | position : Vec3 }
