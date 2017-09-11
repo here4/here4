@@ -23,8 +23,10 @@ import Html exposing (Html)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Math.Vector4 as V4 exposing (Vec4, vec4)
 import Task exposing (Task)
+import Shaders.WorldVertex exposing (worldVertex)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
+import Shaders.Mondrian exposing (mondrian)
 
 
 type alias Attributes =
@@ -136,7 +138,8 @@ init attributes =
             }
 
         walls =
-            make (Cube.wallsWith toNoiseVertex noiseVertex noiseColorFragment)
+            -- make (Cube.wallsWith toNoiseVertex noiseVertex noiseColorFragment)
+            make (Cube.walls worldVertex mondrian)
 
         floor =
             make (Cube.floorWith toNoiseVertex noiseVertex noiseColorFragment)
