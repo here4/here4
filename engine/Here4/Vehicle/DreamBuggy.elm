@@ -28,11 +28,11 @@ drive : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Movin
 drive = move Nothing
 
 
-aboveWater : Ground -> Ground
-aboveWater ground =
+aboveWater : Float -> Ground -> Ground
+aboveWater hover ground =
     let
         eyeLevel pos =
-            max ground.seaLevel (ground.elevation pos)
+            hover + max ground.seaLevel (ground.elevation pos)
 
         waterBounds : Float -> Vec3 -> Vec3
         waterBounds radius pos =
@@ -49,12 +49,12 @@ aboveWater ground =
 
 hovercraft : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 hovercraft attributes dimensions ground inputs thing =
-        move Nothing attributes dimensions (aboveWater ground) inputs thing
+        move Nothing attributes dimensions (aboveWater attributes.height ground) inputs thing
 
 
 boat : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 boat attributes dimensions ground inputs thing =
-        move (Just [DeepWater, ShallowWater]) attributes dimensions (aboveWater ground) inputs thing
+        move (Just [DeepWater, ShallowWater]) attributes dimensions (aboveWater attributes.height ground) inputs thing
 
 
 move : Maybe (List GroundSurface) -> Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
