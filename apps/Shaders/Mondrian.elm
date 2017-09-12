@@ -31,7 +31,8 @@ fragment_mondrian =
         , functions =
             [ """
 // rectangle that starts at bottom left
-float rect(vec2 p, vec2 pos, vec2 size) {
+float rect(vec2 uv, vec2 pos, vec2 size) {
+    vec2 p = uv - floor(uv); // Use within bounding unit square
     vec2 bl = step(pos, p);
     // Subtracting from 1.0 to invert coordinates and the top right values
     vec2 tr = step(1.0 - pos - size, vec2(1.0 - p));
