@@ -27,6 +27,7 @@ import Shaders.WorldVertex exposing (worldVertex)
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
 import Shaders.Mondrian exposing (mondrian)
+import Shaders.PointLightSquares exposing (pointLightSquares)
 
 
 type alias Attributes =
@@ -145,7 +146,8 @@ init attributes =
             make (Cube.floorWith toNoiseVertex noiseVertex noiseColorFragment)
 
         ceiling =
-            make (Cube.ceilingWith toNoiseVertex noiseVertex noiseColorFragment)
+            -- make (Cube.ceilingWith toNoiseVertex noiseVertex noiseColorFragment)
+            make (Cube.ceiling worldVertex pointLightSquares)
 
         box =
             { position = originPosition
