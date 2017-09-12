@@ -44,7 +44,7 @@ vec4 mondrian (vec2 uv) {
     // x: 0.0 to xMax
     vec2 p = gl_FragCoord.xy / iResolution.y;
     // Storing xMax so it can easily be used in positional functions
-    float xMax = 7.0; //iResolution.x / iResolution.y;
+    float xMax = 1.3; // iResolution.x / iResolution.y;
     vec3 cBlue = vec3(0.016, 0.016, 0.627);
     vec3 cWhite = vec3(0.984, 0.988, 0.957);
     vec3 cGray = vec3(0.102, 0.078, 0.078);
@@ -53,7 +53,7 @@ vec4 mondrian (vec2 uv) {
     vec3 cYellow = vec3(0.85, 0.85, 0.0);
     vec3 c = cWhite;
     // Increment animation speed
-    float speed = iGlobalTime * 2.0;
+    float speed = iGlobalTime * 0.3;
     // Use Sine wave to animate x and y positions for certain elements
     float y1 = 0.3 + sin(speed) * 0.1;
     float x1 = xMax - 0.6 + sin(speed) * 0.1;
@@ -61,12 +61,14 @@ vec4 mondrian (vec2 uv) {
     c = mix(c, cRed, rect(uv, vec2(x1, y1), vec2(xMax - x1, 1.0 - y1)));
     c = mix(c, cGray, rect(uv, vec2(0.3, y1), vec2(0.2, 0.6 - y1)));
     c = mix(c, cBlue, rect(uv, vec2(0.0, 0.0), vec2(0.3, y1)));
+    c = mix(c, cYellow, rect(uv, vec2(0.3, 0.89), vec2(0.2, 0.11)));
     // Black lines
     c = mix(c, cBlack, rect(uv, vec2(0.0, 0.6), vec2(0.5, 0.03)));
     c = mix(c, cBlack, rect(uv, vec2(0.3, 0.0), vec2(0.03, 1.0)));
     c = mix(c, cBlack, rect(uv, vec2(0.5, 0.0), vec2(0.03, 1.0)));
     c = mix(c, cBlack, rect(uv, vec2(0.0, y1), vec2(xMax, 0.03)));
     c = mix(c, cBlack, rect(uv, vec2(x1, y1), vec2(0.03, 1.0 - y1)));
+    c = mix(c, cBlack, rect(uv, vec2(0.3, 0.89), vec2(0.2, 0.03)));
     return vec4(c, 1.0);
 }
 """
