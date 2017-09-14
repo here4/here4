@@ -4,6 +4,7 @@
     "repository": "https://github.com/here4/here4.git",
     "license": "BSD3",
     "source-directories": [
+        "geometry",
         "engine",
         "primitive",
         "terrain",
@@ -18,6 +19,7 @@
         "Body.Wedge",
         "Boids",
         "BoxRoom",
+        "Geometry.VertexStrip",
         "Here4.App",
         "Here4.App.Types",
         "Here4.Body",
