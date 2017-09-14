@@ -1,5 +1,5 @@
 {
-    "version": "3.9.0",
+    "version": "3.9.2",
     "summary": "3D app framework",
     "repository": "https://github.com/here4/here4.git",
     "license": "BSD3",
@@ -8,6 +8,7 @@
         "engine",
         "primitive",
         "terrain",
+        "city",
         "apps",
         "object",
         "shufflepuck"
@@ -48,6 +49,7 @@
         "Here4.Vehicle.DreamBuggy",
         "Here4.Vehicle.Walking",
         "Here4.World",
+        "Road",
         "Sky",
         "StaticGround",
         "WaterWalls"
