@@ -1,5 +1,6 @@
 module Here4.Orientation exposing (..)
 
+import Geometry.Projection exposing (..)
 import Math.Matrix4 as M4
 import Math.Vector3 exposing (Vec3, vec3)
 import Math.Vector3 as V3
@@ -143,21 +144,6 @@ toMat4 =
         Qn.toMat4
 
 
-
--- | Projection onto the plane containing vectors v1, v2
-
-
-v3_projectPlane v1 v2 u =
-    let
-        -- normal vector to the plane containing v1, v2
-        n =
-            V3.normalize <| V3.cross v1 v2
-    in
-        -- u, without its component that is not in the plane
-        V3.sub u (V3.scale (V3.dot u n) n)
-
-
-
 -- | Roll to upright
 
 
@@ -184,7 +170,7 @@ rollTo targetUp o =
         -- Projection of the up vector onto the plane formed by
         -- the forward vector and the Y axis
         upProj =
-            v3_projectPlane targetUp fwd up
+            projectPlane targetUp fwd up
 
         -- Helper function to flip a vector if it is pointing downwards
         -- We use this to ensure we don't end up with an upside-down camera
@@ -229,7 +215,7 @@ pitchTo targetUp o =
         -- Projection of the up vector onto the plane formed by
         -- the forward vector and the Y axis
         upProj =
-            v3_projectPlane targetUp right up
+            projectPlane targetUp right up
 
         -- Helper function to flip a vector if it is pointing downwards
         -- We use this to ensure we don't end up with an upside-down camera
