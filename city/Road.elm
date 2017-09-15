@@ -103,19 +103,27 @@ toRoadVertices path =
             , normal = uprightNormal v1 v2
             , coord = vec3 0 0 0
             }
-        end v1 v2 =
+        end v1 v2 prev =
             { position = v2
             , normal = uprightNormal v1 v2
-            , coord = vec3 0 0 0
+            , coord = nextCoord v1 v2 prev.coord
             }
-        middle v1 v2 v3 =
+        middle v1 v2 v3 prev =
             { position = v2
             , normal = interpolateNormal v1 v2 v3
-            , coord = vec3 0 0 0
+            , coord = nextCoord v1 v2 prev.coord
             }
     in
-        mapTriple start end middle path
+        foldTriple start end middle path
 
+
+nextCoord : Vec3 -> Vec3 -> Vec3 -> Vec3
+nextCoord v1 v2 prevCoord =
+    let
+        d = V3.distance v1 v2
+        y = V3.getY prevCoord
+    in
+        V3.setY (y+d) prevCoord
 
 uprightNormal : Vec3 -> Vec3 -> Vec3
 uprightNormal v1 v2 =
