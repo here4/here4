@@ -3,11 +3,16 @@ module Road exposing (..)
 import Geometry.VertexStrip exposing (..)
 import Here4.App as App exposing (..)
 import Here4.App.Types exposing (..)
+import Here4.Appearance exposing (..)
 import Here4.Body exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (Vec3, vec3)
-import WebGL exposing (Mesh, triangleStrip)
+import Math.Vector4 as V4 exposing (vec4)
+import Math.Matrix4 as M4
+import Shaders.ColorFragment exposing (..)
+import Shaders.NoiseVertex exposing (..)
+import WebGL exposing (Entity, Mesh, entity, triangleStrip)
 
 
 type alias Model =
@@ -81,19 +86,66 @@ generateRoad sideWidth path =
     -- entity etc.
     []
 
+roadAppearance : Float -> List Vec3 -> Perception -> List Entity
+roadAppearance sideWidth path p =
+    let
+        resolution =
+            vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
 
-roadMesh : Float -> List Vec3 -> List (Mesh RoadVertex)
+        s =
+            p.globalTime
+
+        detail =
+            p.measuredFPS / 3.0
+
+        iHMD =
+            if p.cameraVR then
+                1.0
+            else
+                0.0
+
+        mesh =
+            roadMesh sideWidth path
+    in
+        [ entity noiseVertex
+            noiseColorFragment
+            mesh
+            { iResolution = resolution
+            , iHMD = iHMD
+            , iDetail = detail
+            , iGlobalTime = s
+            , iGlobalTimeV = s
+            , iLensDistort = p.lensDistort
+            , modelViewProjectionMatrix = M4.mul p.perspective p.lookAt
+            , modelMatrix = M4.identity
+            , viewPosition = p.cameraPos
+            , lightPosition = p.lightPosition
+            , ambientColor = p.ambientColor
+            }
+        ]
+
+
+roadMesh : Float -> List Vec3 -> Mesh NoiseVertex
 roadMesh sideWidth path =
     let
+        toNoiseVertex v =
+            { position = v.position
+            , normal = v.normal
+            , coord = v.coord
+            , color = vec4 0.4 0.4 0.4 0.5
+            , smoothing = 0.1
+            , textureScale = 1.0
+            , timeScale = 0.0
+            }
+
         (leftSide, rightSide) =
             roadSides sideWidth (toRoadVertices path)
     in
-        [ triangleStrip (mkStrip leftSide rightSide) ]
+        mkStrip
+            (List.map toNoiseVertex leftSide)
+            (List.map toNoiseVertex rightSide)
+        |> triangleStrip
     
-
--- roadSides : Float -> List Vec3 -> (List RoadVertex, List RoadVertex)
--- roadSides sideWidth path =
-
 
 toRoadVertices : List Vec3 -> List RoadVertex
 toRoadVertices path =
