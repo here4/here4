@@ -5,6 +5,7 @@ import Here4.App as App exposing (..)
 import Here4.App.Types exposing (..)
 import Here4.Appearance exposing (..)
 import Here4.Body exposing (..)
+import Here4.Orientation as Orientation
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (Vec3, vec3)
@@ -24,9 +25,9 @@ type alias Msg =
     ()
 
 
-create : List Vec3 -> ( App, Cmd AppMsg )
-create path =
-    App.create (init path)
+create : List Vec3 -> Vec3 -> ( App, Cmd AppMsg )
+create path startPos =
+    App.create (init path startPos)
         { id = always "road"
         , label = always "Road"
         , update = update
@@ -39,13 +40,13 @@ create path =
         }
 
 
-init : List Vec3 -> ( Model, Cmd (CtrlMsg Msg) )
-init path =
+init : List Vec3 -> Vec3 -> ( Model, Cmd (CtrlMsg Msg) )
+init path startPos =
     let
-        bodies = generateRoad 5.0 path
+        body = generateRoad 5.0 path startPos
     in
         ( { path = path
-          , bodies = bodies
+          , bodies = [body]
           }
         , Cmd.none
         )
@@ -81,10 +82,19 @@ type alias RoadVertex =
     }
 
 
-generateRoad : Float -> List Vec3 -> List Body
-generateRoad sideWidth path =
-    -- entity etc.
-    []
+generateRoad : Float -> List Vec3 -> Vec3 -> Body
+generateRoad sideWidth path startPos =
+    let
+        appear =
+            roadAppearance sideWidth path
+    in
+        { anchor = AnchorGround
+        , scale = vec3 1 1 1
+        , position = startPos
+        , orientation = Orientation.initial
+        , appear = appear
+        }
+
 
 roadAppearance : Float -> List Vec3 -> Perception -> List Entity
 roadAppearance sideWidth path p =
