@@ -86,7 +86,7 @@ roadMesh : Float -> List Vec3 -> List (Mesh RoadVertex)
 roadMesh sideWidth path =
     let
         (leftSide, rightSide) =
-            roadSides sideWidth path
+            roadSides sideWidth (toRoadVertices path)
     in
         [ triangleStrip (mkStrip leftSide rightSide) ]
     
@@ -95,18 +95,63 @@ roadMesh sideWidth path =
 -- roadSides sideWidth path =
 
 
-roadSides : Float -> List Vec3 -> (List Vec3, List Vec3)
+toRoadVertices : List Vec3 -> List RoadVertex
+toRoadVertices path =
+    let
+        start v1 v2 =
+            { position = v1
+            , normal = uprightNormal v1 v2
+            , coord = vec3 0 0 0
+            }
+        end v1 v2 =
+            { position = v2
+            , normal = uprightNormal v1 v2
+            , coord = vec3 0 0 0
+            }
+        middle v1 v2 v3 =
+            { position = v2
+            , normal = interpolateNormal v1 v2 v3
+            , coord = vec3 0 0 0
+            }
+    in
+        tripleWise start end middle path
+
+
+uprightNormal : Vec3 -> Vec3 -> Vec3
+uprightNormal v1 v2 =
+    let
+        rise = V3.normalize (V3.sub v2 v1)
+        crossWalk = V3.cross V3.j rise
+    in
+        V3.cross crossWalk rise
+
+
+interpolateNormal : Vec3 -> Vec3 -> Vec3 -> Vec3
+interpolateNormal v1 v2 v3 =
+    let
+        norm12 = uprightNormal v1 v2
+        norm23 = uprightNormal v2 v3
+    in
+        V3.add norm12 norm23
+        |> V3.scale 0.5
+
+
+roadSides : Float -> List RoadVertex -> (List RoadVertex, List RoadVertex)
 roadSides roadWidth path =
     (side (-roadWidth/2) path, side (roadWidth/2) path)
 
 
-side : Float -> List Vec3 -> List Vec3
+side : Float -> List RoadVertex -> List RoadVertex
 side sideWidth path =
-    case path of
-        ( v1 :: v2 :: rest ) ->
-            V3.add v1 (sideOffset sideWidth v1 v2) :: sideCorners sideWidth path
-        _ ->
-            []
+    let
+        start v1 v2 =
+            { v1 | position = V3.add v1.position (sideOffset sideWidth v1.position v2.position) }
+        end v1 v2 =
+            { v2 | position = V3.add v2.position (sideOffset sideWidth v1.position v2.position) }
+        middle v1 v2 v3 =
+            { v2 | position = corner sideWidth v1.position v2.position v3.position }
+    in
+        tripleWise start end middle path
 
 
 -- Given a path segment (v1, v2), return the offset of the roadside
@@ -167,13 +212,35 @@ corner sideWidth v1 v2 v3 =
             
 
 
--- Generate the corner vertices for a roadside, and the end
-sideCorners : Float -> List Vec3 -> List Vec3
-sideCorners sideWidth path =
-    case path of
-        ( v1 :: v2 :: v3 :: rest ) ->
-            corner sideWidth v1 v2 v3 :: sideCorners sideWidth (v2 :: v3 :: rest)
-        [v1, v2] ->
-            [v2]
-        _ ->
+
+----------------------------------------------------------------------
+
+
+pairwise : (a -> b) -> (a -> a -> b) -> List a -> List b
+pairwise ending f xs =
+    case xs of
+        ( x1 :: x2 :: rest ) ->
+            f x1 x2 :: pairwise ending f (x2 :: rest)
+        [x] ->
+            [ending x]
+        [] ->
             []
+
+
+tripleWise : (a -> a -> b) -> (a -> a -> b) -> (a -> a -> a -> b) -> List a -> List b
+tripleWise start end middle xs0 =
+    let
+        f xs =
+            case xs of
+                ( x1 :: x2 :: x3 :: rest ) ->
+                    middle x1 x2 x3 :: f (x2 :: x3 :: rest)
+                [ x1, x2 ] ->
+                    [end x1 x2]
+                _ ->
+                    []
+    in
+        case xs0 of
+            ( x1 :: x2 :: rest ) ->
+                start x1 x2 :: f xs0
+            _ ->
+                []
