@@ -152,12 +152,22 @@ roadSides roadWidth path =
 side : Float -> List RoadVertex -> List RoadVertex
 side sideWidth path =
     let
+        mapX : (Float -> Float) -> Vec3 -> Vec3
+        mapX f v =
+            V3.setX (f (V3.getX v)) v
+
         start v1 v2 =
-            { v1 | position = V3.add v1.position (sideOffset sideWidth v1.position v2.position) }
+            { v1 | position = V3.add v1.position (sideOffset sideWidth v1.position v2.position)
+                 , coord = mapX (\x -> x + sideWidth) v1.coord
+            }
         end v1 v2 =
-            { v2 | position = V3.add v2.position (sideOffset sideWidth v1.position v2.position) }
+            { v2 | position = V3.add v2.position (sideOffset sideWidth v1.position v2.position)
+                 , coord = mapX (\x -> x + sideWidth) v2.coord
+            }
         middle v1 v2 v3 =
-            { v2 | position = corner sideWidth v1.position v2.position v3.position }
+            { v2 | position = corner sideWidth v1.position v2.position v3.position
+                 , coord = mapX (\x -> x + sideWidth) v2.coord
+            }
     in
         mapTriple start end middle path
 
