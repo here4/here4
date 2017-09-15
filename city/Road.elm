@@ -114,7 +114,7 @@ toRoadVertices path =
             , coord = vec3 0 0 0
             }
     in
-        tripleWise start end middle path
+        mapTriple start end middle path
 
 
 uprightNormal : Vec3 -> Vec3 -> Vec3
@@ -151,7 +151,7 @@ side sideWidth path =
         middle v1 v2 v3 =
             { v2 | position = corner sideWidth v1.position v2.position v3.position }
     in
-        tripleWise start end middle path
+        mapTriple start end middle path
 
 
 -- Given a path segment (v1, v2), return the offset of the roadside
@@ -215,20 +215,19 @@ corner sideWidth v1 v2 v3 =
 
 ----------------------------------------------------------------------
 
-
-pairwise : (a -> b) -> (a -> a -> b) -> List a -> List b
-pairwise ending f xs =
+mapPair : (a -> b) -> (a -> a -> b) -> List a -> List b
+mapPair ending f xs =
     case xs of
         ( x1 :: x2 :: rest ) ->
-            f x1 x2 :: pairwise ending f (x2 :: rest)
+            f x1 x2 :: mapPair ending f (x2 :: rest)
         [x] ->
             [ending x]
         [] ->
             []
 
 
-tripleWise : (a -> a -> b) -> (a -> a -> b) -> (a -> a -> a -> b) -> List a -> List b
-tripleWise start end middle xs0 =
+mapTriple : (a -> a -> b) -> (a -> a -> b) -> (a -> a -> a -> b) -> List a -> List b
+mapTriple start end middle xs0 =
     let
         f xs =
             case xs of
@@ -242,5 +241,29 @@ tripleWise start end middle xs0 =
         case xs0 of
             ( x1 :: x2 :: rest ) ->
                 start x1 x2 :: f xs0
+            _ ->
+                []
+
+foldTriple : (a -> a -> b) -> (a -> a -> b -> b) -> (a -> a -> a -> b -> b) -> List a -> List b
+foldTriple start end middle xs0 =
+    let
+        f b0 xs =
+            case xs of
+                ( x1 :: x2 :: x3 :: rest ) ->
+                    let
+                        b = middle x1 x2 x3 b0
+                    in
+                        b :: f b (x2 :: x3 :: rest)
+                [ x1, x2 ] ->
+                    [end x1 x2 b0]
+                _ ->
+                    []
+    in
+        case xs0 of
+            ( x1 :: x2 :: rest ) ->
+                let
+                    init = start x1 x2
+                in
+                    init :: f init xs0
             _ ->
                 []
