@@ -25,9 +25,9 @@ type alias Msg =
     ()
 
 
-create : List Vec3 -> Vec3 -> ( App, Cmd AppMsg )
-create path startPos =
-    App.create (init path startPos)
+create : Float -> List Vec3 -> Vec3 -> ( App, Cmd AppMsg )
+create sideWidth path startPos =
+    App.create (init sideWidth path startPos)
         { id = always "road"
         , label = always "Road"
         , update = update
@@ -40,10 +40,10 @@ create path startPos =
         }
 
 
-init : List Vec3 -> Vec3 -> ( Model, Cmd (CtrlMsg Msg) )
-init path startPos =
+init : Float -> List Vec3 -> Vec3 -> ( Model, Cmd (CtrlMsg Msg) )
+init sideWidth path startPos =
     let
-        body = generateRoad 5.0 path startPos
+        body = generateRoad sideWidth path startPos
     in
         ( { path = path
           , bodies = [body]
