@@ -258,7 +258,10 @@ corner sideWidth v1 v2 v3 =
     let
         offset12 = sideOffset sideWidth v1 v2
         offset23 = sideOffset sideWidth v2 v3
+    in
+        V3.add v2 (V3.scale 0.5 (V3.add offset12 offset23))
 
+{-
         -- Just find where the second line intersects the first plane
 
         p1 = V3.add v1 offset12
@@ -289,8 +292,7 @@ corner sideWidth v1 v2 v3 =
             V3.add v2 offset12
         else
             vec3 (x/denominator) 0 (y/denominator)
-            
-
+-} 
 
 
 ----------------------------------------------------------------------
