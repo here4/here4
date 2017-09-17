@@ -1,5 +1,6 @@
 module Road exposing (..)
 
+import Geometry.Projection exposing (..)
 import Geometry.VertexStrip exposing (..)
 import Here4.App as App exposing (..)
 import Here4.App.Types exposing (..)
@@ -219,80 +220,69 @@ side sideWidth path =
             V3.setX (f (V3.getX v)) v
 
         start v1 v2 =
-            { v1 | position = V3.add v1.position (sideOffset sideWidth v1.position v2.position)
+            { v1 | position = startOffset sideWidth v1 v2
                  , coord = mapX (\x -> x + sideWidth) v1.coord
             }
-        end v1 v2 =
-            { v2 | position = V3.add v2.position (sideOffset sideWidth v1.position v2.position)
+
+        end v1 v2 prev =
+            { v2 | position = endOffset sideWidth v1 v2
                  , coord = mapX (\x -> x + sideWidth) v2.coord
             }
-        middle v1 v2 v3 =
-            { v2 | position = corner sideWidth v1.position v2.position v3.position
+
+        middle v1 v2 v3 prev =
+            { v2 | position = corner sideWidth v1 v2 v3
                  , coord = mapX (\x -> x + sideWidth) v2.coord
             }
     in
-        mapTriple start end middle path
+        foldTriple start end middle path
 
 
 -- Given a path segment (v1, v2), return the offset of the roadside
 -- ie. if the center of the road is the line v1->v2, then the
 -- roadside passes through the line (v1+offset)->(v2+offset)
--- This assumes no banking, ie. the offset is always in the XZ plane
-sideOffset : Float -> Vec3 -> Vec3 -> Vec3
-sideOffset sideWidth v1 v2 =
+sideOffset : Float -> Vec3 -> Vec3 -> Vec3 -> Vec3
+sideOffset sideWidth v1 v2 n =
     let
         segmentUnit =
             V3.normalize (V3.sub v2 v1)
-
-        segmentNorm =
-            vec3 (V3.getZ segmentUnit) 0 (V3.getX segmentUnit)
+        o =
+            V3.cross segmentUnit n
     in
-        V3.scale sideWidth segmentNorm
+        V3.scale sideWidth o
+
+
+startOffset : Float -> RoadVertex -> RoadVertex -> Vec3
+startOffset sideWidth v1 v2 =
+    V3.add v1.position (sideOffset sideWidth v1.position v2.position v1.normal)
+
+
+endOffset : Float -> RoadVertex -> RoadVertex -> Vec3
+endOffset sideWidth v1 v2 =
+    V3.add v2.position (sideOffset sideWidth v1.position v2.position v2.normal)
 
 
 -- Position of the corner of the roadside
 -- Given a path (v1, v2, v3), return the position of the corner
 -- near v2
-corner : Float -> Vec3 -> Vec3 -> Vec3 -> Vec3
+corner : Float -> RoadVertex -> RoadVertex -> RoadVertex -> Vec3
 corner sideWidth v1 v2 v3 =
     let
-        offset12 = sideOffset sideWidth v1 v2
-        offset23 = sideOffset sideWidth v2 v3
+        offset12 = sideOffset sideWidth v1.position v2.position v2.normal
+        pos12_0 = V3.add v1.position offset12
+        pos12_1 = V3.add v2.position offset12
+        pos23_0 = V3.add v2.position offset23
+        pos23_1 = V3.add v3.position offset23
+
+        offset23 = sideOffset sideWidth v2.position v3.position v2.normal
+
+        l1 = projectPlaneNormal v2.normal (V3.sub pos12_1 pos12_0)
+        l2 = projectPlaneNormal v2.normal (V3.sub pos23_0 pos23_1)
+
+        -- project both vectors (prev, pos12) and (v2+offset23, v3+offset23)
+        -- onto the same plane (v2.position, v2.normal)
+        -- Then, find their intersection point in that plane
     in
-        V3.add v2 (V3.scale 0.5 (V3.add offset12 offset23))
-
-{-
-        -- Just find where the second line intersects the first plane
-
-        p1 = V3.add v1 offset12
-        p2 = V3.add v2 offset23
-
-        norm u v w =
-            V3.normalize <| V3.cross (V3.sub u v) (V3.sub w v)
-
-        norm12 = norm p1 v1 v2
-        norm23 = norm p2 v2 v3
-
-        -- V3.cross norm12 norm23
-
-        getXZ v = (V3.getX v, V3.getZ v)
-
-        -- The two roadsides, in (x,y) notation
-        (x1, y1) = getXZ <| V3.add v1 offset12
-        (x2, y2) = getXZ <| V3.add v2 offset12
-        (x3, y3) = getXZ <| V3.add v2 offset23
-        (x4, y4) = getXZ <| V3.add v3 offset23
-
-        denominator = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4)
-
-        x = (x1*y2 - y1*x2)*(x3-x4) - (x1-x2)*(x3*y4 - y3*x4)
-        y = (x1*y2 - y1*x2)*(y3-y4) - (y1-y2)*(x3*y4 - y3*x4)
-    in
-        if abs denominator < 0.0001 then
-            V3.add v2 offset12
-        else
-            vec3 (x/denominator) 0 (y/denominator)
--} 
+        Maybe.withDefault pos12_1 (intersectLineLine pos12_1 l1 pos23_0 l2)
 
 
 ----------------------------------------------------------------------
