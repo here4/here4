@@ -12,6 +12,7 @@ import Html.Attributes as Html
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Math.Vector4 as V4 exposing (vec4)
 import Math.Matrix4 as M4
+import Maybe.Extra as Maybe
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
 import WebGL exposing (Entity, Mesh, entity, triangleStrip)
@@ -19,6 +20,9 @@ import WebGL exposing (Entity, Mesh, entity, triangleStrip)
 
 type alias Model =
     { path : List Vec3
+    , sideWidth : Float
+    , leftSide : List RoadVertex
+    , rightSide : List RoadVertex
     , bodies : List Body
     }
 
@@ -44,11 +48,21 @@ create sideWidth path startPos =
 init : Float -> List Vec3 -> Vec3 -> ( Model, Cmd (CtrlMsg Msg) )
 init sideWidth path startPos =
     let
-        body = generateRoad sideWidth path startPos
+        (leftSide, rightSide) =
+            roadSides sideWidth (toRoadVertices path)
+
+        body =
+            generateRoad leftSide rightSide startPos
+
+        model =
+            { path = path
+            , sideWidth = sideWidth
+            , leftSide = leftSide
+            , rightSide = rightSide
+            , bodies = [body]
+            }
     in
-        ( { path = path
-          , bodies = [body]
-          }
+        ( model
         , Cmd.none
         )
 
@@ -76,6 +90,30 @@ overlay _ =
 ----------------------------------------------------------------------
 
 
+-- Vertical distance (downwards) to nearest floor
+distanceToNearestFloor : Model -> Vec3 -> Maybe Float
+distanceToNearestFloor model pos =
+    List.map2 (,) model.leftSide model.rightSide
+    |> mapPair (always Nothing)
+        (\(a,b) (d,c) -> distanceToQuad a.position b.position c.position d.position pos (vec3 0 -1 0))
+    |> Maybe.values
+    |> List.minimum
+
+
+distanceToQuad : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Maybe Float
+distanceToQuad a b c d p0 p =
+    let
+        n = V3.cross (V3.sub b a) (V3.sub d a)
+        hitPoint = intersectPlane a n p0 p
+        hitInsideQuad = insideQuad a b c d
+    in
+        Maybe.filter hitInsideQuad hitPoint
+        |> Maybe.map (V3.distance p0)
+
+
+----------------------------------------------------------------------
+
+
 type alias RoadVertex =
     { position : Vec3
     , normal : Vec3
@@ -83,11 +121,11 @@ type alias RoadVertex =
     }
 
 
-generateRoad : Float -> List Vec3 -> Vec3 -> Body
-generateRoad sideWidth path startPos =
+generateRoad : List RoadVertex -> List RoadVertex -> Vec3 -> Body
+generateRoad leftSide rightSide startPos =
     let
         appear =
-            roadAppearance sideWidth path
+            roadAppearance leftSide rightSide
     in
         { anchor = AnchorGround
         , scale = vec3 1 1 1
@@ -97,8 +135,8 @@ generateRoad sideWidth path startPos =
         }
 
 
-roadAppearance : Float -> List Vec3 -> Perception -> List Entity
-roadAppearance sideWidth path p =
+roadAppearance : List RoadVertex -> List RoadVertex -> Perception -> List Entity
+roadAppearance leftSide rightSide p =
     let
         resolution =
             vec3 (toFloat p.windowSize.width) (toFloat p.windowSize.height) 0
@@ -116,7 +154,7 @@ roadAppearance sideWidth path p =
                 0.0
 
         mesh =
-            roadMesh sideWidth path
+            roadMesh leftSide rightSide
     in
         [ entity noiseVertex
             noiseColorFragment
@@ -136,8 +174,8 @@ roadAppearance sideWidth path p =
         ]
 
 
-roadMesh : Float -> List Vec3 -> Mesh NoiseVertex
-roadMesh sideWidth path =
+roadMesh : List RoadVertex -> List RoadVertex -> Mesh NoiseVertex
+roadMesh leftSide rightSide =
     let
         toNoiseVertex v =
             { position = v.position
@@ -148,9 +186,6 @@ roadMesh sideWidth path =
             , textureScale = 1.0
             , timeScale = 0.0
             }
-
-        (leftSide, rightSide) =
-            roadSides sideWidth (toRoadVertices path)
     in
         mkStrip
             (List.map toNoiseVertex leftSide)
@@ -275,12 +310,11 @@ corner sideWidth v1 v2 v3 =
 
         offset23 = sideOffset sideWidth v2.position v3.position v2.normal
 
-        l1 = projectPlaneNormal v2.normal (V3.sub pos12_1 pos12_0)
-        l2 = projectPlaneNormal v2.normal (V3.sub pos23_0 pos23_1)
-
         -- project both vectors (prev, pos12) and (v2+offset23, v3+offset23)
         -- onto the same plane (v2.position, v2.normal)
         -- Then, find their intersection point in that plane
+        l1 = projectPlaneNormal v2.normal (V3.sub pos12_1 pos12_0)
+        l2 = projectPlaneNormal v2.normal (V3.sub pos23_0 pos23_1)
     in
         Maybe.withDefault pos12_1 (intersectLineLine pos12_1 l1 pos23_0 l2)
 

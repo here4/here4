@@ -22,22 +22,21 @@ projectPlaneNormal n u =
     V3.sub u (V3.scale (V3.dot u n) n)
 
 
--- | Intersection point of the line containing p1, p2
+-- | Intersection point of the line containing (p0 -> p0+p)
 -- onto the plane containing vector v with normal n
 intersectPlane : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Maybe Vec3
-intersectPlane v n p1 p2 =
+intersectPlane v n p0 p =
     let
-        ray = V3.sub p2 p1
-        d = V3.dot n ray
+        d = V3.dot n p
         epsilon = 1e-6
     in
         if abs d  > epsilon then
             let
-                w = V3.sub p1 v
+                w = V3.sub p0 v
                 fac = -(V3.dot n w / d)
-                u = V3.scale fac ray
+                u = V3.scale fac p
             in
-                Just (V3.add p1 u)
+                Just (V3.add p0 u)
         else
             Nothing
 
@@ -64,3 +63,14 @@ intersectLineLine u0 u v0 v =
             Just (V3.add u0 (V3.scale s u))
         else
             Nothing
+
+
+-- | Is the point p inside the quad (a,b,c,d) ?
+insideQuad : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Bool
+insideQuad a b c d p =
+    let
+        borders = [(a,b), (b,c), (c,d), (d,a)]
+        inside (a,b) = V3.dot (V3.sub b a) (V3.sub p a) > 0
+    in
+        List.all inside borders
+
