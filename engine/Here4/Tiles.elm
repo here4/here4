@@ -45,6 +45,7 @@ createTileGround tiles =
     in
         ( { bounds = tileBounds tiles
           , elevation = tileElevation tiles
+          , nearestFloor = tileFloor tiles
           , seaLevel = seaLevel
           , surface = surface
           , coordRangeX = Placement.coordRangeX tiles.placement
@@ -148,3 +149,15 @@ tileElevation { placement, elevations } pos =
             mix i00 i10 ixf + mix i00 i01 izf
         else
             mix i01 i11 ixf + mix i10 i11 izf
+
+
+tileFloor : Tiles -> Vec3 -> Maybe Float
+tileFloor tiles p =
+    let
+        e = tileElevation tiles p
+        y = V3.getY p
+    in
+        if y >= e then
+            Just (y - e)
+        else
+            Nothing

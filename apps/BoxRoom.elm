@@ -157,6 +157,7 @@ init attributes =
         ground =
             { bounds = emplace (boundingBox box)
             , elevation = always 0.0
+            , nearestFloor = \p -> let y = V3.getY p in if y >= 0 then Just y else Nothing
             , seaLevel = 0.0
             , surface = always Ground.Grass
             , coordRangeX =

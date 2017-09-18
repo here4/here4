@@ -5,7 +5,7 @@ import FontAwesome
 import Here4.Orientation as Orientation exposing (..)
 import Here4.Body exposing (..)
 import Here4.Model as Model
-import Here4.Ground exposing (Ground)
+import Here4.Ground exposing (..)
 import Here4.Vehicle exposing (Driveable)
 import Html exposing (Html)
 import Html.Attributes as Html
@@ -21,25 +21,21 @@ import Debug
 
 drive : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 drive attributes dimensions ground inputs thing =
-    let
-        eyeLevel pos =
-            ground.elevation pos + attributes.height
-    in
-        move attributes ground eyeLevel inputs thing
+    move attributes ground attributes.height inputs thing
 
 
-move : Driveable vehicle -> Ground -> Model.EyeLevel -> Model.Inputs -> Moving a -> Moving a
-move attributes terrain eyeLevel inputs motion =
+move : Driveable vehicle -> Ground -> Float -> Model.Inputs -> Moving a -> Moving a
+move attributes ground height inputs motion =
     motion
-        |> turn eyeLevel attributes.speed inputs.x inputs.dt
-        |> goForward eyeLevel attributes.speed inputs
-        |> gravity eyeLevel inputs.dt
-        |> physics eyeLevel inputs.dt
-        |> keepWithinbounds terrain attributes.radius
+        |> turn attributes.speed inputs.x inputs.dt
+        |> goForward ground attributes.speed inputs
+        |> gravity ground height inputs.dt
+        |> physics ground height inputs.dt
+        |> keepWithinbounds ground attributes.radius
 
 
-turn : Model.EyeLevel -> Float -> Float -> Float -> Moving a -> Moving a
-turn eyeLevel speed dx dt motion =
+turn : Float -> Float -> Float -> Moving a -> Moving a
+turn speed dx dt motion =
     let
         steer =
             0.1 * speed * dx * dt
@@ -53,8 +49,8 @@ turn eyeLevel speed dx dt motion =
         { motion | orientation = orientation }
 
 
-goForward : Model.EyeLevel -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
-goForward eyeLevel speed inputs motion =
+goForward : Ground -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
+goForward ground speed inputs motion =
     let
         accel =
             clamp -1.0 1.0 <|
@@ -68,30 +64,29 @@ goForward eyeLevel speed inputs motion =
         strafe =
             V3.scale (0.1 * speed * -inputs.mx) V3.i
 
-        -- e = (eyeLevel motion.position) / 80.0 -- placement.yMult
-        e =
-            (eyeLevel motion.position) / 120.0
+        surface =
+            ground.surface motion.position
 
         friction =
-            if e > 0.8 then
+            if surface == Snow then
                 -0.1
-            else if e < 0.0 then
+            else if surface == DeepWater then
                 0.8
-            else if e < 0.1 then
+            else if surface == ShallowWater then
                 0.6
-            else if e < 0.15 then
+            else if surface == Beach then
                 0.5
             else
                 0.2
 
         maxSpeed =
-            if e > 0.8 then
+            if surface == Snow then
                 30
-            else if e < 0.0 then
+            else if surface == DeepWater then
                 3
-            else if e < 0.1 then
+            else if surface == ShallowWater then
                 10
-            else if e < 0.15 then
+            else if surface == Beach then
                 15
             else
                 20
@@ -104,8 +99,8 @@ adjustVelocity maxSpeed friction dv dt v =
     v3_clamp maxSpeed <| add (V3.scale dt dv) (V3.scale (1.0 - (friction * dt)) v)
 
 
-physics : Model.EyeLevel -> Float -> Moving a -> Moving a
-physics eyeLevel dt motion =
+physics : Ground -> Float -> Float -> Moving a -> Moving a
+physics ground height dt motion =
     let
         pos =
             add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
@@ -113,8 +108,10 @@ physics eyeLevel dt motion =
         p =
             V3.toRecord pos
 
-        e =
-            eyeLevel pos
+        e = height +
+            Maybe.withDefault
+                (ground.elevation pos)
+                (Maybe.map (\d -> V3.getY pos - d) (ground.nearestFloor pos))
 
         vy0 =
             getY motion.velocity
@@ -123,10 +120,10 @@ physics eyeLevel dt motion =
             if p.y < e then
                 let
                     vy =
-                        if ((e < (0.8 * 80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10 * dt) then
+                        -- if ((e < (0.8 * 80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10 * dt) then
                             clamp 0 10 (V3.length motion.velocity * (e - p.y) * dt * 5)
-                        else
-                            0
+                        -- else
+                        --     0
                 in
                     ( vec3 p.x e p.z, vec3 0 vy 0 )
             else
@@ -147,13 +144,14 @@ v3_clamp len v =
         V3.scale len (V3.normalize v)
 
 
-keepWithinbounds terrain radius motion =
-    { motion | position = terrain.bounds radius motion.position }
+keepWithinbounds ground radius motion =
+    { motion | position = ground.bounds radius motion.position }
 
 
-gravity : Model.EyeLevel -> Float -> Moving a -> Moving a
-gravity eyeLevel dt motion =
-    if getY motion.position <= eyeLevel motion.position then
+gravity : Ground -> Float -> Float -> Moving a -> Moving a
+gravity ground height dt motion =
+    -- if getY motion.position <= eyeLevel motion.position then
+    if (Maybe.withDefault 0 (ground.nearestFloor motion.position) <= height) then
         motion
     else
         let

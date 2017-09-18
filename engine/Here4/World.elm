@@ -17,7 +17,7 @@ import Here4.Orientation as Orientation exposing (Orientation)
 import Here4.Space as Space
 import Html exposing (Html)
 import Math.Vector3 as V3 exposing (vec3)
-import Maybe.Extra exposing (isJust)
+import Maybe.Extra as Maybe exposing (isJust)
 import Task
 import Time exposing (Time)
 
@@ -958,5 +958,19 @@ worldFocus appKey model =
 
 worldGround : WorldKey () -> Multiverse model -> Maybe Ground
 worldGround (WorldKey worldKey ()) model =
-    Bag.get worldKey model.worlds
-        |> Maybe.andThen .maybeGround
+    let
+        groundWithFloors : World -> Maybe Ground
+        groundWithFloors world =
+            let
+                nearestFloor g p =
+                    g p :: List.map (\floor -> floor p) world.floors
+                    |> Maybe.values
+                    |> List.minimum
+
+                withFloors ground =
+                    { ground | nearestFloor = nearestFloor ground.nearestFloor }
+            in
+                Maybe.map withFloors world.maybeGround
+    in
+        Bag.get worldKey model.worlds
+            |> Maybe.andThen groundWithFloors

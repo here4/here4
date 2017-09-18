@@ -27,6 +27,7 @@ type alias Floor =
 type alias Ground =
     { bounds : Float {- Radius -} -> Vec3 -> Vec3
     , elevation : Vec3 -> Float
+    , nearestFloor : Floor
     , surface : Vec3 -> GroundSurface
     , seaLevel : Float
     , coordRangeX : ( Float, Float )

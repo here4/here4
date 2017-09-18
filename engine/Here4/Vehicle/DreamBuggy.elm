@@ -58,13 +58,13 @@ boat attributes dimensions ground inputs thing =
 
 
 move : Maybe (List GroundSurface) -> Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
-move surfaces attributes dimensions terrain inputs motion =
+move surfaces attributes dimensions ground inputs motion =
     motion
-        |> turn attributes dimensions terrain.elevation inputs.x inputs.dt
-        |> goForward terrain attributes.speed inputs
-        |> gravity terrain.elevation inputs.dt
-        |> physics surfaces terrain inputs.dt
-        |> keepWithinbounds terrain attributes.radius
+        |> turn attributes dimensions ground.elevation inputs.x inputs.dt
+        |> goForward ground attributes.speed inputs
+        |> gravity ground inputs.dt
+        |> physics surfaces ground inputs.dt
+        |> keepWithinbounds ground attributes.radius
 
 
 clampBuggy : Orientation -> Orientation
@@ -240,7 +240,9 @@ physics mSurfaces ground dt motion =
             V3.toRecord pos
 
         e =
-            ground.elevation pos
+            Maybe.withDefault
+                (ground.elevation pos)
+                (Maybe.map (\d -> V3.getY pos - d) (ground.nearestFloor pos))
 
         vy0 =
             getY motion.velocity
@@ -283,13 +285,14 @@ v3_clamp len v =
         V3.scale len (V3.normalize v)
 
 
-keepWithinbounds terrain radius motion =
-    { motion | position = terrain.bounds radius motion.position }
+keepWithinbounds ground radius motion =
+    { motion | position = ground.bounds radius motion.position }
 
 
-gravity : Model.EyeLevel -> Float -> Moving a -> Moving a
-gravity eyeLevel dt motion =
-    if getY motion.position <= eyeLevel motion.position then
+gravity : Ground -> Float -> Moving a -> Moving a
+gravity ground dt motion =
+    -- if getY motion.position <= eyeLevel motion.position then
+    if (Maybe.withDefault 0 (ground.nearestFloor motion.position) <= 0.0) then
         motion
     else
         let
