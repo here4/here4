@@ -108,13 +108,13 @@ keysToInputs keys inputs0 =
             x && keys.shift
     in
         { inputs0
-            | x = inputs0.x + minusPlus 1.0 keys.kA keys.kD
+            | x = inputs0.x + minusPlus 0.5 keys.kA keys.kD
             , y = inputs0.y + minusPlus 1.0 keys.kS keys.kW
             , mx = inputs0.mx + minusPlus 1.0 keys.left keys.right
             , my = inputs0.my + minusPlus 1.0 keys.down keys.up
             , cx = inputs0.cx + minusPlus 1.0 keys.kH keys.kL
             , cy = inputs0.cy + minusPlus 1.0 keys.kJ keys.kK
-            , button_X = risingEdge inputs0.button_X keys.space
+            , button_Y = risingEdge inputs0.button_X keys.space
             , prevCamera = shifted <| risingEdge inputs0.prevCamera keys.kC
             , nextCamera = unshifted <| risingEdge inputs0.nextCamera keys.kC
             , toggleOverlay = risingEdge inputs0.toggleOverlay keys.kI
