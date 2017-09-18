@@ -108,7 +108,7 @@ keysToInputs keys inputs0 =
             x && keys.shift
     in
         { inputs0
-            | x = inputs0.x + minusPlus 1.0 keys.kA keys.kD
+            | x = inputs0.x + minusPlus 0.5 keys.kA keys.kD
             , y = inputs0.y + minusPlus 1.0 keys.kS keys.kW
             , mx = inputs0.mx + minusPlus 1.0 keys.left keys.right
             , my = inputs0.my + minusPlus 1.0 keys.down keys.up
