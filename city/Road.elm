@@ -206,7 +206,7 @@ roadMesh leftSide rightSide =
             , coord = v.coord
             , color = vec4 0.4 0.4 0.4 0.5
             , smoothing = 0.1
-            , textureScale = 1.0
+            , textureScale = 0.2
             , timeScale = 0.0
             }
     in
