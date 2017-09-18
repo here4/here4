@@ -6,6 +6,7 @@ import Here4.App as App exposing (..)
 import Here4.App.Types exposing (..)
 import Here4.Appearance exposing (..)
 import Here4.Body exposing (..)
+import Here4.Dispatch exposing (..)
 import Here4.Orientation as Orientation
 import Html exposing (Html)
 import Html.Attributes as Html
@@ -15,6 +16,7 @@ import Math.Matrix4 as M4
 import Maybe.Extra as Maybe
 import Shaders.ColorFragment exposing (..)
 import Shaders.NoiseVertex exposing (..)
+import Task exposing (Task)
 import WebGL exposing (Entity, Mesh, entity, triangleStrip)
 
 
@@ -61,9 +63,13 @@ init sideWidth path startPos =
             , rightSide = rightSide
             , bodies = [body]
             }
+
+        addFloor =
+            Task.succeed (distanceToNearestFloor model)
+                |> Task.perform (Effect << AddFloor ())
     in
         ( model
-        , Cmd.none
+        , addFloor
         )
 
 

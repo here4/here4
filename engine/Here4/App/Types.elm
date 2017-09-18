@@ -14,7 +14,7 @@ import Dynamic exposing (Dynamic)
 import Here4.Body exposing (..)
 import Here4.Camera.Types exposing (Framing)
 import Here4.Dispatch exposing (..)
-import Here4.Ground exposing (Ground)
+import Here4.Ground exposing (Ground, Floor)
 import Here4.Location exposing (Location)
 import Here4.Model exposing (Inputs, AppKey, PartyKey)
 import Here4.Orientation exposing (Orientation)
@@ -68,6 +68,7 @@ type Msg
 
 type EffectMsg worldKey appKey
     = UpdateGround worldKey Ground
+    | AddFloor worldKey Floor
     | RelocateParty worldKey PartyKey Location
     | AddApp worldKey (App, Cmd AppMsg)
     | RemoveApp worldKey appKey

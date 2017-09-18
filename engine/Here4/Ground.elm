@@ -2,6 +2,7 @@ module Here4.Ground
     exposing
         ( Ground
         , GroundSurface(..)
+        , Floor
         , aboveSeaLevel
         , onWater
         , on
@@ -17,6 +18,10 @@ type GroundSurface
     | Beach
     | ShallowWater
     | DeepWater
+
+
+type alias Floor =
+    Vec3 -> Maybe Float
 
 
 type alias Ground =

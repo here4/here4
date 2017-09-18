@@ -9,7 +9,7 @@ import Here4.Body exposing (Body)
 import Here4.Camera.Types exposing (Framing, Shot)
 import Here4.Control exposing (..)
 import Here4.Dispatch exposing (..)
-import Here4.Ground exposing (Ground)
+import Here4.Ground exposing (Ground, Floor)
 import Here4.Location exposing (..)
 import Here4.Model as Model exposing (GlobalMsg, NavigatorMsg, WorldKey(..), AppKey(..), PartyKey(..))
 import Here4.Navigator.Control exposing (NavMsg)
@@ -42,6 +42,7 @@ type alias World =
     , label : String
     , backgroundColor : Color
     , maybeGround : Maybe Ground
+    , floors : List Floor
     , apps : Bag App
     , parties : Bag Party
     , defaultSelf : ( App, Cmd AppMsg )
@@ -134,6 +135,7 @@ oneWorldInit attributes ( oldWorlds, oldCmds ) =
             , label = attributes.label
             , backgroundColor = attributes.backgroundColor
             , maybeGround = Nothing
+            , floors = []
             , apps = Bag.empty
             , parties = Bag.empty
             , defaultSelf = attributes.defaultSelf
@@ -215,6 +217,9 @@ toWorldEffect worldKey appKey e =
         UpdateGround () ground ->
             UpdateGround worldKey ground
 
+        AddFloor () floor ->
+            AddFloor worldKey floor
+
         RelocateParty () partyKey location ->
             RelocateParty worldKey partyKey location
 
@@ -270,6 +275,9 @@ toAppMsg dispatch =
             case e of
                 UpdateGround _ ground ->
                     UpdateGround () ground
+
+                AddFloor _ floor ->
+                    AddFloor () floor
 
                 RelocateParty _ partyKey location ->
                     RelocateParty () partyKey location
@@ -481,6 +489,15 @@ worldUpdate hubUpdate msg model =
                     { world | maybeGround = Just ground }
             in
                 ( { model | worlds = Bag.update worldKey (Maybe.map updateGround) model.worlds }
+                , Cmd.none
+                )
+
+        HubEff (AddFloor (WorldKey worldKey ()) floor) ->
+            let
+                updateFloors world =
+                    { world | floors = floor :: world.floors }
+            in
+                ( { model | worlds = Bag.update worldKey (Maybe.map updateFloors) model.worlds }
                 , Cmd.none
                 )
 
