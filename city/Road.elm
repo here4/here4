@@ -25,7 +25,7 @@ type alias Model =
     , sideWidth : Float
     , leftSide : List RoadVertex
     , rightSide : List RoadVertex
-    , bodies : List Body
+    , body : Body
     }
 
 type alias Msg =
@@ -61,7 +61,7 @@ init sideWidth path startPos =
             , sideWidth = sideWidth
             , leftSide = leftSide
             , rightSide = rightSide
-            , bodies = [body]
+            , body = body
             }
 
         addFloor =
@@ -80,12 +80,29 @@ update msg model =
 
 animate : Ground -> Time -> Model -> ( Model, Cmd (CtrlMsg Msg) )
 animate ground dt model =
-    ( model, Cmd.none )
+    let
+        aboveGround pos =
+            let
+                minY =
+                    ground.elevation pos
+            in
+                if V3.getY pos > minY then
+                    pos
+                else
+                    V3.setY minY pos
+
+        moveAboveGround body =
+            { body | position = aboveGround body.position }
+
+    in
+        ( { model | body = moveAboveGround model.body }
+        , Cmd.none
+        )
 
 
 bodies : Model -> Vec3 -> List Body
 bodies model pos =
-    model.bodies
+    [ model.body ]
 
 
 overlay : Model -> Html msg
