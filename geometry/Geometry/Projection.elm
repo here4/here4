@@ -47,19 +47,32 @@ intersectPlane v n p0 p =
 intersectLineLine : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Maybe Vec3
 intersectLineLine u0 u v0 v =
     let
-        uv = V3.sub v0 u0
+        uv =
+            V3.sub v0 u0
 
-        uXv = V3.cross u v
+        uXv =
+            V3.cross u v
 
-        epsilon = 1e-6
-        nearZero x = abs x < epsilon
+        uXv2 =
+            V3.dot uXv uXv
 
-        coplanar = nearZero (V3.dot uv uXv)
+        epsilon =
+            1e-6
 
-        s = (V3.dot (V3.cross uv v) uXv) / V3.dot uXv uXv
+        nearZero x =
+            abs x < epsilon
+
+        parallel =
+            uXv2 == 0
+
+        coplanar =
+            nearZero (V3.dot uv uXv)
+
+        s =
+            (V3.dot (V3.cross uv v) uXv) / uXv2
     in
         -- if (coplanar && s >= 0.0 && s <= 1.0) then
-        if coplanar then
+        if not parallel && coplanar then
             Just (V3.add u0 (V3.scale s u))
         else
             Nothing
