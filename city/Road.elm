@@ -116,17 +116,23 @@ overlay _ =
 -- Vertical distance (downwards) to nearest floor
 distanceToNearestFloor : Model -> Vec3 -> Maybe Float
 distanceToNearestFloor model pos =
-    List.map2 (,) model.leftSide model.rightSide
-    |> mapPair (always Nothing)
-        (\(a,b) (d,c) -> distanceToQuad a.position b.position c.position d.position pos (vec3 0 -1 0))
-    |> Maybe.values
-    |> List.minimum
+    let
+        relativePos =
+            V3.sub pos model.body.position
+    in
+        List.map2 (,) model.leftSide model.rightSide
+        |> mapPair (always Nothing)
+            (\(a,b) (d,c) ->
+                distanceToQuad a.position b.position c.position d.position
+                    relativePos (vec3 0 -1 0))
+        |> Maybe.values
+        |> List.minimum
 
 
 distanceToQuad : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Maybe Float
 distanceToQuad a b c d p0 p =
     let
-        n = V3.cross (V3.sub b a) (V3.sub d a)
+        n = V3.normalize <| V3.cross (V3.sub b a) (V3.sub d a)
         hitPoint = intersectPlane a n p0 p
         hitInsideQuad = insideQuad a b c d
     in
