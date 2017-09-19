@@ -134,10 +134,13 @@ turn attributes dimensions eyeLevel dx dt motion =
         perp2dCCW x y =
             ( -y, x )
 
+        perp2dCW x y =
+            ( y, -x )
+
         targetUpRoll =
             let
                 ( x, y ) =
-                    perp2dCCW vehicleWidth (rightTireY - leftTireY)
+                    perp2dCW vehicleWidth (rightTireY - leftTireY)
             in
                 vec3 x y 0
 
@@ -145,9 +148,9 @@ turn attributes dimensions eyeLevel dx dt motion =
             let
                 ( z, y ) =
                     if frontTireY > centerY then
-                        perp2dCCW vehicleFwdLength (frontTireY - rearTireY)
+                        perp2dCW vehicleFwdLength (frontTireY - rearTireY)
                     else
-                        perp2dCCW (vehicleFwdLength / 2.0) (centerY - rearTireY)
+                        perp2dCW (vehicleFwdLength / 2.0) (centerY - rearTireY)
             in
                 vec3 0 y z
 
@@ -251,10 +254,10 @@ physics mSurfaces ground height dt motion =
             if p.y < e + 0.5 then
                 let
                     vy =
-                        if ((e < (0.8 * 80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10 * dt) then
+                        -- if ((e < (0.8 * 80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10 * dt) then
                             clamp 0 10 (V3.length motion.velocity * (e - p.y) * dt * 5)
-                        else
-                            0
+                        -- else
+                        --     0
                 in
                     ( vec3 p.x e p.z, vec3 0 vy 0 )
             else
