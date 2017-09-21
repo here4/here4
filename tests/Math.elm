@@ -3,7 +3,7 @@ module Math exposing (..)
 import Test exposing (..)
 import Expect
 import Fuzz exposing (Fuzzer, conditional, float)
-import Orientation
+import Geometry.Projection exposing (..)
 import Math.Vector3 as V3 exposing (Vec3)
 
 
@@ -29,7 +29,7 @@ suite =
             \() ->
                 let
                     proj =
-                        Orientation.v3_projectPlane V3.i V3.j (V3.vec3 1 1 1)
+                        projectPlane V3.i V3.j (V3.vec3 1 1 1)
 
                     crossX =
                         V3.cross V3.i proj

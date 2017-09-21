@@ -1,15 +1,17 @@
 {
     "version": "1.0.0",
     "summary": "Test Suites",
-    "repository": "https://github.com/kfish/dreambuggy.git",
+    "repository": "https://github.com/here4/here4.git",
     "license": "BSD3",
     "source-directories": [
-        "../dreambuggy",
+        "../geometry",
         "../engine",
+        "../primitive",
         "../terrain",
+        "../city",
         "../apps",
+        "../object",
         "../vehicles",
-        "../quaternion",
         "."
     ],
     "exposed-modules": [],
@@ -22,12 +24,12 @@
         "elm-lang/keyboard": "1.0.0 <= v < 2.0.0",
         "elm-lang/mouse": "1.0.0 <= v < 2.0.0",
         "elm-lang/window": "1.0.0 <= v < 2.0.0",
-        "elm-community/linear-algebra": "3.1.0 <= v < 4.0.0",
-        "elm-community/webgl": "2.0.0 <= v < 3.0.0",
-        "elm-community/list-extra": "6.0.0 <= v < 7.0.0",
+        "elm-community/linear-algebra": "3.1.1 <= v < 4.0.0",
+        "elm-community/list-extra": "6.1.0 <= v < 7.0.0",
         "elm-community/maybe-extra": "4.0.0 <= v < 5.0.0",
         "elm-community/random-extra": "2.0.0 <= v < 3.0.0",
-        "kfish/quaternion": "1.1.0 <= v < 2.0.0"
+        "elm-community/webgl": "2.0.3 <= v < 3.0.0",
+        "kfish/quaternion": "2.0.1 <= v < 3.0.0"
     },
     "elm-version": "0.18.0 <= v < 0.19.0"
 }
