@@ -33,7 +33,7 @@ intersectPlane v n p0 p =
         if abs d  > epsilon then
             let
                 w = V3.sub p0 v
-                fac = (V3.dot n w / d)
+                fac = -(V3.dot n w / d)
                 u = V3.scale fac p
             in
                 Just (V3.add p0 u)
