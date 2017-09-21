@@ -5,22 +5,9 @@ import Expect
 import Fuzz exposing (Fuzzer, conditional, float)
 import Geometry.Projection as Geometry
 import Math.Vector3 as V3 exposing (Vec3)
+import MathExpect exposing (..)
+import MathFuzz exposing (..)
 import Here4.Orientation as Orientation
-
-
-vec3 : Fuzzer Vec3
-vec3 =
-    Fuzz.map3 V3.vec3 float float float
-
-
-nonZeroVec3 : Fuzzer Vec3
-nonZeroVec3 =
-    conditional
-        { retries = 1
-        , fallback = always V3.i
-        , condition = \v -> V3.length v /= 0
-        }
-        vec3
 
 
 suite : Test
@@ -58,21 +45,19 @@ projectPlane =
                         ]
                         proj
 
-        {-
-           , fuzz3 nonZeroVec3 nonZeroVec3 nonZeroVec3 "Project vector onto plane" <|
+           , fuzz3 unitVec3 unitVec3 unitVec3 "Project vector onto plane" <|
                \v1 v2 u ->
-                   let proj = Orientation.v3_projectPlane v1 v2 u
+                   let proj = Geometry.projectPlane v1 v2 u
                        cross1 = V3.cross v1 proj
                        cross2 = V3.cross v2 proj
                        dot1 = V3.dot cross1
                        dot2 = V3.dot cross2
                    in
                        Expect.all
-                           [ (dot1 >> Expect.equal 0)
-                           , (dot2 >> Expect.equal 0)
+                           [ (dot1 >> floatEqual 0)
+                           , (dot2 >> floatEqual 0)
                            ]
                            proj
-        -}
         ]
 
 {-
