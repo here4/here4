@@ -14,9 +14,25 @@ suite : Test
 suite =
     describe "Math tests"
         [ projectPlane
+        , intersectPlane
         -- , orientUpright
         ]
 
+
+intersectPlane : Test
+intersectPlane =
+    describe "intersectPlane"
+        [ test "Intersect with XZ plane" <|
+            \() ->
+                let
+                    v = V3.vec3 0 0 0
+                    n = V3.vec3 0 1 0
+                    p = V3.vec3 0 -1 0
+                in
+                    Expect.all
+                        [ Expect.equal (Just (V3.vec3 2 0 2)) ]
+                        (Geometry.intersectPlane v n (V3.vec3 2 1 2) p)
+        ]
 
 projectPlane : Test
 projectPlane =
