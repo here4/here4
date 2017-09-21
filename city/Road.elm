@@ -63,13 +63,9 @@ init sideWidth path startPos =
             , rightSide = rightSide
             , body = body
             }
-
-        addFloor =
-            Task.succeed (distanceToNearestFloor model)
-                |> Task.perform (Effect << AddFloor ())
     in
         ( model
-        , addFloor
+        , Cmd.none
         )
 
 
@@ -86,18 +82,29 @@ animate ground dt model =
                 minY =
                     ground.elevation pos
             in
-                if V3.getY pos > minY then
-                    pos
+                if V3.getY pos >= minY then
+                    Nothing
                 else
-                    V3.setY minY pos
+                    Just <| V3.setY minY pos
 
-        moveAboveGround body =
-            { body | position = aboveGround body.position }
+        setPosition body pos =
+            { body | position = pos }
 
+        result newPos =
+            let
+                newModel =
+                    { model | body = setPosition model.body newPos }
+                addFloor =
+                    Task.succeed (distanceToNearestFloor newModel)
+                        |> Task.perform (Effect << AddFloor ())
+            in
+                ( newModel, addFloor )
     in
-        ( { model | body = moveAboveGround model.body }
-        , Cmd.none
-        )
+        case aboveGround model.body.position of
+            Nothing ->
+                ( model, Cmd.none )
+            Just newPos ->
+                result newPos
 
 
 bodies : Model -> Vec3 -> List Body
