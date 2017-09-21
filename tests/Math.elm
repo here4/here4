@@ -3,8 +3,9 @@ module Math exposing (..)
 import Test exposing (..)
 import Expect
 import Fuzz exposing (Fuzzer, conditional, float)
-import Geometry.Projection exposing (..)
+import Geometry.Projection as Geometry
 import Math.Vector3 as V3 exposing (Vec3)
+import Here4.Orientation as Orientation
 
 
 vec3 : Fuzzer Vec3
@@ -25,11 +26,19 @@ nonZeroVec3 =
 suite : Test
 suite =
     describe "Math tests"
+        [ projectPlane
+        -- , orientUpright
+        ]
+
+
+projectPlane : Test
+projectPlane =
+    describe "projectPlane"
         [ test "Project (1,1,1) onto the X,Y plane" <|
             \() ->
                 let
                     proj =
-                        projectPlane V3.i V3.j (V3.vec3 1 1 1)
+                        Geometry.projectPlane V3.i V3.j (V3.vec3 1 1 1)
 
                     crossX =
                         V3.cross V3.i proj
@@ -50,16 +59,6 @@ suite =
                         proj
 
         {-
-           , test "Upright" <|
-               \() ->
-                   let
-                       o = Orientation.fromAngleAxis (pi/4) V3.k
-                       upr = Orientation.upright o
-                   in
-                       Expect.all
-                           [ (Expect.equal Orientation.initial)
-                           ]
-                           upr
            , fuzz3 nonZeroVec3 nonZeroVec3 nonZeroVec3 "Project vector onto plane" <|
                \v1 v2 u ->
                    let proj = Orientation.v3_projectPlane v1 v2 u
@@ -75,3 +74,20 @@ suite =
                            proj
         -}
         ]
+
+{-
+orientUpright : Test
+orientUpright =
+    describe "Orientation.upright"
+        [ test "Upright" <|
+            \() ->
+                let
+                    o = Orientation.fromAngleAxis (pi/4) V3.k
+                    upr = Orientation.rollUpright o
+                in
+                    Expect.all
+                        [ (Expect.equal Orientation.initial)
+                        ]
+                        upr
+        ]
+-}
