@@ -63,7 +63,7 @@ move surfaces attributes dimensions ground inputs motion =
         |> turn attributes dimensions ground.elevation inputs.x inputs.dt
         |> goForward ground attributes.speed inputs
         |> gravity ground inputs.dt
-        |> physics surfaces ground inputs.dt
+        |> physics surfaces ground attributes.height inputs.dt
         |> keepWithinbounds ground attributes.radius
 
 
@@ -227,8 +227,8 @@ adjustVelocity maxSpeed friction dv dt v =
     v3_clamp maxSpeed <| add (V3.scale dt dv) (V3.scale (1.0 - (friction * dt)) v)
 
 
-physics : Maybe (List GroundSurface) -> Ground -> Float -> Moving a -> Moving a
-physics mSurfaces ground dt motion =
+physics : Maybe (List GroundSurface) -> Ground -> Float -> Float -> Moving a -> Moving a
+physics mSurfaces ground height dt motion =
     let
         pos =
             add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
@@ -239,7 +239,7 @@ physics mSurfaces ground dt motion =
         p =
             V3.toRecord pos
 
-        e =
+        e = height +
             Maybe.withDefault
                 (ground.elevation pos)
                 (Maybe.map (\d -> V3.getY pos - d) (ground.nearestFloor pos))
