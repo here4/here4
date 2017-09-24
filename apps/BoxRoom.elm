@@ -1,6 +1,7 @@
 module BoxRoom
     exposing
         ( create
+        , floor
         , dimensions
         , color
         , textureScale
@@ -33,12 +34,18 @@ import Shaders.PointLightSquares exposing (pointLightSquares)
 type alias Attributes =
     { id : String
     , label : String
+    , floor : Float
     , dimensions : Vec3
     , color : Vec4
     , textureScale : Float
     , timeScale : Float
     , smoothing : Float
     }
+
+
+floor : Float -> Update Attributes
+floor f attr =
+    { attr | floor = f }
 
 
 dimensions : Vec3 -> Update Attributes
@@ -70,6 +77,7 @@ defaultAttributes : Attributes
 defaultAttributes =
     { id = "_room"
     , label = "Room"
+    , floor = 0.0
     , dimensions = vec3 10 3 10
     , color = vec4 1.0 1.0 1.0 1.0
     , textureScale = 0.1
@@ -115,10 +123,10 @@ init attributes =
             V3.toTuple attributes.dimensions
 
         floorCenterPosition =
-            vec3 0 0 0
+            vec3 0 attributes.floor 0
 
         originPosition =
-            vec3 (-width / 2) 0 (-length / 2)
+            vec3 (-width / 2) attributes.floor (-length / 2)
 
         make appear =
             { anchor = AnchorGround
@@ -154,10 +162,19 @@ init attributes =
             , dimensions = attributes.dimensions
             }
 
+        nearestFloor p =
+            let
+                y = V3.getY p
+            in
+                if y >= attributes.floor then
+                    Just (y - attributes.floor)
+                else
+                    Nothing
+
         ground =
             { bounds = emplace (boundingBox box)
-            , elevation = always 0.0
-            , nearestFloor = \p -> let y = V3.getY p in if y >= 0 then Just y else Nothing
+            , elevation = always attributes.floor
+            , nearestFloor = nearestFloor
             , seaLevel = 0.0
             , surface = always Ground.Grass
             , coordRangeX =
