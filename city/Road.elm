@@ -232,18 +232,26 @@ roadMesh leftSide rightSide =
 toRoadVertices : List Vec3 -> List RoadVertex
 toRoadVertices path =
     let
+        thickness = 0.01
+
+        addThickness v =
+            let
+                y = V3.getY v
+            in
+                V3.setY (y+thickness) v
+
         start v1 v2 =
-            { position = v1
+            { position = addThickness v1
             , normal = uprightNormal v1 v2
             , coord = vec3 0 0 0
             }
         end v1 v2 prev =
-            { position = v2
+            { position = addThickness v2
             , normal = uprightNormal v1 v2
             , coord = nextCoord v1 v2 prev.coord
             }
         middle v1 v2 v3 prev =
-            { position = v2
+            { position = addThickness v2
             , normal = interpolateNormal v1 v2 v3
             , coord = nextCoord v1 v2 prev.coord
             }
