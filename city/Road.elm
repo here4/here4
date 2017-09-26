@@ -20,8 +20,21 @@ import Task exposing (Task)
 import WebGL exposing (Entity, Mesh, entity, triangleStrip)
 
 
+type alias BankingPoint =
+    { position : Vec3
+    , banking : Float -- degrees
+    }
+
+
+toBankingPoint : Vec3 -> BankingPoint
+toBankingPoint v =
+    { position = v
+    , banking = 0
+    }
+
+
 type alias Model =
-    { path : List Vec3
+    { path : List BankingPoint
     , sideWidth : Float
     , leftSide : List RoadVertex
     , rightSide : List RoadVertex
@@ -32,9 +45,7 @@ type alias Msg =
     ()
 
 
-create : Float -> List Vec3 -> Vec3 -> ( App, Cmd AppMsg )
-create sideWidth path startPos =
-    App.create (init sideWidth path startPos)
+methods =
         { id = always "road"
         , label = always "Road"
         , update = update
@@ -47,7 +58,21 @@ create sideWidth path startPos =
         }
 
 
-init : Float -> List Vec3 -> Vec3 -> ( Model, Cmd (CtrlMsg Msg) )
+-- Create a flat road (possibly hilly, with ramps and turns, but no banking)
+create : Float -> List Vec3 -> Vec3 -> ( App, Cmd AppMsg )
+create sideWidth path startPos =
+    App.create (init sideWidth (List.map toBankingPoint path) startPos)
+        methods
+
+
+-- Create a road with banking
+racetrack : Float -> List BankingPoint -> Vec3 -> ( App, Cmd AppMsg )
+racetrack sideWidth path startPos =
+    App.create (init sideWidth path startPos)
+        methods
+
+
+init : Float -> List BankingPoint -> Vec3 -> ( Model, Cmd (CtrlMsg Msg) )
 init sideWidth path startPos =
     let
         (leftSide, rightSide) =
@@ -229,7 +254,7 @@ roadMesh leftSide rightSide =
         |> triangleStrip
     
 
-toRoadVertices : List Vec3 -> List RoadVertex
+toRoadVertices : List BankingPoint -> List RoadVertex
 toRoadVertices path =
     let
         thickness = 0.01
@@ -241,19 +266,25 @@ toRoadVertices path =
                 V3.setY (y+thickness) v
 
         start v1 v2 =
-            { position = addThickness v1
-            , normal = uprightNormal v1 v2
+            { position = addThickness v1.position
+            , normal =
+                uprightCross v1 v2
+                |> bankNormal v1.banking
             , coord = vec3 0 0 0
             }
         end v1 v2 prev =
-            { position = addThickness v2
-            , normal = uprightNormal v1 v2
-            , coord = nextCoord v1 v2 prev.coord
+            { position = addThickness v2.position
+            , normal =
+                uprightCross v1 v2
+                |> bankNormal v2.banking
+            , coord = nextCoord v1.position v2.position prev.coord
             }
         middle v1 v2 v3 prev =
-            { position = addThickness v2
-            , normal = interpolateNormal v1 v2 v3
-            , coord = nextCoord v1 v2 prev.coord
+            { position = addThickness v2.position
+            , normal =
+                interpolateCross v1 v2 v3
+                |> bankNormal v2.banking
+            , coord = nextCoord v1.position v2.position prev.coord
             }
     in
         foldTriple start end middle path
@@ -267,23 +298,35 @@ nextCoord v1 v2 prevCoord =
     in
         V3.setY (y+d) prevCoord
 
-uprightNormal : Vec3 -> Vec3 -> Vec3
-uprightNormal v1 v2 =
+
+bankNormal : Float -> (Vec3, Vec3) -> Vec3
+bankNormal banking (upright, crosswalk) =
     let
-        rise = V3.normalize (V3.sub v2 v1)
-        crossWalk = V3.cross V3.j rise
+        axis = V3.cross upright crosswalk
+        o = Orientation.fromAngleAxis (degrees banking) axis
     in
-        V3.cross crossWalk rise
+        Orientation.rotateBodyV o upright
 
 
-interpolateNormal : Vec3 -> Vec3 -> Vec3 -> Vec3
-interpolateNormal v1 v2 v3 =
+uprightCross : BankingPoint -> BankingPoint -> (Vec3, Vec3)
+uprightCross v1 v2 =
     let
-        norm12 = uprightNormal v1 v2
-        norm23 = uprightNormal v2 v3
+        rise = V3.normalize (V3.sub v2.position v1.position)
+        crosswalk = V3.cross V3.j rise
     in
-        V3.add norm12 norm23
-        |> V3.scale 0.5
+        (V3.cross crosswalk rise, crosswalk)
+
+
+interpolateCross : BankingPoint -> BankingPoint -> BankingPoint -> (Vec3, Vec3)
+interpolateCross v1 v2 v3 =
+    let
+        (norm12, cross12) = uprightCross v1 v2
+        (norm23, cross23) = uprightCross v2 v3
+
+        mean u1 u2 =
+            V3.scale 0.5 (V3.add u1 u2)
+    in
+        (mean norm12 norm23, mean cross12 cross23)
 
 
 roadSides : Float -> List RoadVertex -> (List RoadVertex, List RoadVertex)
