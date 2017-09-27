@@ -36,6 +36,7 @@ toBankingPoint v =
 type alias Model =
     { path : List BankingPoint
     , sideWidth : Float
+    , startY : Float
     , leftSide : List RoadVertex
     , rightSide : List RoadVertex
     , body : Body
@@ -84,6 +85,7 @@ init sideWidth path startPos =
         model =
             { path = path
             , sideWidth = sideWidth
+            , startY = V3.getY startPos
             , leftSide = leftSide
             , rightSide = rightSide
             , body = body
@@ -102,15 +104,15 @@ update msg model =
 animate : Ground -> Time -> Model -> ( Model, Cmd (CtrlMsg Msg) )
 animate ground dt model =
     let
-        aboveGround pos =
+        needRelocation pos =
             let
-                minY =
-                    ground.elevation pos
+                wantY =
+                    model.startY + ground.elevation pos
             in
-                if V3.getY pos >= minY then
+                if V3.getY pos == wantY then
                     Nothing
                 else
-                    Just <| V3.setY minY pos
+                    Just <| V3.setY wantY pos
 
         setPosition body pos =
             { body | position = pos }
@@ -125,7 +127,7 @@ animate ground dt model =
             in
                 ( newModel, addFloor )
     in
-        case aboveGround model.body.position of
+        case needRelocation model.body.position of
             Nothing ->
                 ( model, Cmd.none )
             Just newPos ->
