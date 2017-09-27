@@ -31,7 +31,7 @@ drive = move Nothing
 aboveWater : Float -> Ground -> Ground
 aboveWater hover ground =
     let
-        eyeLevel pos =
+        elevation pos =
             hover + max ground.seaLevel (ground.elevation pos)
 
         waterBounds : Float -> Vec3 -> Vec3
@@ -44,7 +44,7 @@ aboveWater hover ground =
     in
         { ground
             | bounds = waterBounds
-            , elevation = eyeLevel
+            , elevation = elevation
         }
 
 hovercraft : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
@@ -59,8 +59,17 @@ boat attributes dimensions ground inputs thing =
 
 move : Maybe (List GroundSurface) -> Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 move surfaces attributes dimensions ground inputs motion =
-    motion
-        |> turn attributes dimensions ground.elevation inputs.x inputs.dt
+    let
+        tireFloor pos =
+            let
+                tirePos = pos -- V3.add (vec3 0 0.1 0) pos
+            in
+                Maybe.withDefault
+                    (ground.elevation tirePos)
+                    (Maybe.map (\d -> V3.getY tirePos - d) (ground.nearestFloor tirePos))
+    in
+        motion
+        |> turn attributes dimensions tireFloor inputs.x inputs.dt
         |> goForward ground attributes.speed inputs
         |> gravity ground inputs.dt
         |> physics surfaces ground attributes.height inputs.dt
@@ -89,8 +98,8 @@ flatten v =
         normalize (vec3 r.x 0 r.z)
 
 
-turn : Driveable vehicle -> Vec3 -> Model.EyeLevel -> Float -> Float -> Moving a -> Moving a
-turn attributes dimensions eyeLevel dx dt motion =
+turn : Driveable vehicle -> Vec3 -> (Vec3 -> Float) -> Float -> Float -> Moving a -> Moving a
+turn attributes dimensions tireFloor dx dt motion =
     let
         vehicleWidth =
             V3.getX dimensions
@@ -105,19 +114,19 @@ turn attributes dimensions eyeLevel dx dt motion =
             vehicleFwdLength / 2.0
 
         centerY =
-            eyeLevel motion.position
+            tireFloor motion.position
 
         frontRightTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 w 0 l)))
+            tireFloor (add motion.position (rotateBodyV motion.orientation (vec3 w 0 l)))
 
         frontLeftTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 w 0 -l)))
+            tireFloor (add motion.position (rotateBodyV motion.orientation (vec3 w 0 -l)))
 
         rearRightTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -w 0 l)))
+            tireFloor (add motion.position (rotateBodyV motion.orientation (vec3 -w 0 l)))
 
         rearLeftTireY =
-            eyeLevel (add motion.position (rotateBodyV motion.orientation (vec3 -w 0 -l)))
+            tireFloor (add motion.position (rotateBodyV motion.orientation (vec3 -w 0 -l)))
 
         frontTireY =
             max frontLeftTireY frontRightTireY
@@ -155,10 +164,11 @@ turn attributes dimensions eyeLevel dx dt motion =
                 vec3 0 y z
 
         steer =
-            0.4 * dx * dt
+            -- 0.4 * dx * dt
+            2.0 * dx * dt
 
         targetOrientation =
-            if getY motion.position > (eyeLevel motion.position) + 0.5 then
+            if getY motion.position > (tireFloor motion.position) + 0.5 then
                 -- spin if in the air
                 motion.orientation
                     |> rollUpright
@@ -178,7 +188,6 @@ turn attributes dimensions eyeLevel dx dt motion =
 
 goForward : Ground -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
 goForward ground speed inputs motion =
-    -- if getY motion.position > eyeLevel motion.position then motion else
     let
         accel =
             if getY motion.position > (ground.elevation motion.position) + 0.5 then
@@ -234,24 +243,26 @@ physics : Maybe (List GroundSurface) -> Ground -> Float -> Float -> Moving a -> 
 physics mSurfaces ground height dt motion =
     let
         pos =
-            add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
+            V3.add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
+            
+        topPos =
+            V3.add (vec3 0 height 0) pos
 
         targetSurface =
-            ground.surface pos
+            ground.surface topPos
 
         p =
             V3.toRecord pos
 
-        e = height +
-            Maybe.withDefault
-                (ground.elevation pos)
-                (Maybe.map (\d -> V3.getY pos - d) (ground.nearestFloor pos))
+        e = Maybe.withDefault
+                (ground.elevation topPos)
+                (Maybe.map (\d -> V3.getY topPos - d) (ground.nearestFloor topPos))
 
         vy0 =
             getY motion.velocity
 
         ( pos_, dv ) =
-            if p.y < e + 0.5 then
+            if p.y < e then
                 let
                     vy =
                         -- if ((e < (0.8 * 80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10 * dt) then
@@ -294,7 +305,6 @@ keepWithinbounds ground radius motion =
 
 gravity : Ground -> Float -> Moving a -> Moving a
 gravity ground dt motion =
-    -- if getY motion.position <= eyeLevel motion.position then
     if (Maybe.withDefault 0 (ground.nearestFloor motion.position) <= 0.0) then
         motion
     else

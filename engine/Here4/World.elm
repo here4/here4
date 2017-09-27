@@ -973,4 +973,4 @@ worldGround (WorldKey worldKey ()) model =
                 Maybe.map withFloors world.maybeGround
     in
         Bag.get worldKey model.worlds
-            |> Maybe.andThen groundWithFloors
+        |> Maybe.andThen groundWithFloors
