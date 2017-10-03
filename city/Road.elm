@@ -7,9 +7,11 @@ import Here4.App.Types exposing (..)
 import Here4.Appearance exposing (..)
 import Here4.Body exposing (..)
 import Here4.Dispatch exposing (..)
+import Here4.Ground exposing (GroundSurface(..), Barrier, Quad(..), barrierFromQuads, relativeBarrier)
 import Here4.Orientation as Orientation
 import Html exposing (Html)
 import Html.Attributes as Html
+import List.Extra as List
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import Math.Vector4 as V4 exposing (vec4)
 import Math.Matrix4 as M4
@@ -122,8 +124,8 @@ animate ground dt model =
                 newModel =
                     { model | body = setPosition model.body newPos }
                 addFloor =
-                    Task.succeed (distanceToNearestFloor newModel)
-                        |> Task.perform (Effect << AddFloor ())
+                    Task.succeed (findBarrier newModel)
+                        |> Task.perform (Effect << AddBarrier ())
             in
                 ( newModel, addFloor )
     in
@@ -148,22 +150,43 @@ overlay _ =
 
 
 -- Vertical distance (downwards) to nearest floor
-distanceToNearestFloor : Model -> Vec3 -> Maybe Float
-distanceToNearestFloor model pos =
+findBarrier : Model -> Barrier
+findBarrier model =
+{-
     let
         relativePos =
-            V3.sub pos model.body.position
+            V3.sub ray.origin model.body.position
+
+        psDistance2 ray v =
+            V3.distanceSquared ray.origin v
     in
         List.map2 (,) model.leftSide model.rightSide
         |> mapPair (always Nothing)
             (\(a,b) (d,c) ->
                 distanceToQuad a.position b.position c.position d.position
-                    relativePos (vec3 0 -1 0))
+                    relativePos ray.vector)
         |> Maybe.values
-        |> List.minimum
+        |> List.minimumBy (psDistance2 ray)
+        |> Maybe.map (\p -> { position = p, surface = Grass })
+-}
+{-
+    let
+        relativeRay =
+            { position = V3.sub ray.origin model.body.position
+            , vector = ray.vector
+            }
+    in
+-}
+        List.map2 (,) model.leftSide model.rightSide
+        |> mapPair (always Nothing)
+            (\(a,b) (d,c) -> Just (Quad a.position b.position c.position d.position))
+        |> Maybe.values
+        -- |> (\quads -> barrierFromQuads Grass quads relativeRay)
+        |> barrierFromQuads Grass
+        |> relativeBarrier model.body.position
 
-
-distanceToQuad : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Maybe Float
+{-
+distanceToQuad : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Maybe Vec3
 distanceToQuad a b c d p0 p =
     let
         n = V3.normalize <| V3.cross (V3.sub b a) (V3.sub d a)
@@ -171,8 +194,8 @@ distanceToQuad a b c d p0 p =
         hitInsideQuad = insideQuad a b c d
     in
         Maybe.filter hitInsideQuad hitPoint
-        |> Maybe.map (V3.distance p0)
-
+        -- |> Maybe.map (V3.distance p0)
+-}
 
 ----------------------------------------------------------------------
 

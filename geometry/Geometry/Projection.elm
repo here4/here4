@@ -36,7 +36,10 @@ intersectPlane v n p0 p =
                 fac = -(V3.dot n w / d)
                 u = V3.scale fac p
             in
-                Just (V3.add p0 u)
+                if (fac >= 0.0 && fac <= 1.0) then
+                    Just (V3.add p0 u)
+                else
+                    Nothing
         else
             Nothing
 

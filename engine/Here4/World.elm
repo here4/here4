@@ -9,13 +9,14 @@ import Here4.Body exposing (Body)
 import Here4.Camera.Types exposing (Framing, Shot)
 import Here4.Control exposing (..)
 import Here4.Dispatch exposing (..)
-import Here4.Ground exposing (Ground, Floor)
+import Here4.Ground exposing (Ground, Barrier, joinBarriers)
 import Here4.Location exposing (..)
 import Here4.Model as Model exposing (GlobalMsg, NavigatorMsg, WorldKey(..), AppKey(..), PartyKey(..))
 import Here4.Navigator.Control exposing (NavMsg)
 import Here4.Orientation as Orientation exposing (Orientation)
 import Here4.Space as Space
 import Html exposing (Html)
+import List.Extra as List
 import Math.Vector3 as V3 exposing (vec3)
 import Maybe.Extra as Maybe exposing (isJust)
 import Task
@@ -42,7 +43,7 @@ type alias World =
     , label : String
     , backgroundColor : Color
     , maybeGround : Maybe Ground
-    , floors : List Floor
+    , barriers : List Barrier
     , apps : Bag App
     , parties : Bag Party
     , defaultSelf : ( App, Cmd AppMsg )
@@ -135,7 +136,7 @@ oneWorldInit attributes ( oldWorlds, oldCmds ) =
             , label = attributes.label
             , backgroundColor = attributes.backgroundColor
             , maybeGround = Nothing
-            , floors = []
+            , barriers = []
             , apps = Bag.empty
             , parties = Bag.empty
             , defaultSelf = attributes.defaultSelf
@@ -217,8 +218,8 @@ toWorldEffect worldKey appKey e =
         UpdateGround () ground ->
             UpdateGround worldKey ground
 
-        AddFloor () floor ->
-            AddFloor worldKey floor
+        AddBarrier () barrier ->
+            AddBarrier worldKey barrier
 
         RelocateParty () partyKey location ->
             RelocateParty worldKey partyKey location
@@ -276,8 +277,8 @@ toAppMsg dispatch =
                 UpdateGround _ ground ->
                     UpdateGround () ground
 
-                AddFloor _ floor ->
-                    AddFloor () floor
+                AddBarrier _ barrier ->
+                    AddBarrier () barrier
 
                 RelocateParty _ partyKey location ->
                     RelocateParty () partyKey location
@@ -492,12 +493,12 @@ worldUpdate hubUpdate msg model =
                 , Cmd.none
                 )
 
-        HubEff (AddFloor (WorldKey worldKey ()) floor) ->
+        HubEff (AddBarrier (WorldKey worldKey ()) barrier) ->
             let
-                updateFloors world =
-                    { world | floors = floor :: world.floors }
+                updateBarriers world =
+                    { world | barriers = barrier :: world.barriers }
             in
-                ( { model | worlds = Bag.update worldKey (Maybe.map updateFloors) model.worlds }
+                ( { model | worlds = Bag.update worldKey (Maybe.map updateBarriers) model.worlds }
                 , Cmd.none
                 )
 
@@ -959,18 +960,14 @@ worldFocus appKey model =
 worldGround : WorldKey () -> Multiverse model -> Maybe Ground
 worldGround (WorldKey worldKey ()) model =
     let
-        groundWithFloors : World -> Maybe Ground
-        groundWithFloors world =
+        groundWithBarriers : World -> Maybe Ground
+        groundWithBarriers world =
             let
-                nearestFloor g p =
-                    g p :: List.map (\floor -> floor p) world.floors
-                    |> Maybe.values
-                    |> List.minimum
-
-                withFloors ground =
-                    { ground | nearestFloor = nearestFloor ground.nearestFloor }
+                withBarriers ground =
+                    { ground | barrier = joinBarriers (ground.barrier :: world.barriers)
+                    }
             in
-                Maybe.map withFloors world.maybeGround
+                Maybe.map withBarriers world.maybeGround
     in
         Bag.get worldKey model.worlds
-        |> Maybe.andThen groundWithFloors
+        |> Maybe.andThen groundWithBarriers
