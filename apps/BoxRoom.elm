@@ -16,7 +16,7 @@ import Here4.Body exposing (..)
 import Here4.Bounding exposing (emplace)
 import Here4.Bounding.Box exposing (boundingBox)
 import Here4.Dispatch exposing (..)
-import Here4.Ground as Ground
+import Here4.Ground as Ground exposing (barrierFromQuads, Quad(..))
 import Here4.Orientation as Orientation
 import Here4.Primitive.Cube as Cube
 import Here4.Setter exposing (..)
@@ -162,19 +162,37 @@ init attributes =
             , dimensions = attributes.dimensions
             }
 
-        nearestFloor p =
+        barrier =
             let
-                y = V3.getY p
+                x0 = V3.getX originPosition
+                x1 = x0 + width
+                y0 = V3.getY originPosition
+                y1 = y0 + height
+                z0 = V3.getZ originPosition
+                z1 = z0 + length
+
+                fSW = vec3 x0 y0 z0
+                fSE = vec3 x1 y0 z0
+                fNW = vec3 x0 y0 z1
+                fNE = vec3 x1 y0 z1
+                cSW = vec3 x0 y1 z0
+                cSE = vec3 x1 y1 z0
+                cNW = vec3 x0 y1 z1
+                cNE = vec3 x1 y1 z1
             in
-                if y >= attributes.floor then
-                    Just (y - attributes.floor)
-                else
-                    Nothing
+                barrierFromQuads Ground.Grass
+                    [ Quad fSW fSE fNE fNW
+                    , Quad fSW fNW cNW cSW
+                    , Quad fNW fNE cNE cNW
+                    , Quad fNE fSE cSE cNE
+                    , Quad fSE fSW cSW cSE
+                    , Quad cNW cNE cSE cSW
+                    ]
 
         ground =
             { bounds = emplace (boundingBox box)
             , elevation = always attributes.floor
-            , nearestFloor = nearestFloor
+            , barrier = barrier
             , seaLevel = 0.0
             , surface = always Ground.Grass
             , coordRangeX =
