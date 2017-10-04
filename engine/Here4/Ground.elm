@@ -4,6 +4,7 @@ module Here4.Ground
         , GroundSurface(..)
         , Ray
         , Quad(..)
+        , nearestFloor
         , intersectQuad
         , BarrierPoint
         , Barrier
@@ -17,7 +18,7 @@ module Here4.Ground
 
 
 import Geometry.Projection exposing (..)
-import Math.Vector3 as V3 exposing (Vec3)
+import Math.Vector3 as V3 exposing (Vec3, vec3)
 import List.Extra as List -- barrier
 import Maybe.Extra as Maybe -- barrier
 import Here4.Orientation as Orientation exposing (Orientation)
@@ -61,6 +62,19 @@ type alias Ground =
     , coordRangeX : ( Float, Float )
     , coordRangeZ : ( Float, Float )
     }
+
+
+nearestFloor : Ground -> Vec3 -> Float
+nearestFloor ground pos =
+    let
+        ray =
+            { origin = pos
+            , vector = vec3 0 -1 0
+            }
+    in
+        ground.barrier ray
+        |> Maybe.map (\b -> V3.distance pos b.position)
+        |> Maybe.withDefault 1e7
 
 
 type Quad =

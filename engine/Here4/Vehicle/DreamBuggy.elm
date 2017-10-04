@@ -64,9 +64,7 @@ move surfaces attributes dimensions ground inputs motion =
             let
                 tirePos = pos -- V3.add (vec3 0 0.1 0) pos
             in
-                Maybe.withDefault
-                    (ground.elevation tirePos)
-                    (Maybe.map (\d -> V3.getY tirePos - d) (ground.nearestFloor tirePos))
+                V3.getY tirePos - nearestFloor ground tirePos
     in
         motion
         |> turn attributes dimensions tireFloor inputs.x inputs.dt
@@ -254,9 +252,7 @@ physics mSurfaces ground height dt motion =
         p =
             V3.toRecord pos
 
-        e = Maybe.withDefault
-                (ground.elevation topPos)
-                (Maybe.map (\d -> V3.getY topPos - d) (ground.nearestFloor topPos))
+        e = V3.getY topPos - nearestFloor ground topPos
 
         vy0 =
             getY motion.velocity
@@ -305,7 +301,7 @@ keepWithinbounds ground radius motion =
 
 gravity : Ground -> Float -> Moving a -> Moving a
 gravity ground dt motion =
-    if (Maybe.withDefault 0 (ground.nearestFloor motion.position) <= 0.0) then
+    if nearestFloor ground motion.position <= 0.0 then
         motion
     else
         let

@@ -108,10 +108,7 @@ physics ground height dt motion =
         p =
             V3.toRecord pos
 
-        e = height +
-            Maybe.withDefault
-                (ground.elevation pos)
-                (Maybe.map (\d -> V3.getY pos - d) (ground.nearestFloor pos))
+        e = height + V3.getY pos - nearestFloor ground pos
 
         vy0 =
             getY motion.velocity
@@ -151,7 +148,7 @@ keepWithinbounds ground radius motion =
 gravity : Ground -> Float -> Float -> Moving a -> Moving a
 gravity ground height dt motion =
     -- if getY motion.position <= eyeLevel motion.position then
-    if (Maybe.withDefault 0 (ground.nearestFloor motion.position) <= height) then
+    if (nearestFloor ground motion.position <= height) then
         motion
     else
         let
