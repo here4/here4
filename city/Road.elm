@@ -42,6 +42,7 @@ type alias Model =
     , leftSide : List RoadVertex
     , rightSide : List RoadVertex
     , body : Body
+    , haveSetBarrier : Bool
     }
 
 type alias Msg =
@@ -91,6 +92,7 @@ init sideWidth path startPos =
             , leftSide = leftSide
             , rightSide = rightSide
             , body = body
+            , haveSetBarrier = False
             }
     in
         ( model
@@ -111,7 +113,7 @@ animate ground dt model =
                 wantY =
                     model.startY + ground.elevation pos
             in
-                if V3.getY pos == wantY then
+                if model.haveSetBarrier && V3.getY pos == wantY then
                     Nothing
                 else
                     Just <| V3.setY wantY pos
@@ -122,7 +124,10 @@ animate ground dt model =
         result newPos =
             let
                 newModel =
-                    { model | body = setPosition model.body newPos }
+                    { model | body = setPosition model.body newPos
+                            , haveSetBarrier = True
+                    }
+
                 addFloor =
                     Task.succeed (findBarrier newModel)
                         |> Task.perform (Effect << AddBarrier ())
