@@ -4,6 +4,7 @@ module Here4.Ground
         , GroundSurface(..)
         , Ray
         , Quad(..)
+        , intersectQuad
         , BarrierPoint
         , Barrier
         , joinBarriers

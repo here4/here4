@@ -5,10 +5,12 @@ module Here4.Tiles
         )
 
 import Array2D exposing (Array2D)
+import Geometry.Projection exposing (..)
 import Here4.Body exposing (Body)
 import Here4.Ground exposing (..)
 import Here4.Placement as Placement exposing (Placement)
 import Math.Vector3 as V3 exposing (Vec3, vec3, getX, getZ)
+import Maybe.Extra as Maybe -- barrier
 
 
 type alias Tiles =
@@ -22,37 +24,45 @@ createTileGround : Tiles -> ( Ground, List Body )
 createTileGround tiles =
     let
         yMult = tiles.placement.yMult
-
-        snowLevel = 0.8 * yMult
-        beachLevel = 0.15 * yMult
         seaLevel = 0.1 * yMult
-        deepSeaLevel = -0.4 * yMult
-
-        surface pos =
-            let
-                h = tileElevation tiles pos
-            in
-                if h > snowLevel then
-                    Snow
-                else if h < deepSeaLevel then
-                    DeepWater
-                else if h <= seaLevel then
-                    ShallowWater
-                else if h < beachLevel then
-                    Beach
-                else
-                    Grass
     in
         ( { bounds = tileBounds tiles
           , elevation = tileElevation tiles
-          , nearestFloor = tileFloor tiles
+          , barrier = tileBarrier tiles
           , seaLevel = seaLevel
-          , surface = surface
+          , surface = tileSurface tiles
           , coordRangeX = Placement.coordRangeX tiles.placement
           , coordRangeZ = Placement.coordRangeZ tiles.placement
           }
         , tiles.bodies
         )
+
+
+tileSurface : Tiles -> Vec3 -> GroundSurface
+tileSurface tiles pos =
+    surfaceAtElevation tiles (tileElevation tiles pos)
+
+
+surfaceAtElevation : Tiles -> Float -> GroundSurface
+surfaceAtElevation tiles h =
+    let
+        yMult = tiles.placement.yMult
+
+        snowLevel = 0.8 * yMult
+        beachLevel = 0.15 * yMult
+        seaLevel = 0.1 * yMult
+        deepSeaLevel = -0.4 * yMult
+    in
+        if h > snowLevel then
+            Snow
+        else if h < deepSeaLevel then
+            DeepWater
+        else if h <= seaLevel then
+            ShallowWater
+        else if h < beachLevel then
+            Beach
+        else
+            Grass
 
 
 tileBounds : Tiles -> Float -> Vec3 -> Vec3
@@ -161,3 +171,112 @@ tileFloor tiles p =
             Just (y - e)
         else
             Nothing
+
+
+tileBarrier : Tiles -> Barrier
+tileBarrier tiles ray =
+    let
+        fromPosition p =
+            { position = p
+            , surface = surfaceAtElevation tiles (V3.getY p)
+            }
+    in
+        List.map (quadAt tiles) (nearbyIndices tiles.placement ray)
+        |> List.map (intersectQuad ray)
+        |> Maybe.values
+        |> List.head
+        |> Maybe.map fromPosition
+
+
+nearbyIndices : Placement -> Ray -> List (Int, Int)
+nearbyIndices placement ray =
+    let
+        ix0 =
+            (getX ray.origin - placement.xOffset) / placement.xDelta
+
+        ix =
+            floor ix0
+
+        iz0 =
+            (getZ ray.origin - placement.zOffset) / placement.zDelta
+
+        iz =
+            floor iz0
+
+        vx =
+            V3.getX ray.vector
+
+        vz =
+            V3.getZ ray.vector
+
+        sgn v =
+            if abs v < 1e-3 then
+                0
+            else if v < 0 then
+                -1
+            else
+                1
+
+        xrange d =
+            if abs vx < 1e-3 then
+                [ix]
+            else if vx < 0 then
+                List.range (max 0 (ix-d)) ix
+            else
+                List.range ix (min placement.tileSize (ix+d))
+
+        zrange d =
+            if abs vz < 1e-3 then
+                [iz]
+            else if vz < 0 then
+                List.range (max 0 (iz-d)) iz
+            else
+                List.range iz (min placement.tileSize (iz+d))
+
+        rowAtDistance d =
+            List.map (\x -> (x, iz + (d * sgn vz))) (xrange d)
+
+        colAtDistance d =
+            List.map (\z -> (ix + (d * sgn vx), z)) (zrange d)
+
+        radius d =
+            rowAtDistance d ++ colAtDistance d
+
+        maxXD =
+            if abs vx < 1e-3 then
+                0
+            else if vx < 0 then
+                ix
+            else
+                placement.tileSize - ix - 1
+
+        maxZD =
+            if abs vz < 1e-3 then
+                0
+            else if vz < 0 then
+                iz
+            else
+                placement.tileSize - iz - 1
+
+        maxRadius =
+            max maxXD maxZD
+    in
+        List.concatMap radius (List.range 0 maxRadius)
+
+
+quadAt : Tiles -> (Int, Int) -> Quad
+quadAt { placement, elevations } (ix, iz) =
+    let
+        getY x z =
+            (Array2D.getXY x z 0 elevations) * placement.yMult
+
+        getX x =
+            toFloat x * placement.xDelta + placement.xOffset
+
+        getZ z =
+            toFloat z * placement.zDelta + placement.zOffset
+
+        pos x z =
+            vec3 (getX x) (getY x z) (getZ z)
+    in
+        Quad (pos ix iz) (pos (ix+1) iz) (pos (ix+1) (iz+1)) (pos ix (iz+1))
