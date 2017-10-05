@@ -153,54 +153,14 @@ overlay _ =
 
 ----------------------------------------------------------------------
 
-
--- Vertical distance (downwards) to nearest floor
 findBarrier : Model -> Barrier
 findBarrier model =
-{-
-    let
-        relativePos =
-            V3.sub ray.origin model.body.position
-
-        psDistance2 ray v =
-            V3.distanceSquared ray.origin v
-    in
-        List.map2 (,) model.leftSide model.rightSide
-        |> mapPair (always Nothing)
-            (\(a,b) (d,c) ->
-                distanceToQuad a.position b.position c.position d.position
-                    relativePos ray.vector)
-        |> Maybe.values
-        |> List.minimumBy (psDistance2 ray)
-        |> Maybe.map (\p -> { position = p, surface = Grass })
--}
-{-
-    let
-        relativeRay =
-            { position = V3.sub ray.origin model.body.position
-            , vector = ray.vector
-            }
-    in
--}
         List.map2 (,) model.leftSide model.rightSide
         |> mapPair (always Nothing)
             (\(a,b) (d,c) -> Just (Quad a.position b.position c.position d.position))
         |> Maybe.values
-        -- |> (\quads -> barrierFromQuads Grass quads relativeRay)
         |> barrierFromQuads Grass
         |> relativeBarrier model.body.position
-
-{-
-distanceToQuad : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Maybe Vec3
-distanceToQuad a b c d p0 p =
-    let
-        n = V3.normalize <| V3.cross (V3.sub b a) (V3.sub d a)
-        hitPoint = intersectPlane a n p0 p
-        hitInsideQuad = insideQuad a b c d
-    in
-        Maybe.filter hitInsideQuad hitPoint
-        -- |> Maybe.map (V3.distance p0)
--}
 
 ----------------------------------------------------------------------
 
