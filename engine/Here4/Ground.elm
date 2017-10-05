@@ -137,8 +137,11 @@ relativeBarrier relativePosition barrier ray =
             { origin = V3.sub ray.origin relativePosition
             , vector = ray.vector
             }
+
+        restore p =
+            { p | position = V3.add p.position relativePosition }
     in
-        barrier relativeRay
+        Maybe.map restore (barrier relativeRay)
 
 -- eg. for use with AddApps.addSomewhere
 aboveSeaLevel : Ground -> Vec3 -> Bool
