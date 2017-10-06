@@ -49,10 +49,6 @@ type alias Barrier =
     Ray -> Maybe BarrierPoint
 
 
-type alias Floor =
-    Vec3 -> Maybe Float
-
-
 type alias Ground =
     { bounds : Float {- Radius -} -> Vec3 -> Vec3
     , barrier : Barrier
