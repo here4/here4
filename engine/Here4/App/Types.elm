@@ -12,9 +12,10 @@ module Here4.App.Types exposing
 
 import Dynamic exposing (Dynamic)
 import Here4.Body exposing (..)
+import Here4.Barrier exposing (Barrier)
 import Here4.Camera.Types exposing (Framing)
 import Here4.Dispatch exposing (..)
-import Here4.Ground exposing (Ground, Barrier)
+import Here4.Ground exposing (Ground)
 import Here4.Location exposing (Location)
 import Here4.Model exposing (Inputs, AppKey, PartyKey)
 import Here4.Orientation exposing (Orientation)

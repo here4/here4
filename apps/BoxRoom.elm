@@ -12,11 +12,11 @@ module BoxRoom
 import Here4.App as App exposing (..)
 import Here4.App.Types exposing (..)
 import Here4.Appearance exposing (Appearance)
+import Here4.Barrier as Barrier exposing (GroundSurface(..), barrierFromQuads, Quad(..))
 import Here4.Body exposing (..)
 import Here4.Bounding exposing (emplace)
 import Here4.Bounding.Box exposing (boundingBox)
 import Here4.Dispatch exposing (..)
-import Here4.Ground as Ground exposing (barrierFromQuads, Quad(..))
 import Here4.Orientation as Orientation
 import Here4.Primitive.Cube as Cube
 import Here4.Setter exposing (..)
@@ -180,7 +180,7 @@ init attributes =
                 cNW = vec3 x0 y1 z1
                 cNE = vec3 x1 y1 z1
             in
-                barrierFromQuads Ground.Grass
+                barrierFromQuads Grass
                     [ Quad fSW fSE fNE fNW
                     , Quad fSW fNW cNW cSW
                     , Quad fNW fNE cNE cNW
@@ -194,7 +194,7 @@ init attributes =
             , elevation = always attributes.floor
             , barrier = barrier
             , seaLevel = 0.0
-            , surface = always Ground.Grass
+            , surface = always Grass
             , coordRangeX =
                 let
                     minX =

@@ -24,6 +24,7 @@
         "Geometry.VertexStrip",
         "Here4.App",
         "Here4.App.Types",
+        "Here4.Barrier",
         "Here4.Body",
         "Here4.Bounding",
         "Here4.Bounding.Box",

@@ -2,10 +2,11 @@ module Here4.Vehicle.Walking exposing (drive, overlay)
 
 import Color exposing (white)
 import FontAwesome
-import Here4.Orientation as Orientation exposing (..)
+import Here4.Barrier exposing (..)
 import Here4.Body exposing (..)
+import Here4.Ground exposing (Ground, nearestFloor)
 import Here4.Model as Model
-import Here4.Ground exposing (..)
+import Here4.Orientation as Orientation exposing (..)
 import Here4.Vehicle exposing (Driveable)
 import Html exposing (Html)
 import Html.Attributes as Html

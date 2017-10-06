@@ -6,6 +6,7 @@ module Here4.Tiles
 
 import Array2D exposing (Array2D)
 import Geometry.Projection exposing (..)
+import Here4.Barrier exposing (..)
 import Here4.Body exposing (Body)
 import Here4.Ground exposing (..)
 import Here4.Placement as Placement exposing (Placement)

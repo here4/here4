@@ -2,6 +2,7 @@ module Here4.Vehicle.DreamBuggy exposing (drive, hovercraft, boat, overlay)
 
 import Color exposing (white)
 import FontAwesome
+import Here4.Barrier exposing (..)
 import Here4.Body exposing (..)
 import Here4.Ground exposing (..)
 import Here4.Model as Model

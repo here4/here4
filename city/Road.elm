@@ -5,9 +5,9 @@ import Geometry.VertexStrip exposing (..)
 import Here4.App as App exposing (..)
 import Here4.App.Types exposing (..)
 import Here4.Appearance exposing (..)
+import Here4.Barrier exposing (GroundSurface(..), Barrier, Quad(..), barrierFromQuads, relativeBarrier)
 import Here4.Body exposing (..)
 import Here4.Dispatch exposing (..)
-import Here4.Ground exposing (GroundSurface(..), Barrier, Quad(..), barrierFromQuads, relativeBarrier)
 import Here4.Orientation as Orientation
 import Html exposing (Html)
 import Html.Attributes as Html
