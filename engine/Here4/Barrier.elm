@@ -13,7 +13,7 @@ module Here4.Barrier
         )
 
 import Geometry.Projection exposing (..)
--- import Here4.Orientation as Orientation exposing (Orientation)
+import Here4.Orientation as Orientation exposing (Orientation)
 import Math.Vector3 as V3 exposing (Vec3, vec3)
 import List.Extra as List
 import Maybe.Extra as Maybe
@@ -51,7 +51,7 @@ type GroundSurface
 
 type alias BarrierPoint =
     { position : Vec3
-    -- , orientation : Orientation
+    , orientation : Orientation
     , surface : GroundSurface
     }
 
@@ -76,6 +76,7 @@ barrierFromQuad surface quad ray =
     let
         fromPosition p =
             { position = p
+            , orientation = Orientation.initial
             , surface = surface
             }
     in

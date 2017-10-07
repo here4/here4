@@ -9,6 +9,7 @@ import Geometry.Projection exposing (..)
 import Here4.Barrier exposing (..)
 import Here4.Body exposing (Body)
 import Here4.Ground exposing (..)
+import Here4.Orientation as Orientation exposing (Orientation)
 import Here4.Placement as Placement exposing (Placement)
 import Math.Vector3 as V3 exposing (Vec3, vec3, getX, getZ)
 import Maybe.Extra as Maybe -- barrier
