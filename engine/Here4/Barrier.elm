@@ -74,9 +74,19 @@ joinBarriers barriers ray =
 barrierFromQuad : GroundSurface -> Quad -> Barrier
 barrierFromQuad surface quad ray =
     let
+        (Quad a b c d) =
+            quad
+
+        mean v1 v2 =
+            V3.scale 0.5 (V3.add v1 v2)
+
+        dir =
+            V3.sub (mean d c) (mean a b)
+            |> V3.normalize
+
         fromPosition p =
             { position = p
-            , orientation = Orientation.initial
+            , orientation = Orientation.fromTo V3.k dir
             , surface = surface
             }
     in
