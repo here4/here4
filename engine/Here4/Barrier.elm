@@ -84,16 +84,9 @@ barrierFromQuad surface quad ray =
 
 barrierFromQuads : GroundSurface -> List Quad -> Barrier
 barrierFromQuads surface quads ray =
-    let
-        fromPosition p =
-            { position = p
-            , surface = surface
-            }
-    in
-        List.map (intersectQuad ray) quads
-        |> Maybe.values
-        |> List.minimumBy (V3.distanceSquared ray.origin)
-        |> Maybe.map fromPosition
+    List.map (\quad -> barrierFromQuad surface quad ray) quads
+    |> Maybe.values
+    |> List.minimumBy (\b -> V3.distanceSquared ray.origin b.position)
 
 
 relativeBarrier : Vec3 -> Barrier -> Barrier
