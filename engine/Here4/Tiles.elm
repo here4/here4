@@ -177,16 +177,19 @@ tileFloor tiles p =
 tileBarrier : Tiles -> Barrier
 tileBarrier tiles ray =
     let
-        fromPosition p =
-            { position = p
-            , surface = surfaceAtElevation tiles (V3.getY p)
+        setSurface barrier =
+            { barrier
+                | surface = surfaceAtElevation tiles (V3.getY barrier.position)
             }
+
+        fromQuad q =
+            barrierFromQuad Grass q ray
+            |> Maybe.map setSurface
     in
         List.map (quadAt tiles) (nearbyIndices tiles.placement ray)
-        |> List.map (intersectQuad ray)
+        |> List.map fromQuad
         |> Maybe.values
         |> List.head
-        |> Maybe.map fromPosition
 
 
 nearbyIndices : Placement -> Ray -> List (Int, Int)

@@ -7,6 +7,7 @@ module Here4.Barrier
         , BarrierPoint
         , Barrier
         , joinBarriers
+        , barrierFromQuad
         , barrierFromQuads
         , relativeBarrier
         )
