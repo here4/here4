@@ -28,26 +28,52 @@ drive attributes dimensions ground inputs thing =
 move : Driveable vehicle -> Ground -> Float -> Model.Inputs -> Moving a -> Moving a
 move attributes ground height inputs motion =
     motion
-        |> turn attributes.speed inputs.x inputs.dt
+        |> turn ground attributes.speed height inputs.x inputs.dt
         |> goForward ground attributes.speed inputs
         |> gravity ground height inputs.dt
         |> physics ground height inputs.dt
         |> keepWithinbounds ground attributes.radius
 
 
-turn : Float -> Float -> Float -> Moving a -> Moving a
-turn speed dx dt motion =
+turn : Ground -> Float -> Float -> Float -> Float -> Moving a -> Moving a
+turn ground speed height dx dt motion =
     let
         steer =
             0.1 * speed * dx * dt
 
+        down =
+            vec3 0 -height 0
+
+        currentDown =
+            Orientation.rotateBodyV motion.orientation down
+
+        ray =
+            { origin = motion.position
+            , vector = currentDown
+            }
+
+        (reorient, newPosition) =
+            case ground.barrier ray of
+                Just barrierPoint ->
+                    let
+                        newDown = Orientation.rotateBodyV barrierPoint.orientation down
+                    in
+                        ( Orientation.followedBy (Orientation.fromTo currentDown newDown)
+                        , V3.sub barrierPoint.position newDown
+                        )
+                Nothing ->
+                    ( rollUpright >> pitchUpright
+                    , motion.position
+                    )
+
         orientation =
             motion.orientation
-                |> rollUpright
-                |> pitchUpright
+                |> reorient
                 |> followedBy (fromAngleAxis steer V3.j)
     in
-        { motion | orientation = orientation }
+        { motion | position = newPosition
+                 , orientation = orientation
+        }
 
 
 goForward : Ground -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
@@ -103,6 +129,26 @@ adjustVelocity maxSpeed friction dv dt v =
 physics : Ground -> Float -> Float -> Moving a -> Moving a
 physics ground height dt motion =
     let
+        orientedVelocity =
+            Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity)
+
+        ray =
+            { origin = motion.position
+            , vector = orientedVelocity
+            }
+
+        potentialPosition =
+            V3.add motion.position orientedVelocity
+    in
+        case ground.barrier ray of
+            Just _ ->
+                { motion | velocity = vec3 0 0 0 }
+            Nothing ->
+                { motion | position = potentialPosition
+                         , velocity = motion.velocity
+                }
+
+{-
         pos =
             add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
 
@@ -128,7 +174,7 @@ physics ground height dt motion =
                 ( pos, vec3 0 0 0 )
     in
         { motion | position = pos_, velocity = V3.add motion.velocity dv }
-
+-}
 
 
 -- | Clamp a vector to be no longer than len

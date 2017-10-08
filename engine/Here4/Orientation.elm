@@ -204,11 +204,11 @@ pitchUpright =
 pitchTo : V3.Vec3 -> Orientation -> Orientation
 pitchTo targetUp o =
     let
-        -- Camera forward vector of the original orientation
+        -- Right vector of the original orientation
         right =
             rotateBodyV o V3.i
 
-        -- Camera up vector of the original orientation
+        -- Up vector of the original orientation
         up =
             rotateBodyV o V3.j
 

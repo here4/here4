@@ -80,13 +80,27 @@ barrierFromQuad surface quad ray =
         mean v1 v2 =
             V3.scale 0.5 (V3.add v1 v2)
 
-        dir =
-            V3.sub (mean d c) (mean a b)
+        n =
+            V3.cross (V3.sub b a) (V3.sub d a)
+
+        towards =
+            if V3.dot n ray.vector > 0 then
+                V3.negate n
+            else
+                n
+
+        dir s1 s2 e1 e2 =
+            V3.sub (mean e1 e2) (mean s1 s2)
             |> V3.normalize
+
+        orientation =
+            Orientation.fromTo V3.j towards
+            |> Orientation.followedBy (Orientation.fromTo V3.i (dir a d b c))
+            |> Orientation.followedBy (Orientation.fromTo V3.k (dir a b d c))
 
         fromPosition p =
             { position = p
-            , orientation = Orientation.fromTo V3.k dir
+            , orientation = orientation
             , surface = surface
             }
     in
