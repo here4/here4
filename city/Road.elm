@@ -302,7 +302,7 @@ uprightCross : BankingPoint -> BankingPoint -> (Vec3, Vec3)
 uprightCross v1 v2 =
     let
         rise = V3.normalize (V3.sub v2.position v1.position)
-        crosswalk = V3.cross V3.j rise
+        crosswalk = V3.cross (vec3 0 -1 0) rise
     in
         (V3.cross crosswalk rise, crosswalk)
 
@@ -380,20 +380,12 @@ corner : Float -> RoadVertex -> RoadVertex -> RoadVertex -> Vec3
 corner sideWidth v1 v2 v3 =
     let
         offset12 = sideOffset sideWidth v1.position v2.position v2.normal
-        pos12_0 = V3.add v1.position offset12
         pos12_1 = V3.add v2.position offset12
-        pos23_0 = V3.add v2.position offset23
-        pos23_1 = V3.add v3.position offset23
 
         offset23 = sideOffset sideWidth v2.position v3.position v2.normal
-
-        -- project both vectors (prev, pos12) and (v2+offset23, v3+offset23)
-        -- onto the same plane (v2.position, v2.normal)
-        -- Then, find their intersection point in that plane
-        l1 = projectPlaneNormal v2.normal (V3.sub pos12_1 pos12_0)
-        l2 = projectPlaneNormal v2.normal (V3.sub pos23_0 pos23_1)
+        pos23_0 = V3.add v2.position offset23
     in
-        Maybe.withDefault pos12_1 (intersectLineLine pos12_1 l1 pos23_0 l2)
+        V3.scale 0.5 (V3.add pos12_1 pos23_0)
 
 
 ----------------------------------------------------------------------
