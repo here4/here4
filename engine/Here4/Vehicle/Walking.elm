@@ -41,39 +41,38 @@ turn ground speed height dx dt motion =
         steer =
             0.1 * speed * dx * dt
 
-        down =
-            vec3 0 -height 0
-
-        currentDown =
-            Orientation.rotateBodyV motion.orientation down
+        currentUp =
+            Orientation.rotateBodyV motion.orientation V3.j
 
         ray =
-            { origin = motion.position
-            , vector = currentDown
+            { origin = V3.add motion.position (V3.scale (height/2) currentUp)
+            , vector = V3.scale -height currentUp
             }
 
-        (reorient, newPosition) =
+        upright =
+            motion.orientation
+            |> Orientation.rollUpright
+            |> Orientation.pitchUpright
+
+        newOrientation =
             case ground.barrier ray of
                 Just barrierPoint ->
                     let
-                        newDown = Orientation.rotateBodyV barrierPoint.orientation down
+                        o = Orientation.fromTo currentUp barrierPoint.normal
                     in
-                        ( Orientation.followedBy (Orientation.fromTo currentDown newDown)
-                        , V3.sub barrierPoint.position newDown
-                        )
+                        motion.orientation
+                        |> Orientation.followedBy o
                 Nothing ->
-                    ( rollUpright >> pitchUpright
-                    , motion.position
-                    )
+                    upright
+
+        newUp =
+            Orientation.rotateBodyV newOrientation V3.j
 
         orientation =
-            motion.orientation
-                |> reorient
-                |> followedBy (fromAngleAxis steer V3.j)
+            newOrientation
+            |> followedBy (fromAngleAxis steer newUp)
     in
-        { motion | position = newPosition
-                 , orientation = orientation
-        }
+        { motion | orientation = orientation }
 
 
 goForward : Ground -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
@@ -132,21 +131,65 @@ physics ground height dt motion =
         orientedVelocity =
             Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity)
 
-        ray =
-            { origin = motion.position
+        currentUp =
+            Orientation.rotateBodyV motion.orientation V3.j
+
+        forwardRay =
+            { origin = V3.add motion.position (V3.scale (height/2) currentUp)
             , vector = orientedVelocity
             }
 
-        potentialPosition =
-            V3.add motion.position orientedVelocity
+        newMotion =
+            case ground.barrier forwardRay of
+                Just barrierPoint ->
+                    let
+                        newPosition =
+                            V3.add barrierPoint.position (V3.scale 0.01 barrierPoint.normal)
+                    in
+                        { motion | position = newPosition }
+
+                Nothing ->
+                    let
+                        wantPosition = V3.add motion.position orientedVelocity
+
+                        newDown =
+                            Orientation.rotateBodyV motion.orientation (vec3 0 -height 0)
+
+                        downRay =
+                            { origin = V3.sub wantPosition (V3.scale 0.5 newDown)
+                            , vector = newDown
+                            }
+
+                        newPosition =
+                            ground.barrier downRay
+                            |> Maybe.map (\b -> V3.add b.position (V3.scale 0.01 b.normal))
+                            |> Maybe.withDefault wantPosition
+                    in
+                        { motion | position = newPosition }
     in
-        case ground.barrier ray of
+        newMotion
+
+{-
+        case ground.barrier downRay of
+            Just barrierPoint ->
+                let
+                    newPosition =
+                        V3.add barrierPoint.position (V3.scale 0.01 barrierPoint.normal)
+                in
+                    { motion | position = newPosition }
+            Nothing ->
+                    { motion | position = potentialPosition }
+-}
+
+{-
+        case ground.barrier forwardRay of
             Just _ ->
                 { motion | velocity = vec3 0 0 0 }
             Nothing ->
-                { motion | position = potentialPosition
+                { motion | position = newPosition
                          , velocity = motion.velocity
                 }
+-}
 
 {-
         pos =
@@ -194,15 +237,20 @@ keepWithinbounds ground radius motion =
 
 gravity : Ground -> Float -> Float -> Moving a -> Moving a
 gravity ground height dt motion =
-    -- if getY motion.position <= eyeLevel motion.position then
-    if (nearestFloor ground motion.position <= height) then
-        motion
-    else
-        let
-            v =
-                V3.toRecord motion.velocity
-        in
-            { motion | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }
+    let
+        p =
+            V3.toRecord motion.position
+
+        altitude =
+            nearestFloor ground motion.position
+
+        fall =
+            min (9.8 * dt) (altitude - 0.01)
+    in
+        if (altitude <= 0.015) then
+            motion 
+        else
+            { motion | position = vec3 p.x (p.y - fall) p.z }
 
 
 overlay : Html msg

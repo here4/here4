@@ -90,3 +90,11 @@ insideQuad a b c d p =
     in
         List.all inside borders
 
+
+insideTriangle : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Bool
+insideTriangle a b c p =
+    let
+        borders = [(a,b), (b,c), (c,a)]
+        inside (a,b) = V3.dot (V3.sub b a) (V3.sub p a) > 0
+    in
+        List.all inside borders

@@ -34,11 +34,16 @@ intersectQuad ray (Quad a b c d) =
     let
         p0 = ray.origin
         p = ray.vector
-        n = V3.normalize <| V3.cross (V3.sub b a) (V3.sub d a)
-        hitPoint = intersectPlane a n p0 p
-        hitInsideQuad = insideQuad a b c d
+        n_a = V3.normalize <| V3.cross (V3.sub b a) (V3.sub d a)
+        n_c = V3.normalize <| V3.cross (V3.sub b c) (V3.sub d c)
+        hitPoint_a = intersectPlane a n_a p0 p
+        hitPoint_c = intersectPlane c n_c p0 p
+        hitInside_a = insideTriangle a b d
+        hitInside_c = insideTriangle c d b
     in
-        Maybe.filter hitInsideQuad hitPoint
+        Maybe.or
+        (Maybe.filter hitInside_a hitPoint_a)
+        (Maybe.filter hitInside_c hitPoint_c)
 
 
 type GroundSurface
@@ -51,7 +56,7 @@ type GroundSurface
 
 type alias BarrierPoint =
     { position : Vec3
-    , orientation : Orientation
+    , normal : Vec3
     , surface : GroundSurface
     }
 
@@ -77,30 +82,19 @@ barrierFromQuad surface quad ray =
         (Quad a b c d) =
             quad
 
-        mean v1 v2 =
-            V3.scale 0.5 (V3.add v1 v2)
-
         n =
             V3.cross (V3.sub b a) (V3.sub d a)
+            |> V3.normalize
 
-        towards =
+        normal =
             if V3.dot n ray.vector > 0 then
                 V3.negate n
             else
                 n
 
-        dir s1 s2 e1 e2 =
-            V3.sub (mean e1 e2) (mean s1 s2)
-            |> V3.normalize
-
-        orientation =
-            Orientation.fromTo V3.j towards
-            |> Orientation.followedBy (Orientation.fromTo V3.i (dir a d b c))
-            |> Orientation.followedBy (Orientation.fromTo V3.k (dir a b d c))
-
         fromPosition p =
             { position = p
-            , orientation = orientation
+            , normal = normal
             , surface = surface
             }
     in
