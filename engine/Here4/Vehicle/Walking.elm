@@ -159,13 +159,22 @@ physics ground height dt motion =
                             { origin = V3.sub wantPosition (V3.scale 0.5 newDown)
                             , vector = newDown
                             }
-
-                        newPosition =
-                            ground.barrier downRay
-                            |> Maybe.map (\b -> V3.add b.position (V3.scale 0.01 b.normal))
-                            |> Maybe.withDefault wantPosition
                     in
-                        { motion | position = newPosition }
+                            case ground.barrier downRay of
+                                Just b ->
+                                    let
+                                        stepPosition =
+                                            V3.add b.position (V3.scale 0.01 b.normal)
+
+                                        newPosition =
+                                            if V3.dot (V3.sub stepPosition wantPosition) orientedVelocity < 0 then
+                                                wantPosition
+                                            else
+                                                stepPosition
+                                    in
+                                        { motion | position = newPosition }
+                                Nothing ->
+                                    { motion | position = wantPosition }
     in
         newMotion
 
