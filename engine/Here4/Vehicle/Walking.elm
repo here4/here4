@@ -178,60 +178,8 @@ physics ground height dt motion =
     in
         newMotion
 
-{-
-        case ground.barrier downRay of
-            Just barrierPoint ->
-                let
-                    newPosition =
-                        V3.add barrierPoint.position (V3.scale 0.01 barrierPoint.normal)
-                in
-                    { motion | position = newPosition }
-            Nothing ->
-                    { motion | position = potentialPosition }
--}
-
-{-
-        case ground.barrier forwardRay of
-            Just _ ->
-                { motion | velocity = vec3 0 0 0 }
-            Nothing ->
-                { motion | position = newPosition
-                         , velocity = motion.velocity
-                }
--}
-
-{-
-        pos =
-            add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
-
-        p =
-            V3.toRecord pos
-
-        e = height + V3.getY pos - nearestFloor ground pos
-
-        vy0 =
-            getY motion.velocity
-
-        ( pos_, dv ) =
-            if p.y < e then
-                let
-                    vy =
-                        -- if ((e < (0.8 * 80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10 * dt) then
-                            clamp 0 10 (V3.length motion.velocity * (e - p.y) * dt * 5)
-                        -- else
-                        --     0
-                in
-                    ( vec3 p.x e p.z, vec3 0 vy 0 )
-            else
-                ( pos, vec3 0 0 0 )
-    in
-        { motion | position = pos_, velocity = V3.add motion.velocity dv }
--}
-
 
 -- | Clamp a vector to be no longer than len
-
-
 v3_clamp : Float -> Vec3 -> Vec3
 v3_clamp len v =
     if V3.length v <= len then
