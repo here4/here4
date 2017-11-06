@@ -26,7 +26,8 @@ welcome motion =
 
 
 drive : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
-drive = move Nothing
+drive =
+    move Nothing
 
 
 aboveWater : Float -> Ground -> Ground
@@ -48,14 +49,15 @@ aboveWater hover ground =
             , elevation = elevation
         }
 
+
 hovercraft : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 hovercraft attributes dimensions ground inputs thing =
-        move Nothing attributes dimensions (aboveWater attributes.height ground) inputs thing
+    move Nothing attributes dimensions (aboveWater attributes.height ground) inputs thing
 
 
 boat : Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 boat attributes dimensions ground inputs thing =
-        move (Just [DeepWater, ShallowWater]) attributes dimensions (aboveWater attributes.height ground) inputs thing
+    move (Just [ DeepWater, ShallowWater ]) attributes dimensions (aboveWater attributes.height ground) inputs thing
 
 
 move : Maybe (List GroundSurface) -> Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
@@ -63,21 +65,25 @@ move surfaces attributes dimensions ground inputs motion =
     let
         tireFloor pos =
             let
-                tirePos = pos -- V3.add (vec3 0 0.1 0) pos
+                tirePos =
+                    pos
+
+                -- V3.add (vec3 0 0.1 0) pos
             in
                 V3.getY tirePos - nearestFloor ground tirePos
     in
         motion
-        |> turn attributes dimensions tireFloor inputs.x inputs.dt
-        |> goForward ground attributes.speed inputs
-        |> gravity ground inputs.dt
-        |> physics surfaces ground attributes.height inputs.dt
-        |> keepWithinbounds ground attributes.radius
+            |> turn attributes dimensions tireFloor inputs.x inputs.dt
+            |> goForward ground attributes.speed inputs
+            |> gravity ground inputs.dt
+            |> physics surfaces ground attributes.height inputs.dt
+            |> keepWithinbounds ground attributes.radius
 
 
 clampBuggy : Orientation -> Orientation
 clampBuggy o =
     o
+
 
 
 {-
@@ -243,7 +249,7 @@ physics mSurfaces ground height dt motion =
     let
         pos =
             V3.add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
-            
+
         topPos =
             V3.add (vec3 0 height 0) pos
 
@@ -253,7 +259,8 @@ physics mSurfaces ground height dt motion =
         p =
             V3.toRecord pos
 
-        e = V3.getY topPos - nearestFloor ground topPos
+        e =
+            V3.getY topPos - nearestFloor ground topPos
 
         vy0 =
             getY motion.velocity
@@ -263,9 +270,10 @@ physics mSurfaces ground height dt motion =
                 let
                     vy =
                         -- if ((e < (0.8 * 80) && vy0 > -30) || vy0 > -9.8) && e - p.y > (10 * dt) then
-                            clamp 0 10 (V3.length motion.velocity * (e - p.y) * dt * 5)
-                        -- else
-                        --     0
+                        clamp 0 10 (V3.length motion.velocity * (e - p.y) * dt * 5)
+
+                    -- else
+                    --     0
                 in
                     ( vec3 p.x e p.z, vec3 0 vy 0 )
             else
@@ -280,6 +288,7 @@ physics mSurfaces ground height dt motion =
                     newMotion
                 else
                     motion
+
             Nothing ->
                 newMotion
 

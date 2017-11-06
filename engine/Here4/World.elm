@@ -506,13 +506,12 @@ worldUpdate hubUpdate msg model =
         HubEff (RelocateParty (WorldKey worldKey ()) (PartyKey partyKey) location) ->
             relocate (WorldKey worldKey (PartyKey partyKey)) location model
 
-
         HubEff (AddApp (WorldKey worldKey ()) app) ->
             let
                 addApp world =
                     let
                         ( newApps, newCmdMsgs ) =
-                            worldAddApps (WorldKey worldKey ()) [app] world.apps
+                            worldAddApps (WorldKey worldKey ()) [ app ] world.apps
                     in
                         ( { world | apps = newApps }
                         , Cmd.batch newCmdMsgs
@@ -523,23 +522,21 @@ worldUpdate hubUpdate msg model =
 
                 updateModel ws =
                     { model | worlds = ws }
-
             in
                 Bag.get worldKey model.worlds
-                |> Maybe.map
-                    ( addApp >> Tuple.mapFirst (replaceWorld >> updateModel))
-                |> Maybe.withDefault (model, Cmd.none)
-
+                    |> Maybe.map
+                        (addApp >> Tuple.mapFirst (replaceWorld >> updateModel))
+                    |> Maybe.withDefault ( model, Cmd.none )
 
         HubEff (RemoveApp (WorldKey worldKey ()) (Just (AppKey appKey))) ->
             let
                 updateApps f world =
                     { world | apps = f world.apps }
+
                 newModel =
                     { model | worlds = Bag.update worldKey (Maybe.map (updateApps (Bag.remove appKey))) model.worlds }
             in
                 ( newModel, Cmd.none )
-
 
         Send key appMsg ->
             let
@@ -641,7 +638,11 @@ worldUpdate hubUpdate msg model =
             ( model, Cmd.none )
 
 
-worldAnimate : WorldKey () -> Ground -> Time -> Multiverse model
+worldAnimate :
+    WorldKey ()
+    -> Ground
+    -> Time
+    -> Multiverse model
     -> ( Multiverse model, Cmd (WorldMsg (NavMsg msg)) )
 worldAnimate (WorldKey worldKey ()) ground dt model =
     let
@@ -666,7 +667,7 @@ worldAnimate (WorldKey worldKey ()) ground dt model =
                     Bag.insert newApp apps
             in
                 ( newBag, Cmd.map (response (AppKey appKey)) appCmd :: appCmds )
-       
+
         updateApps world =
             let
                 ( newApps, newAppCmds ) =
@@ -681,9 +682,9 @@ worldAnimate (WorldKey worldKey ()) ground dt model =
             { model | worlds = ws }
     in
         Bag.get worldKey model.worlds
-        |> Maybe.map
-            ( updateApps >> Tuple.mapFirst (replaceWorld >> updateModel))
-        |> Maybe.withDefault (model, Cmd.none)
+            |> Maybe.map
+                (updateApps >> Tuple.mapFirst (replaceWorld >> updateModel))
+            |> Maybe.withDefault ( model, Cmd.none )
 
 
 worldJoin : WorldKey () -> Multiverse model -> ( Maybe (WorldKey PartyKey), Multiverse model, Cmd (WorldMsg msg) )
@@ -965,10 +966,11 @@ worldGround (WorldKey worldKey ()) model =
         groundWithBarriers world =
             let
                 withBarriers ground =
-                    { ground | barrier = joinBarriers (ground.barrier :: world.barriers)
+                    { ground
+                        | barrier = joinBarriers (ground.barrier :: world.barriers)
                     }
             in
                 Maybe.map withBarriers world.maybeGround
     in
         Bag.get worldKey model.worlds
-        |> Maybe.andThen groundWithBarriers
+            |> Maybe.andThen groundWithBarriers

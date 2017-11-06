@@ -1,14 +1,15 @@
-module Here4.App.Types exposing
-    ( Animated
-    , App
-    , AppModel
-    , AppMsg
-    , AppPosition
-    , CtrlMsg
-    , Msg (..)
-    , EffectMsg (..)
-    , Focus
-    )
+module Here4.App.Types
+    exposing
+        ( Animated
+        , App
+        , AppModel
+        , AppMsg
+        , AppPosition
+        , CtrlMsg
+        , Msg(..)
+        , EffectMsg(..)
+        , Focus
+        )
 
 import Dynamic exposing (Dynamic)
 import Here4.Body exposing (..)
@@ -56,6 +57,7 @@ type alias App =
     , model : AppModel
     }
 
+
 type alias CtrlMsg a =
     Dispatch (EffectMsg () ()) Msg a
 
@@ -71,11 +73,10 @@ type EffectMsg worldKey appKey
     = UpdateGround worldKey Ground
     | AddBarrier worldKey Barrier
     | RelocateParty worldKey PartyKey Location
-    | AddApp worldKey (App, Cmd AppMsg)
+    | AddApp worldKey ( App, Cmd AppMsg )
     | RemoveApp worldKey appKey
 
 
 type alias Focus =
     { position : Vec3
     }
-

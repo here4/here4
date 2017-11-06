@@ -45,23 +45,25 @@ turn ground speed height dx dt motion =
             Orientation.rotateBodyV motion.orientation V3.j
 
         ray =
-            { origin = V3.add motion.position (V3.scale (height/2) currentUp)
+            { origin = V3.add motion.position (V3.scale (height / 2) currentUp)
             , vector = V3.scale -height currentUp
             }
 
         upright =
             motion.orientation
-            |> Orientation.rollUpright
-            |> Orientation.pitchUpright
+                |> Orientation.rollUpright
+                |> Orientation.pitchUpright
 
         newOrientation =
             case ground.barrier ray of
                 Just barrierPoint ->
                     let
-                        o = Orientation.fromTo currentUp barrierPoint.normal
+                        o =
+                            Orientation.fromTo currentUp barrierPoint.normal
                     in
                         motion.orientation
-                        |> Orientation.followedBy o
+                            |> Orientation.followedBy o
+
                 Nothing ->
                     upright
 
@@ -70,7 +72,7 @@ turn ground speed height dx dt motion =
 
         orientation =
             newOrientation
-            |> followedBy (fromAngleAxis steer newUp)
+                |> followedBy (fromAngleAxis steer newUp)
     in
         { motion | orientation = orientation }
 
@@ -135,7 +137,7 @@ physics ground height dt motion =
             Orientation.rotateBodyV motion.orientation V3.j
 
         forwardRay =
-            { origin = V3.add motion.position (V3.scale (height/2) currentUp)
+            { origin = V3.add motion.position (V3.scale (height / 2) currentUp)
             , vector = orientedVelocity
             }
 
@@ -150,7 +152,8 @@ physics ground height dt motion =
 
                 Nothing ->
                     let
-                        wantPosition = V3.add motion.position orientedVelocity
+                        wantPosition =
+                            V3.add motion.position orientedVelocity
 
                         newDown =
                             Orientation.rotateBodyV motion.orientation (vec3 0 -height 0)
@@ -160,26 +163,30 @@ physics ground height dt motion =
                             , vector = newDown
                             }
                     in
-                            case ground.barrier downRay of
-                                Just b ->
-                                    let
-                                        stepPosition =
-                                            V3.add b.position (V3.scale 0.01 b.normal)
+                        case ground.barrier downRay of
+                            Just b ->
+                                let
+                                    stepPosition =
+                                        V3.add b.position (V3.scale 0.01 b.normal)
 
-                                        newPosition =
-                                            if V3.dot (V3.sub stepPosition wantPosition) orientedVelocity < 0 then
-                                                wantPosition
-                                            else
-                                                stepPosition
-                                    in
-                                        { motion | position = newPosition }
-                                Nothing ->
-                                    { motion | position = wantPosition }
+                                    newPosition =
+                                        if V3.dot (V3.sub stepPosition wantPosition) orientedVelocity < 0 then
+                                            wantPosition
+                                        else
+                                            stepPosition
+                                in
+                                    { motion | position = newPosition }
+
+                            Nothing ->
+                                { motion | position = wantPosition }
     in
         newMotion
 
 
+
 -- | Clamp a vector to be no longer than len
+
+
 v3_clamp : Float -> Vec3 -> Vec3
 v3_clamp len v =
     if V3.length v <= len then
@@ -205,7 +212,7 @@ gravity ground height dt motion =
             min (9.8 * dt) (altitude - 0.01)
     in
         if (altitude <= 0.015) then
-            motion 
+            motion
         else
             { motion | position = vec3 p.x (p.y - fall) p.z }
 

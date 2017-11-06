@@ -25,25 +25,40 @@ type alias Ray =
     }
 
 
-type Quad =
-    Quad Vec3 Vec3 Vec3 Vec3
+type Quad
+    = Quad Vec3 Vec3 Vec3 Vec3
 
 
 intersectQuad : Ray -> Quad -> Maybe Vec3
 intersectQuad ray (Quad a b c d) =
     let
-        p0 = ray.origin
-        p = ray.vector
-        n_a = V3.normalize <| V3.cross (V3.sub b a) (V3.sub d a)
-        n_c = V3.normalize <| V3.cross (V3.sub b c) (V3.sub d c)
-        hitPoint_a = intersectPlane a n_a p0 p
-        hitPoint_c = intersectPlane c n_c p0 p
-        hitInside_a = insideTriangle a b d
-        hitInside_c = insideTriangle c d b
+        p0 =
+            ray.origin
+
+        p =
+            ray.vector
+
+        n_a =
+            V3.normalize <| V3.cross (V3.sub b a) (V3.sub d a)
+
+        n_c =
+            V3.normalize <| V3.cross (V3.sub b c) (V3.sub d c)
+
+        hitPoint_a =
+            intersectPlane a n_a p0 p
+
+        hitPoint_c =
+            intersectPlane c n_c p0 p
+
+        hitInside_a =
+            insideTriangle a b d
+
+        hitInside_c =
+            insideTriangle c d b
     in
         Maybe.or
-        (Maybe.filter hitInside_a hitPoint_a)
-        (Maybe.filter hitInside_c hitPoint_c)
+            (Maybe.filter hitInside_a hitPoint_a)
+            (Maybe.filter hitInside_c hitPoint_c)
 
 
 type GroundSurface
@@ -72,8 +87,8 @@ joinBarriers barriers ray =
             V3.distanceSquared ray.origin point.position
     in
         List.map (\f -> f ray) barriers
-        |> Maybe.values
-        |> List.minimumBy (distance2 ray)
+            |> Maybe.values
+            |> List.minimumBy (distance2 ray)
 
 
 barrierFromQuad : GroundSurface -> Quad -> Barrier
@@ -84,7 +99,7 @@ barrierFromQuad surface quad ray =
 
         n =
             V3.cross (V3.sub b a) (V3.sub d a)
-            |> V3.normalize
+                |> V3.normalize
 
         normal =
             if V3.dot n ray.vector > 0 then
@@ -99,14 +114,14 @@ barrierFromQuad surface quad ray =
             }
     in
         intersectQuad ray quad
-        |> Maybe.map fromPosition
+            |> Maybe.map fromPosition
 
 
 barrierFromQuads : GroundSurface -> List Quad -> Barrier
 barrierFromQuads surface quads ray =
     List.map (\quad -> barrierFromQuad surface quad ray) quads
-    |> Maybe.values
-    |> List.minimumBy (\b -> V3.distanceSquared ray.origin b.position)
+        |> Maybe.values
+        |> List.minimumBy (\b -> V3.distanceSquared ray.origin b.position)
 
 
 relativeBarrier : Vec3 -> Barrier -> Barrier
@@ -121,4 +136,3 @@ relativeBarrier relativePosition barrier ray =
             { p | position = V3.add p.position relativePosition }
     in
         Maybe.map restore (barrier relativeRay)
-

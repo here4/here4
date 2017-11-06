@@ -199,6 +199,7 @@ animateSelf f ground dt model =
         ( newModel, Cmd.map Self newMsg )
 
 
+
 {-
    ----------------------------------------------------------------------
    -- Debugging: noop App
@@ -234,7 +235,6 @@ update msg { methods, model } =
             methods.update msg model
     in
         ( { methods = methods, model = newModel }, newCmdMsg )
-
 
 
 animate : Ground -> Time -> App -> ( App, Cmd AppMsg )

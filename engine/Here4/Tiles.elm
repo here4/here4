@@ -12,7 +12,10 @@ import Here4.Ground exposing (..)
 import Here4.Orientation as Orientation exposing (Orientation)
 import Here4.Placement as Placement exposing (Placement)
 import Math.Vector3 as V3 exposing (Vec3, vec3, getX, getZ)
-import Maybe.Extra as Maybe -- barrier
+import Maybe.Extra as Maybe
+
+
+-- barrier
 
 
 type alias Tiles =
@@ -25,8 +28,11 @@ type alias Tiles =
 createTileGround : Tiles -> ( Ground, List Body )
 createTileGround tiles =
     let
-        yMult = tiles.placement.yMult
-        seaLevel = 0.1 * yMult
+        yMult =
+            tiles.placement.yMult
+
+        seaLevel =
+            0.1 * yMult
     in
         ( { bounds = tileBounds tiles
           , elevation = tileElevation tiles
@@ -48,12 +54,20 @@ tileSurface tiles pos =
 surfaceAtElevation : Tiles -> Float -> GroundSurface
 surfaceAtElevation tiles h =
     let
-        yMult = tiles.placement.yMult
+        yMult =
+            tiles.placement.yMult
 
-        snowLevel = 0.8 * yMult
-        beachLevel = 0.15 * yMult
-        seaLevel = 0.1 * yMult
-        deepSeaLevel = -0.4 * yMult
+        snowLevel =
+            0.8 * yMult
+
+        beachLevel =
+            0.15 * yMult
+
+        seaLevel =
+            0.1 * yMult
+
+        deepSeaLevel =
+            -0.4 * yMult
     in
         if h > snowLevel then
             Snow
@@ -166,8 +180,11 @@ tileElevation { placement, elevations } pos =
 tileFloor : Tiles -> Vec3 -> Maybe Float
 tileFloor tiles p =
     let
-        e = tileElevation tiles p
-        y = V3.getY p
+        e =
+            tileElevation tiles p
+
+        y =
+            V3.getY p
     in
         if y >= e then
             Just (y - e)
@@ -185,15 +202,15 @@ tileBarrier tiles ray =
 
         fromQuad q =
             barrierFromQuad Grass q ray
-            |> Maybe.map setSurface
+                |> Maybe.map setSurface
     in
         List.map (quadAt tiles) (nearbyIndices tiles.placement ray)
-        |> List.map fromQuad
-        |> Maybe.values
-        |> List.head
+            |> List.map fromQuad
+            |> Maybe.values
+            |> List.head
 
 
-nearbyIndices : Placement -> Ray -> List (Int, Int)
+nearbyIndices : Placement -> Ray -> List ( Int, Int )
 nearbyIndices placement ray =
     let
         ix0 =
@@ -215,7 +232,7 @@ nearbyIndices placement ray =
             V3.getZ ray.vector
 
         sgn v =
-            if abs v < 1e-3 then
+            if abs v < 1.0e-3 then
                 0
             else if v < 0 then
                 -1
@@ -223,32 +240,32 @@ nearbyIndices placement ray =
                 1
 
         xrange d =
-            if abs vx < 1e-3 then
-                [ix]
+            if abs vx < 1.0e-3 then
+                [ ix ]
             else if vx < 0 then
-                List.range (max 0 (ix-d)) ix
+                List.range (max 0 (ix - d)) ix
             else
-                List.range ix (min placement.tileSize (ix+d))
+                List.range ix (min placement.tileSize (ix + d))
 
         zrange d =
-            if abs vz < 1e-3 then
-                [iz]
+            if abs vz < 1.0e-3 then
+                [ iz ]
             else if vz < 0 then
-                List.range (max 0 (iz-d)) iz
+                List.range (max 0 (iz - d)) iz
             else
-                List.range iz (min placement.tileSize (iz+d))
+                List.range iz (min placement.tileSize (iz + d))
 
         rowAtDistance d =
-            List.map (\x -> (x, iz + (d * sgn vz))) (xrange d)
+            List.map (\x -> ( x, iz + (d * sgn vz) )) (xrange d)
 
         colAtDistance d =
-            List.map (\z -> (ix + (d * sgn vx), z)) (zrange d)
+            List.map (\z -> ( ix + (d * sgn vx), z )) (zrange d)
 
         radius d =
             rowAtDistance d ++ colAtDistance d
 
         maxXD =
-            if abs vx < 1e-3 then
+            if abs vx < 1.0e-3 then
                 0
             else if vx < 0 then
                 ix
@@ -256,7 +273,7 @@ nearbyIndices placement ray =
                 placement.tileSize - ix - 1
 
         maxZD =
-            if abs vz < 1e-3 then
+            if abs vz < 1.0e-3 then
                 0
             else if vz < 0 then
                 iz
@@ -269,8 +286,8 @@ nearbyIndices placement ray =
         List.concatMap radius (List.range 0 maxRadius)
 
 
-quadAt : Tiles -> (Int, Int) -> Quad
-quadAt { placement, elevations } (ix, iz) =
+quadAt : Tiles -> ( Int, Int ) -> Quad
+quadAt { placement, elevations } ( ix, iz ) =
     let
         getY x z =
             (Array2D.getXY x z 0 elevations) * placement.yMult
@@ -284,4 +301,4 @@ quadAt { placement, elevations } (ix, iz) =
         pos x z =
             vec3 (getX x) (getY x z) (getZ z)
     in
-        Quad (pos ix iz) (pos (ix+1) iz) (pos (ix+1) (iz+1)) (pos ix (iz+1))
+        Quad (pos ix iz) (pos (ix + 1) iz) (pos (ix + 1) (iz + 1)) (pos ix (iz + 1))

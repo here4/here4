@@ -238,7 +238,7 @@ animate world dt0 worldKey model0 =
                         dt0
 
                 -- Animate
-                ( multiverseA, multiverseAMsg) =
+                ( multiverseA, multiverseAMsg ) =
                     world.animate worldKey terrain dt model0.multiverse
 
                 {-

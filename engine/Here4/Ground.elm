@@ -31,11 +31,14 @@ nearestFloor ground pos =
             }
     in
         ground.barrier ray
-        |> Maybe.map (\b -> V3.distance pos b.position)
-        |> Maybe.withDefault 1e7
+            |> Maybe.map (\b -> V3.distance pos b.position)
+            |> Maybe.withDefault 1.0e7
+
 
 
 -- eg. for use with AddApps.addSomewhere
+
+
 aboveSeaLevel : Ground -> Vec3 -> Bool
 aboveSeaLevel ground pos =
     ground.elevation pos > ground.seaLevel
