@@ -76,7 +76,8 @@ move surfaces attributes dimensions ground inputs motion =
             |> turn attributes dimensions tireFloor inputs.x inputs.dt
             |> goForward ground attributes.speed inputs
             |> gravity ground inputs.dt
-            |> physics surfaces ground attributes.height inputs.dt
+            |> constrainSurfaces surfaces ground attributes.height inputs.dt
+                   (physics ground attributes.height inputs.dt)
             |> keepWithinbounds ground attributes.radius
 
 
@@ -244,8 +245,8 @@ adjustVelocity maxSpeed friction dv dt v =
     v3_clamp maxSpeed <| add (V3.scale dt dv) (V3.scale (1.0 - (friction * dt)) v)
 
 
-physics : Maybe (List GroundSurface) -> Ground -> Float -> Float -> Moving a -> Moving a
-physics mSurfaces ground height dt motion =
+constrainSurfaces : Maybe (List GroundSurface) -> Ground -> Float -> Float -> (Moving a -> Moving a) ->  Moving a -> Moving a
+constrainSurfaces mSurfaces ground height dt f motion =
     let
         pos =
             V3.add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
@@ -255,6 +256,25 @@ physics mSurfaces ground height dt motion =
 
         targetSurface =
             ground.surface topPos
+    in
+        case mSurfaces of
+            Just surfaces ->
+                if List.member targetSurface surfaces then
+                    f motion
+                else
+                    motion
+
+            Nothing ->
+                f motion
+
+physics : Ground -> Float -> Float -> Moving a -> Moving a
+physics ground height dt motion =
+    let
+        pos =
+            V3.add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
+
+        topPos =
+            V3.add (vec3 0 height 0) pos
 
         p =
             V3.toRecord pos
@@ -278,19 +298,8 @@ physics mSurfaces ground height dt motion =
                     ( vec3 p.x e p.z, vec3 0 vy 0 )
             else
                 ( pos, vec3 0 0 0 )
-
-        newMotion =
-            { motion | position = pos_, velocity = add motion.velocity dv }
     in
-        case mSurfaces of
-            Just surfaces ->
-                if List.member targetSurface surfaces then
-                    newMotion
-                else
-                    motion
-
-            Nothing ->
-                newMotion
+        { motion | position = pos_, velocity = add motion.velocity dv }
 
 
 
