@@ -15,6 +15,7 @@ suite =
     describe "Math tests"
         [ projectPlane
         , intersectPlane
+
         -- , orientUpright
         ]
 
@@ -25,14 +26,20 @@ intersectPlane =
         [ test "Intersect with XZ plane" <|
             \() ->
                 let
-                    v = V3.vec3 0 0 0
-                    n = V3.vec3 0 1 0
-                    p = V3.vec3 0 -1 0
+                    v =
+                        V3.vec3 0 0 0
+
+                    n =
+                        V3.vec3 0 1 0
+
+                    p =
+                        V3.vec3 0 -1 0
                 in
                     Expect.all
                         [ Expect.equal (Just (V3.vec3 2 0 2)) ]
                         (Geometry.intersectPlane v n (V3.vec3 2 1 2) p)
         ]
+
 
 projectPlane : Test
 projectPlane =
@@ -60,35 +67,46 @@ projectPlane =
                         , (dotY >> Expect.equal 0)
                         ]
                         proj
-
-           , fuzz3 unitVec3 unitVec3 unitVec3 "Project vector onto plane" <|
-               \v1 v2 u ->
-                   let proj = Geometry.projectPlane v1 v2 u
-                       cross1 = V3.cross v1 proj
-                       cross2 = V3.cross v2 proj
-                       dot1 = V3.dot cross1
-                       dot2 = V3.dot cross2
-                   in
-                       Expect.all
-                           [ (dot1 >> floatEqual 0)
-                           , (dot2 >> floatEqual 0)
-                           ]
-                           proj
-        ]
-
-{-
-orientUpright : Test
-orientUpright =
-    describe "Orientation.upright"
-        [ test "Upright" <|
-            \() ->
+        , fuzz3 unitVec3 unitVec3 unitVec3 "Project vector onto plane" <|
+            \v1 v2 u ->
                 let
-                    o = Orientation.fromAngleAxis (pi/4) V3.k
-                    upr = Orientation.rollUpright o
+                    proj =
+                        Geometry.projectPlane v1 v2 u
+
+                    cross1 =
+                        V3.cross v1 proj
+
+                    cross2 =
+                        V3.cross v2 proj
+
+                    dot1 =
+                        V3.dot cross1
+
+                    dot2 =
+                        V3.dot cross2
                 in
                     Expect.all
-                        [ (Expect.equal Orientation.initial)
+                        [ (dot1 >> floatEqual 0)
+                        , (dot2 >> floatEqual 0)
                         ]
-                        upr
+                        proj
         ]
+
+
+
+{-
+   orientUpright : Test
+   orientUpright =
+       describe "Orientation.upright"
+           [ test "Upright" <|
+               \() ->
+                   let
+                       o = Orientation.fromAngleAxis (pi/4) V3.k
+                       upr = Orientation.rollUpright o
+                   in
+                       Expect.all
+                           [ (Expect.equal Orientation.initial)
+                           ]
+                           upr
+           ]
 -}

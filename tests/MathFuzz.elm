@@ -46,6 +46,7 @@ floatRecord4 =
     Fuzz.map4 (\s i j k -> { s = s, i = i, j = j, k = k }) float float float float
 
 
+
 -- Backported from elm-test 4.0.0, remove when bumping dependency
 
 

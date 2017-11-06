@@ -54,7 +54,7 @@ addApps : List ( App, Cmd AppMsg ) -> ( App, Cmd AppMsg )
 addApps apps =
     App.create
         -- ( Nothing , Cmd.batch (removeSelf :: List.map addAppEffect apps) )
-        ( Nothing , Cmd.batch (List.map addAppEffect apps) )
+        ( Nothing, Cmd.batch (List.map addAppEffect apps) )
         methods
 
 
@@ -65,14 +65,14 @@ addRandom gen =
         methods
 
 
-addAnywhere : (Vec3 -> (App, Cmd AppMsg) ) -> ( App, Cmd AppMsg )
+addAnywhere : (Vec3 -> ( App, Cmd AppMsg )) -> ( App, Cmd AppMsg )
 addAnywhere placer =
     App.create
         ( Just { check = \_ _ -> True, placer = placer }, Cmd.none )
         methods
 
 
-addSomewhere : (Ground -> Vec3 -> Bool) -> (Vec3 -> (App, Cmd AppMsg) ) -> ( App, Cmd AppMsg )
+addSomewhere : (Ground -> Vec3 -> Bool) -> (Vec3 -> ( App, Cmd AppMsg )) -> ( App, Cmd AppMsg )
 addSomewhere check placer =
     App.create
         ( Just { check = check, placer = placer }, Cmd.none )
@@ -94,9 +94,14 @@ removeSelf =
 randomPosition : Ground -> Random.Generator Vec3
 randomPosition ground =
     let
-        fromXZ x z = vec3 x 0 z
-        (minX, maxX) = ground.coordRangeX
-        (minZ, maxZ) = ground.coordRangeZ
+        fromXZ x z =
+            vec3 x 0 z
+
+        ( minX, maxX ) =
+            ground.coordRangeX
+
+        ( minZ, maxZ ) =
+            ground.coordRangeZ
     in
         Random.map2 fromXZ (Random.float minX maxX) (Random.float minZ maxZ)
 
@@ -108,6 +113,7 @@ update msg model =
             ( model
             , Cmd.batch [ removeSelf, addAppEffect app ]
             )
+
         _ ->
             ( model, Cmd.none )
 
@@ -117,9 +123,11 @@ animate ground dt model =
     case model of
         Just placer ->
             let
-                gen = Random.map placer.placer (Random.filter (placer.check ground) (randomPosition ground))
+                gen =
+                    Random.map placer.placer (Random.filter (placer.check ground) (randomPosition ground))
             in
                 ( Nothing, Cmd.map Self (Random.generate AppGenerated gen) )
+
         Nothing ->
             ( model, Cmd.none )
 

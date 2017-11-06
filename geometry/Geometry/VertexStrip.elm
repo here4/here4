@@ -11,7 +11,10 @@ type alias VertexLike v =
     }
 
 
+
 -- Make the next pair of vertices for a strip, with successive normals
+
+
 vertexPair : VertexLike v -> VertexLike v -> VertexLike v -> VertexLike v -> List (VertexLike v)
 vertexPair v1 v2 v3 v4 =
     let
@@ -42,6 +45,7 @@ mkStrip vs1 vs2 =
 
         _ ->
             []
+
 
 
 -- Make a triangle facet, with normals at all vertices pointing in the
@@ -91,4 +95,3 @@ mkStripMaybe vs1 vs2 =
             map3 (,,) vs1 vs2 (drop 1 vs1) ++ map3 (,,) vs2 (drop 1 vs1) (drop 1 vs2)
     in
         List.filterMap mkMaybe strip
-

@@ -248,6 +248,7 @@ surfaceMesh ( rx, rz ) skip placement m =
         List.map triangleStrip <| List.map2 mkStrip rows (drop 1 rows)
 
 
+
 ----------------------------------------------------------------------
 
 

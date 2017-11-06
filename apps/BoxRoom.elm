@@ -164,21 +164,47 @@ init attributes =
 
         barrier =
             let
-                x0 = V3.getX originPosition
-                x1 = x0 + width
-                y0 = V3.getY originPosition
-                y1 = y0 + height
-                z0 = V3.getZ originPosition
-                z1 = z0 + length
+                x0 =
+                    V3.getX originPosition
 
-                fSW = vec3 x0 y0 z0
-                fSE = vec3 x1 y0 z0
-                fNW = vec3 x0 y0 z1
-                fNE = vec3 x1 y0 z1
-                cSW = vec3 x0 y1 z0
-                cSE = vec3 x1 y1 z0
-                cNW = vec3 x0 y1 z1
-                cNE = vec3 x1 y1 z1
+                x1 =
+                    x0 + width
+
+                y0 =
+                    V3.getY originPosition
+
+                y1 =
+                    y0 + height
+
+                z0 =
+                    V3.getZ originPosition
+
+                z1 =
+                    z0 + length
+
+                fSW =
+                    vec3 x0 y0 z0
+
+                fSE =
+                    vec3 x1 y0 z0
+
+                fNW =
+                    vec3 x0 y0 z1
+
+                fNE =
+                    vec3 x1 y0 z1
+
+                cSW =
+                    vec3 x0 y1 z0
+
+                cSE =
+                    vec3 x1 y1 z0
+
+                cNW =
+                    vec3 x0 y1 z1
+
+                cNE =
+                    vec3 x1 y1 z1
             in
                 barrierFromQuads Grass
                     [ Quad fSW fSE fNE fNW

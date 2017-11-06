@@ -4,6 +4,8 @@ import Math.Vector3 as V3 exposing (Vec3)
 
 
 -- | Projection of u onto the plane containing vectors v1, v2
+
+
 projectPlane : Vec3 -> Vec3 -> Vec3 -> Vec3
 projectPlane v1 v2 u =
     let
@@ -15,26 +17,40 @@ projectPlane v1 v2 u =
         V3.sub u (V3.scale (V3.dot u n) n)
 
 
+
 -- | Projection of u onto the plane with normal n
+
+
 projectPlaneNormal : Vec3 -> Vec3 -> Vec3
 projectPlaneNormal n u =
     -- u, without its component that is not in the plane
     V3.sub u (V3.scale (V3.dot u n) n)
 
 
+
 -- | Intersection point of the line containing (p0 -> p0+p)
 -- onto the plane containing vector v with normal n
+
+
 intersectPlane : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Maybe Vec3
 intersectPlane v n p0 p =
     let
-        d = V3.dot n p
-        epsilon = 1e-6
+        d =
+            V3.dot n p
+
+        epsilon =
+            1.0e-6
     in
-        if abs d  > epsilon then
+        if abs d > epsilon then
             let
-                w = V3.sub p0 v
-                fac = -(V3.dot n w / d)
-                u = V3.scale fac p
+                w =
+                    V3.sub p0 v
+
+                fac =
+                    -(V3.dot n w / d)
+
+                u =
+                    V3.scale fac p
             in
                 if (fac >= 0.0 && fac <= 1.0) then
                     Just (V3.add p0 u)
@@ -44,9 +60,12 @@ intersectPlane v n p0 p =
             Nothing
 
 
+
 -- Intersection of lines (u0 -> u0+u) and (v0 -> v0+v)
 -- Adapated from
 -- https://gist.github.com/hanigamal/6556506
+
+
 intersectLineLine : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Maybe Vec3
 intersectLineLine u0 u v0 v =
     let
@@ -60,7 +79,7 @@ intersectLineLine u0 u v0 v =
             V3.dot uXv uXv
 
         epsilon =
-            1e-6
+            1.0e-6
 
         nearZero x =
             abs x < epsilon
@@ -81,12 +100,18 @@ intersectLineLine u0 u v0 v =
             Nothing
 
 
+
 -- | Is the point p inside the quad (a,b,c,d) ?
+
+
 insideQuad : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Vec3 -> Bool
 insideQuad a b c d p =
     let
-        borders = [(a,b), (b,c), (c,d), (d,a)]
-        inside (a,b) = V3.dot (V3.sub b a) (V3.sub p a) > 0
+        borders =
+            [ ( a, b ), ( b, c ), ( c, d ), ( d, a ) ]
+
+        inside ( a, b ) =
+            V3.dot (V3.sub b a) (V3.sub p a) > 0
     in
         List.all inside borders
 
@@ -94,7 +119,10 @@ insideQuad a b c d p =
 insideTriangle : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Bool
 insideTriangle a b c p =
     let
-        borders = [(a,b), (b,c), (c,a)]
-        inside (a,b) = V3.dot (V3.sub b a) (V3.sub p a) > 0
+        borders =
+            [ ( a, b ), ( b, c ), ( c, a ) ]
+
+        inside ( a, b ) =
+            V3.dot (V3.sub b a) (V3.sub p a) > 0
     in
         List.all inside borders
