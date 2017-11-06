@@ -73,7 +73,8 @@ move surfaces attributes dimensions ground inputs motion =
                 V3.getY tirePos - nearestFloor ground tirePos
     in
         motion
-            |> turn attributes dimensions tireFloor inputs.x inputs.dt
+            |> turn ground attributes.speed attributes.height inputs.x inputs.dt
+            -- |> turn attributes dimensions tireFloor inputs.x inputs.dt
             |> goForward ground attributes.speed inputs
             |> gravity ground inputs.dt
             |> constrainSurfaces surfaces ground attributes.height inputs.dt
@@ -104,6 +105,48 @@ flatten v =
         normalize (vec3 r.x 0 r.z)
 
 
+turn : Ground -> Float -> Float -> Float -> Float -> Moving a -> Moving a
+turn ground speed height dx dt motion =
+    let
+        steer =
+            0.1 * speed * dx * dt
+
+        currentUp =
+            Orientation.rotateBodyV motion.orientation V3.j
+
+        ray =
+            { origin = V3.add motion.position (V3.scale (height / 2) currentUp)
+            , vector = V3.scale -height currentUp
+            }
+
+        upright =
+            motion.orientation
+                |> Orientation.rollUpright
+                |> Orientation.pitchUpright
+
+        newOrientation =
+            case ground.barrier ray of
+                Just barrierPoint ->
+                    let
+                        o =
+                            Orientation.fromTo currentUp barrierPoint.normal
+                    in
+                        motion.orientation
+                            |> Orientation.followedBy o
+
+                Nothing ->
+                    upright
+
+        newUp =
+            Orientation.rotateBodyV newOrientation V3.j
+
+        orientation =
+            newOrientation
+                |> followedBy (fromAngleAxis steer newUp)
+    in
+        { motion | orientation = orientation }
+
+{-
 turn : Driveable vehicle -> Vec3 -> (Vec3 -> Float) -> Float -> Float -> Moving a -> Moving a
 turn attributes dimensions tireFloor dx dt motion =
     let
@@ -190,7 +233,7 @@ turn attributes dimensions tireFloor dx dt motion =
             targetOrientation
     in
         { motion | orientation = orientation }
-
+-}
 
 goForward : Ground -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
 goForward ground speed inputs motion =
