@@ -270,6 +270,62 @@ constrainSurfaces mSurfaces ground height dt f motion =
 physics : Ground -> Float -> Float -> Moving a -> Moving a
 physics ground height dt motion =
     let
+        orientedVelocity =
+            Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity)
+
+        currentUp =
+            Orientation.rotateBodyV motion.orientation V3.j
+
+        forwardRay =
+            { origin = V3.add motion.position (V3.scale (height / 2) currentUp)
+            , vector = orientedVelocity
+            }
+
+        newMotion =
+            case ground.barrier forwardRay of
+                Just barrierPoint ->
+                    let
+                        newPosition =
+                            V3.add barrierPoint.position (V3.scale 0.01 barrierPoint.normal)
+                    in
+                        { motion | position = newPosition }
+
+                Nothing ->
+                    let
+                        wantPosition =
+                            V3.add motion.position orientedVelocity
+
+                        newDown =
+                            Orientation.rotateBodyV motion.orientation (vec3 0 -height 0)
+
+                        downRay =
+                            { origin = V3.sub wantPosition (V3.scale 0.5 newDown)
+                            , vector = newDown
+                            }
+                    in
+                        case ground.barrier downRay of
+                            Just b ->
+                                let
+                                    stepPosition =
+                                        V3.add b.position (V3.scale 0.01 b.normal)
+
+                                    newPosition =
+                                        if V3.dot (V3.sub stepPosition wantPosition) orientedVelocity < 0 then
+                                            wantPosition
+                                        else
+                                            stepPosition
+                                in
+                                    { motion | position = newPosition }
+
+                            Nothing ->
+                                { motion | position = wantPosition }
+    in
+        newMotion
+
+{-
+physicsOld : Ground -> Float -> Float -> Moving a -> Moving a
+physicsOld ground height dt motion =
+    let
         pos =
             V3.add motion.position (Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity))
 
@@ -300,7 +356,7 @@ physics ground height dt motion =
                 ( pos, vec3 0 0 0 )
     in
         { motion | position = pos_, velocity = add motion.velocity dv }
-
+-}
 
 
 -- | Clamp a vector to be no longer than len
