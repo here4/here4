@@ -71,14 +71,30 @@ move surfaces attributes dimensions ground inputs motion =
                 -- V3.add (vec3 0 0.1 0) pos
             in
                 V3.getY tirePos - nearestFloor ground tirePos
+
+        go dt motion =
+            let
+                (newMotion, dtRemaining) =
+                    constrainSurfaces surfaces ground attributes.height dt
+                       (physics ground attributes.height dt) motion
+            in
+                if dtRemaining > 0.000001 then
+                    reorient ground attributes.height newMotion
+                    |> go dtRemaining
+                else
+                    newMotion
+
     in
         motion
             -- |> turn attributes dimensions tireFloor inputs.x inputs.dt
             |> goForward ground attributes.speed inputs
             |> turn attributes.speed inputs.x inputs.dt
             |> reorient ground attributes.height
+            |> go inputs.dt
+{-
             |> constrainSurfaces surfaces ground attributes.height inputs.dt
                    (physics ground attributes.height inputs.dt)
+-}
             |> gravity ground inputs.dt
             |> keepWithinbounds ground attributes.radius
 
@@ -295,7 +311,7 @@ adjustVelocity maxSpeed friction dv dt v =
     v3_clamp maxSpeed <| add (V3.scale dt dv) (V3.scale (1.0 - (friction * dt)) v)
 
 
-constrainSurfaces : Maybe (List GroundSurface) -> Ground -> Float -> Float -> (Moving a -> Moving a) ->  Moving a -> Moving a
+constrainSurfaces : Maybe (List GroundSurface) -> Ground -> Float -> Float -> (Moving a -> (Moving a, Float)) ->  Moving a -> (Moving a, Float)
 constrainSurfaces mSurfaces ground height dt f motion =
     let
         pos =
@@ -312,12 +328,12 @@ constrainSurfaces mSurfaces ground height dt f motion =
                 if List.member targetSurface surfaces then
                     f motion
                 else
-                    motion
+                    (motion, 0)
 
             Nothing ->
                 f motion
 
-physics : Ground -> Float -> Float -> Moving a -> Moving a
+physics : Ground -> Float -> Float -> Moving a -> (Moving a, Float)
 physics ground height dt motion =
     let
         orientedVelocity =
@@ -326,19 +342,29 @@ physics ground height dt motion =
         currentUp =
             Orientation.rotateBodyV motion.orientation V3.j
 
+        forwardOrigin =
+            V3.add motion.position (V3.scale (height / 2) currentUp)
+
         forwardRay =
-            { origin = V3.add motion.position (V3.scale (height / 2) currentUp)
+            { origin = forwardOrigin
             , vector = orientedVelocity
             }
 
-        newMotion =
+        (newMotion, dtRemaining) =
             case ground.barrier forwardRay of
                 Just barrierPoint ->
                     let
                         newPosition =
                             V3.add barrierPoint.position (V3.scale 0.01 barrierPoint.normal)
+
+                        intersectRatio =
+                            (V3.length orientedVelocity) /
+                            (V3.distance forwardOrigin barrierPoint.position)
+
+                        dtRemaining =
+                            dt * (1.0 - intersectRatio)
                     in
-                        { motion | position = newPosition }
+                        ({ motion | position = newPosition }, dtRemaining)
 
                 Nothing ->
                     let
@@ -365,12 +391,12 @@ physics ground height dt motion =
                                         else
                                             stepPosition
                                 in
-                                    { motion | position = newPosition }
+                                    ({ motion | position = newPosition }, 0)
 
                             Nothing ->
-                                { motion | position = wantPosition }
+                                ({ motion | position = wantPosition }, 0)
     in
-        newMotion
+        (newMotion, dtRemaining)
 
 {-
 physicsOld : Ground -> Float -> Float -> Moving a -> Moving a
