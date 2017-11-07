@@ -73,12 +73,12 @@ move surfaces attributes dimensions ground inputs motion =
                 V3.getY tirePos - nearestFloor ground tirePos
     in
         motion
+            |> goForward ground attributes.speed inputs
             |> turn ground attributes.speed attributes.height inputs.x inputs.dt
             -- |> turn attributes dimensions tireFloor inputs.x inputs.dt
-            |> goForward ground attributes.speed inputs
-            |> gravity ground inputs.dt
             |> constrainSurfaces surfaces ground attributes.height inputs.dt
                    (physics ground attributes.height inputs.dt)
+            |> gravity ground inputs.dt
             |> keepWithinbounds ground attributes.radius
 
 
