@@ -73,9 +73,10 @@ move surfaces attributes dimensions ground inputs motion =
                 V3.getY tirePos - nearestFloor ground tirePos
     in
         motion
-            |> goForward ground attributes.speed inputs
-            |> turn ground attributes.speed attributes.height inputs.x inputs.dt
             -- |> turn attributes dimensions tireFloor inputs.x inputs.dt
+            |> goForward ground attributes.speed inputs
+            |> turn attributes.speed inputs.x inputs.dt
+            |> reorient ground attributes.height
             |> constrainSurfaces surfaces ground attributes.height inputs.dt
                    (physics ground attributes.height inputs.dt)
             |> gravity ground inputs.dt
@@ -105,12 +106,25 @@ flatten v =
         normalize (vec3 r.x 0 r.z)
 
 
-turn : Ground -> Float -> Float -> Float -> Float -> Moving a -> Moving a
-turn ground speed height dx dt motion =
+turn : Float -> Float -> Float -> Moving a -> Moving a
+turn speed dx dt motion =
     let
         steer =
             0.1 * speed * dx * dt
 
+        up =
+            Orientation.rotateBodyV motion.orientation V3.j
+
+        orientation =
+            motion.orientation
+                |> followedBy (fromAngleAxis steer up)
+    in
+        { motion | orientation = orientation }
+
+
+reorient : Ground -> Float -> Moving a -> Moving a
+reorient ground height motion =
+    let
         currentUp =
             Orientation.rotateBodyV motion.orientation V3.j
 
@@ -124,7 +138,7 @@ turn ground speed height dx dt motion =
                 |> Orientation.rollUpright
                 |> Orientation.pitchUpright
 
-        newOrientation =
+        orientation =
             case ground.barrier ray of
                 Just barrierPoint ->
                     let
@@ -136,13 +150,6 @@ turn ground speed height dx dt motion =
 
                 Nothing ->
                     upright
-
-        newUp =
-            Orientation.rotateBodyV newOrientation V3.j
-
-        orientation =
-            newOrientation
-                |> followedBy (fromAngleAxis steer newUp)
     in
         { motion | orientation = orientation }
 
