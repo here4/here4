@@ -74,11 +74,14 @@ move surfaces attributes dimensions ground inputs motion =
 
         go dt motion =
             let
-                (newMotion, dtRemaining) =
+                (partMotion, dtRemaining) =
                     constrainSurfaces surfaces ground attributes.height dt
                        (physics ground attributes.height dt) motion
+
+                newMotion =
+                    gravity ground (dt - dtRemaining) partMotion
             in
-                if dtRemaining > 0.000001 then
+                if dtRemaining > 0.005 then
                     reorient ground attributes.height newMotion
                     |> go dtRemaining
                 else
@@ -95,7 +98,6 @@ move surfaces attributes dimensions ground inputs motion =
             |> constrainSurfaces surfaces ground attributes.height inputs.dt
                    (physics ground attributes.height inputs.dt)
 -}
-            |> gravity ground inputs.dt
             |> keepWithinbounds ground attributes.radius
 
 
