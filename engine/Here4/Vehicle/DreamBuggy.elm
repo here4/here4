@@ -63,6 +63,7 @@ boat attributes dimensions ground inputs thing =
 move : Maybe (List GroundSurface) -> Driveable vehicle -> Vec3 -> Ground -> Model.Inputs -> Moving a -> Moving a
 move surfaces attributes dimensions ground inputs motion =
     let
+{-
         tireFloor pos =
             let
                 tirePos =
@@ -71,27 +72,38 @@ move surfaces attributes dimensions ground inputs motion =
                 -- V3.add (vec3 0 0.1 0) pos
             in
                 V3.getY tirePos - nearestFloor ground tirePos
+-}
 
         go dt motion =
             let
-                (partMotion, dtRemaining) =
-                    constrainSurfaces surfaces ground attributes.height dt
-                       (physics ground attributes.height dt) motion
-
+                -- (partMotion, dtRemaining, applyGravity) =
                 newMotion =
-                    gravity ground (dt - dtRemaining) partMotion
+                    -- constrainSurfaces surfaces ground attributes.height dt
+                       --(updatePosition ground attributes.height dt) motion
+                    updatePosition ground attributes.height dt motion
+                    |> gravity ground attributes.height dt
+
+{-
+                newMotion =
+                    if applyGravity then
+                        gravity ground (dt - dtRemaining) partMotion
+                    else
+                        partMotion
+-}
             in
-                if dtRemaining > 0.005 then
+{-
+                if dt < 0.01 && dtRemaining > 0.005 then
                     reorient ground attributes.height newMotion
                     |> go dtRemaining
                 else
+-}
                     newMotion
 
     in
         motion
             -- |> turn attributes dimensions tireFloor inputs.x inputs.dt
-            |> goForward ground attributes.speed inputs
-            |> turn attributes.speed inputs.x inputs.dt
+            |> updateVelocity ground attributes.speed attributes.height inputs
+            |> inputOrientation attributes.speed inputs.x inputs.dt
             |> reorient ground attributes.height
             |> go inputs.dt
 {-
@@ -124,8 +136,8 @@ flatten v =
         normalize (vec3 r.x 0 r.z)
 
 
-turn : Float -> Float -> Float -> Moving a -> Moving a
-turn speed dx dt motion =
+inputOrientation : Float -> Float -> Float -> Moving a -> Moving a
+inputOrientation speed dx dt motion =
     let
         steer =
             0.1 * speed * dx * dt
@@ -147,8 +159,10 @@ reorient ground height motion =
             Orientation.rotateBodyV motion.orientation V3.j
 
         ray =
-            { origin = V3.add motion.position (V3.scale (height / 2) currentUp)
-            , vector = V3.scale -height currentUp
+            -- { origin = V3.add motion.position (V3.scale (height / 2) currentUp)
+            { origin = motion.position
+            -- , vector = V3.scale -(height*2) currentUp
+            , vector = vec3 0 -height 0 -- actually want inertial down
             }
 
         upright =
@@ -163,11 +177,11 @@ reorient ground height motion =
                         o =
                             Orientation.fromTo currentUp barrierPoint.normal
                     in
-                        motion.orientation
-                            |> Orientation.followedBy o
+                        Orientation.followedBy o motion.orientation
 
                 Nothing ->
-                    upright
+                    -- upright
+                    motion.orientation
     in
         { motion | orientation = orientation }
 
@@ -260,13 +274,15 @@ turn attributes dimensions tireFloor dx dt motion =
         { motion | orientation = orientation }
 -}
 
-goForward : Ground -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
-goForward ground speed inputs motion =
+updateVelocity : Ground -> Float -> Float -> { i | rightTrigger : Float, leftTrigger : Float, mx : Float, y : Float, dt : Float } -> Moving a -> Moving a
+updateVelocity ground speed height inputs motion =
     let
         accel =
-            if getY motion.position > (ground.elevation motion.position) + 0.5 then
+{-
+            if nearestFloor ground motion.position > height + 0.5 then
                 -0.1
             else
+-}
                 clamp -1.0 1.0 <|
                     inputs.y
                         + inputs.rightTrigger
@@ -313,7 +329,8 @@ adjustVelocity maxSpeed friction dv dt v =
     v3_clamp maxSpeed <| add (V3.scale dt dv) (V3.scale (1.0 - (friction * dt)) v)
 
 
-constrainSurfaces : Maybe (List GroundSurface) -> Ground -> Float -> Float -> (Moving a -> (Moving a, Float)) ->  Moving a -> (Moving a, Float)
+-- constrainSurfaces : Maybe (List GroundSurface) -> Ground -> Float -> Float -> (Moving a -> (Moving a, Float, Bool)) ->  Moving a -> (Moving a, Float, Bool)
+constrainSurfaces : Maybe (List GroundSurface) -> Ground -> Float -> Float -> (Moving a -> Moving a) ->  Moving a -> Moving a
 constrainSurfaces mSurfaces ground height dt f motion =
     let
         pos =
@@ -330,75 +347,101 @@ constrainSurfaces mSurfaces ground height dt f motion =
                 if List.member targetSurface surfaces then
                     f motion
                 else
-                    (motion, 0)
+                    motion
 
             Nothing ->
                 f motion
 
-physics : Ground -> Float -> Float -> Moving a -> (Moving a, Float)
-physics ground height dt motion =
+-- updatePosition : Ground -> Float -> Float -> Moving a -> (Moving a, Float, Bool)
+updatePosition : Ground -> Float -> Float -> Moving a -> Moving a
+updatePosition ground height dt motion =
     let
         orientedVelocity =
             Orientation.rotateBodyV motion.orientation (V3.scale dt motion.velocity)
 
+{-
         currentUp =
             Orientation.rotateBodyV motion.orientation V3.j
+-}
 
         forwardOrigin =
-            V3.add motion.position (V3.scale (height / 2) currentUp)
+            -- V3.add motion.position (V3.scale (height / 2) currentUp)
+            motion.position
 
         forwardRay =
             { origin = forwardOrigin
             , vector = orientedVelocity
             }
 
-        (newMotion, dtRemaining) =
-            case ground.barrier forwardRay of
-                Just barrierPoint ->
-                    let
-                        newPosition =
-                            V3.add barrierPoint.position (V3.scale 0.01 barrierPoint.normal)
-
-                        intersectRatio =
-                            (V3.length orientedVelocity) /
-                            (V3.distance forwardOrigin barrierPoint.position)
-
-                        dtRemaining =
-                            dt * (1.0 - intersectRatio)
-                    in
-                        ({ motion | position = newPosition }, dtRemaining)
-
-                Nothing ->
-                    let
-                        wantPosition =
-                            V3.add motion.position orientedVelocity
-
-                        newDown =
-                            Orientation.rotateBodyV motion.orientation (vec3 0 -height 0)
-
-                        downRay =
-                            { origin = V3.sub wantPosition (V3.scale 0.5 newDown)
-                            , vector = newDown
-                            }
-                    in
-                        case ground.barrier downRay of
-                            Just b ->
-                                let
-                                    stepPosition =
-                                        V3.add b.position (V3.scale 0.01 b.normal)
-
-                                    newPosition =
-                                        if V3.dot (V3.sub stepPosition wantPosition) orientedVelocity < 0 then
-                                            wantPosition
-                                        else
-                                            stepPosition
-                                in
-                                    ({ motion | position = newPosition }, 0)
-
-                            Nothing ->
-                                ({ motion | position = wantPosition }, 0)
     in
-        (newMotion, dtRemaining)
+        case ground.barrier forwardRay of
+            Just barrierPoint ->
+                let
+                    currentUp =
+                        Orientation.rotateBodyV motion.orientation V3.j
+
+                    newPosition =
+                        if V3.dot barrierPoint.normal currentUp > 0.01 then
+                            let
+                                o =
+                                    Orientation.fromTo currentUp barrierPoint.normal
+
+                                newOrientation =
+                                    Orientation.followedBy motion.orientation o
+
+                                newOrientedVelocity =
+                                    Orientation.rotateBodyV newOrientation (V3.scale dt motion.velocity)
+                            in
+                                V3.add motion.position newOrientedVelocity
+                                    
+                        else
+                        -- V3.add barrierPoint.position (V3.scale 0.01 barrierPoint.normal)
+                            V3.sub barrierPoint.position (V3.scale height (V3.normalize orientedVelocity))
+{-
+                    intersectRatio =
+                        (V3.length orientedVelocity) /
+                        (V3.distance forwardOrigin barrierPoint.position)
+
+                    dtRemaining =
+                        dt * (1.0 - intersectRatio)
+-}
+                in
+                    -- ({ motion | position = newPosition }, dtRemaining, False)
+                    { motion | position = newPosition }
+
+            Nothing ->
+                let
+                    wantPosition =
+                        V3.add motion.position orientedVelocity
+{-
+                    newDown =
+                        Orientation.rotateBodyV motion.orientation (vec3 0 -height 0)
+
+                    downRay =
+                        { origin = V3.sub wantPosition (V3.scale 0.5 newDown)
+                        , vector = newDown
+                        }
+-}
+                in
+                    { motion | position = wantPosition }
+{-
+                    case ground.barrier downRay of
+                        Just b ->
+                            let
+                                stepPosition =
+                                    V3.add b.position (V3.scale 0.01 b.normal)
+
+                                newPosition =
+                                    if V3.dot (V3.sub stepPosition wantPosition) orientedVelocity < 0 then
+                                        wantPosition
+                                    else
+                                        stepPosition
+                            in
+                                ({ motion | position = newPosition }, 0, False)
+
+                        Nothing ->
+                            ({ motion | position = wantPosition }, 0, True)
+-}
 
 {-
 physicsOld : Ground -> Float -> Float -> Moving a -> Moving a
@@ -452,6 +495,24 @@ keepWithinbounds ground radius motion =
     { motion | position = ground.bounds radius motion.position }
 
 
+gravity : Ground -> Float -> Float -> Moving a -> Moving a
+gravity ground height dt motion =
+    let
+        p =
+            V3.toRecord motion.position
+
+        altitude =
+            nearestFloor ground motion.position
+
+        fall =
+            min (9.8 * dt) (altitude - height)
+    in
+        if (altitude <= height + 0.01) then
+            motion
+        else
+            { motion | position = vec3 p.x (p.y - fall) p.z }
+
+{-
 gravity : Ground -> Float -> Moving a -> Moving a
 gravity ground dt motion =
     if nearestFloor ground motion.position <= 0.0 then
@@ -462,6 +523,7 @@ gravity ground dt motion =
                 V3.toRecord motion.velocity
         in
             { motion | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }
+-}
 
 
 overlay : Html msg
