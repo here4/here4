@@ -30,7 +30,7 @@ move attributes ground height inputs motion =
     motion
         |> turn ground attributes.speed height inputs.x inputs.dt
         |> goForward ground attributes.speed inputs
-        |> gravity ground height inputs.dt
+        |> gravity ground inputs.dt
         |> physics ground height inputs.dt
         |> keepWithinbounds ground attributes.radius
 
@@ -199,8 +199,8 @@ keepWithinbounds ground radius motion =
     { motion | position = ground.bounds radius motion.position }
 
 
-gravity : Ground -> Float -> Float -> Moving a -> Moving a
-gravity ground height dt motion =
+gravity : Ground -> Float -> Moving a -> Moving a
+gravity ground dt motion =
     let
         p =
             V3.toRecord motion.position
