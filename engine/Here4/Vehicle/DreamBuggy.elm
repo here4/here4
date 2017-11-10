@@ -78,9 +78,9 @@ move surfaces attributes dimensions ground inputs motion =
             let
                 -- (partMotion, dtRemaining, applyGravity) =
                 newMotion =
-                    -- constrainSurfaces surfaces ground attributes.height dt
-                       --(updatePosition ground attributes.height dt) motion
-                    updatePosition ground attributes.height dt motion
+                    constrainSurfaces surfaces ground attributes.height dt
+                       (updatePosition ground attributes.height dt) motion
+                    -- updatePosition ground attributes.height dt motion
                     |> gravity ground attributes.height dt
 
 {-
@@ -278,11 +278,9 @@ updateVelocity : Ground -> Float -> Float -> { i | rightTrigger : Float, leftTri
 updateVelocity ground speed height inputs motion =
     let
         accel =
-{-
             if nearestFloor ground motion.position > height + 0.5 then
-                -0.1
+                0
             else
--}
                 clamp -1.0 1.0 <|
                     inputs.y
                         + inputs.rightTrigger
@@ -494,7 +492,7 @@ v3_clamp len v =
 keepWithinbounds ground radius motion =
     { motion | position = ground.bounds radius motion.position }
 
-
+{-
 gravity : Ground -> Float -> Float -> Moving a -> Moving a
 gravity ground height dt motion =
     let
@@ -511,11 +509,11 @@ gravity ground height dt motion =
             motion
         else
             { motion | position = vec3 p.x (p.y - fall) p.z }
+-}
 
-{-
-gravity : Ground -> Float -> Moving a -> Moving a
-gravity ground dt motion =
-    if nearestFloor ground motion.position <= 0.0 then
+gravity : Ground -> Float -> Float -> Moving a -> Moving a
+gravity ground height dt motion =
+    if nearestFloor ground motion.position <= height then
         motion
     else
         let
@@ -523,7 +521,6 @@ gravity ground dt motion =
                 V3.toRecord motion.velocity
         in
             { motion | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }
--}
 
 
 overlay : Html msg

@@ -1,6 +1,7 @@
 module Body.Terrain
     exposing
         ( generate
+        , generateWithPlacement
         , step
         , paint
         , ripplePaint

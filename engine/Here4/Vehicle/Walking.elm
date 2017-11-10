@@ -30,7 +30,7 @@ move attributes ground height inputs motion =
     motion
         |> turn ground attributes.speed height inputs.x inputs.dt
         |> goForward ground attributes.speed inputs
-        |> gravity ground inputs.dt
+        |> gravity ground height inputs.dt
         |> physics ground height inputs.dt
         |> keepWithinbounds ground attributes.radius
 
@@ -198,7 +198,7 @@ v3_clamp len v =
 keepWithinbounds ground radius motion =
     { motion | position = ground.bounds radius motion.position }
 
-
+{-
 gravity : Ground -> Float -> Moving a -> Moving a
 gravity ground dt motion =
     let
@@ -215,7 +215,18 @@ gravity ground dt motion =
             motion
         else
             { motion | position = vec3 p.x (p.y - fall) p.z }
+-}
 
+gravity : Ground -> Float -> Float -> Moving a -> Moving a
+gravity ground height dt motion =
+    if nearestFloor ground motion.position <= height then
+        motion
+    else
+        let
+            v =
+                V3.toRecord motion.velocity
+        in
+            { motion | velocity = vec3 v.x (v.y - 9.8 * dt) v.z }
 
 overlay : Html msg
 overlay =
