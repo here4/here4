@@ -38,7 +38,7 @@ import Html exposing (Html)
 
 
 type alias VehicleAttributes vehicle =
-    { drive : Driveable vehicle -> Vec3 -> Ground -> Inputs -> Moving {} -> Moving {}
+    { drive : Driveable vehicle -> Vec3 -> Ground -> Inputs -> Turning {} -> Turning {}
     , vehicle : Driveable vehicle
     }
 

@@ -27,10 +27,10 @@ import Math.Vector3 as V3 exposing (Vec3, vec3)
 
 
 type alias Model vehicle =
-    { motion : Moving {}
+    { motion : Turning {}
     , rotation : Maybe Orientation
     , action : Action vehicle
-    , body : Maybe (Moving Body)
+    , body : Maybe (Turning Body)
     , object : Load ObjectResult
     , dimensions : Vec3
     }
@@ -112,7 +112,7 @@ applyMotion model =
         { model | body = Maybe.map (apply model.motion) model.body }
 
 
-setMotion : Moving {} -> Model vehicle -> Model vehicle
+setMotion : Turning {} -> Model vehicle -> Model vehicle
 setMotion motion model =
     applyMotion { model | motion = motion }
 
@@ -137,6 +137,8 @@ loadBody scale ( newObject, newMsg ) model =
                         , orientation = Orientation.initial
                         , appear = appear
                         , velocity = vec3 0 0 0
+                        , angularVelocity = Orientation.initial
+                        , gravityVelocity = 0
                         }
                     , dimensions
                     )
@@ -163,6 +165,8 @@ init attributes =
                 { position = attributes.position
                 , orientation = Orientation.initial
                 , velocity = vec3 0 0 0
+                , angularVelocity = Orientation.initial
+                , gravityVelocity = 0
                 }
             , rotation = attributes.rotation
             , action = attributes.action

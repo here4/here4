@@ -144,6 +144,10 @@ toMat4 =
         Qn.toMat4
 
 
+slerp : Float -> Orientation -> Orientation -> Orientation
+slerp t o1 o2 =
+    Qn.slerp t o1 o2
+
 
 -- | Roll to upright
 

@@ -33,8 +33,10 @@ projectPlaneNormal n u =
 
 
 intersectPlane : Vec3 -> Vec3 -> Vec3 -> Vec3 -> Maybe Vec3
-intersectPlane v n p0 p =
+intersectPlane v n0 p0 p =
     let
+        n = V3.negate n0
+
         d =
             V3.dot n p
 
@@ -47,7 +49,7 @@ intersectPlane v n p0 p =
                     V3.sub p0 v
 
                 fac =
-                    -(V3.dot n w / d)
+                    V3.dot n w / d
 
                 u =
                     V3.scale fac p

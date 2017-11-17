@@ -42,6 +42,12 @@ type alias Moving a =
     Oriented { a | velocity : Vec3 }
 
 
+type alias Turning a =
+    Moving { a | angularVelocity : Orientation
+               , gravityVelocity : Float
+           }
+
+
 type alias Massive a =
     { a | mass : Float }
 
